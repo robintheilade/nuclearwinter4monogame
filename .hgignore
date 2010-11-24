@@ -1,6 +1,4 @@
-glob:NuclearWinter/bin/*
-glob:NuclearWinter/obj/*
+glob:*/bin/*
+glob:*/obj/*
 glob:*.user
 glob:*.suo
-glob:Triangulator/bin/*
-glob:Triangulator/obj/*
