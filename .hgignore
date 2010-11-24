@@ -1,0 +1,4 @@
+glob:NuclearWinter/bin/*
+glob:NuclearWinter/obj/*
+glob:*.user
+glob:*.suo

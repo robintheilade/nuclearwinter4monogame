@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+using Microsoft.Xna.Framework;
+
+namespace NuclearWinter.Animation
+{
+    public enum AnimationDirection
+    {
+        Forward,
+        Backward,
+        Stopped
+    }
+
+    public enum AnimationLoop
+    {
+        NoLoop,
+        Loop,
+        LoopSwing
+    }
+
+    public abstract class AnimatedValue
+    {
+        //----------------------------------------------------------------------
+        public void Update( float _fElapsedTime )
+        {
+            if( Direction == AnimationDirection.Stopped )
+            {
+                return;
+            }
+
+            Time += ( (Direction == AnimationDirection.Forward) ? _fElapsedTime : -_fElapsedTime );
+
+            if( Time >= Delay + Duration )
+            {
+                switch( Loop )
+                {
+                    case AnimationLoop.NoLoop:
+                        Time = Delay + Duration;
+                        break;
+                    case AnimationLoop.Loop:
+                        Time -= Delay + Duration;
+                        break;
+                    case AnimationLoop.LoopSwing:
+                        Time = (Delay + Duration) - ( Time - (Delay + Duration) );
+
+                        Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
+                        break;
+                }
+            }
+            else
+            if( Time < 0 )
+            {
+                switch( Loop )
+                {
+                    case AnimationLoop.NoLoop:
+                        Time = 0;
+                        break;
+                    case AnimationLoop.Loop:
+                        Time += Delay + Duration;
+                        break;
+                    case AnimationLoop.LoopSwing:
+                        Time = -Time;
+                        Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
+                        break;
+                }
+            }
+        }
+        
+        //----------------------------------------------------------------------
+        public abstract float CurrentValue { get; }
+
+        //----------------------------------------------------------------------
+        public AnimationDirection   Direction;
+        public float                Duration;
+        public float                Delay;
+        public float                Time;
+        public AnimationLoop        Loop;
+    }
+}
