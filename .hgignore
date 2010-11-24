@@ -2,3 +2,5 @@ glob:NuclearWinter/bin/*
 glob:NuclearWinter/obj/*
 glob:*.user
 glob:*.suo
+glob:Triangulator/bin/*
+glob:Triangulator/obj/*
