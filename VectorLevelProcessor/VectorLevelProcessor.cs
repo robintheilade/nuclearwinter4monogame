@@ -346,8 +346,8 @@ namespace VectorLevelProcessor
             // Read style
             string strStyleAttr = mXmlReader.GetAttribute( "style" );
 
-            float fFillOpacity = 1.0f;
-            float fStrokeOpacity = 1.0f;
+            float fFillOpacity = 1f;
+            float fStrokeOpacity = 1f;
             bool bHasStroke = false;
 
             if( strStyleAttr != null )
@@ -413,7 +413,7 @@ namespace VectorLevelProcessor
             path.FillColor *= fFillOpacity;
             if( ! bHasStroke )
             {
-                path.StrokeWidth = 0.0f;
+                path.StrokeWidth = 0f;
             }
             path.StrokeColor *= fStrokeOpacity;
 
@@ -683,12 +683,13 @@ namespace VectorLevelProcessor
         /// </summary>
         private Color ReadHexColor( string _value )
         {
+            // NOTE: Had to invert red & blue, why?
             byte R, G, B;
-            R = byte.Parse( _value.Substring( 1, 2 ), NumberStyles.HexNumber, CultureInfo.InvariantCulture );
+            R = byte.Parse( _value.Substring( 5, 2 ), NumberStyles.HexNumber, CultureInfo.InvariantCulture );
             G = byte.Parse( _value.Substring( 3, 2 ), NumberStyles.HexNumber, CultureInfo.InvariantCulture );
-            B = byte.Parse( _value.Substring( 5, 2 ), NumberStyles.HexNumber, CultureInfo.InvariantCulture );
+            B = byte.Parse( _value.Substring( 1, 2 ), NumberStyles.HexNumber, CultureInfo.InvariantCulture );
             
-            return new Color( R, G, B, 255 );
+            return new Color( R, G, B );
         }
 
         //----------------------------------------------------------------------
