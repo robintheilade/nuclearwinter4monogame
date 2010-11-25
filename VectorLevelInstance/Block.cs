@@ -544,7 +544,6 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         // Rendering
         GraphicsDevice                  mGraphicsDevice;
-		VertexDeclaration               mVertexDeclaration;
 
         VertexBuffer                    mFillVertexBuffer;
 		IndexBuffer                     mFillIndexBuffer;

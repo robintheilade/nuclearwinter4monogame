@@ -515,6 +515,13 @@ namespace Box2D.XNA
             return _I + _mass * Vector2.Dot(_sweep.localCenter, _sweep.localCenter);
         }
 
+        /// Get the inverse of central rotational inertia of the body.
+	    /// @return the inverse of the rotational inertia
+	    public float GetInverseInertia()
+        {
+            return _invI;
+        }
+
         /// Get the mass data of the body.
 	    /// @return a struct containing the mass, inertia and center of the body.
 	    public void GetMassData(out MassData massData)

@@ -103,7 +103,7 @@ namespace VectorLevel
         {
             mSavedViewport = GraphicsDevice.Viewport;
             GraphicsDevice.SetRenderTarget( mLightMap );
-            GraphicsDevice.Viewport = mSavedViewport;
+            //GraphicsDevice.Viewport = mSavedViewport;
 
             GraphicsDevice.Clear( AmbientLightColor );
         }
@@ -121,27 +121,25 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        public void ApplyLightMap()
-        {
-            throw new NotImplementedException();
-            /*
-            //mSpriteBatch.Begin( SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.SaveState );
-            GraphicsDevice.RenderState.SourceBlend = Blend.Zero;
-            GraphicsDevice.RenderState.DestinationBlend = Blend.SourceColor;
-            GraphicsDevice.RenderState.BlendFunction = BlendFunction.Add;
-            //mSpriteBatch.Draw( mLightMap.GetTexture(), Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 8f, SpriteEffects.None, 0f );
-            //mSpriteBatch.End();
-            */
-        }
-
-        //----------------------------------------------------------------------
         public void ClearAlphaToOne()
         {
-            GraphicsDevice.BlendState.ColorWriteChannels = ColorWriteChannels.Alpha;
-            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            mSpriteBatch.Draw( mFullAlphaTex, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
+            mSpriteBatch.Begin( SpriteSortMode.Immediate, BlendState.Opaque );
+
+            BlendState blendState = new BlendState();
+            blendState.AlphaDestinationBlend    = Blend.One;
+            blendState.AlphaSourceBlend         = Blend.One;
+            blendState.AlphaBlendFunction       = BlendFunction.Max;
+            blendState.ColorWriteChannels       = ColorWriteChannels.Alpha;
+            blendState.ColorWriteChannels1       = ColorWriteChannels.Alpha;
+            blendState.ColorWriteChannels2       = ColorWriteChannels.Alpha;
+            blendState.ColorWriteChannels3       = ColorWriteChannels.Alpha;
+
+            GraphicsDevice.BlendState           = blendState;
+
+            mSpriteBatch.Draw( mFullAlphaTex, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White );
             mSpriteBatch.End();
-            GraphicsDevice.BlendState.ColorWriteChannels = ColorWriteChannels.All;
+
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
         }
         
         //----------------------------------------------------------------------
