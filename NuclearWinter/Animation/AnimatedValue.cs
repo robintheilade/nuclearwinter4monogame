@@ -17,7 +17,7 @@ namespace NuclearWinter.Animation
     {
         NoLoop,
         Loop,
-        LoopSwing
+        LoopBackAndForth
     }
 
     public abstract class AnimatedValue
@@ -42,7 +42,7 @@ namespace NuclearWinter.Animation
                     case AnimationLoop.Loop:
                         Time -= Delay + Duration;
                         break;
-                    case AnimationLoop.LoopSwing:
+                    case AnimationLoop.LoopBackAndForth:
                         Time = (Delay + Duration) - ( Time - (Delay + Duration) );
 
                         Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
@@ -60,7 +60,7 @@ namespace NuclearWinter.Animation
                     case AnimationLoop.Loop:
                         Time += Delay + Duration;
                         break;
-                    case AnimationLoop.LoopSwing:
+                    case AnimationLoop.LoopBackAndForth:
                         Time = -Time;
                         Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
                         break;
