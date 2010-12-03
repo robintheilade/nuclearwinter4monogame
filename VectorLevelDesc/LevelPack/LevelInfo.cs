@@ -5,6 +5,7 @@ using System.Text;
 
 namespace VectorLevel.LevelPack
 {
+
     public class LevelInfo
     {
         //----------------------------------------------------------------------
@@ -14,16 +15,23 @@ namespace VectorLevel.LevelPack
         }
 
         //----------------------------------------------------------------------
-        public LevelInfo( string _strFilepath, string _strTitle, string _strDescription )
+        public LevelInfo( string _strFilepath, string _strTitle, Difficulty _difficulty )
         {
-            Filepath    = _strFilepath;
-            Title       = _strTitle;
-            Description = _strDescription;
+            Filepath            = _strFilepath;
+            Title               = _strTitle;
+            LevelDifficulty     = _difficulty;
         }
 
         //----------------------------------------------------------------------
-        public string   Filepath;
-        public string   Title;
-        public string   Description;
+        public string       Filepath            = "";
+        public string       Title               = "";
+        public Difficulty   LevelDifficulty     = Difficulty.Easy;
+
+        public enum Difficulty
+        {
+            Easy,
+            Medium,
+            Hard
+        }
     }
 }

@@ -95,7 +95,6 @@
     <Compile Include="Entities\Marker.cs" />
     <Compile Include="Entities\Path.cs" />
     <Compile Include="LevelDesc.cs" />
-    <Compile Include="LevelPack\LevelGroup.cs" />
     <Compile Include="LevelPack\LevelInfo.cs" />
     <Compile Include="LevelPack\LevelPack.cs" />
     <Compile Include="LevelPack\LevelPackReader.cs" />

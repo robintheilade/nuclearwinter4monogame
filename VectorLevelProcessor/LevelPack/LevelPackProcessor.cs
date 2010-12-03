@@ -13,6 +13,8 @@ using System.Globalization;
 using TInput = VectorLevelProcessor.XMLFile;
 using TOutput = VectorLevel.LevelPack.LevelPack;
 
+using VectorLevel.LevelPack;
+
 namespace VectorLevelProcessor.LevelPack
 {
     /// <summary>
@@ -35,40 +37,34 @@ namespace VectorLevelProcessor.LevelPack
         /// <returns></returns>
         public override TOutput Process( TInput _input, ContentProcessorContext _context )
         {
-            
             VectorLevel.LevelPack.LevelPack levelPack = new VectorLevel.LevelPack.LevelPack();
 
             System.Xml.XmlReader reader = _input.XmlReader;
 
             reader.Read();
-            reader.ReadStartElement( "LevelPack" );
 
             _context.Logger.LogImportantMessage( "Output directory is: " + _context.OutputDirectory );
             _context.Logger.LogImportantMessage( "Intermediate directory is: " + _context.IntermediateDirectory );
 
             while( reader.Read() )
             {
-                if( reader.IsStartElement( "Group" ) && reader.IsEmptyElement )
+                if( reader.IsStartElement( "LevelPack" )) 
                 {
-                    string strGroupPath    = reader.GetAttribute( "Path" );
-                    string strGroupTitle   = reader.GetAttribute( "Title" );
+                    levelPack.Title = reader.GetAttribute( "Title" );
+                }
 
-                    string strFullGroupPath = System.IO.Path.Combine( System.IO.Path.GetDirectoryName( _input.Filepath ), strGroupPath );
+                if( reader.IsStartElement( "Level" ) && reader.IsEmptyElement )
+                {
+                    string strLevelFilepath         = reader.GetAttribute( "Path" );
+                    string strLevelTitle            = reader.GetAttribute( "Title" );
+                    LevelInfo.Difficulty difficulty =  (LevelInfo.Difficulty)Enum.Parse( typeof(LevelInfo.Difficulty), reader.GetAttribute( "Difficulty" ), true );
 
-                    VectorLevel.LevelPack.LevelGroup levelGroup = new VectorLevel.LevelPack.LevelGroup( strGroupTitle );
-                    
-                    foreach( string strLevelFilepath in System.IO.Directory.GetFiles( strFullGroupPath, "*", System.IO.SearchOption.AllDirectories ) )
-                    {
-                        // Using BuildAndLoadAsset() instead of Convert() would allow to reuse XML intermediate files instead of rebuilding all levels each time
-                        // BUT it implies that everything can be XML-deserializable (which is not currently the case)
-                        _context.AddDependency( strLevelFilepath );
-                        System.Xml.XmlReader levelReader = System.Xml.XmlReader.Create( strLevelFilepath );
-                        VectorLevel.LevelDesc level = _context.Convert<XMLFile, VectorLevel.LevelDesc>( new XMLFile( System.IO.Path.GetFullPath( strLevelFilepath ), levelReader ), "VectorLevelProcessor" );
-
-                        levelGroup.Levels.Add( new VectorLevel.LevelPack.LevelInfo( System.IO.Path.Combine( strGroupPath, System.IO.Path.GetFileNameWithoutExtension( strLevelFilepath ) ), level.Title, level.Description ) );
-                    }
-
-                    levelPack.LevelGroups.Add( levelGroup );
+                    levelPack.Levels.Add(
+                        new VectorLevel.LevelPack.LevelInfo(
+                            strLevelFilepath,
+                            strLevelTitle,
+                            difficulty )
+                        );
                 }
                 else
                 if( reader.NodeType == XmlNodeType.EndElement )

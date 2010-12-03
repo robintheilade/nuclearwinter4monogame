@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
+using VectorLevel.LevelPack;
+
 // TODO: replace this with the type you want to write out.
 using TRead = VectorLevel.LevelPack.LevelPack;
 
@@ -22,26 +24,16 @@ namespace VectorLevel.LevelPack
         {
             LevelPack levelPack = new LevelPack();
 
-            Int16 iGroupCount = _input.ReadInt16();
+            levelPack.Title = _input.ReadString();
+            Int16 iLevelCount = _input.ReadInt16();
 
-            for( int i = 0; i < iGroupCount; i++ )
+            for( int iLevelIndex = 0; iLevelIndex < iLevelCount; iLevelIndex++ )
             {
-                string levelGroupTitle = _input.ReadString();
+                string                  strLevelFilepath    = _input.ReadString();
+                string                  strLevelTitle       = _input.ReadString();
+                LevelInfo.Difficulty    levelDifficulty     = (LevelInfo.Difficulty)_input.ReadByte();
 
-                LevelGroup levelGroup = new LevelGroup( levelGroupTitle );
-
-                Int16 iLevelCount = _input.ReadInt16();
-
-                for( int levelIndex = 0; levelIndex < iLevelCount; levelIndex++ )
-                {
-                    string levelFilepath = _input.ReadString();
-                    string levelTitle = _input.ReadString();
-                    string levelDescription = _input.ReadString();
-
-                    levelGroup.Levels.Add( new LevelInfo( levelFilepath, levelTitle, levelDescription ) );
-                }
-
-                levelPack.LevelGroups.Add( levelGroup );
+                levelPack.Levels.Add( new LevelInfo( strLevelFilepath, strLevelTitle, levelDifficulty ) );
             }
             
             return levelPack;

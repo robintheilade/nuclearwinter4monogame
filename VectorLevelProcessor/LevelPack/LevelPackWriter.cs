@@ -23,19 +23,14 @@ namespace VectorLevelProcessor.LevelPack
     {
         protected override void Write( ContentWriter _output, TWrite _levelPack )
         {
-            _output.Write( (Int16)_levelPack.LevelGroups.Count );
-            
-            foreach( VectorLevel.LevelPack.LevelGroup levelGroup in _levelPack.LevelGroups )
-            {
-                _output.Write( levelGroup.Title );
-                _output.Write( (Int16)levelGroup.Levels.Count );
+            _output.Write( _levelPack.Title );
+            _output.Write( (Int16)_levelPack.Levels.Count );
 
-                foreach( VectorLevel.LevelPack.LevelInfo levelInfo in levelGroup.Levels )
-                {
-                    _output.Write( levelInfo.Filepath );
-                    _output.Write( levelInfo.Title );
-                    _output.Write( levelInfo.Description );
-                }
+            foreach( VectorLevel.LevelPack.LevelInfo levelInfo in _levelPack.Levels )
+            {
+                _output.Write( levelInfo.Filepath );
+                _output.Write( levelInfo.Title );
+                _output.Write( (byte)levelInfo.LevelDifficulty );
             }
         }
 

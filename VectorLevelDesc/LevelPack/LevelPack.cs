@@ -7,6 +7,7 @@ namespace VectorLevel.LevelPack
 {
     public class LevelPack
     {
-        public List<LevelGroup>     LevelGroups = new List<LevelGroup>();
+        public string               Title   = "Unnamed level pack";
+        public List<LevelInfo>      Levels  = new List<LevelInfo>();
     }
 }

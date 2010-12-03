@@ -424,7 +424,7 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        void DrawShadow( Light _light, int _startingIndex, int _iBufferIndex, int _iShadowVertexCount )
+        void DrawShadowStrip( Light _light, int _startingIndex, int _iBufferIndex, int _iShadowVertexCount )
         {
             // Create a triangle strip that has the shape of the shadow
             int currentIndex = _startingIndex;
@@ -524,7 +524,7 @@ namespace VectorLevel
                             iShadowVertexCount = Path.Subpaths[0].Vertices.Count + 1 - startingVertexIndex + nextEdge;
                         }
 
-                        DrawShadow( _light, startingVertexIndex, iVertexIndex, iShadowVertexCount * 2 );
+                        DrawShadowStrip( _light, startingVertexIndex, iVertexIndex, iShadowVertexCount * 2 );
                         mGraphicsDevice.DrawUserPrimitives<VertexPositionColor>( PrimitiveType.TriangleStrip, ShadowVertices, iVertexIndex, ( iShadowVertexCount - 1 ) * 2 );
                         iVertexIndex += iShadowVertexCount * 2;
                         break;
