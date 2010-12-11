@@ -38,7 +38,7 @@ namespace VectorLevel
             //------------------------------------------------------------------
             // Setup lightmap
             PresentationParameters pp = _graphicsDevice.PresentationParameters;
-            mLightMap = new RenderTarget2D( _graphicsDevice, pp.BackBufferWidth / 8, pp.BackBufferHeight / 8, false, SurfaceFormat.Color, DepthFormat.None );
+            mLightMap = new RenderTarget2D( _graphicsDevice, pp.BackBufferWidth / 4, pp.BackBufferHeight / 4, false, SurfaceFormat.Color, DepthFormat.None );
 
             mSpriteBatch = _spriteBatch;
             mContent = new ContentManager( _serviceProvider, "Content" );
