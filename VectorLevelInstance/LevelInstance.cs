@@ -16,11 +16,13 @@ namespace VectorLevel
     public class LevelInstance
     {
         //----------------------------------------------------------------------
-        public LevelInstance( uint _mapWidth, uint _mapHeight )
+        public LevelInstance( uint _mapWidth, uint _mapHeight, int _iLightMapSizeFactor )
         {
             MapWidth            = _mapWidth;
             MapHeight           = _mapHeight;
             AmbientLightColor   = new Color( 192, 192, 192 );
+
+            LightMapSizeFactor  = _iLightMapSizeFactor;
         }
         
         //----------------------------------------------------------------------
@@ -38,7 +40,7 @@ namespace VectorLevel
             //------------------------------------------------------------------
             // Setup lightmap
             PresentationParameters pp = _graphicsDevice.PresentationParameters;
-            mLightMap = new RenderTarget2D( _graphicsDevice, pp.BackBufferWidth / 4, pp.BackBufferHeight / 4, false, SurfaceFormat.Color, DepthFormat.None );
+            LightMap = new RenderTarget2D( _graphicsDevice, pp.BackBufferWidth / LightMapSizeFactor, pp.BackBufferHeight / LightMapSizeFactor, false, SurfaceFormat.Color, DepthFormat.None );
 
             mSpriteBatch = _spriteBatch;
             mContent = new ContentManager( _serviceProvider, "Content" );
@@ -102,7 +104,7 @@ namespace VectorLevel
         public void PrepareLightMap()
         {
             mSavedViewport = GraphicsDevice.Viewport;
-            GraphicsDevice.SetRenderTarget( mLightMap );
+            GraphicsDevice.SetRenderTarget( LightMap );
             //GraphicsDevice.Viewport = mSavedViewport;
 
             GraphicsDevice.Clear( AmbientLightColor );
@@ -145,6 +147,8 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         public uint                 MapWidth;
         public uint                 MapHeight;
+        public int                  LightMapSizeFactor  { get; private set; }
+        public RenderTarget2D       LightMap            { get; private set; }
 
         //----------------------------------------------------------------------
         // Rendering
@@ -160,7 +164,6 @@ namespace VectorLevel
         SpriteBatch                 mSpriteBatch;
 
         Viewport                    mSavedViewport;
-        public RenderTarget2D       mLightMap;
         Texture2D                   mFullAlphaTex;
         public Color                AmbientLightColor;
 
