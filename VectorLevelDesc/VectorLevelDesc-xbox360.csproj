@@ -104,7 +104,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Triangulator\Triangulator-xbox360.csproj">
       <Project>{6302E217-6EBC-4600-B8E1-E9FFD518D5F4}</Project>
-      <Name>Triangulator</Name>
+      <Name>Triangulator-xbox360</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

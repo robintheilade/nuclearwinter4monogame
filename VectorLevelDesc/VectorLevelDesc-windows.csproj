@@ -60,7 +60,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Triangulator\Triangulator-windows.csproj">
       <Project>{88e9d23f-a286-41f7-bc4b-39a585281cff}</Project>
-      <Name>Windows Copy of Triangulator</Name>
+      <Name>Triangulator-windows</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

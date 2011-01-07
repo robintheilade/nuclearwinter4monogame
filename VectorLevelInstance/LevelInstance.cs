@@ -16,13 +16,13 @@ namespace VectorLevel
     public class LevelInstance
     {
         //----------------------------------------------------------------------
-        public LevelInstance( uint _mapWidth, uint _mapHeight, int _iLightMapSizeFactor )
+        public LevelInstance( uint _mapWidth, uint _mapHeight, int _iLightMapSizeFactor, Color _ambientLightColor )
         {
             MapWidth            = _mapWidth;
             MapHeight           = _mapHeight;
-            AmbientLightColor   = new Color( 192, 192, 192 );
 
             LightMapSizeFactor  = _iLightMapSizeFactor;
+            AmbientLightColor   = _ambientLightColor;
         }
         
         //----------------------------------------------------------------------

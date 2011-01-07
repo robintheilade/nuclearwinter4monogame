@@ -44,7 +44,7 @@ namespace NuclearWinter
             for( int i = 0; i < siMaxInput; i++ )
             {
                 PreviousGamePadStates[ i ] = GamePadStates[ i ];
-                GamePadStates[ i ] = GamePad.GetState((PlayerIndex)i  );
+                GamePadStates[ i ] = GamePad.GetState( (PlayerIndex)i );
             }
 
             PreviousKeyboardState = KeyboardState;

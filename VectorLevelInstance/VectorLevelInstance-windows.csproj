@@ -101,7 +101,7 @@
     </ProjectReference>
     <ProjectReference Include="Content\VectorLevelInstanceContent.contentproj">
       <Project>{F53C37FC-9CFF-41E1-8E1D-399F06305296}</Project>
-      <Name>VectorLevelInstanceContent</Name>
+      <Name>VectorLevelInstanceContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
   </ItemGroup>
