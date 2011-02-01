@@ -78,7 +78,7 @@ namespace Box2D.XNA
 
         /// The maximum linear velocity of a body. This limit is very large and is used
         /// to prevent numerical problems. You shouldn't need to adjust this.
-        public static float b2_maxTranslation = 2.0f;
+        public static float b2_maxTranslation = 1.0f;
         public static float b2_maxTranslationSquared = (b2_maxTranslation * b2_maxTranslation);
 
         /// The maximum angular velocity of a body. This limit is very large and is used
