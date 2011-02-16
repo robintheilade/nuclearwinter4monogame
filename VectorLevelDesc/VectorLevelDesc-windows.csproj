@@ -68,6 +68,7 @@
     <Compile Include="Entities\Group.cs" />
     <Compile Include="Entities\Marker.cs" />
     <Compile Include="Entities\Path.cs" />
+    <Compile Include="Entities\Text.cs" />
     <Compile Include="LevelDesc.cs" />
     <Compile Include="LevelPack\LevelInfo.cs" />
     <Compile Include="LevelPack\LevelPack.cs" />

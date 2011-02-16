@@ -162,6 +162,15 @@ namespace VectorLevelProcessor
                     mLevelDesc.Entities[ marker.Name ] = marker;
                     mLevelDesc.OrderedEntities.Add( marker );
                 }
+                else
+                //--------------------------------------------------------------
+                // Text element
+                if( mXmlPathStack.Peek() == "text" )
+                {
+                    VectorLevel.Entities.Text text = ReadText();
+                    mLevelDesc.Entities[ text.Name ] = text;
+                    mLevelDesc.OrderedEntities.Add( text );
+                }
             }
 
             if( mXmlReader.IsEmptyElement )
@@ -199,6 +208,15 @@ namespace VectorLevelProcessor
             if( mXmlReader.LocalName == "g" )
             {
                 mGroupStack.Pop();
+            }
+            else
+            if( mXmlReader.LocalName == "tspan" )
+            {
+                if( mstrData != "" )
+                {
+                    VectorLevel.Entities.Text text = mLevelDesc.OrderedEntities[mLevelDesc.OrderedEntities.Count - 1] as VectorLevel.Entities.Text;
+                    text.TextSpans.Add( new VectorLevel.Entities.TextSpan( mstrData ) );
+                }
             }
 
             mXmlPathStack.Pop();
@@ -318,6 +336,21 @@ namespace VectorLevelProcessor
             }
 
             return newMatrix;
+        }
+
+        //----------------------------------------------------------------------
+        internal VectorLevel.Entities.Text ReadText()
+        {
+            string strTextName      = mXmlReader.GetAttribute( "id" );
+            
+            Vector2 vPosition = new Vector2(
+                float.Parse( mXmlReader.GetAttribute( "x" ), CultureInfo.InvariantCulture ),
+                float.Parse( mXmlReader.GetAttribute( "y" ), CultureInfo.InvariantCulture ) );
+
+            float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
+
+            VectorLevel.Entities.Text text = new VectorLevel.Entities.Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle );
+            return text;
         }
 
         //----------------------------------------------------------------------

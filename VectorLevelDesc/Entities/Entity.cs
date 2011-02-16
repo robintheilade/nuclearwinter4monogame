@@ -38,6 +38,7 @@ namespace VectorLevel.Entities
     {
         Marker,
         Path,
+        Text,
         Group
     };
 }

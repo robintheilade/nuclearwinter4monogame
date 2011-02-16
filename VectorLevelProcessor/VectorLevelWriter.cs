@@ -57,6 +57,9 @@ namespace VectorLevelProcessor
                     case VectorLevel.Entities.EntityType.Path:
                         WritePath( _output, entity as VectorLevel.Entities.Path );
                         break;
+                    case VectorLevel.Entities.EntityType.Text:
+                        WriteText( _output, entity as VectorLevel.Entities.Text );
+                        break;
                     default:
                         throw new Exception();
                 }
@@ -75,6 +78,20 @@ namespace VectorLevelProcessor
             _output.Write( _marker.MarkerType );
             _output.Write( _marker.Position );
             _output.Write( _marker.Angle );
+        }
+
+        //----------------------------------------------------------------------
+        internal void WriteText( ContentWriter _output, VectorLevel.Entities.Text _text )
+        {
+            _output.Write( _text.Position );
+            _output.Write( _text.Angle );
+
+            _output.Write( (UInt16)_text.TextSpans.Count );
+
+            foreach( VectorLevel.Entities.TextSpan textSpan in _text.TextSpans )
+            {
+                _output.Write( textSpan.Value );
+            }
         }
 
         //----------------------------------------------------------------------

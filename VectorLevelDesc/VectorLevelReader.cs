@@ -52,6 +52,9 @@ namespace VectorLevelProcessor
                     case VectorLevel.Entities.EntityType.Path:
                         entity = ReadPath( _input, levelDesc );
                         break;
+                    case VectorLevel.Entities.EntityType.Text:
+                        entity = ReadText( _input, levelDesc );
+                        break;
                     default:
                         throw new Exception();
                 }
@@ -84,6 +87,22 @@ namespace VectorLevelProcessor
             
             VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as VectorLevel.Entities.Group, strMarkerType, vPosition, fAngle );
             return marker;
+        }
+
+
+        //----------------------------------------------------------------------
+        internal VectorLevel.Entities.Text ReadText( ContentReader _input, TRead _levelDesc )
+        {
+            VectorLevel.Entities.Text text = new VectorLevel.Entities.Text( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as VectorLevel.Entities.Group, _input.ReadVector2(), _input.ReadSingle() );
+
+            UInt16 uiTextSpanCount = _input.ReadUInt16();
+
+            for( UInt16 uiTextSpanIndex = 0; uiTextSpanIndex < uiTextSpanCount; uiTextSpanIndex++ )
+            {
+                text.TextSpans.Add( new VectorLevel.Entities.TextSpan( _input.ReadString() ) );
+            }
+
+            return text;
         }
 
         //----------------------------------------------------------------------
