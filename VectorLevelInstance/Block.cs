@@ -210,7 +210,7 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        public void InitRender( GraphicsDevice _graphicsDevice, float _fDepth )
+        public void InitRender( GraphicsDevice _graphicsDevice, float _fDepth, float _fScale )
         {
             mGraphicsDevice = _graphicsDevice;
 
@@ -228,7 +228,7 @@ namespace VectorLevel
 
 	            for (int i = 0; i < Path.MeshVertices.Length; i++)
                 {
-	                aFillVertices[ i ] = new VertexPositionColorTexture( new Vector3( Path.MeshVertices[i], _fDepth ), Path.FillColor, Path.MeshVertices[i] / 200f );
+	                aFillVertices[ i ] = new VertexPositionColorTexture( new Vector3( Path.MeshVertices[i], _fDepth ), Path.FillColor, Path.MeshVertices[i] / 200f / _fScale );
                 }
 
                 mFillVertexBuffer = new VertexBuffer( mGraphicsDevice, VertexPositionColorTexture.VertexDeclaration, aFillVertices.Length, BufferUsage.WriteOnly );
