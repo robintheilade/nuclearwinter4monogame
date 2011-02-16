@@ -96,6 +96,7 @@ namespace NuclearWinter
 
                     if( bButtonPressed )
                     {
+                        mafRepeatTimers[ iGamePad ] = 0f;
                         maLastPressedButtons[ iGamePad ] = button;
                         break;
                     }
@@ -103,7 +104,7 @@ namespace NuclearWinter
 
                 if( maLastPressedButtons[iGamePad] != 0 )
                 {
-                    if( GamePadStates[ iGamePad ].IsButtonDown(maLastPressedButtons[ iGamePad ] ) )
+                    if( GamePadStates[ iGamePad ].IsButtonDown( maLastPressedButtons[ iGamePad ] ) )
                     {
                         float fRepeatValue      = ( mafRepeatTimers[ iGamePad ] - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
                         float fNewRepeatValue   = ( mafRepeatTimers[ iGamePad ] + fElapsedTime - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
