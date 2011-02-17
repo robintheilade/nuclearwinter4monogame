@@ -65,6 +65,10 @@ namespace VectorLevel
             fixtureDef.friction = _fFriction;
             fixtureDef.restitution = _fRestitution;
 
+            var shape = new Box2D.XNA.LoopShape();
+
+            List<Vector2> lvVertices = new List<Vector2>();
+
             int j = Path.Subpaths[0].Vertices.Count - 1;
             for( int i = 0; i < Path.Subpaths[0].Vertices.Count; i++ )
             {
@@ -98,15 +102,24 @@ namespace VectorLevel
                 if( vDiff.Length() / _fPhysicsRatio > 1f )
                 {
                     //lvActualPolygon.Insert( 0, Path.Subpaths[0].Vertices[ i ] / PhysicsRatio );
-                    var shape = new Box2D.XNA.PolygonShape();
+                    /*var shape = new Box2D.XNA.PolygonShape();
                     shape.SetAsEdge( Path.Subpaths[0].Vertices[ j ] / _fPhysicsRatio, Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
                     
                     fixtureDef.shape = shape;
                     Body.CreateFixture( fixtureDef );
-                    
+                    */
+
+                    lvVertices.Add( Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
+
                     j = i;
                 }
             }
+
+            shape._vertices = lvVertices.ToArray();
+            shape._count = lvVertices.Count;
+
+            fixtureDef.shape = shape;
+            Body.CreateFixture( fixtureDef );
         }
 
         //----------------------------------------------------------------------
