@@ -88,7 +88,7 @@ namespace NuclearWinter
                             bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
                             break;
                         
-                        // Default button behaviour for the rest
+                        // Default button behavior for the rest
                         default:
                             bButtonPressed = GamePadStates[ iGamePad ].IsButtonDown( button ) && PreviousGamePadStates[ iGamePad ].IsButtonUp( button );
                             break;
@@ -192,7 +192,7 @@ namespace NuclearWinter
                         bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
                         break;
                     
-                    // Default button behaviour for the rest
+                    // Default button behavior for the rest
                     default:
                         bButtonPressed = GamePadStates[ iGamePad ].IsButtonDown( _button ) && PreviousGamePadStates[ iGamePad ].IsButtonUp( _button );
                         break;
