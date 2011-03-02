@@ -131,6 +131,12 @@ namespace NuclearWinter
 
 
         }
+        
+        //----------------------------------------------------------------------
+        public bool WasKeyJustPressed( Keys _key )
+        {
+            return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
+        }
 
         //----------------------------------------------------------------------
         public bool WasButtonJustPressed( Buttons _button, PlayerIndex _controllingPlayer )
