@@ -78,6 +78,7 @@ namespace VectorLevelProcessor
             _output.Write( _marker.MarkerType );
             _output.Write( _marker.Position );
             _output.Write( _marker.Angle );
+            _output.Write( _marker.Color );
         }
 
         //----------------------------------------------------------------------

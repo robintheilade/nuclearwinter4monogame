@@ -359,33 +359,41 @@ namespace VectorLevelProcessor
             string strMarkerName    = mXmlReader.GetAttribute( "id" );
             string strImagePath     = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
             string strMarkerType    = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
-            
+
+            //------------------------------------------------------------------
             Vector2 vPosition = new Vector2(
                 float.Parse( mXmlReader.GetAttribute( "x" ), CultureInfo.InvariantCulture ),
                 float.Parse( mXmlReader.GetAttribute( "y" ), CultureInfo.InvariantCulture ) );
 
             float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
 
-            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle );
+            //------------------------------------------------------------------
+            // Read style
+            string strStyleAttr = mXmlReader.GetAttribute( "style" );
+
+            Color fillColor = Color.White;
+            Color strokeColor = new Color();
+            float fStrokeWidth = 0f;
+            ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth );
+
+            //------------------------------------------------------------------
+            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle, fillColor );
+
             return marker;
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Path ReadPath()
+        internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth )
         {
-            VectorLevel.Entities.Path path = new VectorLevel.Entities.Path( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek() );
-
-            //------------------------------------------------------------------
-            // Read style
-            string strStyleAttr = mXmlReader.GetAttribute( "style" );
+            _fStrokeWidth = 0f;
 
             float fFillOpacity = 1f;
             float fStrokeOpacity = 1f;
             bool bHasStroke = false;
 
-            if( strStyleAttr != null )
+            if( _strStyleAttr != null )
             {
-                string[] styles = strStyleAttr.Split( ";".ToCharArray() );
+                string[] styles = _strStyleAttr.Split( ";".ToCharArray() );
                 foreach( string style in styles )
                 {
                     string[] keyValPair = style.Split( ":".ToCharArray() );
@@ -397,20 +405,20 @@ namespace VectorLevelProcessor
                     case "fill":
                         if( value[0] == '#' )
                         {
-                            path.FillColor = ReadHexColor( value );
+                            _fillColor = ReadHexColor( value );
                         }
                         else
                         if( value.ToLower() == "none" )
                         {
                             // FIXME: disable fill rendering altogether
-                            path.FillColor = Color.Transparent;
+                            _fillColor = Color.Transparent;
                             fFillOpacity = 0f;
                         }
                         break;
                     case "stroke":
                         if( value[0] == '#' )
                         {
-                            path.StrokeColor = ReadHexColor( value );
+                            _strokeColor = ReadHexColor( value );
                             bHasStroke = true;
                         }
                         break;
@@ -436,19 +444,30 @@ namespace VectorLevelProcessor
                     case "stroke-width":
                         {
                         value = value.Replace("px", "");
-                        path.StrokeWidth = float.Parse( value, CultureInfo.InvariantCulture );
+                        _fStrokeWidth = float.Parse( value, CultureInfo.InvariantCulture );
                         break;
                         }
                     }
                 }
             }
 
-            path.FillColor *= fFillOpacity;
+            _fillColor *= fFillOpacity;
             if( ! bHasStroke )
             {
-                path.StrokeWidth = 0f;
+                _fStrokeWidth = 0f;
             }
-            path.StrokeColor *= fStrokeOpacity;
+            _strokeColor *= fStrokeOpacity;
+        }
+
+        //----------------------------------------------------------------------
+        internal VectorLevel.Entities.Path ReadPath()
+        {
+            VectorLevel.Entities.Path path = new VectorLevel.Entities.Path( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek() );
+
+            //------------------------------------------------------------------
+            // Read style
+            string strStyleAttr = mXmlReader.GetAttribute( "style" );
+            ReadStyle( strStyleAttr, ref path.FillColor, ref path.StrokeColor, ref path.StrokeWidth );
 
             //------------------------------------------------------------------
             // Read contours
