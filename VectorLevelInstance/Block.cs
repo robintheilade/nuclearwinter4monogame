@@ -235,7 +235,7 @@ namespace VectorLevel
 
             if( Path.Subpaths[0].IsClosed )
             {
-                //------------------------------------------------------------------
+                //--------------------------------------------------------------
 			    // Create Fill VertexBuffer
 			    VertexPositionColorTexture[] aFillVertices = new VertexPositionColorTexture[ iFillVerticesCount ];
 
@@ -247,7 +247,7 @@ namespace VectorLevel
                 mFillVertexBuffer = new VertexBuffer( mGraphicsDevice, VertexPositionColorTexture.VertexDeclaration, aFillVertices.Length, BufferUsage.WriteOnly );
                 mFillVertexBuffer.SetData( aFillVertices );
 
-                //------------------------------------------------------------------
+                //--------------------------------------------------------------
 			    // Create Fill IndexBuffer
 			    short[] aFillIndices = new short[ iFillPrimitivesCount * 3 ];
 

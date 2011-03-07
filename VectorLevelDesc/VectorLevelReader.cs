@@ -83,10 +83,12 @@ namespace VectorLevelProcessor
             string strParentName    = _input.ReadString();
             string strMarkerType    = _input.ReadString();
             Vector2 vPosition       = _input.ReadVector2();
+            Vector2 vSize           = _input.ReadVector2();
             float fAngle            = _input.ReadSingle();
+            Vector2 vScale          = _input.ReadVector2();
             Color color             = _input.ReadColor();
             
-            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as VectorLevel.Entities.Group, strMarkerType, vPosition, fAngle, color );
+            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as VectorLevel.Entities.Group, strMarkerType, vPosition, vSize, fAngle, vScale, color );
             return marker;
         }
 

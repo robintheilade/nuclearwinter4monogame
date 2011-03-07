@@ -365,7 +365,15 @@ namespace VectorLevelProcessor
                 float.Parse( mXmlReader.GetAttribute( "x" ), CultureInfo.InvariantCulture ),
                 float.Parse( mXmlReader.GetAttribute( "y" ), CultureInfo.InvariantCulture ) );
 
+            Vector2 vSize = new Vector2(
+                float.Parse( mXmlReader.GetAttribute( "width" ), CultureInfo.InvariantCulture ),
+                float.Parse( mXmlReader.GetAttribute( "height" ), CultureInfo.InvariantCulture ) );
+
             float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
+            Vector2 vScale = new Vector2(
+                    (float)Math.Sqrt( Math.Pow( mMatrixStack.Peek().M11, 2 ) + Math.Pow( mMatrixStack.Peek().M12, 2 ) ),
+                    (float)Math.Sqrt( Math.Pow( mMatrixStack.Peek().M21, 2 ) + Math.Pow( mMatrixStack.Peek().M22, 2 ) )
+                );
 
             //------------------------------------------------------------------
             // Read style
@@ -377,7 +385,7 @@ namespace VectorLevelProcessor
             ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth );
 
             //------------------------------------------------------------------
-            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle, fillColor );
+            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, Vector2.Transform( vPosition, mMatrixStack.Peek() ), vSize, fAngle, vScale, fillColor );
 
             return marker;
         }
