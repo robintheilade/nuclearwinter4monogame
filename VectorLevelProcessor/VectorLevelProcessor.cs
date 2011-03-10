@@ -369,10 +369,12 @@ namespace VectorLevelProcessor
                 float.Parse( mXmlReader.GetAttribute( "width" ), CultureInfo.InvariantCulture ),
                 float.Parse( mXmlReader.GetAttribute( "height" ), CultureInfo.InvariantCulture ) );
 
-            float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
+            Matrix matrix = mMatrixStack.Peek();
+
+            float fAngle = (float)Math.Atan2( matrix.M12 /* cos angle */, matrix.M11 /* sin angle */ );
             Vector2 vScale = new Vector2(
-                    (float)Math.Sqrt( Math.Pow( mMatrixStack.Peek().M11, 2 ) + Math.Pow( mMatrixStack.Peek().M12, 2 ) ),
-                    (float)Math.Sqrt( Math.Pow( mMatrixStack.Peek().M21, 2 ) + Math.Pow( mMatrixStack.Peek().M22, 2 ) )
+                    Math.Sign( matrix.M11 ) * (float)Math.Sqrt( Math.Pow( matrix.M11, 2 ) + Math.Pow( matrix.M12, 2 ) ),
+                    Math.Sign( matrix.M22 ) * (float)Math.Sqrt( Math.Pow( matrix.M21, 2 ) + Math.Pow( matrix.M22, 2 ) )
                 );
 
             //------------------------------------------------------------------
