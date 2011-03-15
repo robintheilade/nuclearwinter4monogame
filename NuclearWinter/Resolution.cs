@@ -28,6 +28,13 @@ namespace NuclearWinter
             Fullscreen      = _bFullscreen;
         }
 
+        //----------------------------------------------------------------------
+        public override string ToString()
+        {
+            return Width.ToString() + "x" + Height.ToString();
+        }
+
+        //----------------------------------------------------------------------
         public int      Width;            ///< Width
         public int      Height;           ///< Height
         public bool     Fullscreen;       ///< Is the Mode fullscreen?
@@ -39,53 +46,51 @@ namespace NuclearWinter
     /// </summary>
     public sealed class Resolution
     {
-        //----------------------------------------------------------------------
-        /// <summary>
-        /// Initialize the Resolution
-        /// </summary>
-        /// <param name="_graphics"></param>
-        public static void Initialize( GraphicsDeviceManager _graphics )
+        static Resolution()
         {
             InternalMode = new ScreenMode( 1920, 1080, true );
 
-            List<ScreenMode> lSortedScreenModes = new List<ScreenMode>();
-            lSortedScreenModes.Add( new ScreenMode( 1920, 1200, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1920, 1080, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1680, 1050, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1440, 900, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1280, 800, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1280, 720, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 1024, 768, true ) );
-            lSortedScreenModes.Add( new ScreenMode( 800, 450, true ) );
+            SortedScreenModes = new List<ScreenMode>();
+            SortedScreenModes.Add( new ScreenMode( 800, 450, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1024, 768, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1280, 720, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1280, 800, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1440, 900, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1680, 1050, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1920, 1080, true ) );
+            SortedScreenModes.Add( new ScreenMode( 1920, 1200, true ) );
+        }
 
-            foreach( ScreenMode mode in lSortedScreenModes )
+        //----------------------------------------------------------------------
+        // Initialize the best Resolution available
+        public static int Initialize( GraphicsDeviceManager _graphics )
+        {
+            List<ScreenMode> lReversedScreenModes = new List<ScreenMode>( SortedScreenModes );
+            lReversedScreenModes.Reverse();
+
+            int i = 0;
+            foreach( ScreenMode mode in lReversedScreenModes )
             {
                 if( SetScreenMode( _graphics, mode ) )
                 {
-                    break;
+                    return lReversedScreenModes.Count - ( i + 1 );
                 }
+                i++;
             }
+
+            return 0;
         }
 
-        //---------------------------------------------------------------------
-        /// <summary>
-        /// Initialize the Resolution using the specified ScreenMode
-        /// </summary>
-        /// <param name="_graphics"></param>
-        /// <param name="_mode"></param>
+        //----------------------------------------------------------------------
+        // Initialize the Resolution using the specified ScreenMode
         public static void Initialize( GraphicsDeviceManager _graphics, ScreenMode _mode )
         {
             InternalMode = new ScreenMode( 1920, 1080, true );
             SetScreenMode( _graphics, _mode );
         }
 
-        //---------------------------------------------------------------------
-        /// <summary>
-        /// Set the specified screen mode
-        /// </summary>
-        /// <param name="_graphics"></param>
-        /// <param name="_mode"></param>
-        /// <returns></returns>
+        //----------------------------------------------------------------------
+        // Set the specified screen mode
         public static bool SetScreenMode( GraphicsDeviceManager _graphics, ScreenMode _mode )
         {
             if( _mode.Fullscreen )
@@ -114,12 +119,8 @@ namespace NuclearWinter
             return false;
         }
 
-        //---------------------------------------------------------------------
-        /// <summary>
-        /// Apply the specified ScreenMode
-        /// </summary>
-        /// <param name="_graphics"></param>
-        /// <param name="_mode"></param>
+        //----------------------------------------------------------------------
+        // Apply the specified ScreenMode
         private static void ApplyScreenMode( GraphicsDeviceManager _graphics, ScreenMode _mode )
         {
             Mode = _mode;
@@ -141,6 +142,9 @@ namespace NuclearWinter
             _graphics.GraphicsDevice.Viewport = mViewport;
         }
         
+        //----------------------------------------------------------------------
+        public static List<ScreenMode> SortedScreenModes;
+
         public static ScreenMode    Mode { get; private set; }                  // Actual mode
         public static ScreenMode    InternalMode { get; private set; }          // Internal mode
 
