@@ -19,6 +19,7 @@ namespace NuclearWinter.GameFlow
         /// </summary>
         public abstract void Stop();
 
+        public virtual void OnActivated() {}
 
         /// <summary>
         /// Called repeatedly when starting the GameState, until it returns true
