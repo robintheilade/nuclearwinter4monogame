@@ -24,7 +24,7 @@ namespace VectorLevel
             LightMapSizeFactor  = _iLightMapSizeFactor;
             AmbientLightColor   = _ambientLightColor;
         }
-        
+
         //----------------------------------------------------------------------
         /// <summary>
         /// Initialize Level geometry rendering
@@ -42,6 +42,7 @@ namespace VectorLevel
             PresentationParameters pp = _graphicsDevice.PresentationParameters;
             LightMap = new RenderTarget2D( _graphicsDevice, pp.BackBufferWidth / LightMapSizeFactor, pp.BackBufferHeight / LightMapSizeFactor, false, SurfaceFormat.Color, DepthFormat.None );
 
+            //------------------------------------------------------------------
             mSpriteBatch = _spriteBatch;
             mContent = new ContentManager( _serviceProvider, "Content" );
             mFullAlphaTex = mContent.Load<Texture2D>( "BlackPixel" );

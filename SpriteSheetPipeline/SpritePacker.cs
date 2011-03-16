@@ -56,7 +56,7 @@ namespace SpriteSheetPipeline
 
             // Work out how big the output bitmap should be.
             int outputWidth = GuessOutputWidth(sprites);
-            int outputHeight = 0;
+            int outputHeight = 4096;
             int totalSpriteSize = 0;
 
             // Choose positions for each sprite, one at a time.

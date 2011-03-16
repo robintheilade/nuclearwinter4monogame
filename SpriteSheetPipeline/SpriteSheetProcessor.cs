@@ -57,7 +57,8 @@ namespace SpriteSheetPipeline
       BitmapContent packedSprites = SpritePacker.PackSprites(sourceSprites,
                                           spriteSheet.SpriteRectangles, context);
 
-      spriteSheet.Texture.Mipmaps.Add(packedSprites);
+        spriteSheet.Texture.Mipmaps.Add(packedSprites);
+        spriteSheet.Texture.ConvertBitmapType( typeof(Dxt5BitmapContent) );
 
       return spriteSheet;
     }
