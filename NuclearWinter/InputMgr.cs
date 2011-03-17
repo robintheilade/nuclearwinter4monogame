@@ -211,47 +211,9 @@ namespace NuclearWinter
                 
                 //--------------------------------------------------------------
                 // Keyboard controls
-                if( ( _button == Buttons.A ) && KeyboardState.IsKeyDown( Keys.Space ) && ! PreviousKeyboardState.IsKeyDown( Keys.Space ) ) 
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.B ) && KeyboardState.IsKeyDown( Keys.LeftAlt ) && ! PreviousKeyboardState.IsKeyDown( Keys.LeftAlt ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.X ) && KeyboardState.IsKeyDown( Keys.Back ) && ! PreviousKeyboardState.IsKeyDown( Keys.Back ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.Y ) && KeyboardState.IsKeyDown( Keys.LeftShift ) && ! PreviousKeyboardState.IsKeyDown( Keys.LeftShift ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.Start ) && KeyboardState.IsKeyDown( Keys.Enter ) && ! PreviousKeyboardState.IsKeyDown( Keys.Enter ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.LeftThumbstickLeft ) && KeyboardState.IsKeyDown( Keys.Left ) && ! PreviousKeyboardState.IsKeyDown( Keys.Left ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.LeftThumbstickRight ) && KeyboardState.IsKeyDown( Keys.Right ) && ! PreviousKeyboardState.IsKeyDown( Keys.Right ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.LeftThumbstickUp ) && KeyboardState.IsKeyDown( Keys.Up ) && ! PreviousKeyboardState.IsKeyDown( Keys.Up ) )
-                {
-                    bButtonPressed = true;
-                }
-                else
-                if( ( _button == Buttons.LeftThumbstickDown ) && KeyboardState.IsKeyDown( Keys.Down ) && ! PreviousKeyboardState.IsKeyDown( Keys.Down ) )
+                Keys key = GetKeyboardMapping( _button );
+
+                if( key != Keys.None && KeyboardState.IsKeyDown( key ) && ! PreviousKeyboardState.IsKeyDown( key ) )
                 {
                     bButtonPressed = true;
                 }
@@ -266,5 +228,36 @@ namespace NuclearWinter
                     ||  WasButtonJustPressed( _button, PlayerIndex.Four, out _playerIndex, _bRepeat );
             }
         }
+
+        //----------------------------------------------------------------------
+        public Keys GetKeyboardMapping( Buttons button )
+        {
+            switch( button )
+            {
+                case Buttons.A:
+                    return Keys.Space;
+                case Buttons.B:
+                    return Keys.LeftAlt;
+                case Buttons.Start:
+                    return Keys.Enter;
+                case Buttons.Back:
+                    return Keys.Escape;
+                case Buttons.Y:
+                    return Keys.LeftShift;
+                case Buttons.X:
+                    return Keys.Back;
+                case Buttons.LeftThumbstickLeft:
+                    return Keys.Left;
+                case Buttons.LeftThumbstickRight:
+                    return Keys.Right;
+                case Buttons.LeftThumbstickUp:
+                    return Keys.Up;
+                case Buttons.LeftThumbstickDown:
+                    return Keys.Down;
+            }
+
+            return Keys.None;
+        }
+
     }
 }
