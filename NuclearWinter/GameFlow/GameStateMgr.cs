@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.GameFlow
 {
@@ -96,6 +97,13 @@ namespace NuclearWinter.GameFlow
                         // We're done fading out
                         CurrentState.Stop();
                         CurrentState = null;
+
+                        // Reset all vibrations when switching active GameState
+                        GamePad.SetVibration( PlayerIndex.One,      0f, 0f );
+                        GamePad.SetVibration( PlayerIndex.Two,      0f, 0f );
+                        GamePad.SetVibration( PlayerIndex.Three,    0f, 0f );
+                        GamePad.SetVibration( PlayerIndex.Four,     0f, 0f );
+
                         mNextState.Start();
                     }
                 }
