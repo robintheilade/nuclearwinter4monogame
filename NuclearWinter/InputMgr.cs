@@ -242,6 +242,10 @@ namespace NuclearWinter
                     return Keys.Enter;
                 case Buttons.Back:
                     return Keys.Escape;
+                case Buttons.LeftShoulder:
+                    return Keys.PageUp;
+                case Buttons.RightShoulder:
+                    return Keys.PageDown;
                 case Buttons.Y:
                     return Keys.LeftShift;
                 case Buttons.X:
