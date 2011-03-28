@@ -52,14 +52,14 @@ namespace NuclearWinter.GameFlow
         {
             //------------------------------
             // precondition
-            System.Diagnostics.Debug.Assert( mNextState == null );
+            System.Diagnostics.Debug.Assert( NextState == null );
             //------------------------------
 
-            mNextState = _newState;
+            NextState = _newState;
 
             if( CurrentState == null )
             {
-                mNextState.Start();
+                NextState.Start();
             }
 
         }
@@ -86,7 +86,7 @@ namespace NuclearWinter.GameFlow
             //-----------------------------------------------------------------
             // Handle state switching
             else
-            if( mNextState != null )
+            if( NextState != null )
             {
                 if( CurrentState != null )
                 {
@@ -104,7 +104,7 @@ namespace NuclearWinter.GameFlow
                         GamePad.SetVibration( PlayerIndex.Three,    0f, 0f );
                         GamePad.SetVibration( PlayerIndex.Four,     0f, 0f );
 
-                        mNextState.Start();
+                        NextState.Start();
                     }
                 }
                 
@@ -112,11 +112,11 @@ namespace NuclearWinter.GameFlow
                 {
                     //---------------------------------------------------------
                     // Fade in next state
-                    if( mNextState.UpdateFadeIn( _time ) )
+                    if( NextState.UpdateFadeIn( _time ) )
                     {
                         // We're done fading in
-                        CurrentState = mNextState;
-                        mNextState = null;
+                        CurrentState = NextState;
+                        NextState = null;
                         
                         CurrentState.Update( _time );
                     }
@@ -143,7 +143,7 @@ namespace NuclearWinter.GameFlow
                 CurrentState.DrawFadeOut( _time );
             }
             else
-            if( mNextState != null )
+            if( NextState != null )
             {
                 if( CurrentState != null )
                 {
@@ -151,7 +151,7 @@ namespace NuclearWinter.GameFlow
                 }
                 else
                 {
-                    mNextState.DrawFadeIn( _time );
+                    NextState.DrawFadeIn( _time );
                 }
             }
             else
@@ -162,12 +162,12 @@ namespace NuclearWinter.GameFlow
         
         //---------------------------------------------------------------------
         public bool IsSwitching {
-            get { return null != mNextState; }
+            get { return null != NextState; }
         }
 
         //---------------------------------------------------------------------
-        public GameState                        CurrentState { get; private set; }  // Current game state
-        private GameState                       mNextState;                         // Next game state to be started, stored while the current state is fading out
-        private bool                            mbExit;                             // Is the game exiting?
+        public GameState                        CurrentState    { get; private set; }   // Current game state
+        public GameState                        NextState       { get; private set; }   // Next game state to be started, stored while the current state is fading out
+        private bool                            mbExit;                                 // Is the game exiting?
     }
 }
