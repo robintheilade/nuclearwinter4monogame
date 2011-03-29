@@ -95,6 +95,7 @@
     <Compile Include="InputMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resolution.cs" />
+    <Compile Include="StringBuilderExtNumeric.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
