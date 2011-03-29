@@ -24,6 +24,8 @@ namespace NuclearWinter
         const float                         sfButtonRepeatDelay     = 0.3f;
         const float                         sfButtonRepeatInterval  = 0.1f;
 
+        List<Buttons>                       lButtons;
+
         //---------------------------------------------------------------------
         public InputMgr( Game _game )
         : base ( _game )
@@ -34,6 +36,8 @@ namespace NuclearWinter
             maLastPressedButtons    = new Buttons[ siMaxInput ];
             mafRepeatTimers         = new float[ siMaxInput ];
             mabRepeatButtons        = new bool[ siMaxInput ];
+
+            lButtons                = Utils.GetValues<Buttons>();
         }
 
         //---------------------------------------------------------------------
@@ -54,7 +58,7 @@ namespace NuclearWinter
             {
                 mabRepeatButtons[ iGamePad ] = false;
 
-                foreach( Buttons button in Utils.GetValues<Buttons>() )
+                foreach( Buttons button in lButtons )
                 {
                     bool bButtonPressed;
 

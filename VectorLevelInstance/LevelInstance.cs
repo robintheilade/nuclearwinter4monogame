@@ -23,6 +23,15 @@ namespace VectorLevel
 
             LightMapSizeFactor  = _iLightMapSizeFactor;
             AmbientLightColor   = _ambientLightColor;
+
+            mClearAlphaBlendState = new BlendState();
+            mClearAlphaBlendState.AlphaDestinationBlend    = Blend.One;
+            mClearAlphaBlendState.AlphaSourceBlend         = Blend.One;
+            mClearAlphaBlendState.AlphaBlendFunction       = BlendFunction.Max;
+            mClearAlphaBlendState.ColorWriteChannels       = ColorWriteChannels.Alpha;
+            mClearAlphaBlendState.ColorWriteChannels1       = ColorWriteChannels.Alpha;
+            mClearAlphaBlendState.ColorWriteChannels2       = ColorWriteChannels.Alpha;
+            mClearAlphaBlendState.ColorWriteChannels3       = ColorWriteChannels.Alpha;
         }
 
         //----------------------------------------------------------------------
@@ -127,17 +136,7 @@ namespace VectorLevel
         public void ClearAlphaToOne()
         {
             mSpriteBatch.Begin( SpriteSortMode.Immediate, BlendState.Opaque );
-
-            BlendState blendState = new BlendState();
-            blendState.AlphaDestinationBlend    = Blend.One;
-            blendState.AlphaSourceBlend         = Blend.One;
-            blendState.AlphaBlendFunction       = BlendFunction.Max;
-            blendState.ColorWriteChannels       = ColorWriteChannels.Alpha;
-            blendState.ColorWriteChannels1       = ColorWriteChannels.Alpha;
-            blendState.ColorWriteChannels2       = ColorWriteChannels.Alpha;
-            blendState.ColorWriteChannels3       = ColorWriteChannels.Alpha;
-
-            GraphicsDevice.BlendState           = blendState;
+            GraphicsDevice.BlendState = mClearAlphaBlendState;
 
             mSpriteBatch.Draw( mFullAlphaTex, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White );
             mSpriteBatch.End();
@@ -160,6 +159,8 @@ namespace VectorLevel
 		internal IndexBuffer        FillIndexBuffer     { get; private set; }
         internal VertexBuffer       StrokeVertexBuffer  { get; private set; }
         internal IndexBuffer        StrokeIndexBuffer   { get; private set; }
+
+        BlendState                  mClearAlphaBlendState;
 
         ContentManager              mContent;
         SpriteBatch                 mSpriteBatch;
