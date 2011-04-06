@@ -15,8 +15,10 @@ namespace NuclearWinter
         public readonly GamePadState[]      GamePadStates;
         public readonly GamePadState[]      PreviousGamePadStates;
 
-        public KeyboardState                KeyboardState;
-        public KeyboardState                PreviousKeyboardState;
+#if WINDOWS
+        public LocalizedKeyboardState       KeyboardState;
+        public LocalizedKeyboardState       PreviousKeyboardState;
+#endif
 
         Buttons[]                           maLastPressedButtons;
         float[]                             mafRepeatTimers;
@@ -51,8 +53,10 @@ namespace NuclearWinter
                 GamePadStates[ i ] = GamePad.GetState( (PlayerIndex)i );
             }
 
+#if WINDOWS
             PreviousKeyboardState = KeyboardState;
-            KeyboardState = Keyboard.GetState();
+           KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
+#endif
 
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
             {
@@ -136,11 +140,13 @@ namespace NuclearWinter
 
         }
         
+#if WINDOWS
         //----------------------------------------------------------------------
         public bool WasKeyJustPressed( Keys _key )
         {
             return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
         }
+#endif
 
         //----------------------------------------------------------------------
         public bool WasButtonJustPressed( Buttons _button, PlayerIndex _controllingPlayer )
@@ -213,6 +219,7 @@ namespace NuclearWinter
                     bButtonPressed = ( mabRepeatButtons[ (int)_playerIndex ] && _button == maLastPressedButtons[ (int)_playerIndex ] );
                 }
                 
+#if WINDOWS
                 //--------------------------------------------------------------
                 // Keyboard controls
                 Keys key = GetKeyboardMapping( _button );
@@ -221,6 +228,7 @@ namespace NuclearWinter
                 {
                     bButtonPressed = true;
                 }
+#endif
 
                 return bButtonPressed;
             }
@@ -256,6 +264,7 @@ namespace NuclearWinter
 
             return Keys.None;
         }
+
 
     }
 }
