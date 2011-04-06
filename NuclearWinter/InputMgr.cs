@@ -240,20 +240,10 @@ namespace NuclearWinter
             {
                 case Buttons.A:
                     return Keys.Space;
-                case Buttons.B:
-                    return Keys.LeftAlt;
                 case Buttons.Start:
                     return Keys.Enter;
                 case Buttons.Back:
                     return Keys.Escape;
-                case Buttons.LeftShoulder:
-                    return Keys.PageUp;
-                case Buttons.RightShoulder:
-                    return Keys.PageDown;
-                case Buttons.Y:
-                    return Keys.LeftShift;
-                case Buttons.X:
-                    return Keys.Back;
                 case Buttons.LeftThumbstickLeft:
                     return Keys.Left;
                 case Buttons.LeftThumbstickRight:
