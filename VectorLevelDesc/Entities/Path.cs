@@ -143,7 +143,7 @@ namespace VectorLevel.Entities
             float fOffset = ( fLeftOffset + fRightOffset ) / 2f;
             Vector2 vNewPoint = ComputeCubicBezierPoint( ref vStart, ref vEnd, ref vControlPoint1, ref vControlPoint2, fOffset );
 
-            if( Vector2.Distance( vNewPoint, ( vLeft + vRight ) / 2f) <= 2f )
+            if( Vector2.Distance( vNewPoint, ( vLeft + vRight ) / 2f) <= 1f )
             {
                 return lvPoints;
             }
