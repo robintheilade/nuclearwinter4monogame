@@ -156,8 +156,14 @@ namespace VectorLevelProcessor
                     subpath.PathNodes.Add( node );
                 }
 
+                subpath.Vertices = _input.ReadObject<List<Vector2>>();
+                subpath.NodeIndices = _input.ReadObject<List<int>>();
+
                 path.Subpaths.Add( subpath );
             }
+
+            path.MeshVertices = _input.ReadObject<Vector2[]>();
+            path.MeshIndices = _input.ReadObject<int[]>();
 
             return path;
         }

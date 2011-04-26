@@ -100,6 +100,8 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         internal void WritePath( ContentWriter _output, VectorLevel.Entities.Path _path )
         {
+            _path.Flatten();
+
             _output.Write( (UInt32) _path.FillColor.PackedValue );
             _output.Write( (UInt32) _path.StrokeColor.PackedValue );
             _output.Write( _path.StrokeWidth );
@@ -110,8 +112,8 @@ namespace VectorLevelProcessor
             foreach( VectorLevel.Entities.Subpath subpath in _path.Subpaths )
             {
                 _output.Write( subpath.IsClosed );
+
                 _output.Write( (UInt16)subpath.PathNodes.Count );
-                
                 foreach( VectorLevel.Entities.PathNode node in subpath.PathNodes )
                 {
                     _output.Write( (char)node.Type );
@@ -119,7 +121,13 @@ namespace VectorLevelProcessor
                     _output.Write( node.ControlPoint1 );
                     _output.Write( node.ControlPoint2 );
                 }
+
+                _output.WriteObject<List<Vector2>>( subpath.Vertices );
+                _output.WriteObject<List<int>>( subpath.NodeIndices );
             }
+
+            _output.WriteObject<Vector2[]>( _path.MeshVertices );
+            _output.WriteObject<int[]>( _path.MeshIndices );
         }
 
         //----------------------------------------------------------------------

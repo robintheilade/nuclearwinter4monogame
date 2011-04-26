@@ -17,7 +17,6 @@ namespace VectorLevel
         public Block( Entities.Path _path )
         {
             Path = _path;
-            Path.Flatten();
 
             BackFacing = new bool[ Path.Subpaths[0].Vertices.Count ];
             StartingVertices = new int[ Path.Subpaths[0].Vertices.Count ];
