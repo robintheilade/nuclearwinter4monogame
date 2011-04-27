@@ -4,6 +4,7 @@ using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace NuclearWinter.Input
 {
@@ -15,5 +16,14 @@ namespace NuclearWinter.Input
         {
 
         }
+
+        //---------------------------------------------------------------------
+        public override void Update( GameTime _time )
+        {
+            Touches = TouchPanel.GetState();
+        }
+
+        //---------------------------------------------------------------------
+        public TouchCollection     Touches { get; private set; }
     }
 }

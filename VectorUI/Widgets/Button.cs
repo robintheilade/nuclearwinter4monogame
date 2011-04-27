@@ -6,6 +6,7 @@ using System.Text;
 using VectorLevel.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace VectorUI.Widgets
 {
@@ -28,22 +29,44 @@ namespace VectorUI.Widgets
             mvScale = _marker.Size / new Vector2( mIdleTexture.Width, mIdleTexture.Height ) * _marker.Scale;
 
             mColor = _marker.Color;
+
+            mHitRectangle = new Rectangle( (int)(mvPosition.X - mvOrigin.X ), (int)(mvPosition.Y - mvOrigin.Y ), (int)_marker.Size.X, (int)_marker.Size.Y );
+
+            mbPressed = false;
         }
 
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime )
         {
+            mbPressed = false;
+            foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
+            {
+                Vector2 vPos = touch.Position;
+                vPos -= mvOrigin;
+                vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
+                vPos += mvOrigin;
+
+                if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
+                {
+                    mbPressed = true;
+                    break;
+                }
+            }
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.Draw( mIdleTexture, mvPosition, null, mColor, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            UISheet.Game.SpriteBatch.Draw( mbPressed ? mPressedTexture : mIdleTexture, mvPosition, null, mColor, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------
         Texture2D       mIdleTexture;
         Texture2D       mPressedTexture;
+
+        bool            mbPressed;
+
+        Rectangle       mHitRectangle;
 
         Vector2         mvPosition;
         float           mfAngle;
