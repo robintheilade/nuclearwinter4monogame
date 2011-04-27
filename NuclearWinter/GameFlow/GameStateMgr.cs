@@ -9,41 +9,24 @@ using Microsoft.Xna.Framework.Input;
 namespace NuclearWinter.GameFlow
 {
 
-    /// <summary>
-    /// This singleton class takes care of switching between game phases.
-    /// </summary>
+    //--------------------------------------------------------------------------
+    // Game Component that handles game states and their transitions
     public class GameStateMgr: DrawableGameComponent
     {
-        /// <summary>
-        /// Constructs a new screen manager component.
-        /// </summary>
-        public GameStateMgr(Game game)
-            : base(game)
+        //----------------------------------------------------------------------
+        public GameStateMgr( Game game )
+            : base( game )
         {
             
         }
 
-        //---------------------------------------------------------------------
-        public override void Initialize()
-        {
-            base.Initialize();
-
-
-        }
-
-        protected override void LoadContent()
-        {
-            // Load content belonging to the screen manager.
-            ContentManager content = Game.Content;
-        }
-
-        //---------------------------------------------------------------------
+        //----------------------------------------------------------------------
         public void Exit()
         {
             mbExit = true;
         }
 
-        //---------------------------------------------------------------------
+        //----------------------------------------------------------------------
         /// <summary>
         /// Switches current GameState.
         /// </summary>

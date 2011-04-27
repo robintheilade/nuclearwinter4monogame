@@ -4,23 +4,32 @@ using System.Text;
 
 namespace NuclearWinter.GameFlow
 {
-    /// <summary>
+    //--------------------------------------------------------------------------
     /// Each GameState handles part of the game : menu, in-game, settings, etc.
-    /// </summary>
     public abstract class GameState
     {
+        //----------------------------------------------------------------------
+        public GameState( NuclearGame _game )
+        {
+            Game = _game;
+        }
+
+        //----------------------------------------------------------------------
         /// <summary>
         /// Starts the GameState, called when it becomes the current one.
         /// </summary>
         public abstract void Start();
 
+        //----------------------------------------------------------------------
         /// <summary>
         /// Stops the GameState, called when switching to another one.
         /// </summary>
         public abstract void Stop();
 
+        //----------------------------------------------------------------------
         public virtual void OnActivated() {}
 
+        //----------------------------------------------------------------------
         /// <summary>
         /// Called repeatedly when starting the GameState, until it returns true
         /// </summary>
@@ -30,6 +39,7 @@ namespace NuclearWinter.GameFlow
             return true;
         }
 
+        //----------------------------------------------------------------------
         /// <summary>
         /// Draws while fading in.
         /// </summary>
@@ -39,7 +49,7 @@ namespace NuclearWinter.GameFlow
 
         }
 
-
+        //----------------------------------------------------------------------
         /// <summary>
         /// Called repeatedly when stopping the GameState, until it returns true
         /// </summary>
@@ -49,6 +59,7 @@ namespace NuclearWinter.GameFlow
             return true;
         }
 
+        //----------------------------------------------------------------------
         /// <summary>
         /// Draws while fading out.
         /// </summary>
@@ -58,17 +69,21 @@ namespace NuclearWinter.GameFlow
 
         }
 
-
+        //----------------------------------------------------------------------
         /// <summary>
         /// Updates the GameState.
         /// </summary>
         /// <param name="_elapsedTime"></param>
         public abstract void Update( Microsoft.Xna.Framework.GameTime _time );
         
+        //----------------------------------------------------------------------
         /// <summary>
         /// Draws the GameState.
         /// </summary>
         /// <param name="_time"></param>
         public abstract void Draw( Microsoft.Xna.Framework.GameTime _time );
+
+        //----------------------------------------------------------------------
+        public readonly NuclearGame         Game;
     }
 }
