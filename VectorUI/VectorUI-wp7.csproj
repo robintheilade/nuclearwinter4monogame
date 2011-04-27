@@ -80,8 +80,15 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UISheet.cs" />
+    <Compile Include="Widgets\Button.cs" />
+    <Compile Include="Widgets\Image.cs" />
+    <Compile Include="Widgets\Widget.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NuclearWinter\NuclearWinter-wp7.csproj">
+      <Project>{702ECDAF-D334-40E3-8521-A41EFD49D190}</Project>
+      <Name>NuclearWinter-wp7</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VectorLevelDesc\VectorLevelDesc-wp7.csproj">
       <Project>{06BBFEFB-F859-4703-A085-36D73C444FF0}</Project>
       <Name>VectorLevelDesc-wp7</Name>

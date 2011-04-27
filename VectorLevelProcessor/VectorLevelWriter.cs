@@ -79,6 +79,7 @@ namespace VectorLevelProcessor
         internal void WriteMarker( ContentWriter _output, Marker _marker )
         {
             _output.Write( _marker.MarkerType );
+            _output.Write( _marker.MarkerFullPath );
             _output.Write( _marker.Position );
             _output.Write( _marker.Size );
             _output.Write( _marker.Angle );

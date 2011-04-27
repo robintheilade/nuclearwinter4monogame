@@ -5,13 +5,18 @@ using System.Text;
 using VectorLevel;
 using VectorLevel.Entities;
 
+using NuclearWinter;
+
 namespace VectorUI
 {
     public class UISheet
     {
         //----------------------------------------------------------------------
-        public UISheet( LevelDesc _uiDesc )
+        public UISheet( NuclearGame _game, LevelDesc _uiDesc )
         {
+            Game        = _game;
+            mlWidgets   = new List<Widgets.Widget>();
+
             CreateUIFromRoot( _uiDesc.Root );
         }
 
@@ -53,11 +58,40 @@ namespace VectorUI
         {
             if( _marker.MarkerType.StartsWith( "Button" ) )
             {
-
+                mlWidgets.Add( new Widgets.Button( this, _marker ) );
+            }
+            else
+            {
+                mlWidgets.Add( new Widgets.Image( this, _marker ) );
             }
         }
 
         //----------------------------------------------------------------------
+        public void Update( float _fElapsedTime )
+        {
+            foreach( Widgets.Widget widget in mlWidgets )
+            {
+                widget.Update( _fElapsedTime );
+            }
+        }
 
+        //----------------------------------------------------------------------
+        public void Draw()
+        {
+            Game.SpriteBatch.Begin();
+
+            foreach( Widgets.Widget widget in mlWidgets )
+            {
+                widget.Draw();
+            }
+
+            Game.SpriteBatch.End();
+        }
+
+        //----------------------------------------------------------------------
+        public NuclearGame          Game;
+
+        //----------------------------------------------------------------------
+        List<Widgets.Widget>        mlWidgets;
     }
 }

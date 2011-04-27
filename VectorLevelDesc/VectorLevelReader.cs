@@ -83,16 +83,17 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         internal Marker ReadMarker( ContentReader _input, TRead _levelDesc )
         {
-            string strMarkerName    = _input.ReadString();
-            string strParentName    = _input.ReadString();
-            string strMarkerType    = _input.ReadString();
-            Vector2 vPosition       = _input.ReadVector2();
-            Vector2 vSize           = _input.ReadVector2();
-            float fAngle            = _input.ReadSingle();
-            Vector2 vScale          = _input.ReadVector2();
-            Color color             = _input.ReadColor();
+            string strMarkerName        = _input.ReadString();
+            string strParentName        = _input.ReadString();
+            string strMarkerType        = _input.ReadString();
+            string strMarkerFullPath    = _input.ReadString();
+            Vector2 vPosition           = _input.ReadVector2();
+            Vector2 vSize               = _input.ReadVector2();
+            float fAngle                = _input.ReadSingle();
+            Vector2 vScale              = _input.ReadVector2();
+            Color color                 = _input.ReadColor();
             
-            Marker marker = new Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as Group, strMarkerType, vPosition, vSize, fAngle, vScale, color );
+            Marker marker = new Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as Group, strMarkerType, strMarkerFullPath, vPosition, vSize, fAngle, vScale, color );
             return marker;
         }
 

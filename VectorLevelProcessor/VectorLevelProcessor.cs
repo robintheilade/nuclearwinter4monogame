@@ -139,7 +139,7 @@ namespace VectorLevelProcessor
                     {
                         //------------------------------------------------------
                         // Any other kind of group
-                        group = new VectorLevel.Entities.Group( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek(), GroupMode.Group );
+                        group = new Group( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek(), GroupMode.Group );
                     }
 
                     mGroupStack.Push( group );
@@ -152,7 +152,7 @@ namespace VectorLevelProcessor
                 // Path / Rect element
                 if( mXmlPathStack.Peek() == "path" || mXmlPathStack.Peek() == "rect" )
                 {
-                    VectorLevel.Entities.Path path = ReadPath();
+                    Path path = ReadPath();
                     mLevelDesc.Entities[ path.Name ] = path;
                     mLevelDesc.OrderedEntities.Add( path );
                 }
@@ -161,7 +161,7 @@ namespace VectorLevelProcessor
                 // Image element
                 if( mXmlPathStack.Peek() == "image" )
                 {
-                    VectorLevel.Entities.Marker marker = ReadMarker();
+                    Marker marker = ReadMarker();
                     mLevelDesc.Entities[ marker.Name ] = marker;
                     mLevelDesc.OrderedEntities.Add( marker );
                 }
@@ -170,7 +170,7 @@ namespace VectorLevelProcessor
                 // Text element
                 if( mXmlPathStack.Peek() == "text" )
                 {
-                    VectorLevel.Entities.Text text = ReadText();
+                    Text text = ReadText();
                     mLevelDesc.Entities[ text.Name ] = text;
                     mLevelDesc.OrderedEntities.Add( text );
                 }
@@ -217,8 +217,8 @@ namespace VectorLevelProcessor
             {
                 if( mstrData != "" )
                 {
-                    VectorLevel.Entities.Text text = mLevelDesc.OrderedEntities[mLevelDesc.OrderedEntities.Count - 1] as VectorLevel.Entities.Text;
-                    text.TextSpans.Add( new VectorLevel.Entities.TextSpan( mstrData ) );
+                    Text text = mLevelDesc.OrderedEntities[mLevelDesc.OrderedEntities.Count - 1] as Text;
+                    text.TextSpans.Add( new TextSpan( mstrData ) );
                 }
             }
 
@@ -342,7 +342,7 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Text ReadText()
+        internal Text ReadText()
         {
             string strTextName      = mXmlReader.GetAttribute( "id" );
             
@@ -352,16 +352,24 @@ namespace VectorLevelProcessor
 
             float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
 
-            VectorLevel.Entities.Text text = new VectorLevel.Entities.Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle );
+            Text text = new Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle );
             return text;
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Marker ReadMarker()
+        internal Marker ReadMarker()
         {
-            string strMarkerName    = mXmlReader.GetAttribute( "id" );
-            string strImagePath     = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
-            string strMarkerType    = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
+            string strMarkerName        = mXmlReader.GetAttribute( "id" );
+            string strImagePath         = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
+            string strMarkerType        = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
+            string strMarkerFullPath    = strImagePath.Substring( strImagePath.IndexOf( "Content" ) + 8 );
+
+            int iExtension = strMarkerFullPath.LastIndexOf( '.' );
+            int iPathSeparator = Math.Max( strMarkerFullPath.LastIndexOf( System.IO.Path.DirectorySeparatorChar ), strMarkerFullPath.LastIndexOf( System.IO.Path.AltDirectorySeparatorChar ) );
+            if( iExtension != -1 && iExtension > iPathSeparator )
+            {
+                strMarkerFullPath = strMarkerFullPath.Substring( 0, iExtension );
+            }
 
             //------------------------------------------------------------------
             Vector2 vPosition = new Vector2(
@@ -388,7 +396,7 @@ namespace VectorLevelProcessor
             ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth );
 
             //------------------------------------------------------------------
-            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, Vector2.Transform( vPosition, mMatrixStack.Peek() ), vSize, fAngle, vScale, fillColor );
+            Marker marker = new Marker( strMarkerName, mGroupStack.Peek(), strMarkerType, strMarkerFullPath, Vector2.Transform( vPosition, mMatrixStack.Peek() ), vSize, fAngle, vScale, fillColor );
 
             return marker;
         }
@@ -471,9 +479,9 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Path ReadPath()
+        internal Path ReadPath()
         {
-            VectorLevel.Entities.Path path = new VectorLevel.Entities.Path( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek() );
+            Path path = new Path( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek() );
 
             //------------------------------------------------------------------
             // Read style
@@ -490,12 +498,12 @@ namespace VectorLevelProcessor
                 float fWidth = float.Parse( mXmlReader.GetAttribute( "width" ), CultureInfo.InvariantCulture );
                 float fHeight = float.Parse( mXmlReader.GetAttribute( "height" ), CultureInfo.InvariantCulture );
 
-                VectorLevel.Entities.Subpath subpath = new VectorLevel.Entities.Subpath();
+                Subpath subpath = new Subpath();
 
-                subpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.MoveTo, Vector2.Transform( new Vector2( fX, fY ), mMatrixStack.Peek() ) ) );
-                subpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX + fWidth, fY ), mMatrixStack.Peek() ) ) );
-                subpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX + fWidth, fY + fHeight ), mMatrixStack.Peek() ) ) );
-                subpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX, fY + fHeight ), mMatrixStack.Peek() ) ) );
+                subpath.PathNodes.Add( new PathNode( PathNode.NodeType.MoveTo, Vector2.Transform( new Vector2( fX, fY ), mMatrixStack.Peek() ) ) );
+                subpath.PathNodes.Add( new PathNode( PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX + fWidth, fY ), mMatrixStack.Peek() ) ) );
+                subpath.PathNodes.Add( new PathNode( PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX + fWidth, fY + fHeight ), mMatrixStack.Peek() ) ) );
+                subpath.PathNodes.Add( new PathNode( PathNode.NodeType.LineTo, Vector2.Transform( new Vector2( fX, fY + fHeight ), mMatrixStack.Peek() ) ) );
                 subpath.IsClosed = true;
 
                 path.Subpaths.Add( subpath );
@@ -516,14 +524,14 @@ namespace VectorLevelProcessor
         /// <param name="_strPathData"></param>
         /// <param name="_strPathID"></param>
         /// <returns></returns>
-        internal void ParseSVGPathData( VectorLevel.Entities.Path _path, string _strPathData )
+        internal void ParseSVGPathData( Path _path, string _strPathData )
         {
             Vector2 vCurrentPosition = Vector2.Zero;
             
             string[] astrTokens = _strPathData.Split( " ,".ToCharArray() );
             string strImplicitCommand = "";
 
-            VectorLevel.Entities.Subpath currentSubpath = null;
+            Subpath currentSubpath = null;
 
             int iTokenIndex = -1;
             while( iTokenIndex < astrTokens.Length - 1 )
@@ -535,7 +543,7 @@ namespace VectorLevelProcessor
                 // Start a new subpath
                 if( ( strToken == "M" ) || ( strToken == "m" ) )
                 {
-                    currentSubpath = new VectorLevel.Entities.Subpath();
+                    currentSubpath = new Subpath();
                     _path.Subpaths.Add( currentSubpath );
 
                     // Read vertex and add it to subpath
@@ -548,7 +556,7 @@ namespace VectorLevelProcessor
                         vertex += vCurrentPosition;
                     }
 
-                    currentSubpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.MoveTo, Vector2.Transform( vertex, mMatrixStack.Peek() ) ) );
+                    currentSubpath.PathNodes.Add( new PathNode( PathNode.NodeType.MoveTo, Vector2.Transform( vertex, mMatrixStack.Peek() ) ) );
 
                     vCurrentPosition = vertex;
                     strImplicitCommand = (strToken == "M" ) ? "L" : "l";
@@ -634,8 +642,8 @@ namespace VectorLevelProcessor
                         vControlPoint2 += vCurrentPosition;
                     }
 
-                    currentSubpath.PathNodes.Add( new VectorLevel.Entities.PathNode(
-                        VectorLevel.Entities.PathNode.NodeType.CurveTo,
+                    currentSubpath.PathNodes.Add( new PathNode(
+                        PathNode.NodeType.CurveTo,
                         Vector2.Transform( vertex, mMatrixStack.Peek() ),
                         Vector2.Transform( vControlPoint1, mMatrixStack.Peek() ),
                         Vector2.Transform( vControlPoint2, mMatrixStack.Peek() ) ) );
@@ -655,7 +663,7 @@ namespace VectorLevelProcessor
                         vertex += vCurrentPosition;
                     }
 
-                    currentSubpath.PathNodes.Add( new VectorLevel.Entities.PathNode( VectorLevel.Entities.PathNode.NodeType.LineTo, Vector2.Transform( vertex, mMatrixStack.Peek() ) ) );
+                    currentSubpath.PathNodes.Add( new PathNode( PathNode.NodeType.LineTo, Vector2.Transform( vertex, mMatrixStack.Peek() ) ) );
 
                     vCurrentPosition = vertex;
                 }
@@ -771,7 +779,7 @@ namespace VectorLevelProcessor
 
         XmlReader                           mXmlReader;
         Stack<string>                       mXmlPathStack;
-        Stack<VectorLevel.Entities.Group>   mGroupStack;
+        Stack<Group>   mGroupStack;
         Stack<Matrix>                       mMatrixStack;
         string                              mstrData = "";
         
