@@ -18,7 +18,7 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         public LevelDesc()
         {
-            Root = new Entities.Group( "", null );
+            Root = new Entities.Group( "", null, VectorLevel.Entities.GroupMode.Root );
 
             // OrderedEntities are used for writing entities in the proper order
             Entities = new Dictionary<string, Entities.Entity>();

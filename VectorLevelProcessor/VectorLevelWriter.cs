@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
+using VectorLevel;
+using VectorLevel.Entities;
+
 using TWrite = VectorLevel.LevelDesc;
 
 namespace VectorLevelProcessor
@@ -34,7 +37,7 @@ namespace VectorLevelProcessor
             // Write entities
             _output.Write( (UInt16)(_levelDesc.Entities.Count - 1) ); // -1 for the Root group
             
-            foreach( VectorLevel.Entities.Entity entity in _levelDesc.OrderedEntities )
+            foreach( Entity entity in _levelDesc.OrderedEntities )
             {
                 if( entity == _levelDesc.Root )
                 {
@@ -48,17 +51,17 @@ namespace VectorLevelProcessor
                 
                 switch( entity.Type )
                 {
-                    case VectorLevel.Entities.EntityType.Group:
-                        WriteGroup( _output, entity as VectorLevel.Entities.Group );
+                    case EntityType.Group:
+                        WriteGroup( _output, entity as Group );
                         break;
-                    case VectorLevel.Entities.EntityType.Marker:
-                        WriteMarker( _output, entity as VectorLevel.Entities.Marker );
+                    case EntityType.Marker:
+                        WriteMarker( _output, entity as Marker );
                         break;
-                    case VectorLevel.Entities.EntityType.Path:
-                        WritePath( _output, entity as VectorLevel.Entities.Path );
+                    case EntityType.Path:
+                        WritePath( _output, entity as Path );
                         break;
-                    case VectorLevel.Entities.EntityType.Text:
-                        WriteText( _output, entity as VectorLevel.Entities.Text );
+                    case EntityType.Text:
+                        WriteText( _output, entity as Text );
                         break;
                     default:
                         throw new Exception();
@@ -67,13 +70,13 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
-        internal void WriteGroup( ContentWriter _output, VectorLevel.Entities.Group _group )
+        internal void WriteGroup( ContentWriter _output, Group _group )
         {
-            // Nothing!
+            _output.WriteObject<GroupMode>( _group.GroupMode );
         }
 
         //----------------------------------------------------------------------
-        internal void WriteMarker( ContentWriter _output, VectorLevel.Entities.Marker _marker )
+        internal void WriteMarker( ContentWriter _output, Marker _marker )
         {
             _output.Write( _marker.MarkerType );
             _output.Write( _marker.Position );
@@ -84,21 +87,21 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
-        internal void WriteText( ContentWriter _output, VectorLevel.Entities.Text _text )
+        internal void WriteText( ContentWriter _output, Text _text )
         {
             _output.Write( _text.Position );
             _output.Write( _text.Angle );
 
             _output.Write( (UInt16)_text.TextSpans.Count );
 
-            foreach( VectorLevel.Entities.TextSpan textSpan in _text.TextSpans )
+            foreach( TextSpan textSpan in _text.TextSpans )
             {
                 _output.Write( textSpan.Value );
             }
         }
 
         //----------------------------------------------------------------------
-        internal void WritePath( ContentWriter _output, VectorLevel.Entities.Path _path )
+        internal void WritePath( ContentWriter _output, Path _path )
         {
             _path.Flatten();
 
@@ -109,12 +112,12 @@ namespace VectorLevelProcessor
             // Subpaths
             _output.Write( (UInt16) _path.Subpaths.Count );
 
-            foreach( VectorLevel.Entities.Subpath subpath in _path.Subpaths )
+            foreach( Subpath subpath in _path.Subpaths )
             {
                 _output.Write( subpath.IsClosed );
 
                 _output.Write( (UInt16)subpath.PathNodes.Count );
-                foreach( VectorLevel.Entities.PathNode node in subpath.PathNodes )
+                foreach( PathNode node in subpath.PathNodes )
                 {
                     _output.Write( (char)node.Type );
                     _output.Write( node.Position );

@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
+using VectorLevel;
+using VectorLevel.Entities;
+
 // TODO: replace this with the type you want to write out.
 using TRead = VectorLevel.LevelDesc;
 
@@ -23,7 +26,7 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         protected override TRead Read( ContentReader _input, TRead _levelDesc )
         {
-            VectorLevel.LevelDesc levelDesc = new VectorLevel.LevelDesc();
+            LevelDesc levelDesc = new LevelDesc();
 
             levelDesc.Title         = _input.ReadString();
             levelDesc.Description   = _input.ReadString();
@@ -37,22 +40,22 @@ namespace VectorLevelProcessor
 
             for( int entityIndex = 0; entityIndex < entityCount; entityIndex++ )
             {
-                VectorLevel.Entities.EntityType entityType = (VectorLevel.Entities.EntityType)_input.ReadChar();
+                EntityType entityType = (EntityType)_input.ReadChar();
 
-                VectorLevel.Entities.Entity entity;
+                Entity entity;
 
                 switch( entityType )
                 {
-                    case VectorLevel.Entities.EntityType.Group:
+                    case EntityType.Group:
                         entity = ReadGroup( _input, levelDesc );
                         break;
-                    case VectorLevel.Entities.EntityType.Marker:
+                    case EntityType.Marker:
                         entity = ReadMarker( _input, levelDesc );
                         break;
-                    case VectorLevel.Entities.EntityType.Path:
+                    case EntityType.Path:
                         entity = ReadPath( _input, levelDesc );
                         break;
-                    case VectorLevel.Entities.EntityType.Text:
+                    case EntityType.Text:
                         entity = ReadText( _input, levelDesc );
                         break;
                     default:
@@ -67,17 +70,18 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Group ReadGroup( ContentReader _input, TRead _levelDesc )
+        internal Group ReadGroup( ContentReader _input, TRead _levelDesc )
         {
             string strGroupName = _input.ReadString();
             string strParentName = _input.ReadString();
-            VectorLevel.Entities.Group group = new VectorLevel.Entities.Group( strGroupName, _levelDesc.Entities[ strParentName ] as VectorLevel.Entities.Group );
+            GroupMode groupMode = _input.ReadObject<GroupMode>();
+            Group group = new Group( strGroupName, _levelDesc.Entities[ strParentName ] as Group, groupMode );
 
             return group;
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Marker ReadMarker( ContentReader _input, TRead _levelDesc )
+        internal Marker ReadMarker( ContentReader _input, TRead _levelDesc )
         {
             string strMarkerName    = _input.ReadString();
             string strParentName    = _input.ReadString();
@@ -88,30 +92,30 @@ namespace VectorLevelProcessor
             Vector2 vScale          = _input.ReadVector2();
             Color color             = _input.ReadColor();
             
-            VectorLevel.Entities.Marker marker = new VectorLevel.Entities.Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as VectorLevel.Entities.Group, strMarkerType, vPosition, vSize, fAngle, vScale, color );
+            Marker marker = new Marker( strMarkerName, _levelDesc.Entities[ strParentName ] as Group, strMarkerType, vPosition, vSize, fAngle, vScale, color );
             return marker;
         }
 
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Text ReadText( ContentReader _input, TRead _levelDesc )
+        internal Text ReadText( ContentReader _input, TRead _levelDesc )
         {
-            VectorLevel.Entities.Text text = new VectorLevel.Entities.Text( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as VectorLevel.Entities.Group, _input.ReadVector2(), _input.ReadSingle() );
+            Text text = new Text( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as Group, _input.ReadVector2(), _input.ReadSingle() );
 
             UInt16 uiTextSpanCount = _input.ReadUInt16();
 
             for( UInt16 uiTextSpanIndex = 0; uiTextSpanIndex < uiTextSpanCount; uiTextSpanIndex++ )
             {
-                text.TextSpans.Add( new VectorLevel.Entities.TextSpan( _input.ReadString() ) );
+                text.TextSpans.Add( new TextSpan( _input.ReadString() ) );
             }
 
             return text;
         }
 
         //----------------------------------------------------------------------
-        internal VectorLevel.Entities.Path ReadPath( ContentReader _input, TRead _levelDesc )
+        internal Path ReadPath( ContentReader _input, TRead _levelDesc )
         {
-            VectorLevel.Entities.Path path = new VectorLevel.Entities.Path( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as VectorLevel.Entities.Group );
+            Path path = new Path( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as Group );
 
             // Fill Color
             UInt32 uiPackedFillColor    = _input.ReadUInt32();
@@ -139,16 +143,16 @@ namespace VectorLevelProcessor
             
             for( UInt16 subpathIndex = 0; subpathIndex < subpathCount; subpathIndex++ )
             {
-                VectorLevel.Entities.Subpath subpath = new VectorLevel.Entities.Subpath();
+                Subpath subpath = new Subpath();
 
                 subpath.IsClosed = _input.ReadBoolean();
                 UInt16 nodeCount = _input.ReadUInt16();
 
                 for( UInt16 nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++ )
                 {
-                    VectorLevel.Entities.PathNode node = new VectorLevel.Entities.PathNode();
+                    PathNode node = new PathNode();
                     
-                    node.Type = (VectorLevel.Entities.PathNode.NodeType)_input.ReadChar();
+                    node.Type = (PathNode.NodeType)_input.ReadChar();
                     node.Position = _input.ReadVector2();
                     node.ControlPoint1 = _input.ReadVector2();
                     node.ControlPoint2 = _input.ReadVector2();

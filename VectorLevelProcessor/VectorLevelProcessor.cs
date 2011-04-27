@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.Xml;
 using System.Globalization;
 
+using VectorLevel;
+using VectorLevel.Entities;
+
 using TInput = VectorLevelProcessor.XMLFile;
 using TOutput = VectorLevel.LevelDesc;
 
@@ -36,13 +39,13 @@ namespace VectorLevelProcessor
         {
             //------------------------------------------------------------------
             // Create level desc
-            mLevelDesc = new VectorLevel.LevelDesc();
+            mLevelDesc = new LevelDesc();
             mLevelDesc.Title = System.IO.Path.GetFileNameWithoutExtension( _input.Filepath ); // Fallback if no name is specified in RDF meta-data
 
             mMatrixStack = new Stack<Matrix>();
             mMatrixStack.Push( Matrix.Identity );
 
-            mGroupStack = new Stack<VectorLevel.Entities.Group>();
+            mGroupStack = new Stack<Group>();
             mGroupStack.Push( mLevelDesc.Root );
 
             //------------------------------------------------------------------
@@ -122,7 +125,7 @@ namespace VectorLevelProcessor
                 // Group element
                 if( mXmlPathStack.Peek() == "g" )
                 {
-                    VectorLevel.Entities.Group group;
+                    Group group;
 
                     string strGroupMode = mXmlReader.GetAttribute( "groupmode", "http://www.inkscape.org/namespaces/inkscape" );
                     if( strGroupMode == "layer" )
@@ -130,13 +133,13 @@ namespace VectorLevelProcessor
                         //------------------------------------------------------
                         // Inkscape Layer, use the label rather than the id
                         string strLayerName = mXmlReader.GetAttribute( "label", "http://www.inkscape.org/namespaces/inkscape" );
-                        group = new VectorLevel.Entities.Group( strLayerName, mGroupStack.Peek() );
+                        group = new Group( strLayerName, mGroupStack.Peek(), GroupMode.Layer );
                     }
                     else
                     {
                         //------------------------------------------------------
                         // Any other kind of group
-                        group = new VectorLevel.Entities.Group( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek() );
+                        group = new VectorLevel.Entities.Group( mXmlReader.GetAttribute( "id" ), mGroupStack.Peek(), GroupMode.Group );
                     }
 
                     mGroupStack.Push( group );
