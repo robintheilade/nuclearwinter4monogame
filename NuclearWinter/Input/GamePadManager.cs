@@ -5,9 +5,9 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace NuclearWinter
+namespace NuclearWinter.Input
 {
-    public class InputMgr: GameComponent
+    public class GamePadManager: GameComponent
     {
         public const int                    siMaxInput              = 4;
         public const float                  sfStickThreshold        = 0.4f;
@@ -29,7 +29,7 @@ namespace NuclearWinter
         List<Buttons>                       lButtons;
 
         //---------------------------------------------------------------------
-        public InputMgr( Game _game )
+        public GamePadManager( Game _game )
         : base ( _game )
         {
             GamePadStates           = new GamePadState[ siMaxInput ];

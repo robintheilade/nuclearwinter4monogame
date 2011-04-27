@@ -97,7 +97,8 @@
     <Compile Include="Animation\Timeline.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
-    <Compile Include="InputMgr.cs" />
+    <Compile Include="Input\GamePadManager.cs" />
+    <Compile Include="Input\TouchManager.cs" />
     <Compile Include="LocalizedKeyboardState.cs" />
     <Compile Include="NuclearGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
