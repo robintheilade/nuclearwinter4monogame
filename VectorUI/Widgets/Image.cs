@@ -13,7 +13,7 @@ namespace VectorUI.Widgets
     {
         //----------------------------------------------------------------------
         public Image( UISheet _sheet, Marker _marker )
-        : base( _sheet )
+        : base( _marker.Name, _sheet )
         {
             mTexture = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath );
 

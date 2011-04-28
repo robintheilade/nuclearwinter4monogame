@@ -8,8 +8,9 @@ namespace VectorUI.Widgets
     public abstract class Widget
     {
         //----------------------------------------------------------------------
-        public Widget( UISheet _uiSheet )
+        public Widget( string _strName, UISheet _uiSheet )
         {
+            Name    = _strName;
             UISheet = _uiSheet;
         }
 
@@ -18,6 +19,10 @@ namespace VectorUI.Widgets
         public abstract void Draw();
 
         //----------------------------------------------------------------------
-        public UISheet UISheet;
+        public string       Name        { get; private set; }
+        public UISheet      UISheet     { get; private set; }
+
+        //----------------------------------------------------------------------
+        public Action       Click;
     }
 }

@@ -18,6 +18,12 @@ namespace VectorUI
             mlWidgets   = new List<Widgets.Widget>();
 
             CreateUIFromRoot( _uiDesc.Root );
+
+            maWidgets   = new Dictionary<string,Widgets.Widget>();
+            foreach( Widgets.Widget widget in mlWidgets )
+            {
+                maWidgets[ widget.Name ] = widget;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -56,6 +62,11 @@ namespace VectorUI
         //----------------------------------------------------------------------
         void CreateUIFromMarker( Marker _marker )
         {
+            if( _marker.MarkerType.StartsWith( "Checkbox" ) )
+            {
+                mlWidgets.Add( new Widgets.Checkbox( this, _marker ) );
+            }
+            else
             if( _marker.MarkerType.StartsWith( "Button" ) )
             {
                 mlWidgets.Add( new Widgets.Button( this, _marker ) );
@@ -89,9 +100,16 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
+        public Widgets.Widget GetWidget( string _strName )
+        {
+            return maWidgets[ _strName ];
+        }
+
+        //----------------------------------------------------------------------
         public NuclearGame          Game;
 
         //----------------------------------------------------------------------
-        List<Widgets.Widget>        mlWidgets;
+        List<Widgets.Widget>                    mlWidgets;
+        Dictionary<string, Widgets.Widget>      maWidgets;
     }
 }
