@@ -46,7 +46,7 @@ namespace NuclearWinter.GameFlow
         /// <param name="_time"></param>
         public virtual void DrawFadeIn( Microsoft.Xna.Framework.GameTime _time )
         {
-
+            Draw( _time );
         }
 
         //----------------------------------------------------------------------
@@ -66,7 +66,7 @@ namespace NuclearWinter.GameFlow
         /// <param name="_time"></param>
         public virtual void DrawFadeOut( Microsoft.Xna.Framework.GameTime _time )
         {
-
+            Draw( _time );
         }
 
         //----------------------------------------------------------------------
