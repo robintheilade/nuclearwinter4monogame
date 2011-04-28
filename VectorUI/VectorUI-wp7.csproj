@@ -83,6 +83,7 @@
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Checkbox.cs" />
     <Compile Include="Widgets\Image.cs" />
+    <Compile Include="Widgets\Label.cs" />
     <Compile Include="Widgets\Widget.cs" />
   </ItemGroup>
   <ItemGroup>

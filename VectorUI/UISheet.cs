@@ -6,15 +6,17 @@ using VectorLevel;
 using VectorLevel.Entities;
 
 using NuclearWinter;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace VectorUI
 {
     public class UISheet
     {
         //----------------------------------------------------------------------
-        public UISheet( NuclearGame _game, LevelDesc _uiDesc )
+        public UISheet( NuclearGame _game, SpriteFont _font, LevelDesc _uiDesc )
         {
             Game        = _game;
+            Font        = _font;
             mlWidgets   = new List<Widgets.Widget>();
 
             CreateUIFromRoot( _uiDesc.Root );
@@ -54,6 +56,9 @@ namespace VectorUI
                         break;
                     case VectorLevel.Entities.EntityType.Marker:
                         CreateUIFromMarker( entity as Marker );
+                        break;
+                    case VectorLevel.Entities.EntityType.Text:
+                        mlWidgets.Add( new Widgets.Label( this, entity as Text ) );
                         break;
                 }
             }
@@ -107,6 +112,7 @@ namespace VectorUI
 
         //----------------------------------------------------------------------
         public NuclearGame          Game;
+        public SpriteFont           Font;
 
         //----------------------------------------------------------------------
         List<Widgets.Widget>                    mlWidgets;
