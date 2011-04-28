@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter
 {
-    public abstract class NuclearGame: Game
+    public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
         public NuclearGame()
@@ -38,7 +38,7 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
-        public abstract string GetUIString( string _strId );
+        public virtual string GetUIString( string _strId ) { return _strId; }
 
         //----------------------------------------------------------------------
         public GraphicsDeviceManager                        Graphics;
