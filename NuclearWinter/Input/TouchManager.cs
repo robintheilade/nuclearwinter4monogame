@@ -1,3 +1,4 @@
+#if WINDOWS_PHONE
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,3 +28,4 @@ namespace NuclearWinter.Input
         public TouchCollection     Touches { get; private set; }
     }
 }
+#endif
