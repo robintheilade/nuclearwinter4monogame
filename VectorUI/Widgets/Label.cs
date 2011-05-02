@@ -19,7 +19,14 @@ namespace VectorUI.Widgets
 
             //Vector2 vSize = UISheet.Font.MeasureString( Text );
             mvPosition = _text.Position - new Vector2( 0, /* FIXME: hard-coded stuff! */ 35 );
-            mColor = Color.Black; // FIXME: _text.Color
+            mvOrigin = Vector2.Zero;
+
+            if( _text.Anchor == TextAnchor.Middle )
+            {
+                mvOrigin = new Vector2( UISheet.Font.MeasureString( Text ).X / 2f, 0f );
+            }
+
+            mColor = _text.FillColor;
         }
 
         //----------------------------------------------------------------------
@@ -30,13 +37,14 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.DrawString( UISheet.Font, Text, mvPosition, mColor );
+            UISheet.Game.SpriteBatch.DrawString( UISheet.Font, Text, mvPosition, mColor, 0f, mvOrigin, 1f, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------
         public string   Text;
 
         Vector2         mvPosition;
+        Vector2         mvOrigin;
         Color           mColor;
     }
 }

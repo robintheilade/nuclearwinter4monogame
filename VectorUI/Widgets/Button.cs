@@ -25,7 +25,7 @@ namespace VectorUI.Widgets
             Vector2 vRotatedCenter = Vector2.Transform( _marker.Size / 2f, matrix );
             mvPosition = _marker.Position + vRotatedCenter;
 
-            mvOrigin = new Vector2( mIdleTexture.Width, mIdleTexture.Height ) / 2f;
+            mvOrigin = _marker.Size / 2f;
             mvScale = _marker.Size / new Vector2( mIdleTexture.Width, mIdleTexture.Height ) * _marker.Scale;
 
             mColor = _marker.Color;

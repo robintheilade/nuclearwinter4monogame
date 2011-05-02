@@ -92,6 +92,8 @@ namespace VectorLevelProcessor
         {
             _output.Write( _text.Position );
             _output.Write( _text.Angle );
+            _output.Write( _text.FillColor );
+            _output.WriteObject<TextAnchor>( _text.Anchor );
 
             _output.Write( (UInt16)_text.TextSpans.Count );
 

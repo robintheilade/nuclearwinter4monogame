@@ -352,7 +352,18 @@ namespace VectorLevelProcessor
 
             float fAngle = (float)Math.Atan2( mMatrixStack.Peek().M12 /* cos angle */, mMatrixStack.Peek().M11 /* sin angle */ );
 
-            Text text = new Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle );
+            //------------------------------------------------------------------
+            // Read style
+            string strStyleAttr = mXmlReader.GetAttribute( "style" );
+
+            Color fillColor = Color.White;
+            Color strokeColor = new Color();
+            float fStrokeWidth = 0f;
+            VectorLevel.Entities.TextAnchor textAnchor = TextAnchor.Start;
+            ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth, ref textAnchor );
+
+            //------------------------------------------------------------------
+            Text text = new Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle, fillColor, textAnchor );
             return text;
         }
 
@@ -401,8 +412,33 @@ namespace VectorLevelProcessor
             return marker;
         }
 
+        internal Dictionary<string,string> ParseStyle( string _strStyleAttr )
+        {
+            string[] styles = _strStyleAttr.Split( ";".ToCharArray() );
+
+            Dictionary<string,string> dStyleDefs = new Dictionary<string,string>();
+
+            foreach( string style in styles )
+            {
+                string[] keyValPair = style.Split( ":".ToCharArray() );
+                string key = keyValPair[0];
+                string value = keyValPair[1];
+
+                dStyleDefs[key] = value;
+            }
+
+            return dStyleDefs;
+        }
+
         //----------------------------------------------------------------------
         internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth )
+        {
+            VectorLevel.Entities.TextAnchor textAnchor = VectorLevel.Entities.TextAnchor.Start;
+            ReadStyle( _strStyleAttr, ref _fillColor, ref _strokeColor, ref _fStrokeWidth, ref textAnchor );
+        }
+
+        //----------------------------------------------------------------------
+        internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth, ref VectorLevel.Entities.TextAnchor _textAnchor )
         {
             _fStrokeWidth = 0f;
 
@@ -412,22 +448,19 @@ namespace VectorLevelProcessor
 
             if( _strStyleAttr != null )
             {
-                string[] styles = _strStyleAttr.Split( ";".ToCharArray() );
-                foreach( string style in styles )
-                {
-                    string[] keyValPair = style.Split( ":".ToCharArray() );
-                    string key = keyValPair[0];
-                    string value = keyValPair[1];
+                Dictionary<string,string> dStyleDefs = ParseStyle( _strStyleAttr );
 
-                    switch( key )
+                foreach( KeyValuePair<string,string> styleDef in dStyleDefs )
+                {
+                    switch( styleDef.Key )
                     {
                     case "fill":
-                        if( value[0] == '#' )
+                        if( styleDef.Value[0] == '#' )
                         {
-                            _fillColor = ReadHexColor( value );
+                            _fillColor = ReadHexColor( styleDef.Value );
                         }
                         else
-                        if( value.ToLower() == "none" )
+                        if( styleDef.Value.ToLower() == "none" )
                         {
                             // FIXME: disable fill rendering altogether
                             _fillColor = Color.Transparent;
@@ -435,35 +468,54 @@ namespace VectorLevelProcessor
                         }
                         break;
                     case "stroke":
-                        if( value[0] == '#' )
+                        if( styleDef.Value[0] == '#' )
                         {
-                            _strokeColor = ReadHexColor( value );
+                            _strokeColor = ReadHexColor( styleDef.Value );
                             bHasStroke = true;
                         }
                         break;
                     case "fill-opacity":
                         {
-                        float fOpacity = float.Parse( value, CultureInfo.InvariantCulture );
+                        float fOpacity = float.Parse( styleDef.Value, CultureInfo.InvariantCulture );
                         fFillOpacity *= fOpacity;
                         break;
                         }
                     case "opacity":
                         {
-                        float fOpacity = float.Parse( value, CultureInfo.InvariantCulture );
+                        float fOpacity = float.Parse( styleDef.Value, CultureInfo.InvariantCulture );
                         fStrokeOpacity *= fOpacity;
                         fFillOpacity = fOpacity;
                         break;
                         }
                     case "stroke-opacity":
                         {
-                        float fOpacity = float.Parse( value, CultureInfo.InvariantCulture );
+                        float fOpacity = float.Parse( styleDef.Value, CultureInfo.InvariantCulture );
                         fStrokeOpacity *= fOpacity;
                         break;
                         }
                     case "stroke-width":
                         {
-                        value = value.Replace("px", "");
+                        string value = styleDef.Value.Replace("px", "");
                         _fStrokeWidth = float.Parse( value, CultureInfo.InvariantCulture );
+                        break;
+                        }
+                    case "text-anchor":
+                        {
+                        switch( styleDef.Value )
+                        {
+                            case "start":
+                                _textAnchor = VectorLevel.Entities.TextAnchor.Start;
+                                break;
+                            case "middle":
+                                _textAnchor = VectorLevel.Entities.TextAnchor.Middle;
+                                break;
+                            case "end":
+                                _textAnchor = VectorLevel.Entities.TextAnchor.End;
+                                break;
+                            default:
+                                _textAnchor = VectorLevel.Entities.TextAnchor.Start;
+                                break;
+                        }
                         break;
                         }
                     }
