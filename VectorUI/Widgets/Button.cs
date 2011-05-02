@@ -52,7 +52,7 @@ namespace VectorUI.Widgets
 
                     if( touch.State == TouchLocationState.Released && Click != null )
                     {
-                        Click();
+                        Click( this );
                     }
                     break;
                 }

@@ -75,7 +75,7 @@ namespace VectorUI.Widgets
 
                             if( SelectItem != null )
                             {
-                                SelectItem( SelectedItemIndex );
+                                SelectItem( this, SelectedItemIndex );
                             }
                         }
                     }

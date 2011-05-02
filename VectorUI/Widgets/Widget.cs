@@ -23,7 +23,7 @@ namespace VectorUI.Widgets
         public UISheet      UISheet     { get; private set; }
 
         //----------------------------------------------------------------------
-        public Action       Click;
-        public Action<int>  SelectItem;
+        public Action<Widget>       Click;
+        public Action<Widget,int>   SelectItem;
     }
 }
