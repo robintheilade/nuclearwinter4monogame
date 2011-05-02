@@ -24,5 +24,6 @@ namespace VectorUI.Widgets
 
         //----------------------------------------------------------------------
         public Action       Click;
+        public Action<int>  SelectItem;
     }
 }

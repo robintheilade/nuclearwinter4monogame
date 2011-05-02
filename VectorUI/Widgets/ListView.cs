@@ -16,8 +16,9 @@ namespace VectorUI.Widgets
         public ListView( UISheet _sheet, Marker _marker )
         : base( _marker.Name, _sheet )
         {
-            mBorderTexture  = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath );
-            mItemTexture    = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "Item" );
+            mBorderTex          = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath );
+            mItemTex            = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "Item" );
+            mSelectedItemTex    = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "SelectedItem" );
 
             Position  = new Point( (int)_marker.Position.X, (int)_marker.Position.Y );
             Size      = new Point( (int)_marker.Size.X, (int)_marker.Size.Y );
@@ -43,25 +44,55 @@ namespace VectorUI.Widgets
                 {
                     if( touch.State == TouchLocationState.Pressed )
                     {
-                        mbDragging = true;
-                        mfStartDrag = mfScroll + touch.Position.Y;
+                        mfDragOffset = mfScroll + vPos.Y;
+                        mfDragPreviousY = vPos.Y;
                     }
                     else
-                    if( touch.State == TouchLocationState.Moved && mbDragging )
+                    if( touch.State == TouchLocationState.Moved )
                     {
-                        mfScroll = MathHelper.Clamp( mfStartDrag - touch.Position.Y, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
+                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                        {
+                            mbDragging = true;
+                        }
+                        
+                        if( mbDragging )
+                        {
+                            mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
+                            mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                            mfDragPreviousY = vPos.Y;
+                        }
                     }
                     else
                     if( touch.State == TouchLocationState.Released )
                     {
-                        mbDragging = false;
-                    }
+                        if( mbDragging )
+                        {
+                            mbDragging = false;
+                        }
+                        else
+                        {
+                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + 10 ) + mfScroll ) / 70 );
 
-                    if( touch.State == TouchLocationState.Released && Click != null )
-                    {
-                        Click();
+                            if( SelectItem != null )
+                            {
+                                SelectItem( SelectedItemIndex );
+                            }
+                        }
                     }
                     break;
+                }
+            }
+
+            if( ! mbDragging  && mfScrollInertia != 0f )
+            {
+                mfScrollInertia *= Math.Max( 0f, 1f - ( _fElapsedTime * 5f ) );
+                if( Math.Abs( mfScrollInertia ) < 1f )
+                {
+                    mfScrollInertia = 0f;
+                }
+                else
+                {
+                    mfScroll = MathHelper.Clamp( mfScroll + mfScrollInertia, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
                 }
             }
         }
@@ -69,13 +100,14 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.DrawBox( mBorderTexture, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, mColor );
-
-
+            UISheet.DrawBox( mBorderTex, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, mColor );
             
+            Rectangle savedRectangle = UISheet.Game.GraphicsDevice.ScissorRectangle;
+            UISheet.Game.GraphicsDevice.ScissorRectangle = new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 );
+
             for( int iEntry = 0; iEntry < ListData.Entries.Count; iEntry++ )
             {
-                UISheet.DrawBox( mItemTexture, new Rectangle( Position.X + 10, Position.Y + 10 + iEntry * 70 - (int)mfScroll, Size.X - 20, 70 ), 20, mColor );
+                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( Position.X + 10, Position.Y + 10 + iEntry * 70 - (int)mfScroll, Size.X - 20, 70 ), 20, mColor );
             }
 
             int iOffsetX = 0;
@@ -97,7 +129,7 @@ namespace VectorUI.Widgets
                     case Models.ListColumnType.Text:
                         foreach( var entry in ListData.Entries )
                         {
-                            UISheet.Game.SpriteBatch.DrawString( UISheet.Font, entry.Values[iColumn], new Vector2( Position.X + iOffsetX + 10, Position.Y + 20 + 70 * iEntry - (int)mfScroll ), Color.Black );
+                            UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont, entry.Values[iColumn], new Vector2( Position.X + iOffsetX + 10, Position.Y + 20 + 70 * iEntry - (int)mfScroll ), Color.Black );
                             iEntry++;
                         }
 
@@ -106,6 +138,8 @@ namespace VectorUI.Widgets
 
                 iOffsetX += ListData.Columns[iColumn].Size;
             }
+
+            UISheet.Game.GraphicsDevice.ScissorRectangle = savedRectangle;
         }
 
         //----------------------------------------------------------------------
@@ -139,8 +173,9 @@ namespace VectorUI.Widgets
         Models.ListData         mListData;
 
         //----------------------------------------------------------------------
-        Texture2D                       mBorderTexture;
-        Texture2D                       mItemTexture;
+        Texture2D                       mBorderTex;
+        Texture2D                       mItemTex;
+        Texture2D                       mSelectedItemTex;
 
         Dictionary<string,Texture2D>    ItemTextures;
 
@@ -149,7 +184,9 @@ namespace VectorUI.Widgets
         public int                      SelectedItemIndex;
 
         bool                            mbDragging;
-        float                           mfStartDrag;
+        float                           mfDragOffset;
+        float                           mfDragPreviousY;
+        float                           mfScrollInertia;
 
         Rectangle                       mHitRectangle;
 

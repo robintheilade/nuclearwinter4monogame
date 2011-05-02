@@ -8,16 +8,20 @@ using VectorLevel.Entities;
 using NuclearWinter;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace VectorUI
 {
     public class UISheet
     {
         //----------------------------------------------------------------------
-        public UISheet( NuclearGame _game, SpriteFont _font, LevelDesc _uiDesc )
+        public UISheet( NuclearGame _game, LevelDesc _uiDesc )
         {
             Game        = _game;
-            Font        = _font;
+            Content     = new ContentManager( Game.Services, "Content" );
+
+            Font        = _game.Content.Load<SpriteFont>( "Fonts/UIFont" );
+            SmallFont   = _game.Content.Load<SpriteFont>( "Fonts/UISmallFont" );
             mlWidgets   = new List<Widgets.Widget>();
 
             CreateUIFromRoot( _uiDesc.Root );
@@ -27,6 +31,9 @@ namespace VectorUI
             {
                 maWidgets[ widget.Name ] = widget;
             }
+
+            mRasterizerState = new RasterizerState();
+            mRasterizerState.ScissorTestEnable = true;
         }
 
         //----------------------------------------------------------------------
@@ -100,7 +107,7 @@ namespace VectorUI
         //----------------------------------------------------------------------
         public void Draw()
         {
-            Game.SpriteBatch.Begin();
+            Game.SpriteBatch.Begin( SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, mRasterizerState );
 
             foreach( Widgets.Widget widget in mlWidgets )
             {
@@ -139,10 +146,14 @@ namespace VectorUI
 
         //----------------------------------------------------------------------
         public NuclearGame          Game;
+        public ContentManager       Content;
         public SpriteFont           Font;
+        public SpriteFont           SmallFont;
 
         //----------------------------------------------------------------------
         List<Widgets.Widget>                    mlWidgets;
         Dictionary<string, Widgets.Widget>      maWidgets;
+
+        public RasterizerState      mRasterizerState;
     }
 }
