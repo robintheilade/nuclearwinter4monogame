@@ -7,6 +7,7 @@ using VectorLevel.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
 
 namespace VectorUI.Widgets
 {
@@ -38,25 +39,45 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime )
         {
-#if WINDOWS_PHONE
             mbPressed = false;
+#if WINDOWS_PHONE
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
             {
                 Vector2 vPos = touch.Position;
+#elif WINDOWS
+                Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+#endif
                 vPos -= mvOrigin;
                 vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
                 vPos += mvOrigin;
-
-                if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
+                
+                if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) 
+                    )
                 {
-                    mbPressed = true;
+#if WINDOWS
+                    if( UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed )
+                    {
+#endif
+                        mbPressed = true;
+#if WINDOWS
+                    }
+#endif
 
-                    if( touch.State == TouchLocationState.Released && Click != null )
+                    if(
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Released
+#elif WINDOWS
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#endif
+                        && Click != null )
                     {
                         Click( this );
                     }
+#if WINDOWS_PHONE
                     break;
+#endif
                 }
+#if WINDOWS_PHONE
             }
 #endif
         }

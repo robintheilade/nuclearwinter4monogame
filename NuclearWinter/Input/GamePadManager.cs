@@ -16,6 +16,9 @@ namespace NuclearWinter.Input
         public readonly GamePadState[]      PreviousGamePadStates;
 
 #if WINDOWS
+        public MouseState                   MouseState;
+        public MouseState                   PreviousMouseState;
+
         public LocalizedKeyboardState       KeyboardState;
         public LocalizedKeyboardState       PreviousKeyboardState;
 #endif
@@ -54,6 +57,9 @@ namespace NuclearWinter.Input
             }
 
 #if WINDOWS
+            PreviousMouseState = MouseState;
+            MouseState = Mouse.GetState();
+
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
 #endif
@@ -159,6 +165,48 @@ namespace NuclearWinter.Input
         }
         
 #if WINDOWS
+        //----------------------------------------------------------------------
+        public bool WasMouseButtonJustPressed( int _iButton )
+        {
+            switch( _iButton )
+            {
+                case 0:
+                    return MouseState.LeftButton    == ButtonState.Pressed && PreviousMouseState.LeftButton     == ButtonState.Released;
+                case 1:
+                    return MouseState.MiddleButton  == ButtonState.Pressed && PreviousMouseState.MiddleButton   == ButtonState.Released;
+                case 2:
+                    return MouseState.RightButton   == ButtonState.Pressed && PreviousMouseState.RightButton    == ButtonState.Released;
+                case 3:
+                    return MouseState.XButton1      == ButtonState.Pressed && PreviousMouseState.XButton1       == ButtonState.Released;
+                case 4:
+                    return MouseState.XButton2      == ButtonState.Pressed && PreviousMouseState.XButton2       == ButtonState.Released;
+                default:
+                    return false;
+            }
+
+        }
+
+        //----------------------------------------------------------------------
+        public bool WasMouseButtonJustReleased( int _iButton )
+        {
+            switch( _iButton )
+            {
+                case 0:
+                    return MouseState.LeftButton    == ButtonState.Released && PreviousMouseState.LeftButton     == ButtonState.Pressed;
+                case 1:
+                    return MouseState.MiddleButton  == ButtonState.Released && PreviousMouseState.MiddleButton   == ButtonState.Pressed;
+                case 2:
+                    return MouseState.RightButton   == ButtonState.Released && PreviousMouseState.RightButton    == ButtonState.Pressed;
+                case 3:
+                    return MouseState.XButton1      == ButtonState.Released && PreviousMouseState.XButton1       == ButtonState.Pressed;
+                case 4:
+                    return MouseState.XButton2      == ButtonState.Released && PreviousMouseState.XButton2       == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+
+        }
+
         //----------------------------------------------------------------------
         public bool WasKeyJustPressed( Keys _key )
         {
