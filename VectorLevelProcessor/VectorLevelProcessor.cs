@@ -120,6 +120,11 @@ namespace VectorLevelProcessor
             }
             
             else
+            if( mXmlPathStack.Contains( "defs" ) )
+            {
+                // Ignore defs for now
+            }
+            else
             {
                 //--------------------------------------------------------------
                 // Group element
@@ -251,7 +256,7 @@ namespace VectorLevelProcessor
                 if( cChar == '(' )
                 {
                     // Which transform is this?
-                    switch( strData.ToLower() )
+                    switch( strData.ToLower().Trim() )
                     {
                         case "matrix":
                             transformType = TransformType.Matrix;
@@ -320,9 +325,23 @@ namespace VectorLevelProcessor
                             break;
 
                         case TransformType.Scale:
-                            if( astrTokens.Length != 2 ) throw new Exception( String.Format( "Scale transform type expects 2 values, found {0}", astrTokens.Length ) );
+                            Vector3 vScale = Vector3.Zero;
                             
-                            Vector3 vScale = new Vector3( float.Parse( astrTokens[0], CultureInfo.InvariantCulture ), float.Parse( astrTokens[1], CultureInfo.InvariantCulture ), 0 );
+                            if( astrTokens.Length == 1 )
+                            {
+                                float fScale = float.Parse( astrTokens[0], CultureInfo.InvariantCulture );
+                                vScale = new Vector3( fScale, fScale, 0 );
+                            }
+                            else
+                            if( astrTokens.Length == 2 )
+                            {
+                                vScale = new Vector3( float.Parse( astrTokens[0], CultureInfo.InvariantCulture ), float.Parse( astrTokens[1], CultureInfo.InvariantCulture ), 0 );
+                            }
+                            else
+                            {
+                                throw new Exception( String.Format( "Scale transform type expects 1 or 2 values, found {0}", astrTokens.Length ) );
+                            }
+
                             newMatrix = Matrix.CreateScale( vScale ) * newMatrix;
                             break;
                         default:
@@ -495,8 +514,14 @@ namespace VectorLevelProcessor
                         }
                     case "stroke-width":
                         {
-                        string value = styleDef.Value.Replace("px", "");
+                        string value = styleDef.Value.Replace("px", "").Replace("pt", "");
                         _fStrokeWidth = float.Parse( value, CultureInfo.InvariantCulture );
+
+                        if( styleDef.Value.EndsWith( "pt" ) )
+                        {
+                            // 1px = 0.75pt (http://www.w3.org/TR/CSS21/syndata.html)
+                            _fStrokeWidth /= 0.75f;
+                        }
                         break;
                         }
                     case "text-anchor":
