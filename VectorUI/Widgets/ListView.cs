@@ -36,6 +36,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime )
         {
+#if WINDOWS_PHONE
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
             {
                 Vector2 vPos = touch.Position;
@@ -95,6 +96,7 @@ namespace VectorUI.Widgets
                     mfScroll = MathHelper.Clamp( mfScroll + mfScrollInertia, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
                 }
             }
+#endif
         }
 
         //----------------------------------------------------------------------

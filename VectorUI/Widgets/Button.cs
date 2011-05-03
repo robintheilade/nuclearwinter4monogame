@@ -38,6 +38,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime )
         {
+#if WINDOWS_PHONE
             mbPressed = false;
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
             {
@@ -57,6 +58,7 @@ namespace VectorUI.Widgets
                     break;
                 }
             }
+#endif
         }
 
         //----------------------------------------------------------------------
