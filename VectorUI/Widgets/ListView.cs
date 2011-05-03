@@ -57,6 +57,8 @@ namespace VectorUI.Widgets
                     {
                         mfDragOffset = mfScroll + vPos.Y;
                         mfDragPreviousY = vPos.Y;
+
+                        SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + 10 ) + mfScroll ) / 70 );
                     }
                     else
                     if( 
@@ -72,13 +74,10 @@ namespace VectorUI.Widgets
                             mbDragging = false;
                         }
                         else
+                        if( SelectItem != null )
                         {
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + 10 ) + mfScroll ) / 70 );
-
-                            if( SelectItem != null )
-                            {
-                                SelectItem( this, SelectedItemIndex );
-                            }
+                            SelectItem( this, SelectedItemIndex );
                         }
                     }
                     else
@@ -92,6 +91,7 @@ namespace VectorUI.Widgets
                     {
                         if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
                         {
+                            SelectedItemIndex = -1;
                             mbDragging = true;
                         }
                         
