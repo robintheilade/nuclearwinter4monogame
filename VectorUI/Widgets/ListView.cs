@@ -7,6 +7,7 @@ using VectorLevel.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
 
 namespace VectorUI.Widgets
 {
@@ -40,31 +41,31 @@ namespace VectorUI.Widgets
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
             {
                 Vector2 vPos = touch.Position;
+#elif WINDOWS
+                Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+#endif
 
                 if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
                 {
-                    if( touch.State == TouchLocationState.Pressed )
+                    if( 
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Pressed
+#else
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
+#endif
+                    )
                     {
                         mfDragOffset = mfScroll + vPos.Y;
                         mfDragPreviousY = vPos.Y;
                     }
                     else
-                    if( touch.State == TouchLocationState.Moved )
-                    {
-                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
-                        {
-                            mbDragging = true;
-                        }
-                        
-                        if( mbDragging )
-                        {
-                            mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
-                            mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
-                            mfDragPreviousY = vPos.Y;
-                        }
-                    }
-                    else
-                    if( touch.State == TouchLocationState.Released )
+                    if( 
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Released
+#else
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#endif
+                    )
                     {
                         if( mbDragging )
                         {
@@ -80,9 +81,35 @@ namespace VectorUI.Widgets
                             }
                         }
                     }
+                    else
+                    if(
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Moved
+#else
+                        UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+#endif
+                    )
+                    {
+                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                        {
+                            mbDragging = true;
+                        }
+                        
+                        if( mbDragging )
+                        {
+                            mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
+                            mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                            mfDragPreviousY = vPos.Y;
+                        }
+                    }
+
+#if WINDOWS_PHONE
                     break;
+#endif
                 }
+#if WINDOWS_PHONE
             }
+#endif
 
             if( ! mbDragging  && mfScrollInertia != 0f )
             {
@@ -96,7 +123,6 @@ namespace VectorUI.Widgets
                     mfScroll = MathHelper.Clamp( mfScroll + mfScrollInertia, 0f, mListData.Entries.Count * 70 - Size.Y + 20 );
                 }
             }
-#endif
         }
 
         //----------------------------------------------------------------------
