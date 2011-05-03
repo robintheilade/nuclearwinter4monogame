@@ -15,7 +15,7 @@ namespace VectorUI.Widgets
         public Label( UISheet _sheet, Text _text )
         : base( _text.Name, _sheet )
         {
-            Text = UISheet.Game.GetUIString( _text.TextSpans[0].Value.Substring( 6 ) );
+            Text = UISheet.Game.GetUIString( _text.TextSpans[0].Value.Substring( "String".Length ) );
 
             //Vector2 vSize = UISheet.Font.MeasureString( Text );
             mvPosition = _text.Position - new Vector2( 0, /* FIXME: hard-coded stuff! */ 35 );

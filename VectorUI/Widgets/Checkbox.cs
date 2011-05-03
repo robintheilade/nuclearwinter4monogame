@@ -19,7 +19,7 @@ namespace VectorUI.Widgets
         {
             mbOn = _marker.MarkerType.EndsWith( "On" );
 
-            string basePath = _marker.MarkerFullPath.Substring( 0, _marker.MarkerFullPath.Length - ( mbOn ? 2 : 3 ) );
+            string basePath = _marker.MarkerFullPath.Substring( 0, _marker.MarkerFullPath.Length - ( mbOn ? "On" : "Off" ).Length );
 
             mOffTex         = UISheet.Game.Content.Load<Texture2D>( basePath + "Off" );
             mOnTex          = UISheet.Game.Content.Load<Texture2D>( basePath + "On" );
