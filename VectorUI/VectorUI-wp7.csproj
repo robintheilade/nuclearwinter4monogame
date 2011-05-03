@@ -78,6 +78,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\AnimationBlock.cs" />
+    <Compile Include="Animation\AnimationLayer.cs" />
+    <Compile Include="Animation\FadeBlock.cs" />
+    <Compile Include="Animation\SlideBlock.cs" />
     <Compile Include="Models\ListData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UISheet.cs" />

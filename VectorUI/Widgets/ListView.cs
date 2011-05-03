@@ -76,6 +76,7 @@ namespace VectorUI.Widgets
                         else
                         if( SelectItem != null )
                         {
+                            UISheet.MenuClickSFX.Play();
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + 10 ) + mfScroll ) / 70 );
                             SelectItem( this, SelectedItemIndex );
                         }

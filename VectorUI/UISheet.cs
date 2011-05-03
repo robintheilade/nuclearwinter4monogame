@@ -9,6 +9,9 @@ using NuclearWinter;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
+using VectorUI.Animation;
+using Microsoft.Xna.Framework.Audio;
 
 namespace VectorUI
 {
@@ -17,12 +20,20 @@ namespace VectorUI
         //----------------------------------------------------------------------
         public UISheet( NuclearGame _game, LevelDesc _uiDesc )
         {
-            Game        = _game;
-            Content     = new ContentManager( Game.Services, "Content" );
+            Game            = _game;
+            Content         = new ContentManager( Game.Services, "Content" );
 
-            Font        = _game.Content.Load<SpriteFont>( "Fonts/UIFont" );
-            SmallFont   = _game.Content.Load<SpriteFont>( "Fonts/UISmallFont" );
-            mlWidgets   = new List<Widgets.Widget>();
+            mRasterizerState = new RasterizerState();
+            mRasterizerState.ScissorTestEnable = true;
+
+            Font            = _game.Content.Load<SpriteFont>( "Fonts/UIFont" );
+            SmallFont       = _game.Content.Load<SpriteFont>( "Fonts/UISmallFont" );
+
+            MenuValidateSFX = _game.Content.Load<SoundEffect>( "Sounds/MenuValidate01" );
+            MenuClickSFX    = _game.Content.Load<SoundEffect>( "Sounds/MenuClick01" );
+
+            mlWidgets       = new List<Widgets.Widget>();
+            AnimationLayers = new Dictionary<string,AnimationLayer>();
 
             CreateUIFromRoot( _uiDesc.Root );
 
@@ -31,9 +42,6 @@ namespace VectorUI
             {
                 maWidgets[ widget.Name ] = widget;
             }
-
-            mRasterizerState = new RasterizerState();
-            mRasterizerState.ScissorTestEnable = true;
         }
 
         //----------------------------------------------------------------------
@@ -49,7 +57,11 @@ namespace VectorUI
                         {
                             if( group.Name.StartsWith( "Animation" ) )
                             {
-                                VisitAnimationGroup( group );
+                                string strAnimationLayerName = group.Name.Substring( "Animation".Length );
+                                AnimationLayer layer = new AnimationLayer( this );
+                                AnimationLayers[strAnimationLayerName] = layer;
+
+                                VisitAnimationGroup( layer, group );
                             }
                             else
                             {
@@ -88,12 +100,6 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void VisitAnimationGroup( Group _group )
-        {
-
-        }
-
-        //----------------------------------------------------------------------
         void CreateUIFromMarker( Marker _marker )
         {
             if( _marker.MarkerType.StartsWith( "Checkbox" ) )
@@ -115,6 +121,26 @@ namespace VectorUI
                 mlWidgets.Add( new Widgets.Image( this, _marker ) );
             }
         }
+
+        //----------------------------------------------------------------------
+        void VisitAnimationGroup( AnimationLayer _layer, Group _group )
+        {
+            foreach( Entity entity in _group.Entities )
+            {
+                switch( entity.Type )
+                {
+                    case VectorLevel.Entities.EntityType.Group:
+                        VisitAnimationGroup( _layer, entity as Group );
+                        break;
+                    case VectorLevel.Entities.EntityType.Marker:
+                        break;
+                    case VectorLevel.Entities.EntityType.Text:
+                        break;
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------
 
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
@@ -171,9 +197,14 @@ namespace VectorUI
         public SpriteFont           Font;
         public SpriteFont           SmallFont;
 
+        public SoundEffect          MenuValidateSFX;
+        public SoundEffect          MenuClickSFX;
+
         //----------------------------------------------------------------------
-        List<Widgets.Widget>                    mlWidgets;
-        Dictionary<string, Widgets.Widget>      maWidgets;
+        List<Widgets.Widget>                        mlWidgets;
+        Dictionary<string, Widgets.Widget>          maWidgets;
+
+        public Dictionary<string,AnimationLayer>    AnimationLayers { get; private set; }
 
         public RasterizerState      mRasterizerState;
     }
