@@ -395,7 +395,7 @@ namespace VectorLevelProcessor
             string strImagePath         = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
             string strMarkerType        = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
 
-            if( ! System.IO.Path.IsPathRooted( strImagePath ) )
+            if( ! strImagePath.Contains("://" ) && ! System.IO.Path.IsPathRooted( strImagePath ) )
             {
                 strImagePath = System.IO.Path.Combine( mstrPathToLevel, strImagePath );
             }
@@ -572,6 +572,11 @@ namespace VectorLevelProcessor
             // Read style
             string strStyleAttr = mXmlReader.GetAttribute( "style" );
             ReadStyle( strStyleAttr, ref path.FillColor, ref path.StrokeColor, ref path.StrokeWidth );
+
+            //------------------------------------------------------------------
+            // Read connections
+            path.ConnectionStart    = mXmlReader.GetAttribute( "connection-start", "http://www.inkscape.org/namespaces/inkscape" );
+            path.ConnectionEnd      = mXmlReader.GetAttribute( "connection-end", "http://www.inkscape.org/namespaces/inkscape" );
 
             //------------------------------------------------------------------
             // Read contours

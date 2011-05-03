@@ -51,7 +51,7 @@ namespace VectorUI
             {
                 switch( entity.Type )
                 {
-                    case VectorLevel.Entities.EntityType.Group:
+                    case EntityType.Group:
                         Group group = entity as Group;
                         if( group.GroupMode == GroupMode.Layer )
                         {
@@ -86,13 +86,13 @@ namespace VectorUI
             {
                 switch( entity.Type )
                 {
-                    case VectorLevel.Entities.EntityType.Group:
+                    case EntityType.Group:
                         VisitWidgetGroup( entity as Group );
                         break;
-                    case VectorLevel.Entities.EntityType.Marker:
+                    case EntityType.Marker:
                         CreateUIFromMarker( entity as Marker );
                         break;
-                    case VectorLevel.Entities.EntityType.Text:
+                    case EntityType.Text:
                         mlWidgets.Add( new Widgets.Label( this, entity as Text ) );
                         break;
                 }
@@ -129,18 +129,51 @@ namespace VectorUI
             {
                 switch( entity.Type )
                 {
-                    case VectorLevel.Entities.EntityType.Group:
+                    case EntityType.Group:
                         VisitAnimationGroup( _layer, entity as Group );
                         break;
-                    case VectorLevel.Entities.EntityType.Marker:
+                    case EntityType.Marker:
+                        CreateAnimBlockFromMarker( _layer, entity as Marker );
                         break;
-                    case VectorLevel.Entities.EntityType.Text:
+                    case EntityType.Path:
+                        CreateAnimLinkFromPath( _layer, entity as Path );
+                        break;
+                    case EntityType.Text:
                         break;
                 }
             }
         }
 
         //----------------------------------------------------------------------
+        void CreateAnimBlockFromMarker( AnimationLayer _layer, Marker _marker )
+        {
+            AnimationBlock block = null;
+            switch( _marker.MarkerType )
+            {
+                case "SlideIn":
+                case "SlideOut":
+                    block = new SlideBlock( _layer, _marker.MarkerType.EndsWith( "In" ), 0.3f, 200f, _marker.Angle );
+                    break;
+                case "FadeIn":
+                case "FadeOut":
+                    block = new FadeBlock( _layer, _marker.MarkerType.EndsWith( "In" ), 0.3f );
+                    break;
+                default:
+                    Debug.Assert( false );
+                    break;
+            }
+
+            Debug.Assert( block != null );
+
+            _layer.AnimationBlocks[ _marker.Name ] = block;
+        }
+
+        //----------------------------------------------------------------------
+        void CreateAnimLinkFromPath( AnimationLayer _layer, Path _path )
+        {
+            // FIXME: group support!
+            _layer.TargetWidgetNames.Add( _path.ConnectionEnd.Substring(1) );
+        }
 
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
@@ -148,6 +181,11 @@ namespace VectorUI
             foreach( Widgets.Widget widget in mlWidgets )
             {
                 widget.Update( _fElapsedTime );
+            }
+            
+            foreach( AnimationLayer animLayer in AnimationLayers.Values )
+            {
+                animLayer.Update( _fElapsedTime );
             }
         }
 

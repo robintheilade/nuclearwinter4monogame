@@ -90,6 +90,10 @@ namespace VectorLevel.Entities
         // Flattened path data
         public Vector2[]                MeshVertices;
         public int[]                    MeshIndices;
+
+        // Connections
+        public string                   ConnectionStart;
+        public string                   ConnectionEnd;
     }
 
     //--------------------------------------------------------------------------

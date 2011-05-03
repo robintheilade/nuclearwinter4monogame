@@ -112,6 +112,10 @@ namespace VectorLevelProcessor
             _output.Write( (UInt32) _path.StrokeColor.PackedValue );
             _output.Write( _path.StrokeWidth );
 
+            // Connections
+            _output.Write( _path.ConnectionStart );
+            _output.Write( _path.ConnectionEnd );
+
             // Subpaths
             _output.Write( (UInt16) _path.Subpaths.Count );
 

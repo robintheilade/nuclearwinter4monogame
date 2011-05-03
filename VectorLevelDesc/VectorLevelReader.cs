@@ -139,6 +139,11 @@ namespace VectorLevelProcessor
             // Stroke width
             path.StrokeWidth = _input.ReadSingle();
 
+
+            // Connections
+            path.ConnectionStart    = _input.ReadString();
+            path.ConnectionEnd      = _input.ReadString();
+
             // Subpaths
             UInt16 subpathCount = _input.ReadUInt16();
             

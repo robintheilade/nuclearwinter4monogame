@@ -5,6 +5,7 @@ using System.Text;
 
 namespace VectorUI.Animation
 {
+    // FIXME: See to merge part of this with NuclearWinter.Animation.Timeline
     public class AnimationLayer
     {
         //----------------------------------------------------------------------
@@ -13,7 +14,9 @@ namespace VectorUI.Animation
             UISheet             = _uiSheet;
 
             TargetWidgetNames   = new List<string>();
-            AnimationBlocks     = new List<KeyValuePair<float,AnimationBlock>>();
+            AnimationBlocks     = new Dictionary<string,AnimationBlock>();
+
+            Time                = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -24,6 +27,8 @@ namespace VectorUI.Animation
             {
                 TargetWidgets.Add( UISheet.GetWidget( strWidgetName ) );
             }
+
+            HasStarted = true;
         }
 
         //----------------------------------------------------------------------
@@ -31,15 +36,23 @@ namespace VectorUI.Animation
         {
             if( ! HasStarted ) return;
             
-            foreach( KeyValuePair<float,AnimationBlock> block in AnimationBlocks )
+            Time += _fElapsedTime;
+
+            IsDone = true;
+            foreach( AnimationBlock block in AnimationBlocks.Values )
             {
-                block.Value.Update( _fElapsedTime );
+                if( ! block.Update( Time ) )
+                {
+                    IsDone = false;
+                }
             }
         }
 
         //----------------------------------------------------------------------
-        public bool IsDone      { get; private set; }
-        public bool HasStarted  { get; private set; }
+        public bool     IsDone      { get; private set; }
+        public bool     HasStarted  { get; private set; }
+
+        public float    Time        { get; private set; }
 
         //----------------------------------------------------------------------
         public UISheet                                      UISheet;
@@ -47,6 +60,6 @@ namespace VectorUI.Animation
         public List<string>                                 TargetWidgetNames   { get; private set; }
         public List<Widgets.Widget>                         TargetWidgets;
 
-        public List<KeyValuePair<float,AnimationBlock>>     AnimationBlocks     { get; private set; }
+        public Dictionary<string,AnimationBlock>            AnimationBlocks     { get; private set; }
     }
 }

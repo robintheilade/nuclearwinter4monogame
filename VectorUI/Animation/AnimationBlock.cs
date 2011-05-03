@@ -10,11 +10,12 @@ namespace VectorUI.Animation
         //----------------------------------------------------------------------
         public AnimationBlock( AnimationLayer _parentLayer, float _fDuration )
         {
+            AnimationLayer = _parentLayer;
             Duration = _fDuration;
         }
 
         //----------------------------------------------------------------------
-        public abstract void Update( float _fElapsedTime );
+        public abstract bool Update( float _fElapsedTime );
 
         //----------------------------------------------------------------------
         public float            Duration                    { get; private set; }

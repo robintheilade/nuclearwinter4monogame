@@ -86,7 +86,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.Draw( mbPressed ? mPressedTexture : mIdleTexture, mvPosition, null, mColor, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            UISheet.Game.SpriteBatch.Draw( mbPressed ? mPressedTexture : mIdleTexture, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------
