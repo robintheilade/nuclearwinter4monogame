@@ -7,6 +7,7 @@ using VectorLevel.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
 
 namespace VectorUI.Widgets
 {
@@ -46,8 +47,17 @@ namespace VectorUI.Widgets
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
             {
                 Vector2 vPos = touch.Position;
-
-                if( touch.State == TouchLocationState.Pressed )
+#elif WINDOWS
+                Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+#endif
+                
+                if(
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Pressed
+#elif WINDOWS
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
+#endif
+                )
                 {
                     vPos -= mvOrigin;
                     vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
@@ -56,15 +66,19 @@ namespace VectorUI.Widgets
                     if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
                     {
                         mbPressed = true;
+#if WINDOWS_PHONE
                         break;
+#endif
                     }
                 }
                 else
-                if( touch.State == TouchLocationState.Moved )
-                {
-                    mbPressed = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
-                }
-                if( touch.State == TouchLocationState.Released )
+                if(
+#if WINDOWS_PHONE
+                    touch.State == TouchLocationState.Released
+#elif WINDOWS
+                    UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#endif
+                )
                 {
                     if( mbPressed )
                     {
@@ -72,6 +86,18 @@ namespace VectorUI.Widgets
                         mbPressed = false;
                     }
                 }
+                else
+                if(
+#if WINDOWS_PHONE
+                    touch.State == TouchLocationState.Moved
+#else
+                    UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+#endif
+                )
+                {
+                    mbPressed = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
+                }
+#if WINDOWS_PHONE
             }
 #endif
         }
