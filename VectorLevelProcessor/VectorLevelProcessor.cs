@@ -42,6 +42,8 @@ namespace VectorLevelProcessor
             mLevelDesc = new LevelDesc();
             mLevelDesc.Title = System.IO.Path.GetFileNameWithoutExtension( _input.Filepath ); // Fallback if no name is specified in RDF meta-data
 
+            mstrPathToLevel = System.IO.Path.GetDirectoryName( _input.Filepath );
+
             mMatrixStack = new Stack<Matrix>();
             mMatrixStack.Push( Matrix.Identity );
 
@@ -392,6 +394,12 @@ namespace VectorLevelProcessor
             string strMarkerName        = mXmlReader.GetAttribute( "id" );
             string strImagePath         = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
             string strMarkerType        = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
+
+            if( ! System.IO.Path.IsPathRooted( strImagePath ) )
+            {
+                strImagePath = System.IO.Path.Combine( mstrPathToLevel, strImagePath );
+            }
+
             string strMarkerFullPath    = strImagePath.Substring( strImagePath.IndexOf( "Content" ) + 8 );
 
             int iExtension = strMarkerFullPath.LastIndexOf( '.' );
@@ -852,6 +860,8 @@ namespace VectorLevelProcessor
         }
 
         //----------------------------------------------------------------------
+        string                  mstrPathToLevel;
+
         VectorLevel.LevelDesc   mLevelDesc;
 
         XmlReader                           mXmlReader;
