@@ -44,7 +44,22 @@ namespace VectorUI
                 switch( entity.Type )
                 {
                     case VectorLevel.Entities.EntityType.Group:
-                        VisitGroup( entity as Group );
+                        Group group = entity as Group;
+                        if( group.GroupMode == GroupMode.Layer )
+                        {
+                            if( group.Name.StartsWith( "Animation" ) )
+                            {
+                                VisitAnimationGroup( group );
+                            }
+                            else
+                            {
+                                VisitWidgetGroup( group );
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception( "There can only be layers at UI root" );
+                        }
                         break;
                     default:
                         throw new Exception( "There can only be groups at UI root" );
@@ -53,14 +68,14 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void VisitGroup( Group _group )
+        void VisitWidgetGroup( Group _group )
         {
             foreach( Entity entity in _group.Entities )
             {
                 switch( entity.Type )
                 {
                     case VectorLevel.Entities.EntityType.Group:
-                        VisitGroup( entity as Group );
+                        VisitWidgetGroup( entity as Group );
                         break;
                     case VectorLevel.Entities.EntityType.Marker:
                         CreateUIFromMarker( entity as Marker );
@@ -70,6 +85,12 @@ namespace VectorUI
                         break;
                 }
             }
+        }
+
+        //----------------------------------------------------------------------
+        void VisitAnimationGroup( Group _group )
+        {
+
         }
 
         //----------------------------------------------------------------------
