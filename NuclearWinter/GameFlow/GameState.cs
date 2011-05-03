@@ -36,7 +36,7 @@ namespace NuclearWinter.GameFlow
         /// <returns>false while fading in, true when done</returns>
         public virtual bool UpdateFadeIn( Microsoft.Xna.Framework.GameTime _time )
         {
-            Update( _time );
+            // NOTE: Don't call Update() here, it'll be done automatically since we return true
             return true;
         }
 
@@ -57,8 +57,7 @@ namespace NuclearWinter.GameFlow
         /// <returns>false while fading out, true when done</returns>
         public virtual bool UpdateFadeOut( Microsoft.Xna.Framework.GameTime _time )
         {
-            Update( _time );
-
+            // NOTE: Don't call Update() here, it'll be done automatically since we return true
             return true;
         }
 
