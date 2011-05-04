@@ -12,20 +12,16 @@ namespace VectorUI.Animation
         public AnimationLayer( UISheet _uiSheet )
         {
             UISheet             = _uiSheet;
-
-            TargetWidgetNames   = new List<string>();
             AnimationBlocks     = new Dictionary<string,AnimationBlock>();
-
             Time                = 0f;
         }
 
         //----------------------------------------------------------------------
         public void Play()
         {
-            TargetWidgets = new List<Widgets.Widget>();
-            foreach( string strWidgetName in TargetWidgetNames )
+            foreach( AnimationBlock block in AnimationBlocks.Values )
             {
-                TargetWidgets.Add( UISheet.GetWidget( strWidgetName ) );
+                block.ResolveWidgets();
             }
 
             HasStarted = true;
@@ -56,9 +52,6 @@ namespace VectorUI.Animation
 
         //----------------------------------------------------------------------
         public UISheet                                      UISheet;
-
-        public List<string>                                 TargetWidgetNames   { get; private set; }
-        public List<Widgets.Widget>                         TargetWidgets;
 
         public Dictionary<string,AnimationBlock>            AnimationBlocks     { get; private set; }
     }

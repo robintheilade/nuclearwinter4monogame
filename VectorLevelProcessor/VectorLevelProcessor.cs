@@ -578,6 +578,16 @@ namespace VectorLevelProcessor
             path.ConnectionStart    = mXmlReader.GetAttribute( "connection-start", "http://www.inkscape.org/namespaces/inkscape" );
             path.ConnectionEnd      = mXmlReader.GetAttribute( "connection-end", "http://www.inkscape.org/namespaces/inkscape" );
 
+            if( path.ConnectionStart != null && path.ConnectionStart.StartsWith("#") )
+            {
+                path.ConnectionStart = path.ConnectionStart.Substring( "#".Length );
+            }
+
+            if( path.ConnectionEnd != null && path.ConnectionEnd.StartsWith("#") )
+            {
+                path.ConnectionEnd = path.ConnectionEnd.Substring( "#".Length );
+            }
+
             //------------------------------------------------------------------
             // Read contours
             if( mXmlPathStack.Peek() == "rect" )

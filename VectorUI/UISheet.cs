@@ -35,7 +35,7 @@ namespace VectorUI
             mlWidgets       = new List<Widgets.Widget>();
             AnimationLayers = new Dictionary<string,AnimationLayer>();
 
-            CreateUIFromRoot( _uiDesc.Root );
+            CreateUIFromDesc( _uiDesc );
 
             maWidgets   = new Dictionary<string,Widgets.Widget>();
             foreach( Widgets.Widget widget in mlWidgets )
@@ -45,9 +45,9 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void CreateUIFromRoot( Group _root )
+        void CreateUIFromDesc( LevelDesc _uiDesc )
         {
-            foreach( Entity entity in _root.Entities )
+            foreach( Entity entity in _uiDesc.Root.Entities )
             {
                 switch( entity.Type )
                 {
@@ -61,7 +61,7 @@ namespace VectorUI
                                 AnimationLayer layer = new AnimationLayer( this );
                                 AnimationLayers[strAnimationLayerName] = layer;
 
-                                VisitAnimationGroup( layer, group );
+                                VisitAnimationGroup( _uiDesc, layer, group );
                             }
                             else
                             {
@@ -123,20 +123,20 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void VisitAnimationGroup( AnimationLayer _layer, Group _group )
+        void VisitAnimationGroup( LevelDesc _uiDesc, AnimationLayer _layer, Group _group )
         {
             foreach( Entity entity in _group.Entities )
             {
                 switch( entity.Type )
                 {
                     case EntityType.Group:
-                        VisitAnimationGroup( _layer, entity as Group );
+                        VisitAnimationGroup( _uiDesc, _layer, entity as Group );
                         break;
                     case EntityType.Marker:
-                        CreateAnimBlockFromMarker( _layer, entity as Marker );
+                        CreateAnimBlockFromMarker( _uiDesc, _layer, entity as Marker );
                         break;
                     case EntityType.Path:
-                        CreateAnimLinkFromPath( _layer, entity as Path );
+                        CreateAnimLinkFromPath( _uiDesc, _layer, entity as Path );
                         break;
                     case EntityType.Text:
                         break;
@@ -145,7 +145,7 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void CreateAnimBlockFromMarker( AnimationLayer _layer, Marker _marker )
+        void CreateAnimBlockFromMarker( LevelDesc _uiDesc, AnimationLayer _layer, Marker _marker )
         {
             AnimationBlock block = null;
             switch( _marker.MarkerType )
@@ -169,10 +169,31 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        void CreateAnimLinkFromPath( AnimationLayer _layer, Path _path )
+        void CreateAnimLinkFromPath( LevelDesc _uiDesc, AnimationLayer _layer, Path _path )
         {
-            // FIXME: group support!
-            _layer.TargetWidgetNames.Add( _path.ConnectionEnd.Substring(1) );
+            AddWidgetToBlocks( _uiDesc, _layer, _path.ConnectionEnd, _path.ConnectionStart );
+        }
+
+        //----------------------------------------------------------------------
+        void AddWidgetToBlocks( LevelDesc _uiDesc, AnimationLayer _layer, string _widgetName, string _blockName )
+        {
+            Entity sourceEntity = _uiDesc.Entities[ _blockName ];
+
+            switch( sourceEntity.Type )
+            {
+                case EntityType.Group:
+                    foreach( Entity entity in ((Group)sourceEntity).Entities )
+                    {
+                        AddWidgetToBlocks( _uiDesc, _layer, _widgetName, entity.Name );
+                    }
+                    break;
+                case EntityType.Marker:
+                    _layer.AnimationBlocks[ _blockName ].TargetWidgetNames.Add( _widgetName );
+                    break;
+                default:
+                    Debug.Assert( false );
+                    break;
+            }
         }
 
         //----------------------------------------------------------------------

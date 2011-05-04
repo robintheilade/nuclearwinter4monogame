@@ -25,7 +25,7 @@ namespace VectorUI.Animation
             float fActualTime = MathHelper.Clamp( _fTotalTime, 0f, Duration );
             float fProgress = MathHelper.SmoothStep( 0f, 1f, fActualTime / Duration );
             
-            foreach( Widgets.Widget widget in AnimationLayer.TargetWidgets )
+            foreach( Widgets.Widget widget in TargetWidgets )
             {
                 widget.Offset = Vector2.Transform( new Vector2( ( mbSlideIn ? -mfDistance : 0f ) + fProgress * mfDistance, 0f ), mRotationMatrix );
             }

@@ -22,7 +22,7 @@ namespace VectorUI.Animation
             float fActualTime = MathHelper.Clamp( _fTotalTime, 0f, Duration );
             float fProgress = MathHelper.SmoothStep( 0f, 1f, fActualTime / Duration );
 
-            foreach( Widgets.Widget widget in AnimationLayer.TargetWidgets )
+            foreach( Widgets.Widget widget in TargetWidgets )
             {
                 widget.Opacity = mbFadeIn ? fProgress : ( 1f - fProgress );
             }
