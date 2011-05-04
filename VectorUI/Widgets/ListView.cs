@@ -11,16 +11,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace VectorUI.Widgets
 {
-    public class ListViewConfig
-    {
-        public int      FrameCornerSize;
-        public int      FramePadding;
-
-        public int      ItemCornerSize;
-        public int      ItemPadding;
-        public int      ItemHeight;
-    }
-
     public class ListView: Widget
     {
         //----------------------------------------------------------------------
