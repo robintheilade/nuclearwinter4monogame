@@ -1,10 +1,5 @@
 ﻿using System;
 
-
-#if GAMERSERVICES
-using Microsoft.Xna.Framework.GamerServices;
-#endif
-
 using System.Collections.Generic;
 
 namespace VectorLevel

@@ -83,9 +83,6 @@
     <Reference Include="Microsoft.Xna.Framework.Game">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework.GamerServices">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.Xna.Framework.Graphics">
       <Private>False</Private>
     </Reference>
