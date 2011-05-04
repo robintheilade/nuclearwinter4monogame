@@ -117,7 +117,7 @@ namespace VectorUI.Widgets
                 tex = mbPressed ? mOffPressedTex : mOffTex;
             }
 
-            UISheet.Game.SpriteBatch.Draw( tex, mvPosition, null, mColor, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            UISheet.Game.SpriteBatch.Draw( tex, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------

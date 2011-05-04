@@ -139,7 +139,7 @@ namespace VectorUI.Widgets
         {
             Point actualPosition = new Point( Position.X + (int)Offset.X, Position.Y + (int)Offset.Y );
 
-            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), mConfig.FrameCornerSize, mColor );
+            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), mConfig.FrameCornerSize, mColor * Opacity );
             
             Rectangle savedRectangle = UISheet.Game.GraphicsDevice.ScissorRectangle;
 
@@ -148,7 +148,7 @@ namespace VectorUI.Widgets
 
             for( int iEntry = 0; iEntry < ListData.Entries.Count; iEntry++ )
             {
-                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( actualPosition.X + mConfig.FramePadding, actualPosition.Y + mConfig.FramePadding + iEntry * mConfig.ItemHeight - (int)mfScroll, Size.X - mConfig.FramePadding * 2, mConfig.ItemHeight ), mConfig.ItemCornerSize, mColor );
+                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( actualPosition.X + mConfig.FramePadding, actualPosition.Y + mConfig.FramePadding + iEntry * mConfig.ItemHeight - (int)mfScroll, Size.X - mConfig.FramePadding * 2, mConfig.ItemHeight ), mConfig.ItemCornerSize, mColor * Opacity );
             }
 
             int iOffsetX = 0;
@@ -162,11 +162,13 @@ namespace VectorUI.Widgets
                         {
                             if( entry.Values[iColumn] != null )
                             {
-                                UISheet.Game.SpriteBatch.Draw( ItemTextures[ entry.Values[iColumn] ],
+                                Texture2D tex = ItemTextures[ entry.Values[iColumn] ];
+
+                                UISheet.Game.SpriteBatch.Draw( tex,
                                     new Vector2(
-                                        actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding,
-                                        actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ),
-                                    Color.White );
+                                        actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding + ListData.Columns[iColumn].Size / 2 - tex.Width / 2,
+                                        actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll + mConfig.ItemHeight / 2 - tex.Height / 2 ),
+                                    Color.White * Opacity );
                             }
                             iEntry++;
                         }
@@ -177,9 +179,9 @@ namespace VectorUI.Widgets
                             UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont,
                                 entry.Values[iColumn],
                                 new Vector2(
-                                    actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2,
-                                    actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ),
-                                Color.Black );
+                                    actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding,
+                                    actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll + mConfig.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
+                                Color.Black * Opacity );
                             iEntry++;
                         }
 
