@@ -37,7 +37,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.DrawString( UISheet.Font, Text, mvPosition, mColor, 0f, mvOrigin, 1f, SpriteEffects.None, 0f );
+            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition, mColor, mvOrigin, 1f );
         }
 
         //----------------------------------------------------------------------
