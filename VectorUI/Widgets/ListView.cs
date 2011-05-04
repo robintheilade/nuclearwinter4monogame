@@ -30,7 +30,7 @@ namespace VectorUI.Widgets
             mBorderTex          = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath );
             mItemTex            = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "Item" );
             mSelectedItemTex    = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "SelectedItem" );
-            mConfig             = UISheet.Game.Content.Load<ListViewConfig>( _marker.MarkerFullPath + "Config" );
+            Config              = UISheet.Game.Content.Load<ListViewConfig>( _marker.MarkerFullPath + "Config" );
 
             Position  = new Point( (int)_marker.Position.X, (int)_marker.Position.Y );
             Size      = new Point( (int)_marker.Size.X, (int)_marker.Size.Y );
@@ -42,7 +42,7 @@ namespace VectorUI.Widgets
             ItemTextures = new Dictionary<string,Texture2D>();
 
             SelectedItemIndex = -1;
-            mfScroll = 0f;
+            Scroll = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -66,10 +66,10 @@ namespace VectorUI.Widgets
 #endif
                     )
                     {
-                        mfDragOffset = mfScroll + vPos.Y;
+                        mfDragOffset = Scroll + vPos.Y;
                         mfDragPreviousY = vPos.Y;
 
-                        SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + mConfig.FramePadding ) + mfScroll ) / mConfig.ItemHeight );
+                        SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
                     }
                     else
                     if( 
@@ -88,7 +88,7 @@ namespace VectorUI.Widgets
                         if( SelectItem != null )
                         {
                             UISheet.MenuClickSFX.Play();
-                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + mConfig.FramePadding ) + mfScroll ) / mConfig.ItemHeight );
+                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
                             SelectItem( this, SelectedItemIndex );
                         }
                     }
@@ -110,8 +110,8 @@ namespace VectorUI.Widgets
                         
                     if( mbDragging )
                     {
-                        mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * mConfig.ItemHeight - Size.Y + mConfig.FramePadding * 2 );
-                        mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                        Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
+                        ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
                         mfDragPreviousY = vPos.Y;
                     }
                 }
@@ -120,16 +120,16 @@ namespace VectorUI.Widgets
             }
 #endif
 
-            if( ! mbDragging  && mfScrollInertia != 0f )
+            if( ! mbDragging  && ScrollInertia != 0f )
             {
-                mfScrollInertia *= Math.Max( 0f, 1f - ( _fElapsedTime * 5f ) );
-                if( Math.Abs( mfScrollInertia ) < 1f )
+                ScrollInertia *= Math.Max( 0f, 1f - ( _fElapsedTime * 5f ) );
+                if( Math.Abs( ScrollInertia ) < 1f )
                 {
-                    mfScrollInertia = 0f;
+                    ScrollInertia = 0f;
                 }
                 else
                 {
-                    mfScroll = MathHelper.Clamp( mfScroll + mfScrollInertia, 0f, mListData.Entries.Count * mConfig.ItemHeight - Size.Y + mConfig.FramePadding * 2 );
+                    Scroll = MathHelper.Clamp( Scroll + ScrollInertia, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
                 }
             }
         }
@@ -139,16 +139,16 @@ namespace VectorUI.Widgets
         {
             Point actualPosition = new Point( Position.X + (int)Offset.X, Position.Y + (int)Offset.Y );
 
-            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), mConfig.FrameCornerSize, mColor * Opacity );
+            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), Config.FrameCornerSize, mColor * Opacity );
             
             Rectangle savedRectangle = UISheet.Game.GraphicsDevice.ScissorRectangle;
 
             // FIXME: The scissor rectangle will be too big if actualPosition has a negative coordinate!
-            UISheet.Game.GraphicsDevice.ScissorRectangle = new Rectangle( Math.Max( 0, actualPosition.X + mConfig.FramePadding ), Math.Max( 0, actualPosition.Y + mConfig.FramePadding ), Size.X - mConfig.FramePadding * 2, Size.Y - mConfig.FramePadding * 2 );
+            UISheet.Game.GraphicsDevice.ScissorRectangle = new Rectangle( Math.Max( 0, actualPosition.X + Config.FramePadding ), Math.Max( 0, actualPosition.Y + Config.FramePadding ), Size.X - Config.FramePadding * 2, Size.Y - Config.FramePadding * 2 );
 
             for( int iEntry = 0; iEntry < ListData.Entries.Count; iEntry++ )
             {
-                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( actualPosition.X + mConfig.FramePadding, actualPosition.Y + mConfig.FramePadding + iEntry * mConfig.ItemHeight - (int)mfScroll, Size.X - mConfig.FramePadding * 2, mConfig.ItemHeight ), mConfig.ItemCornerSize, mColor * Opacity );
+                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( actualPosition.X + Config.FramePadding, actualPosition.Y + Config.FramePadding + iEntry * Config.ItemHeight - (int)Scroll, Size.X - Config.FramePadding * 2, Config.ItemHeight ), Config.ItemCornerSize, mColor * Opacity );
             }
 
             int iOffsetX = 0;
@@ -166,8 +166,8 @@ namespace VectorUI.Widgets
 
                                 UISheet.Game.SpriteBatch.Draw( tex,
                                     new Vector2(
-                                        actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding + ListData.Columns[iColumn].Size / 2 - tex.Width / 2,
-                                        actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll + mConfig.ItemHeight / 2 - tex.Height / 2 ),
+                                        actualPosition.X + iOffsetX + Config.FramePadding + Config.ItemPadding + ListData.Columns[iColumn].Size / 2 - tex.Width / 2,
+                                        actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - tex.Height / 2 ),
                                     Color.White * Opacity );
                             }
                             iEntry++;
@@ -179,8 +179,8 @@ namespace VectorUI.Widgets
                             UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont,
                                 entry.Values[iColumn],
                                 new Vector2(
-                                    actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding,
-                                    actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll + mConfig.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
+                                    actualPosition.X + iOffsetX + Config.FramePadding + Config.ItemPadding,
+                                    actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
                                 Color.Black * Opacity );
                             iEntry++;
                         }
@@ -228,18 +228,18 @@ namespace VectorUI.Widgets
         Texture2D                       mBorderTex;
         Texture2D                       mItemTex;
         Texture2D                       mSelectedItemTex;
-        ListViewConfig                  mConfig;
+        public ListViewConfig           Config;
 
         Dictionary<string,Texture2D>    ItemTextures;
 
 
-        float                           mfScroll;
+        public float                    Scroll;
         public int                      SelectedItemIndex;
 
         bool                            mbDragging;
         float                           mfDragOffset;
         float                           mfDragPreviousY;
-        float                           mfScrollInertia;
+        public float                    ScrollInertia;
 
         Rectangle                       mHitRectangle;
 
