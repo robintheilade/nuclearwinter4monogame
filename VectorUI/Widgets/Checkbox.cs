@@ -41,66 +41,69 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
-#if WINDOWS_PHONE
-            foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
+            if( _bHandleInput )
             {
-                Vector2 vPos = touch.Position;
+#if WINDOWS_PHONE
+                foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
+                {
+                    Vector2 vPos = touch.Position;
 #elif WINDOWS
-                Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+                    Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
 #endif
                 
-                if(
+                    if(
 #if WINDOWS_PHONE
-                        touch.State == TouchLocationState.Pressed
+                            touch.State == TouchLocationState.Pressed
 #elif WINDOWS
-                        UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
+                            UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
 #endif
-                )
-                {
-                    vPos -= mvOrigin;
-                    vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
-                    vPos += mvOrigin;
+                    )
+                    {
+                        vPos -= mvOrigin;
+                        vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
+                        vPos += mvOrigin;
 
-                    if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
-                    {
-                        mbPressed = true;
+                        if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
+                        {
+                            mbPressed = true;
 #if WINDOWS_PHONE
-                        break;
+                            break;
 #endif
+                        }
                     }
-                }
-                else
-                if(
+                    else
+                    if(
 #if WINDOWS_PHONE
-                    touch.State == TouchLocationState.Released
+                        touch.State == TouchLocationState.Released
 #elif WINDOWS
-                    UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
 #endif
-                )
-                {
-                    if( mbPressed )
+                    )
                     {
-                        UISheet.MenuClickSFX.Play();
-                        mbOn = ! mbOn;
-                        mbPressed = false;
+                        if( mbPressed )
+                        {
+                            UISheet.MenuClickSFX.Play();
+                            mbOn = ! mbOn;
+                            mbPressed = false;
+                        }
                     }
-                }
-                else
-                if(
+                    else
+                    if(
 #if WINDOWS_PHONE
-                    touch.State == TouchLocationState.Moved
+                        touch.State == TouchLocationState.Moved
 #else
-                    UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+                        UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
 #endif
-                )
-                {
-                    mbPressed = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
-                }
+                    )
+                    {
+                        mbPressed = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
+                    }
 #if WINDOWS_PHONE
-            }
+                }
 #endif
+            }
         }
 
         //----------------------------------------------------------------------

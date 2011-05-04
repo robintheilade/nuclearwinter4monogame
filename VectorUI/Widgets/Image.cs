@@ -30,7 +30,7 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
         }
 

@@ -197,11 +197,11 @@ namespace VectorUI
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
+        public void Update( float _fElapsedTime, bool _bHandleInput )
         {
             foreach( Widgets.Widget widget in mlWidgets )
             {
-                widget.Update( _fElapsedTime );
+                widget.Update( _fElapsedTime, _bHandleInput );
             }
             
             foreach( AnimationLayer animLayer in AnimationLayers.Values )

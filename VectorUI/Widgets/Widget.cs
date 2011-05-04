@@ -16,7 +16,7 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
-        public abstract void Update( float _fElapsedTime );
+        public abstract void Update( float _fElapsedTime, bool _bHandleInput );
         public abstract void Draw();
 
         //----------------------------------------------------------------------

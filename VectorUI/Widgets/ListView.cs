@@ -46,79 +46,81 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
-#if WINDOWS_PHONE
-            foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
+            if( _bHandleInput )
             {
-                Vector2 vPos = touch.Position;
+#if WINDOWS_PHONE
+                foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
+                {
+                    Vector2 vPos = touch.Position;
 #elif WINDOWS
-                Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+                    Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
 #endif
                 
-                if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
-                {
-                    if( 
-#if WINDOWS_PHONE
-                        touch.State == TouchLocationState.Pressed
-#else
-                        UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
-#endif
-                    )
+                    if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
                     {
-                        mfDragOffset = Scroll + vPos.Y;
-                        mfDragPreviousY = vPos.Y;
-
-                        SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                    }
-                    else
-                    if( 
+                        if( 
 #if WINDOWS_PHONE
-                        touch.State == TouchLocationState.Released
+                            touch.State == TouchLocationState.Pressed
 #else
-                        UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+                            UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
 #endif
-                    )
-                    {
-                        if( mbDragging )
+                        )
                         {
-                            mbDragging = false;
+                            mfDragOffset = Scroll + vPos.Y;
+                            mfDragPreviousY = vPos.Y;
+
+                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
                         }
                         else
-                        if( SelectItem != null )
+                        if( 
+#if WINDOWS_PHONE
+                            touch.State == TouchLocationState.Released
+#else
+                            UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#endif
+                        )
                         {
-                            UISheet.MenuClickSFX.Play();
-                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                            SelectItem( this, SelectedItemIndex );
+                            if( mbDragging )
+                            {
+                                mbDragging = false;
+                            }
+                            else
+                            if( SelectItem != null )
+                            {
+                                UISheet.MenuClickSFX.Play();
+                                SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                                SelectItem( this, SelectedItemIndex );
+                            }
                         }
                     }
-                }
 
-                if(
+                    if(
 #if WINDOWS_PHONE
-                    touch.State == TouchLocationState.Moved
+                        touch.State == TouchLocationState.Moved
 #else
-                    UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+                        UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
 #endif
-                )
-                {
-                    if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                    )
                     {
-                        SelectedItemIndex = -1;
-                        mbDragging = true;
-                    }
+                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                        {
+                            SelectedItemIndex = -1;
+                            mbDragging = true;
+                        }
                         
-                    if( mbDragging )
-                    {
-                        Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
-                        ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
-                        mfDragPreviousY = vPos.Y;
+                        if( mbDragging )
+                        {
+                            Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
+                            ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                            mfDragPreviousY = vPos.Y;
+                        }
                     }
-                }
-
 #if WINDOWS_PHONE
-            }
+                }
 #endif
+            }
 
             if( ! mbDragging  && ScrollInertia != 0f )
             {

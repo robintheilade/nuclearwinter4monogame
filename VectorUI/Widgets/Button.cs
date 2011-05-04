@@ -37,8 +37,13 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
+            if( ! _bHandleInput )
+            {
+                return;
+            }
+
             mbPressed = false;
 #if WINDOWS_PHONE
             foreach( TouchLocation touch in UISheet.Game.TouchMgr.Touches )
