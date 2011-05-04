@@ -113,8 +113,8 @@ namespace VectorLevelProcessor
             _output.Write( _path.StrokeWidth );
 
             // Connections
-            _output.Write( _path.ConnectionStart );
-            _output.Write( _path.ConnectionEnd );
+            _output.Write( _path.ConnectionStart != null ? _path.ConnectionStart : "" );
+            _output.Write( _path.ConnectionEnd != null ? _path.ConnectionEnd : "" );
 
             // Subpaths
             _output.Write( (UInt16) _path.Subpaths.Count );
