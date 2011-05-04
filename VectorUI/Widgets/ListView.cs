@@ -55,7 +55,7 @@ namespace VectorUI.Widgets
 #elif WINDOWS
                 Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
 #endif
-
+                
                 if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
                 {
                     if( 
@@ -92,33 +92,30 @@ namespace VectorUI.Widgets
                             SelectItem( this, SelectedItemIndex );
                         }
                     }
-                    else
-                    if(
-#if WINDOWS_PHONE
-                        touch.State == TouchLocationState.Moved
-#else
-                        UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
-#endif
-                    )
-                    {
-                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
-                        {
-                            SelectedItemIndex = -1;
-                            mbDragging = true;
-                        }
-                        
-                        if( mbDragging )
-                        {
-                            mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * mConfig.ItemHeight - Size.Y + mConfig.FramePadding * 2 );
-                            mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
-                            mfDragPreviousY = vPos.Y;
-                        }
-                    }
-
-#if WINDOWS_PHONE
-                    break;
-#endif
                 }
+
+                if(
+#if WINDOWS_PHONE
+                    touch.State == TouchLocationState.Moved
+#else
+                    UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+#endif
+                )
+                {
+                    if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                    {
+                        SelectedItemIndex = -1;
+                        mbDragging = true;
+                    }
+                        
+                    if( mbDragging )
+                    {
+                        mfScroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * mConfig.ItemHeight - Size.Y + mConfig.FramePadding * 2 );
+                        mfScrollInertia = ( mfScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                        mfDragPreviousY = vPos.Y;
+                    }
+                }
+
 #if WINDOWS_PHONE
             }
 #endif
@@ -165,7 +162,11 @@ namespace VectorUI.Widgets
                         {
                             if( entry.Values[iColumn] != null )
                             {
-                                UISheet.Game.SpriteBatch.Draw( ItemTextures[ entry.Values[iColumn] ], new Vector2( actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding, actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ), Color.White );
+                                UISheet.Game.SpriteBatch.Draw( ItemTextures[ entry.Values[iColumn] ],
+                                    new Vector2(
+                                        actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding,
+                                        actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ),
+                                    Color.White );
                             }
                             iEntry++;
                         }
@@ -173,7 +174,12 @@ namespace VectorUI.Widgets
                     case Models.ListColumnType.Text:
                         foreach( var entry in ListData.Entries )
                         {
-                            UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont, entry.Values[iColumn], new Vector2( actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding, actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ), Color.Black );
+                            UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont,
+                                entry.Values[iColumn],
+                                new Vector2(
+                                    actualPosition.X + iOffsetX + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2,
+                                    actualPosition.Y + mConfig.FramePadding + mConfig.ItemPadding + mConfig.ItemHeight * iEntry - (int)mfScroll ),
+                                Color.Black );
                             iEntry++;
                         }
 
