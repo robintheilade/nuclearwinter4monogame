@@ -8,12 +8,30 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter
 {
+    public enum TargetPlatform
+    {
+        Windows,
+        Xbox360,
+        WindowsPhone
+    }
+
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
-        public NuclearGame()
+        public NuclearGame( TargetPlatform _platform )
         {
             Graphics = new GraphicsDeviceManager(this);
+
+            switch( _platform )
+            {
+                case TargetPlatform.WindowsPhone:
+                    BlurRadius = 2;
+                    break;
+                case TargetPlatform.Xbox360:
+                case TargetPlatform.Windows:
+                    BlurRadius = 4;
+                    break;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -89,15 +107,17 @@ namespace NuclearWinter
             DrawBlurredText( _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
         }
 
+        int BlurRadius = 4;
+
         //----------------------------------------------------------------------
         public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
         {
             Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
 
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - 4, _vPosition.Y - 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + 4, _vPosition.Y - 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + 4, _vPosition.Y + 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - 4, _vPosition.Y + 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
 
             SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
         }
@@ -132,10 +152,10 @@ namespace NuclearWinter
         {
             Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
 
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - 4, _vPosition.Y - 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + 4, _vPosition.Y - 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + 4, _vPosition.Y + 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - 4, _vPosition.Y + 4 ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
 
             SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
         }
