@@ -8,20 +8,19 @@ namespace NuclearWinter
 {
     public abstract class SaveData
     {
-        public string                           FileName        = "SaveData.bin";
-        public readonly UInt32                  MagicNumber     = 0xffffffff;
+        public string                                           FileName        = "SaveData.bin";
+        public readonly UInt32                                  MagicNumber     = 0xffffffff;
 
-        Dictionary<UInt32,Action<BinaryReader>> mdLoadData;
+        protected Dictionary<UInt32,Action<BinaryReader>>       ReadDataActions;
 
         //--------------------------------------------------------------------------
         protected abstract void WriteData( BinaryWriter _output );
 
         //--------------------------------------------------------------------------
-        public SaveData( UInt32 _uiMagicNumber, Dictionary<UInt32,Action<BinaryReader>> _dLoadData )
+        public SaveData( UInt32 _uiMagicNumber )
         {
             Debug.Assert( _uiMagicNumber != 0xffffffff );
 
-            mdLoadData      = _dLoadData;
             MagicNumber     = _uiMagicNumber;
         }
 
@@ -83,9 +82,9 @@ namespace NuclearWinter
                                     Debug.Assert( false );
                                 }
 
-                                if( mdLoadData.ContainsKey( magicNumber ) )
+                                if( ReadDataActions.ContainsKey( magicNumber ) )
                                 {
-                                    mdLoadData[ magicNumber ]( input );
+                                    ReadDataActions[ magicNumber ]( input );
                                 }
                             }
 

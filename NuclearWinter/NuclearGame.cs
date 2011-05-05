@@ -6,6 +6,11 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#if WINDOWS_PHONE
+using Microsoft.Phone.Shell;
+using Microsoft.Xna.Framework.Media;
+#endif
+
 namespace NuclearWinter
 {
     public enum TargetPlatform
@@ -20,6 +25,11 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         public NuclearGame( TargetPlatform _platform )
         {
+#if WINDOWS_PHONE
+            PhoneApplicationService.Current.Deactivated += new EventHandler<DeactivatedEventArgs>(OnDeactivated);
+            PhoneApplicationService.Current.Closing     += new EventHandler<ClosingEventArgs>(OnClosing);
+#endif
+
             Graphics = new GraphicsDeviceManager(this);
 
             switch( _platform )
@@ -37,6 +47,11 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void Initialize()
         {
+            if( SaveGame != null )
+            {
+                SaveGame.Load();
+            }
+
             SpriteBatch = new SpriteBatch( GraphicsDevice );
 
             GameStateMgr = new GameFlow.GameStateMgr( this );
@@ -53,6 +68,60 @@ namespace NuclearWinter
 #endif
 
             base.Initialize();
+        }
+
+#if WINDOWS_PHONE
+        //----------------------------------------------------------------------
+        protected void OnDeactivated( object _sender, DeactivatedEventArgs _args )
+        {
+            if( SaveGame != null )
+            {
+                SaveGame.Save();
+            }
+
+            if( MediaPlayer.GameHasControl )
+            {
+                MediaPlayer.Stop();
+            }
+
+            // FIXME: We might want to handle tombstoning through PhoneApplicationService.Current.State
+        }
+
+        //----------------------------------------------------------------------
+        void OnClosing( object _sender, ClosingEventArgs _args )
+        {
+            if( SaveGame != null )
+            {
+                SaveGame.Save();
+            }
+
+            if( MediaPlayer.GameHasControl )
+            {
+                MediaPlayer.Stop();
+            }
+        }
+#endif
+
+        //----------------------------------------------------------------------
+        protected override void OnActivated(object sender, EventArgs args)
+        {
+            base.OnActivated(sender, args);
+
+            if( GameStateMgr != null && GameStateMgr.CurrentState != null )
+            {
+                GameStateMgr.CurrentState.OnActivated();
+            }
+        }
+
+        //----------------------------------------------------------------------
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            if( SaveGame != null )
+            {
+                SaveGame.Save();
+            }
+
+            base.OnExiting(sender, args);
         }
 
         //----------------------------------------------------------------------
@@ -163,6 +232,8 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         public GraphicsDeviceManager                        Graphics;
         public SpriteBatch                                  SpriteBatch;
+
+        public SaveData                                     SaveGame;
 
         //----------------------------------------------------------------------
         // Game States
