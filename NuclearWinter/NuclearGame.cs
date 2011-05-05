@@ -5,6 +5,7 @@ using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 #if WINDOWS_PHONE
 using Microsoft.Phone.Shell;
@@ -230,10 +231,25 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
+        public void PlayMusic( Song _song )
+        {
+            if( Song != _song && MediaPlayer.GameHasControl )
+            {
+                MediaPlayer.IsRepeating = true;
+                MediaPlayer.Play( _song );
+                Song = _song;
+            }
+        }
+
+        //----------------------------------------------------------------------
         public GraphicsDeviceManager                        Graphics;
         public SpriteBatch                                  SpriteBatch;
 
         public SaveData                                     SaveGame;
+
+        //----------------------------------------------------------------------
+        // Sound & Music
+        public Song                                 Song;
 
         //----------------------------------------------------------------------
         // Game States
