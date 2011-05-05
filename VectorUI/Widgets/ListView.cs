@@ -84,6 +84,22 @@ namespace VectorUI.Widgets
                                 SelectItem( this, SelectedItemIndex );
                             }
                         }
+                        else
+                        if(
+#if WINDOWS_PHONE
+                            touch.State == TouchLocationState.Moved
+#else
+                            UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+#endif
+                        )
+                        {
+                            if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                            {
+                                SelectedItemIndex = -1;
+                                mbDragging = true;
+                            }
+                        
+                        }
                     }
 
                     if(
@@ -94,12 +110,6 @@ namespace VectorUI.Widgets
 #endif
                     )
                     {
-                        if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
-                        {
-                            SelectedItemIndex = -1;
-                            mbDragging = true;
-                        }
-                        
                         if( mbDragging )
                         {
                             Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
