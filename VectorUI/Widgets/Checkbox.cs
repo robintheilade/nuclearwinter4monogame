@@ -17,9 +17,9 @@ namespace VectorUI.Widgets
         public Checkbox( UISheet _sheet, Marker _marker )
         : base( _marker.Name, _sheet )
         {
-            mbOn = _marker.MarkerType.EndsWith( "On" );
+            IsOn = _marker.MarkerType.EndsWith( "On" );
 
-            string basePath = _marker.MarkerFullPath.Substring( 0, _marker.MarkerFullPath.Length - ( mbOn ? "On" : "Off" ).Length );
+            string basePath = _marker.MarkerFullPath.Substring( 0, _marker.MarkerFullPath.Length - ( IsOn ? "On" : "Off" ).Length );
 
             mOffTex         = UISheet.Game.Content.Load<Texture2D>( basePath + "Off" );
             mOnTex          = UISheet.Game.Content.Load<Texture2D>( basePath + "On" );
@@ -85,7 +85,13 @@ namespace VectorUI.Widgets
                         if( mbPressed )
                         {
                             UISheet.MenuClickSFX.Play();
-                            mbOn = ! mbOn;
+                            IsOn = ! IsOn;
+
+                            if( Click != null )
+                            {
+                                Click( this );
+                            }
+
                             mbPressed = false;
                         }
                     }
@@ -111,7 +117,7 @@ namespace VectorUI.Widgets
         {
             Texture2D tex;
 
-            if( mbOn )
+            if( IsOn )
             {
                 tex = mbPressed ? mOnPressedTex : mOnTex;
             }
@@ -124,12 +130,14 @@ namespace VectorUI.Widgets
         }
 
         //----------------------------------------------------------------------
+        public bool     IsOn;
+
+        //----------------------------------------------------------------------
         Texture2D       mOffTex;
         Texture2D       mOnTex;
         Texture2D       mOffPressedTex;
         Texture2D       mOnPressedTex;
 
-        bool            mbOn;
         bool            mbPressed;
 
         Rectangle       mHitRectangle;
