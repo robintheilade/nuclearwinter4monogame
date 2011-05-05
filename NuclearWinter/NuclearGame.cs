@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Media;
 
 #if WINDOWS_PHONE
 using Microsoft.Phone.Shell;
-using Microsoft.Xna.Framework.Media;
 #endif
 
 namespace NuclearWinter
