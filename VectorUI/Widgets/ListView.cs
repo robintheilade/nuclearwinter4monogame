@@ -25,7 +25,7 @@ namespace VectorUI.Widgets
             Position  = new Point( (int)_marker.Position.X, (int)_marker.Position.Y );
             Size      = new Point( (int)_marker.Size.X, (int)_marker.Size.Y );
 
-            mHitRectangle = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+            mHitRectangle = new Rectangle( Position.X + Config.FramePadding, Position.Y + Config.FramePadding, Size.X - Config.FramePadding * 2, Size.Y - Config.FramePadding * 2 );
 
             mColor = Color.White;
 
