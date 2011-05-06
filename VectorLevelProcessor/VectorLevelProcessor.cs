@@ -380,11 +380,12 @@ namespace VectorLevelProcessor
             Color fillColor = Color.White;
             Color strokeColor = new Color();
             float fStrokeWidth = 0f;
+            float fFontSize = 40f;
             VectorLevel.Entities.TextAnchor textAnchor = TextAnchor.Start;
-            ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth, ref textAnchor );
+            ReadStyle( strStyleAttr, ref fillColor, ref strokeColor, ref fStrokeWidth, ref fFontSize, ref textAnchor );
 
             //------------------------------------------------------------------
-            Text text = new Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle, fillColor, textAnchor );
+            Text text = new Text( strTextName, mGroupStack.Peek(), Vector2.Transform( vPosition, mMatrixStack.Peek() ), fAngle, fillColor, fFontSize, textAnchor );
             return text;
         }
 
@@ -460,12 +461,13 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth )
         {
+            float _fFontSize = 0f;
             VectorLevel.Entities.TextAnchor textAnchor = VectorLevel.Entities.TextAnchor.Start;
-            ReadStyle( _strStyleAttr, ref _fillColor, ref _strokeColor, ref _fStrokeWidth, ref textAnchor );
+            ReadStyle( _strStyleAttr, ref _fillColor, ref _strokeColor, ref _fStrokeWidth, ref _fFontSize, ref textAnchor );
         }
 
         //----------------------------------------------------------------------
-        internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth, ref VectorLevel.Entities.TextAnchor _textAnchor )
+        internal void ReadStyle( string _strStyleAttr, ref Color _fillColor, ref Color _strokeColor, ref float _fStrokeWidth, ref float _fFontSize, ref VectorLevel.Entities.TextAnchor _textAnchor )
         {
             _fStrokeWidth = 0f;
 
@@ -522,14 +524,12 @@ namespace VectorLevelProcessor
                         }
                     case "stroke-width":
                         {
-                        string value = styleDef.Value.Replace("px", "").Replace("pt", "");
-                        _fStrokeWidth = float.Parse( value, CultureInfo.InvariantCulture );
-
-                        if( styleDef.Value.EndsWith( "pt" ) )
-                        {
-                            // 1px = 0.75pt (http://www.w3.org/TR/CSS21/syndata.html)
-                            _fStrokeWidth /= 0.75f;
+                        _fStrokeWidth = ParseCSSValue( styleDef.Value );
+                        break;
                         }
+                    case "font-size":
+                        {
+                        _fFontSize = ParseCSSValue( styleDef.Value );
                         break;
                         }
                     case "text-anchor":
@@ -561,6 +561,21 @@ namespace VectorLevelProcessor
                 _fStrokeWidth = 0f;
             }
             _strokeColor *= fStrokeOpacity;
+        }
+
+        //----------------------------------------------------------------------
+        float ParseCSSValue( string _strValue )
+        {
+            string strValue = _strValue.Replace("px", "").Replace("pt", "");
+            float fValue = float.Parse( strValue, CultureInfo.InvariantCulture );
+
+            if( _strValue.EndsWith( "pt" ) )
+            {
+                // 1px = 0.75pt (http://www.w3.org/TR/CSS21/syndata.html)
+                fValue /= 0.75f;
+            }
+
+            return fValue;
         }
 
         //----------------------------------------------------------------------

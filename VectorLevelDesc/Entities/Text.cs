@@ -19,13 +19,14 @@ namespace VectorLevel.Entities
     public class Text: Entity
     {
         //----------------------------------------------------------------------
-        public Text( string _strName, Group _parent, Vector2 _vPosition, float _fAngle, Color _fillColor, TextAnchor _anchor )
+        public Text( string _strName, Group _parent, Vector2 _vPosition, float _fAngle, Color _fillColor, float _fFontSize, TextAnchor _anchor )
         : base( _strName, EntityType.Text, _parent )
         {
             Position        = _vPosition;
             Angle           = _fAngle;
             TextSpans       = new List<TextSpan>();
             FillColor       = _fillColor;
+            FontSize        = _fFontSize;
             Anchor          = _anchor;
         }
 
@@ -34,6 +35,7 @@ namespace VectorLevel.Entities
         public Vector2              Position    { get; private set; }
         public float                Angle       { get; private set; }
         public Color                FillColor   { get; private set; }
+        public float                FontSize    { get; private set; }
         public TextAnchor           Anchor      { get; private set; }
     }
 

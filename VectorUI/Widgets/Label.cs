@@ -15,13 +15,12 @@ namespace VectorUI.Widgets
         public Label( UISheet _sheet, Text _text )
         : base( _text.Name, _sheet )
         {
-            //Vector2 vSize = UISheet.Font.MeasureString( Text );
-            mvPosition = _text.Position - new Vector2( 0, /* FIXME: hard-coded stuff! */ 35 );
+            mvPosition = _text.Position - new Vector2( 0, _text.FontSize );
             mvOrigin = Vector2.Zero;
+            mfScale = _text.FontSize / 40f /* FIXME: Hard-coded since there is no way to get the base font size from SpriteFront */;
 
             mAnchor = _text.Anchor;
             Text = UISheet.Game.GetUIString( _text.TextSpans[0].Value.Substring( "String".Length ) );
-
 
             mColor = _text.FillColor;
         }
@@ -34,7 +33,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, 1f );
+            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, mfScale );
         }
 
         //----------------------------------------------------------------------
@@ -83,6 +82,7 @@ namespace VectorUI.Widgets
 
         Vector2         mvPosition;
         Vector2         mvOrigin;
+        float           mfScale;
         Color           mColor;
     }
 }

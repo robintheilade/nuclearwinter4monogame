@@ -101,7 +101,7 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         internal Text ReadText( ContentReader _input, TRead _levelDesc )
         {
-            Text text = new Text( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as Group, _input.ReadVector2(), _input.ReadSingle(), _input.ReadColor(), _input.ReadObject<TextAnchor>() );
+            Text text = new Text( _input.ReadString(), _levelDesc.Entities[ _input.ReadString() ] as Group, _input.ReadVector2(), _input.ReadSingle(), _input.ReadColor(), _input.ReadSingle(), _input.ReadObject<TextAnchor>() );
 
             UInt16 uiTextSpanCount = _input.ReadUInt16();
 
