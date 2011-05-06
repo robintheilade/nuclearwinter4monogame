@@ -28,7 +28,7 @@ namespace VectorUI.Widgets
         public float                Opacity = 1f;
 
         //----------------------------------------------------------------------
-        public Action<Widget>       Click;
-        public Action<Widget,int>   SelectItem;
+        public Action<Widget>       OnClick;
+        public Action<Widget,int>   OnSelectItem;
     }
 }

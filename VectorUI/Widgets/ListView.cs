@@ -77,11 +77,11 @@ namespace VectorUI.Widgets
                                 mbDragging = false;
                             }
                             else
-                            if( SelectItem != null )
+                            if( OnSelectItem != null )
                             {
                                 UISheet.MenuClickSFX.Play();
                                 SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                                SelectItem( this, SelectedItemIndex );
+                                OnSelectItem( this, SelectedItemIndex );
                             }
                         }
                         else

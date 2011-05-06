@@ -74,10 +74,10 @@ namespace VectorUI.Widgets
 #elif WINDOWS
                         UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
 #endif
-                        && Click != null )
+                        && OnClick != null )
                     {
                         UISheet.MenuClickSFX.Play();
-                        Click( this );
+                        OnClick( this );
                     }
 #if WINDOWS_PHONE
                     break;
