@@ -176,29 +176,68 @@ namespace VectorUI
         //----------------------------------------------------------------------
         void CreateAnimLinkFromPath( LevelDesc _uiDesc, AnimationLayer _layer, Path _path )
         {
-            AddWidgetToBlocks( _uiDesc, _layer, _path.ConnectionEnd, _path.ConnectionStart );
+            List<AnimationBlock> lBlocks    = GetAllBlocks( _uiDesc, _layer, _path.ConnectionStart );
+            List<string> lWidgets           = GetAllWidgets( _uiDesc, _path.ConnectionEnd );
+
+            foreach( AnimationBlock block in lBlocks )
+            {
+                block.TargetWidgetNames.AddRange( lWidgets );
+            }
         }
 
         //----------------------------------------------------------------------
-        void AddWidgetToBlocks( LevelDesc _uiDesc, AnimationLayer _layer, string _widgetName, string _blockName )
+        List<AnimationBlock> GetAllBlocks( LevelDesc _uiDesc, AnimationLayer _layer, string _entityName )
         {
-            Entity sourceEntity = _uiDesc.Entities[ _blockName ];
+            Entity sourceEntity = _uiDesc.Entities[ _entityName ];
+
+            List<AnimationBlock> lBlocks = new List<AnimationBlock>();
 
             switch( sourceEntity.Type )
             {
                 case EntityType.Group:
                     foreach( Entity entity in ((Group)sourceEntity).Entities )
                     {
-                        AddWidgetToBlocks( _uiDesc, _layer, _widgetName, entity.Name );
+                        lBlocks.AddRange( GetAllBlocks( _uiDesc, _layer, entity.Name ) );
                     }
+
                     break;
                 case EntityType.Marker:
-                    _layer.AnimationBlocks[ _blockName ].TargetWidgetNames.Add( _widgetName );
+                    lBlocks.Add( _layer.AnimationBlocks[ _entityName ] );
                     break;
                 default:
                     Debug.Assert( false );
                     break;
             }
+
+            return lBlocks;
+        }
+
+        //----------------------------------------------------------------------
+        List<string> GetAllWidgets( LevelDesc _uiDesc, string _entityName )
+        {
+            Entity sourceEntity = _uiDesc.Entities[ _entityName ];
+
+            List<string> lEntities = new List<string>();
+
+            switch( sourceEntity.Type )
+            {
+                case EntityType.Group:
+                    foreach( Entity entity in ((Group)sourceEntity).Entities )
+                    {
+                        lEntities.AddRange( GetAllWidgets( _uiDesc, entity.Name ) );
+                    }
+
+                    break;
+                case EntityType.Marker:
+                case EntityType.Text:
+                    lEntities.Add( _entityName );
+                    break;
+                default:
+                    Debug.Assert( false );
+                    break;
+            }
+
+            return lEntities;
         }
 
         //----------------------------------------------------------------------
