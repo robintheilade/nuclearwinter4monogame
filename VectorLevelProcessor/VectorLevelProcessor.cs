@@ -566,6 +566,13 @@ namespace VectorLevelProcessor
         //----------------------------------------------------------------------
         float ParseCSSValue( string _strValue )
         {
+            _strValue = _strValue.Trim();
+
+            if( _strValue == "medium" )
+            {
+                return 16f;
+            }
+
             string strValue = _strValue.Replace("px", "").Replace("pt", "");
             float fValue = float.Parse( strValue, CultureInfo.InvariantCulture );
 
