@@ -235,7 +235,16 @@ namespace NuclearWinter
             if( Song != _song && MediaPlayer.GameHasControl )
             {
                 MediaPlayer.IsRepeating = true;
-                MediaPlayer.Play( _song );
+
+                if( _song != null )
+                {
+                    MediaPlayer.Play( _song );
+                }
+                else
+                {
+                    MediaPlayer.Stop();
+                }
+
                 Song = _song;
             }
         }

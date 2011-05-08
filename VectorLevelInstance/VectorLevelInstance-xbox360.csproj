@@ -91,8 +91,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Block.cs" />
-    <Compile Include="LevelInstance.cs" />
+    <Compile Include="LevelRenderer.cs" />
     <Compile Include="Light.cs" />
+    <Compile Include="LightMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
