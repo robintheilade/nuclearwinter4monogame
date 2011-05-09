@@ -19,8 +19,10 @@ namespace VectorLevel
             MapWidth            = _uiMapWidth;
             MapHeight           = _uiMapHeight;
 
-            Content            = new ContentManager( _game.Services, "Content" );
-            FullAlphaTex       = Content.Load<Texture2D>( "BlackPixel" );
+            Content             = new ContentManager( _game.Services, "Content" );
+            FullAlphaTex        = Content.Load<Texture2D>( "BlackPixel" );
+
+            Camera              = null;
 
             //------------------------------------------------------------------
             // Level borders
@@ -34,9 +36,10 @@ namespace VectorLevel
             //------------------------------------------------------------------
             // Effect
 			Effect = new BasicEffect( Game.GraphicsDevice );
-			Effect.World = Matrix.Identity;
-			Effect.VertexColorEnabled = true;
-			Effect.DiffuseColor = new Vector3( 1f );
+
+			Effect.World                = Matrix.Identity;
+			Effect.VertexColorEnabled   = true;
+			Effect.DiffuseColor         = new Vector3( 1f );
         }
 
         //----------------------------------------------------------------------
@@ -87,7 +90,28 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        public void DrawLevelBorders()
+        public void Update( float _fElapsedTime )
+        {
+            Camera.Update( _fElapsedTime );
+
+            Effect.View       = Camera.View;
+            Effect.Projection = Camera.Projection;
+        }
+
+        //----------------------------------------------------------------------
+        public void BeginDraw()
+        {
+            Effect.CurrentTechnique.Passes[0].Apply();
+        }
+
+        //----------------------------------------------------------------------
+        public void EndDraw()
+        {
+            DrawLevelBorders();
+        }
+
+        //----------------------------------------------------------------------
+        void DrawLevelBorders()
         {
             Game.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
                 PrimitiveType.TriangleList,
@@ -258,6 +282,8 @@ namespace VectorLevel
 
         public uint                 MapWidth;
         public uint                 MapHeight;
+
+        public Camera               Camera;
 
         public Texture2D            FullAlphaTex;
 

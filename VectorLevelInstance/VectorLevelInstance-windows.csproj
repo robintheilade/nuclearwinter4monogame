@@ -13,7 +13,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
-    <XnaProfile>HiDef</XnaProfile>
+    <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>bb9a1070-ea48-4983-ab45-e42c605b003f</XnaCrossPlatformGroupID>
     <XnaOutputType>Library</XnaOutputType>
     <PublishUrl>publish\</PublishUrl>
@@ -85,16 +85,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Block.cs" />
+    <Compile Include="BlockRenderer.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="ICameraBehavior.cs" />
     <Compile Include="LevelRenderer.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="LightMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Box2D.XNA\Box2D.XNA\Box2D.XNA-windows.csproj">
-      <Project>{BF461002-3A8E-451C-91F7-5CC14ADE85E6}</Project>
-      <Name>Box2D.XNA-windows</Name>
+    <ProjectReference Include="..\NuclearWinter\NuclearWinter-windows.csproj">
+      <Project>{2F2A1E2C-560B-44D3-B693-FFB05D271C53}</Project>
+      <Name>NuclearWinter-windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\VectorLevelDesc\VectorLevelDesc-windows.csproj">
       <Project>{af64a6c3-a0d3-4a57-848b-b545b4d5fc8b}</Project>
