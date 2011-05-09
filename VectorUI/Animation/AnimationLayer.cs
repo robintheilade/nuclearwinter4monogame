@@ -24,13 +24,15 @@ namespace VectorUI.Animation
                 block.ResolveWidgets();
             }
 
+            Time = 0f;
+            IsDone = false;
             HasStarted = true;
         }
 
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            if( ! HasStarted ) return;
+            if( ! HasStarted || IsDone ) return;
             
             Time += _fElapsedTime;
 
