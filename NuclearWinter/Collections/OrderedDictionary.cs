@@ -140,7 +140,9 @@ namespace NuclearWinter.Collections
 		{
 			get
 			{
-				if(null == List)
+                // Applied fix for StackOverflowException
+                // found here: http://www.codeproject.com/Messages/2177495/Stack-overflow-bug.aspx
+				if(null == _list)
 				{
 					_list = new List<KeyValuePair<TKey, TValue>>(_initialCapacity);
 				}
