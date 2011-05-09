@@ -31,8 +31,9 @@ namespace VectorUI.Models
     //--------------------------------------------------------------------------
     public class ListEntry
     {
+        public bool                 Disabled;
         public string[]             Values;
-        public object               Tag;
+        public object               UserData;
     }
 
     //--------------------------------------------------------------------------
@@ -45,11 +46,11 @@ namespace VectorUI.Models
         }
 
         //----------------------------------------------------------------------
-        public void AddEntry( string[] _values, object _tag )
+        public void AddEntry( string[] _values, object _userData )
         {
             var entry = new ListEntry();
             entry.Values = _values;
-            entry.Tag = _tag;
+            entry.UserData = _userData;
 
             Entries.Add( entry );
         }

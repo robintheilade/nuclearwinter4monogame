@@ -20,6 +20,13 @@ namespace VectorUI.Widgets
             mBorderTex          = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath );
             mItemTex            = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "Item" );
             mSelectedItemTex    = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "SelectedItem" );
+            try
+            {
+                mDisabledItemTex    = UISheet.Game.Content.Load<Texture2D>( _marker.MarkerFullPath + "DisabledItem" );
+            }
+            catch
+            {
+            }
             Config              = UISheet.Game.Content.Load<ListViewConfig>( _marker.MarkerFullPath + "Config" );
 
             Position  = new Point( (int)_marker.Position.X, (int)_marker.Position.Y );
@@ -63,6 +70,10 @@ namespace VectorUI.Widgets
                             mfDragPreviousY = vPos.Y;
 
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                            if( ListData.Entries[SelectedItemIndex].Disabled )
+                            {
+                                SelectedItemIndex = -1;
+                            }
                         }
                         else
                         if(
@@ -101,6 +112,10 @@ namespace VectorUI.Widgets
                         if( bHitRectangle )
                         {
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                            if( ListData.Entries[SelectedItemIndex].Disabled )
+                            {
+                                SelectedItemIndex = -1;
+                            }
                         }
                         else
                         {
@@ -124,9 +139,16 @@ namespace VectorUI.Widgets
                         else
                         if( OnSelectItem != null && bHitRectangle )
                         {
-                            UISheet.MenuClickSFX.Play();
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                            OnSelectItem( this, SelectedItemIndex, vPos );
+                            if( ListData.Entries[SelectedItemIndex].Disabled )
+                            {
+                                SelectedItemIndex = -1;
+                            }
+                            else
+                            {
+                                UISheet.MenuClickSFX.Play();
+                                OnSelectItem( this, SelectedItemIndex, vPos );
+                            }
                         }
                         else
                         {
@@ -166,7 +188,13 @@ namespace VectorUI.Widgets
 
             for( int iEntry = 0; iEntry < ListData.Entries.Count; iEntry++ )
             {
-                UISheet.DrawBox( iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex, new Rectangle( actualPosition.X + Config.FramePadding, actualPosition.Y + Config.FramePadding + iEntry * Config.ItemHeight - (int)Scroll, Size.X - Config.FramePadding * 2, Config.ItemHeight ), Config.ItemCornerSize, mColor * Opacity );
+                Texture2D entryTex = iEntry == SelectedItemIndex ? mSelectedItemTex : mItemTex;
+                if( ListData.Entries[iEntry].Disabled )
+                {
+                    entryTex = mDisabledItemTex;
+                }
+
+                UISheet.DrawBox( entryTex, new Rectangle( actualPosition.X + Config.FramePadding, actualPosition.Y + Config.FramePadding + iEntry * Config.ItemHeight - (int)Scroll, Size.X - Config.FramePadding * 2, Config.ItemHeight ), Config.ItemCornerSize, mColor * Opacity );
             }
 
             int iOffsetX = 0;
@@ -181,12 +209,17 @@ namespace VectorUI.Widgets
                             if( entry.Values[iColumn] != null )
                             {
                                 Texture2D tex = ItemTextures[ entry.Values[iColumn] ];
+                                Color color = Color.White;
+                                if( ListData.Entries[iEntry].Disabled )
+                                {
+                                    color *= 0.4f;
+                                }
 
                                 UISheet.Game.SpriteBatch.Draw( tex,
                                     new Vector2(
                                         actualPosition.X + iOffsetX + Config.FramePadding + Config.ItemPadding + ListData.Columns[iColumn].Size / 2 - tex.Width / 2,
                                         actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - tex.Height / 2 ),
-                                    Color.White * Opacity );
+                                    color * Opacity );
                             }
                             iEntry++;
                         }
@@ -240,13 +273,16 @@ namespace VectorUI.Widgets
             }
         }
 
-        Models.ListData         mListData;
+        //----------------------------------------------------------------------
+        Models.ListData                 mListData;
 
         //----------------------------------------------------------------------
+        public ListViewConfig           Config;
+
         Texture2D                       mBorderTex;
         Texture2D                       mItemTex;
         Texture2D                       mSelectedItemTex;
-        public ListViewConfig           Config;
+        Texture2D                       mDisabledItemTex;
 
         Dictionary<string,Texture2D>    ItemTextures;
 
