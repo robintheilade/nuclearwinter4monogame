@@ -126,7 +126,7 @@ namespace VectorUI.Widgets
                         {
                             UISheet.MenuClickSFX.Play();
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                            OnSelectItem( this, SelectedItemIndex );
+                            OnSelectItem( this, SelectedItemIndex, vPos );
                         }
                         else
                         {

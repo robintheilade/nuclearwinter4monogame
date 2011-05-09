@@ -24,11 +24,11 @@ namespace VectorUI.Widgets
         public UISheet      UISheet     { get; private set; }
 
         //----------------------------------------------------------------------
-        public Vector2              Offset  = Vector2.Zero;
-        public float                Opacity = 1f;
+        public Vector2                      Offset  = Vector2.Zero;
+        public float                        Opacity = 1f;
 
         //----------------------------------------------------------------------
-        public Action<Widget>       OnClick;
-        public Action<Widget,int>   OnSelectItem;
+        public Action<Widget>               OnClick;
+        public Action<Widget,int,Vector2>   OnSelectItem;
     }
 }
