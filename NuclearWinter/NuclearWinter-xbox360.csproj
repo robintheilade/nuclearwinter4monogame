@@ -95,6 +95,7 @@
     <Compile Include="Animation\LerpValue.cs" />
     <Compile Include="Animation\SmoothValue.cs" />
     <Compile Include="Animation\Timeline.cs" />
+    <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
     <Compile Include="Input\GamePadManager.cs" />
