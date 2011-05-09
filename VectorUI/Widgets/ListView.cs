@@ -48,9 +48,10 @@ namespace VectorUI.Widgets
                     Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
 #endif
                 
-                    if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
+                    bool bHitRectangle = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
+                    if( bHitRectangle )
                     {
-                        if( 
+                        if(
 #if WINDOWS_PHONE
                             touch.State == TouchLocationState.Pressed
 #else
@@ -62,27 +63,6 @@ namespace VectorUI.Widgets
                             mfDragPreviousY = vPos.Y;
 
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                        }
-                        else
-                        if( 
-#if WINDOWS_PHONE
-                            touch.State == TouchLocationState.Released
-#else
-                            UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
-#endif
-                        )
-                        {
-                            if( mbDragging )
-                            {
-                                mbDragging = false;
-                            }
-                            else
-                            if( OnSelectItem != null )
-                            {
-                                UISheet.MenuClickSFX.Play();
-                                SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                                OnSelectItem( this, SelectedItemIndex );
-                            }
                         }
                         else
                         if(
@@ -101,6 +81,7 @@ namespace VectorUI.Widgets
                         
                         }
                     }
+                    
 
                     if(
 #if WINDOWS_PHONE
@@ -115,6 +96,41 @@ namespace VectorUI.Widgets
                             Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
                             ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
                             mfDragPreviousY = vPos.Y;
+                        }
+                        else
+                        if( bHitRectangle )
+                        {
+                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                        }
+                        else
+                        {
+                            SelectedItemIndex = -1;
+                        }
+                    }
+
+                    else
+                    if( 
+#if WINDOWS_PHONE
+                        touch.State == TouchLocationState.Released
+#else
+                        UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#endif
+                    )
+                    {
+                        if( mbDragging )
+                        {
+                            mbDragging = false;
+                        }
+                        else
+                        if( OnSelectItem != null && bHitRectangle )
+                        {
+                            UISheet.MenuClickSFX.Play();
+                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                            OnSelectItem( this, SelectedItemIndex );
+                        }
+                        else
+                        {
+                            SelectedItemIndex = -1;
                         }
                     }
 #if WINDOWS_PHONE
