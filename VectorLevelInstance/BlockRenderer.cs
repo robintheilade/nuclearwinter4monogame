@@ -11,211 +11,50 @@ namespace VectorLevel
     /// <summary>
     /// A static block that can be rendered 
     /// </summary>
-    public class Block
+    public class BlockRenderer
     {
         //----------------------------------------------------------------------
-        public Block( Entities.Path _path )
+        public BlockRenderer( LevelRenderer _levelRenderer, Entities.Path _path )
         {
-            Path = _path;
+            LevelRenderer   = _levelRenderer;
+            Path            = _path;
 
-            BackFacing = new bool[ Path.Subpaths[0].Vertices.Count ];
-            StartingVertices = new int[ Path.Subpaths[0].Vertices.Count ];
-            ShadowVertices = new VertexPositionColor[ Path.Subpaths[0].Vertices.Count * 2 ];
+            ComputeAABB();
         }
 
         //----------------------------------------------------------------------
-        public void CreateBody( Box2D.XNA.World _physics, float _fPhysicsRatio )
+        void ComputeAABB()
         {
-            CreateBody( _physics, _fPhysicsRatio, Block.DefaultFriction, Block.DefaultRestitution );
-        }
-
-        //----------------------------------------------------------------------
-        public void CreateBody( Box2D.XNA.World _physics, float _fPhysicsRatio, float _fFriction, float _fRestitution )
-        {
-            //------------------------------------------------------------------
-            // Body def
-            Box2D.XNA.BodyDef bodyDef = new Box2D.XNA.BodyDef();
-            
-            var pathBodyDef = new Box2D.XNA.BodyDef();
-            pathBodyDef.type = Box2D.XNA.BodyType.Static;
-            Body = _physics.CreateBody( pathBodyDef );
-
-            //------------------------------------------------------------------
-            // Setup minimal bounding box
-            AABB.lowerBound.X = Path.Subpaths[0].Vertices[0].X;
-            AABB.upperBound.X = Path.Subpaths[0].Vertices[0].X;
-            AABB.lowerBound.Y = Path.Subpaths[0].Vertices[0].Y;
-            AABB.upperBound.Y = Path.Subpaths[0].Vertices[0].Y;
-            
-            //------------------------------------------------------------------
-            // Create edges
-            var fixtureDef = new Box2D.XNA.FixtureDef();
-            fixtureDef.density = 0f;
-            fixtureDef.friction = _fFriction;
-            fixtureDef.restitution = _fRestitution;
-
-            var shape = new Box2D.XNA.LoopShape();
-
-            List<Vector2> lvVertices = new List<Vector2>();
+            AABB = new NuclearWinter.AABB( Path.Subpaths[0].Vertices[0], Path.Subpaths[0].Vertices[0] );
 
             int j = Path.Subpaths[0].Vertices.Count - 1;
             for( int i = 0; i < Path.Subpaths[0].Vertices.Count; i++ )
             {
-                //--------------------------------------------------
-                // Extend the path's bounding box (used to optimize shadow rendering)
-                if( Path.Subpaths[0].Vertices[i].X < AABB.lowerBound.X )
+                if( Path.Subpaths[0].Vertices[i].X < AABB.Min.X )
                 {
-                    AABB.lowerBound.X = Path.Subpaths[0].Vertices[i].X;
+                    AABB.Min.X = Path.Subpaths[0].Vertices[i].X;
                 }
 
-                if( Path.Subpaths[0].Vertices[i].X > AABB.upperBound.X )
+                if( Path.Subpaths[0].Vertices[i].X > AABB.Max.X )
                 {
-                    AABB.upperBound.X = Path.Subpaths[0].Vertices[i].X;
+                    AABB.Max.X = Path.Subpaths[0].Vertices[i].X;
                 }
 
-                if( Path.Subpaths[0].Vertices[i].Y < AABB.lowerBound.Y )
+                if( Path.Subpaths[0].Vertices[i].Y < AABB.Min.Y )
                 {
-                    AABB.lowerBound.Y = Path.Subpaths[0].Vertices[i].Y;
+                    AABB.Min.Y = Path.Subpaths[0].Vertices[i].Y;
                 }
 
-                if( Path.Subpaths[0].Vertices[i].Y > AABB.upperBound.Y )
+                if( Path.Subpaths[0].Vertices[i].Y > AABB.Max.Y )
                 {
-                    AABB.upperBound.Y = Path.Subpaths[0].Vertices[i].Y;
-                }
-
-                //--------------------------------------------------
-                // NOTE: We're checking if the edge is not too small
-                // otherwise it could cause asserts to fire in Box2D
-                // at some point during the game
-                Vector2 vDiff = Path.Subpaths[0].Vertices[ j ] - Path.Subpaths[0].Vertices[ i ];
-                if( vDiff.Length() / _fPhysicsRatio > 1f )
-                {
-                    //lvActualPolygon.Insert( 0, Path.Subpaths[0].Vertices[ i ] / PhysicsRatio );
-                    /*var shape = new Box2D.XNA.PolygonShape();
-                    shape.SetAsEdge( Path.Subpaths[0].Vertices[ j ] / _fPhysicsRatio, Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
-                    
-                    fixtureDef.shape = shape;
-                    Body.CreateFixture( fixtureDef );
-                    */
-
-                    lvVertices.Add( Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
-
-                    j = i;
+                    AABB.Max.Y = Path.Subpaths[0].Vertices[i].Y;
                 }
             }
-
-            shape._vertices = lvVertices.ToArray();
-            shape._count = lvVertices.Count;
-
-            fixtureDef.shape = shape;
-            Body.CreateFixture( fixtureDef );
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Compute inside and outside offsets for stroke rendering
-        /// </summary>
-        /// <param name="_iVertex"></param>
-        /// <param name="_vOutOffset"></param>
-        /// <param name="_vInOffset"></param>
-        private void ComputeOffsets( int _iVertex, out Vector2 _vOutOffset, out Vector2 _vInOffset )
+        public void InitRender( float _fDepth, float _fScale )
         {
-            int i = _iVertex;
-            int prevI = (i > 0) ? (i - 1) : (Path.Subpaths[0].Vertices.Count - 1);
-            int nextI = (i + 1) % Path.Subpaths[0].Vertices.Count;
-
-            // Direction vector from previous vertex to current vertex
-            Vector2 vNormPrev = Path.Subpaths[0].Vertices[ prevI ] - Path.Subpaths[0].Vertices[ i ];
-            vNormPrev.Normalize();
-
-            // Direction vector from next vertex to current vertex
-            Vector2 vNormNext = Path.Subpaths[0].Vertices[ i ] - Path.Subpaths[0].Vertices[ nextI ];
-            vNormNext.Normalize();
-
-            //------------------------------------------------------------------
-            // Compute outside offset
-
-            // Offset the previous and next directions on the ouside
-            Vector2 vOutPrev = new Vector2( -vNormPrev.Y, vNormPrev.X) * Path.StrokeWidth / 2f;
-            Vector2 vOutNext = new Vector2(-vNormNext.Y, vNormNext.X) * Path.StrokeWidth / 2f;
-            
-            // Compute offset vertices
-            Vector2 vOutPrevP1 = Path.Subpaths[0].Vertices[ prevI ] + vOutPrev;
-            Vector2 vOutPrevP2 = Path.Subpaths[0].Vertices[ i ] + vOutPrev;
-            
-            Vector2 vOutNextP1 = Path.Subpaths[0].Vertices[ nextI ] + vOutNext;
-            Vector2 vOutNextP2 = Path.Subpaths[0].Vertices[ i ] + vOutNext;
-
-            // Find interesection between the two offset vertices
-            float fOutAPrev = vOutPrevP2.Y - vOutPrevP1.Y;
-            float fOutBPrev = vOutPrevP1.X - vOutPrevP2.X;
-            float fOutCPrev = fOutAPrev * vOutPrevP1.X + fOutBPrev * vOutPrevP1.Y;
-
-            float fOutANext = vOutNextP2.Y - vOutNextP1.Y;
-            float fOutBNext = vOutNextP1.X - vOutNextP2.X;
-            float fOutCNext = fOutANext * vOutNextP1.X + fOutBNext * vOutNextP1.Y;
-            
-            // We've got our new outside offset vertex
-            Vector2 vOutOffset;
-
-            float fOutDet = fOutAPrev * fOutBNext - fOutANext * fOutBPrev;
-            if( Math.Abs( fOutDet ) <= 0.01f )
-            {
-                // Parallel
-                vOutOffset = Path.Subpaths[0].Vertices[ i ] + vOutPrev; // or vOutNext, they are the same!
-            }
-            else
-            {
-                vOutOffset = new Vector2( (fOutBNext * fOutCPrev - fOutBPrev * fOutCNext) / fOutDet, (fOutAPrev * fOutCNext - fOutANext * fOutCPrev) / fOutDet );
-            }
-
-            _vOutOffset = vOutOffset;
-
-            //------------------------------------------------------------------
-            // Compute inside offset
-
-            // Offset the previous and next directions on the inside
-            Vector2 vInPrev = new Vector2(vNormPrev.Y, -vNormPrev.X) * Path.StrokeWidth / 2f;
-            Vector2 vInNext = new Vector2(vNormNext.Y, -vNormNext.X) * Path.StrokeWidth / 2f;
-
-            // Compute offset vertices
-            Vector2 vInPrevP1 = Path.Subpaths[0].Vertices[ prevI ] + vInPrev;
-            Vector2 vInPrevP2 = Path.Subpaths[0].Vertices[ i ] + vInPrev;
-            
-            Vector2 vInNextP1 = Path.Subpaths[0].Vertices[ nextI ] + vInNext;
-            Vector2 vInNextP2 = Path.Subpaths[0].Vertices[ i ] + vInNext;
-
-            // Find interesection between the two offset vertices
-            float fInAPrev = vInPrevP2.Y - vInPrevP1.Y;
-            float fInBPrev = vInPrevP1.X - vInPrevP2.X;
-            float fInCPrev = fInAPrev * vInPrevP1.X + fInBPrev * vInPrevP1.Y;
-            
-            float vInANext = vInNextP2.Y - vInNextP1.Y;
-            float vInBNext = vInNextP1.X - vInNextP2.X;
-            float vInCNext = vInANext * vInNextP1.X + vInBNext * vInNextP1.Y;
-            
-            // We've got our new inside offset vertex
-            Vector2 vInOffset;
-
-            float in_det = fInAPrev * vInBNext - vInANext * fInBPrev;
-            if( Math.Abs( in_det ) <= 0.01 )
-            {
-                // Parallel
-                vInOffset = Path.Subpaths[0].Vertices[ i ] + vInPrev; // or vInNext, they are the same!
-            }
-            else
-            {
-                vInOffset = new Vector2( (vInBNext * fInCPrev - fInBPrev * vInCNext) / in_det, (fInAPrev * vInCNext - vInANext * fInCPrev) / in_det );
-            }
-
-            _vInOffset = vInOffset;
-        }
-
-        //----------------------------------------------------------------------
-        public void InitRender( GraphicsDevice _graphicsDevice, float _fDepth, float _fScale )
-        {
-            mGraphicsDevice = _graphicsDevice;
-
             int iFillVerticesCount      = Path.MeshVertices.Length;
             int iFillPrimitivesCount    = Path.MeshIndices.Length / 3;
 
@@ -233,7 +72,11 @@ namespace VectorLevel
 	                aFillVertices[ i ] = new VertexPositionColorTexture( new Vector3( Path.MeshVertices[i], _fDepth ), Path.FillColor, Path.MeshVertices[i] / 200f / _fScale );
                 }
 
-                mFillVertexBuffer = new VertexBuffer( mGraphicsDevice, VertexPositionColorTexture.VertexDeclaration, aFillVertices.Length, BufferUsage.WriteOnly );
+                mFillVertexBuffer = new VertexBuffer(
+                    LevelRenderer.Game.GraphicsDevice,
+                    VertexPositionColorTexture.VertexDeclaration,
+                    aFillVertices.Length,
+                    BufferUsage.WriteOnly );
                 mFillVertexBuffer.SetData( aFillVertices );
 
                 //--------------------------------------------------------------
@@ -245,7 +88,7 @@ namespace VectorLevel
                     aFillIndices[ i ] = (short)Path.MeshIndices[i];
                 }
 
-			    mFillIndexBuffer = new IndexBuffer( _graphicsDevice, IndexElementSize.SixteenBits, aFillIndices.Length, BufferUsage.WriteOnly );
+			    mFillIndexBuffer = new IndexBuffer( LevelRenderer.Game.GraphicsDevice, IndexElementSize.SixteenBits, aFillIndices.Length, BufferUsage.WriteOnly );
 			    mFillIndexBuffer.SetData( aFillIndices );
             }
 
@@ -358,7 +201,7 @@ namespace VectorLevel
             aStrokeVertices[ Path.Subpaths[0].Vertices.Count * 2 + 1 ] =
                 new VertexPositionColorTexture( aStrokeVertices[ 1 ].Position, Path.StrokeColor, new Vector2( fU, aStrokeVertices[ 1 ].TextureCoordinate.Y ) );
 
-            mStrokeVertexBuffer = new VertexBuffer( mGraphicsDevice, VertexPositionColorTexture.VertexDeclaration, aStrokeVertices.Length, BufferUsage.WriteOnly );
+            mStrokeVertexBuffer = new VertexBuffer( LevelRenderer.Game.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, aStrokeVertices.Length, BufferUsage.WriteOnly );
             mStrokeVertexBuffer.SetData( aStrokeVertices );
 
             //------------------------------------------------------------------
@@ -384,8 +227,103 @@ namespace VectorLevel
                 aStrokeIndices[ i * 2 * 3 + 5 ] = (short)iOutNextVertex;
             }
 
-            mStrokeIndexBuffer = new IndexBuffer( mGraphicsDevice, IndexElementSize.SixteenBits, aStrokeIndices.Length, BufferUsage.WriteOnly );
+            mStrokeIndexBuffer = new IndexBuffer( LevelRenderer.Game.GraphicsDevice, IndexElementSize.SixteenBits, aStrokeIndices.Length, BufferUsage.WriteOnly );
             mStrokeIndexBuffer.SetData( aStrokeIndices );
+        }
+
+        //----------------------------------------------------------------------
+        // Compute inside and outside offsets for stroke rendering
+        private void ComputeOffsets( int _iVertex, out Vector2 _vOutOffset, out Vector2 _vInOffset )
+        {
+            int i = _iVertex;
+            int prevI = (i > 0) ? (i - 1) : (Path.Subpaths[0].Vertices.Count - 1);
+            int nextI = (i + 1) % Path.Subpaths[0].Vertices.Count;
+
+            // Direction vector from previous vertex to current vertex
+            Vector2 vNormPrev = Path.Subpaths[0].Vertices[ prevI ] - Path.Subpaths[0].Vertices[ i ];
+            vNormPrev.Normalize();
+
+            // Direction vector from next vertex to current vertex
+            Vector2 vNormNext = Path.Subpaths[0].Vertices[ i ] - Path.Subpaths[0].Vertices[ nextI ];
+            vNormNext.Normalize();
+
+            //------------------------------------------------------------------
+            // Compute outside offset
+
+            // Offset the previous and next directions on the ouside
+            Vector2 vOutPrev = new Vector2( -vNormPrev.Y, vNormPrev.X) * Path.StrokeWidth / 2f;
+            Vector2 vOutNext = new Vector2(-vNormNext.Y, vNormNext.X) * Path.StrokeWidth / 2f;
+            
+            // Compute offset vertices
+            Vector2 vOutPrevP1 = Path.Subpaths[0].Vertices[ prevI ] + vOutPrev;
+            Vector2 vOutPrevP2 = Path.Subpaths[0].Vertices[ i ] + vOutPrev;
+            
+            Vector2 vOutNextP1 = Path.Subpaths[0].Vertices[ nextI ] + vOutNext;
+            Vector2 vOutNextP2 = Path.Subpaths[0].Vertices[ i ] + vOutNext;
+
+            // Find interesection between the two offset vertices
+            float fOutAPrev = vOutPrevP2.Y - vOutPrevP1.Y;
+            float fOutBPrev = vOutPrevP1.X - vOutPrevP2.X;
+            float fOutCPrev = fOutAPrev * vOutPrevP1.X + fOutBPrev * vOutPrevP1.Y;
+
+            float fOutANext = vOutNextP2.Y - vOutNextP1.Y;
+            float fOutBNext = vOutNextP1.X - vOutNextP2.X;
+            float fOutCNext = fOutANext * vOutNextP1.X + fOutBNext * vOutNextP1.Y;
+            
+            // We've got our new outside offset vertex
+            Vector2 vOutOffset;
+
+            float fOutDet = fOutAPrev * fOutBNext - fOutANext * fOutBPrev;
+            if( Math.Abs( fOutDet ) <= 0.01f )
+            {
+                // Parallel
+                vOutOffset = Path.Subpaths[0].Vertices[ i ] + vOutPrev; // or vOutNext, they are the same!
+            }
+            else
+            {
+                vOutOffset = new Vector2( (fOutBNext * fOutCPrev - fOutBPrev * fOutCNext) / fOutDet, (fOutAPrev * fOutCNext - fOutANext * fOutCPrev) / fOutDet );
+            }
+
+            _vOutOffset = vOutOffset;
+
+            //------------------------------------------------------------------
+            // Compute inside offset
+
+            // Offset the previous and next directions on the inside
+            Vector2 vInPrev = new Vector2(vNormPrev.Y, -vNormPrev.X) * Path.StrokeWidth / 2f;
+            Vector2 vInNext = new Vector2(vNormNext.Y, -vNormNext.X) * Path.StrokeWidth / 2f;
+
+            // Compute offset vertices
+            Vector2 vInPrevP1 = Path.Subpaths[0].Vertices[ prevI ] + vInPrev;
+            Vector2 vInPrevP2 = Path.Subpaths[0].Vertices[ i ] + vInPrev;
+            
+            Vector2 vInNextP1 = Path.Subpaths[0].Vertices[ nextI ] + vInNext;
+            Vector2 vInNextP2 = Path.Subpaths[0].Vertices[ i ] + vInNext;
+
+            // Find interesection between the two offset vertices
+            float fInAPrev = vInPrevP2.Y - vInPrevP1.Y;
+            float fInBPrev = vInPrevP1.X - vInPrevP2.X;
+            float fInCPrev = fInAPrev * vInPrevP1.X + fInBPrev * vInPrevP1.Y;
+            
+            float vInANext = vInNextP2.Y - vInNextP1.Y;
+            float vInBNext = vInNextP1.X - vInNextP2.X;
+            float vInCNext = vInANext * vInNextP1.X + vInBNext * vInNextP1.Y;
+            
+            // We've got our new inside offset vertex
+            Vector2 vInOffset;
+
+            float in_det = fInAPrev * vInBNext - vInANext * fInBPrev;
+            if( Math.Abs( in_det ) <= 0.01 )
+            {
+                // Parallel
+                vInOffset = Path.Subpaths[0].Vertices[ i ] + vInPrev; // or vInNext, they are the same!
+            }
+            else
+            {
+                vInOffset = new Vector2( (vInBNext * fInCPrev - fInBPrev * vInCNext) / in_det, (fInAPrev * vInCNext - vInANext * fInCPrev) / in_det );
+            }
+
+            _vInOffset = vInOffset;
         }
 
         //----------------------------------------------------------------------
@@ -396,13 +334,14 @@ namespace VectorLevel
                 return;
             }
 
-            mGraphicsDevice.Indices = mFillIndexBuffer;
-            mGraphicsDevice.SetVertexBuffer( mFillVertexBuffer );
+            GraphicsDevice graphicsDevice = LevelRenderer.Game.GraphicsDevice;
+
+            graphicsDevice.Indices = mFillIndexBuffer;
+            graphicsDevice.SetVertexBuffer( mFillVertexBuffer );
             
-            mGraphicsDevice.DrawIndexedPrimitives(
+            graphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList,
-                0,
-                0,
+                0, 0,
                 Path.MeshVertices.Length,
                 0,
                 Path.MeshIndices.Length / 3 );
@@ -411,18 +350,28 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         public void DrawStroke()
         {
-            mGraphicsDevice.Indices = mStrokeIndexBuffer;
-            mGraphicsDevice.SetVertexBuffer( mStrokeVertexBuffer );
-            
             int iStrokePrimitivesCount  = ( Path.Subpaths[0].Vertices.Count + (Path.Subpaths[0].IsClosed ? 0 : -1) ) * 2;
-            
-            mGraphicsDevice.DrawIndexedPrimitives(
+
+            GraphicsDevice graphicsDevice = LevelRenderer.Game.GraphicsDevice;
+
+            graphicsDevice.Indices = mStrokeIndexBuffer;
+            graphicsDevice.SetVertexBuffer( mStrokeVertexBuffer );
+            graphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList,
-                0,
-                0,
+                0, 0,
                 (Path.Subpaths[0].Vertices.Count + 1) * 2,
                 0,
                 iStrokePrimitivesCount );
+        }
+
+        #region Shadow rendering
+
+        //----------------------------------------------------------------------
+        public void SetupShadowRendering()
+        {
+            BackFacing          = new bool[ Path.Subpaths[0].Vertices.Count ];
+            StartingVertices    = new int[ Path.Subpaths[0].Vertices.Count ];
+            ShadowVertices      = new VertexPositionColor[ Path.Subpaths[0].Vertices.Count * 2 ];
         }
 
         //----------------------------------------------------------------------
@@ -457,13 +406,7 @@ namespace VectorLevel
         public void DrawShadow( Light _light )
         {
             // Quick AABB test to avoid drawing shadows that won't affect the light texture
-            bool bOutsideBoundingBox =
-                ( _light.Position.X < AABB.lowerBound.X - _light.Range )
-            ||  ( _light.Position.X > AABB.upperBound.X + _light.Range )
-            ||  ( _light.Position.Y < AABB.lowerBound.Y - _light.Range )
-            ||  ( _light.Position.Y > AABB.upperBound.Y + _light.Range );
-
-            if( bOutsideBoundingBox )
+            if( ! AABB.Contains( _light.Position, _light.Range ) )
             {
                 return;
             }
@@ -527,7 +470,7 @@ namespace VectorLevel
                         }
 
                         DrawShadowStrip( _light, startingVertexIndex, iVertexIndex, iShadowVertexCount * 2 );
-                        mGraphicsDevice.DrawUserPrimitives<VertexPositionColor>( PrimitiveType.TriangleStrip, ShadowVertices, iVertexIndex, ( iShadowVertexCount - 1 ) * 2 );
+                        LevelRenderer.Game.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>( PrimitiveType.TriangleStrip, ShadowVertices, iVertexIndex, ( iShadowVertexCount - 1 ) * 2 );
                         iVertexIndex += iShadowVertexCount * 2;
                         break;
                     }
@@ -535,17 +478,15 @@ namespace VectorLevel
             }
         }
 
+        #endregion
+
         //----------------------------------------------------------------------
         public Entities.Path            Path;
-        public Box2D.XNA.Body           Body;
-        public Box2D.XNA.AABB           AABB;
-
-        public const float              DefaultFriction     = 1f;
-        public const float              DefaultRestitution  = 0.1f;
+        public NuclearWinter.AABB       AABB;
 
         //----------------------------------------------------------------------
         // Rendering
-        GraphicsDevice                  mGraphicsDevice;
+        LevelRenderer                   LevelRenderer;
 
         VertexBuffer                    mFillVertexBuffer;
 		IndexBuffer                     mFillIndexBuffer;

@@ -68,6 +68,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AABB.cs" />
     <Compile Include="Animation\AnimatedValue.cs" />
     <Compile Include="Animation\BounceValue.cs" />
     <Compile Include="Animation\LerpValue.cs" />
