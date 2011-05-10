@@ -66,7 +66,7 @@ namespace VectorLevel
                 Color.White,
                 0f,
                 Vector2.Zero,
-                new Vector2( LevelRenderer.Game.GraphicsDevice.Viewport.Width / LevelRenderer.FullAlphaTex.Width, LevelRenderer.Game.GraphicsDevice.Viewport.Height / LevelRenderer.FullAlphaTex.Height )
+                new Vector2( NuclearWinter.Resolution.InternalMode.Width, NuclearWinter.Resolution.InternalMode.Height )
             );
 
             LevelRenderer.Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;

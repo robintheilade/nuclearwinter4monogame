@@ -96,6 +96,10 @@
       <Project>{BF461002-3A8E-451C-91F7-5CC14ADE85E6}</Project>
       <Name>Box2D.XNA-windows</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NuclearWinter\NuclearWinter-windows.csproj">
+      <Project>{2F2A1E2C-560B-44D3-B693-FFB05D271C53}</Project>
+      <Name>NuclearWinter-windows</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VectorLevelDesc\VectorLevelDesc-windows.csproj">
       <Project>{af64a6c3-a0d3-4a57-848b-b545b4d5fc8b}</Project>
       <Name>VectorLevelDesc-windows</Name>

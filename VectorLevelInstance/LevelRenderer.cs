@@ -6,13 +6,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
+using NuclearWinter;
 
 namespace VectorLevel
 {
     public class LevelRenderer
     {
         //----------------------------------------------------------------------
-        public LevelRenderer( Game _game, uint _uiMapWidth, uint _uiMapHeight )
+        public LevelRenderer( NuclearGame _game, uint _uiMapWidth, uint _uiMapHeight )
         {
             Game                = _game;
 
@@ -252,7 +253,7 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        public Game                 Game;
+        public NuclearGame          Game;
         public ContentManager       Content;
         public BasicEffect          Effect;
 

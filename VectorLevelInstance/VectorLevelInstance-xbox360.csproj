@@ -83,6 +83,10 @@
       <Project>{02BB39F7-FC62-438C-AB83-3999D69620D4}</Project>
       <Name>Box2D.XNA-xbox360</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NuclearWinter\NuclearWinter-xbox360.csproj">
+      <Project>{70EBBE66-F4E5-4BF8-8820-6BF278265FBA}</Project>
+      <Name>NuclearWinter-xbox360</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VectorLevelDesc\VectorLevelDesc-xbox360.csproj">
       <Project>{BD208AC0-48BA-49CD-958C-C6E2F51908FF}</Project>
       <Name>VectorLevelDesc-xbox360</Name>
