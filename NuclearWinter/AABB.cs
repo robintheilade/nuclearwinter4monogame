@@ -20,6 +20,16 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
+        public void Extend( Vector2 _vPoint )
+        {
+            Min.X = Math.Min( _vPoint.X, Min.X );
+            Min.Y = Math.Min( _vPoint.Y, Min.Y );
+
+            Max.X = Math.Max( _vPoint.X, Max.X );
+            Max.Y = Math.Max( _vPoint.Y, Max.Y );
+        }
+
+        //----------------------------------------------------------------------
         public bool Intersects( AABB _aabb )
         {
             return
@@ -54,6 +64,32 @@ namespace NuclearWinter
             &&  ( _vPoint.X <= Max.X    + _fAxisDistance )
             &&  ( _vPoint.Y >= Min.Y    - _fAxisDistance )
             &&  ( _vPoint.Y <= Max.Y    + _fAxisDistance );
+        }
+
+        //----------------------------------------------------------------------
+        public float Width
+        {
+            get
+            {
+                return Math.Abs( Max.X - Min.X );
+            }
+        }
+
+        //----------------------------------------------------------------------
+        public float Height 
+        {
+            get
+            {
+                return Math.Abs( Max.Y - Min.Y );
+            }
+        }
+
+        public Vector2 Center
+        {
+            get
+            {
+                return ( Min + Max ) / 2f;
+            }
         }
     }
 }
