@@ -60,13 +60,12 @@ namespace VectorLevel
         public void ClearAlphaToOne()
         {
             LevelRenderer.Game.GraphicsDevice.BlendState = mClearAlphaBlendState;
-
-            LevelRenderer.DrawSprite( LevelRenderer.FullAlphaTex, 
+            LevelRenderer.DrawSprite( LevelRenderer.FullAlphaTex,
                 Vector2.Zero,
                 Color.White,
                 0f,
                 Vector2.Zero,
-                new Vector2( NuclearWinter.Resolution.InternalMode.Width, NuclearWinter.Resolution.InternalMode.Height )
+                new Vector2( LevelRenderer.MapWidth, LevelRenderer.MapHeight )
             );
 
             LevelRenderer.Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;
