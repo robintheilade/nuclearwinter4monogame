@@ -38,7 +38,7 @@ using System.Collections.Generic;
 
 namespace NuclearWinter.Collections
 {
-#if ! WINDOWS_PHONE
+#if WINDOWS
 	[Serializable]
 #endif
 	public class KeyedList<K, V> : IDictionary<K, V>, IList<KeyValuePair<K, V>>

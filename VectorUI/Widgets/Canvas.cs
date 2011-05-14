@@ -17,6 +17,8 @@ namespace VectorUI.Widgets
         public Canvas( UISheet _sheet, Marker _marker )
         : base( _marker.Name, _sheet )
         {
+            Position    = _marker.Position;
+            Size        = _marker.Size;
         }
 
         //----------------------------------------------------------------------
@@ -32,5 +34,8 @@ namespace VectorUI.Widgets
 
         //----------------------------------------------------------------------
         public Action<Widget>   OnDraw;
+
+        public Vector2          Position    { get; private set; }
+        public Vector2          Size        { get; private set; }
     }
 }
