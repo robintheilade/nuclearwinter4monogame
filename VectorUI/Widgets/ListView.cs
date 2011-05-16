@@ -54,8 +54,7 @@ namespace VectorUI.Widgets
 #elif WINDOWS
                     Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
 #endif
-                
-                    bool bHitRectangle = mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y );
+                    bool bHitRectangle = mHitRectangle.Contains( (int)(vPos.X - Offset.X), (int)(vPos.Y - Offset.Y) );
                     if( bHitRectangle )
                     {
                         if(

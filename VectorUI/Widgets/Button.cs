@@ -56,7 +56,7 @@ namespace VectorUI.Widgets
                 vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
                 vPos += mvOrigin;
                 
-                if( mHitRectangle.Contains( (int)vPos.X, (int)vPos.Y ) )
+                if( mHitRectangle.Contains( (int)(vPos.X - Offset.X), (int)(vPos.Y - Offset.Y) ) )
                 {
 #if WINDOWS
                     if( UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed )
