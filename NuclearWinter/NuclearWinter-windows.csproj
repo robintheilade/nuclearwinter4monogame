@@ -94,6 +94,7 @@
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
+    <Compile Include="Input\Accelerometer.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="Input\GamePadManager.cs" />
     <Compile Include="Input\TouchManager.cs" />

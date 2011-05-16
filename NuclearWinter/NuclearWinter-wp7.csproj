@@ -77,6 +77,7 @@
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
+    <Compile Include="Input\Accelerometer.cs" />
     <Compile Include="Input\GamePadManager.cs" />
     <Compile Include="Input\TouchManager.cs" />
     <Compile Include="LocalizedKeyboardState.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Devices.Sensors, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Xna.Framework">
       <Private>False</Private>
