@@ -40,6 +40,7 @@ namespace VectorUI.Widgets
 
             SelectedItemIndex = -1;
             Scroll = 0f;
+            mfBoundedScroll = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -103,7 +104,7 @@ namespace VectorUI.Widgets
                     {
                         if( mbDragging )
                         {
-                            Scroll = MathHelper.Clamp( mfDragOffset - vPos.Y, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
+                            Scroll = mfDragOffset - vPos.Y;
                             ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
                             mfDragPreviousY = vPos.Y;
                         }
@@ -159,7 +160,19 @@ namespace VectorUI.Widgets
 #endif
             }
 
-            if( ! mbDragging  && ScrollInertia != 0f )
+            Scroll = MathHelper.Lerp( Scroll, mfBoundedScroll, _fElapsedTime * 5f );
+
+            if( Scroll < 0f )
+            {
+                Scroll /= 2f;
+            }
+            else
+            if( Scroll > mfScrollMax )
+            {
+                Scroll = mfScrollMax + ( Scroll - mfScrollMax ) / 2f;
+            }
+
+            if( ! mbDragging && ScrollInertia != 0f )
             {
                 ScrollInertia *= Math.Max( 0f, 1f - ( _fElapsedTime * 5f ) );
                 if( Math.Abs( ScrollInertia ) < 1f )
@@ -168,7 +181,7 @@ namespace VectorUI.Widgets
                 }
                 else
                 {
-                    Scroll = MathHelper.Clamp( Scroll + ScrollInertia, 0f, mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2 );
+                    Scroll += ScrollInertia;
                 }
             }
         }
@@ -251,7 +264,8 @@ namespace VectorUI.Widgets
                 return mListData;
             }
 
-            set { 
+            set
+            {
                 mListData = value;
                 
                 for( int iColumn = 0; iColumn < ListData.Columns.Length; iColumn++ )
@@ -269,6 +283,8 @@ namespace VectorUI.Widgets
                         }
                     }
                 }
+
+                mfScrollMax = mListData.Entries.Count * Config.ItemHeight - Size.Y + Config.FramePadding * 2;
             }
         }
 
@@ -285,8 +301,21 @@ namespace VectorUI.Widgets
 
         Dictionary<string,Texture2D>    ItemTextures;
 
+        public float                    Scroll
+        {
+            get {
+                return mfScroll;
+            }
 
-        public float                    Scroll;
+            set {
+                mfScroll = value;
+                mfBoundedScroll = MathHelper.Clamp( mfScroll, 0f, mfScrollMax );
+            }
+        }
+        float                           mfScrollMax;
+        float                           mfScroll;
+        float                           mfBoundedScroll;
+
         public int                      SelectedItemIndex;
 
         bool                            mbDragging;
