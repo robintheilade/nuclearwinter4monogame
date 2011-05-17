@@ -29,6 +29,13 @@ namespace VectorUI.Animation
             HasStarted = true;
         }
 
+        public void Stop()
+        {
+            Time = 0f;
+            IsDone = false;
+            HasStarted = false;
+        }
+
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
@@ -44,6 +51,12 @@ namespace VectorUI.Animation
                     IsDone = false;
                 }
             }
+
+            if( IsDone && IsLooping )
+            {
+                IsDone = false;
+                Time = 0f;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -51,6 +64,8 @@ namespace VectorUI.Animation
         public bool     HasStarted  { get; private set; }
 
         public float    Time        { get; private set; }
+
+        public bool     IsLooping;
 
         //----------------------------------------------------------------------
         public UISheet                                      UISheet;

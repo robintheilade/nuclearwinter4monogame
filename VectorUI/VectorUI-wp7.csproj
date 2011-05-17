@@ -77,7 +77,9 @@
   <ItemGroup>
     <Compile Include="Animation\AnimationBlock.cs" />
     <Compile Include="Animation\AnimationLayer.cs" />
+    <Compile Include="Animation\BlinkBlock.cs" />
     <Compile Include="Animation\FadeBlock.cs" />
+    <Compile Include="Animation\PulseBlock.cs" />
     <Compile Include="Animation\SlideBlock.cs" />
     <Compile Include="Models\ListData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

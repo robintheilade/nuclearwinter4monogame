@@ -159,6 +159,12 @@ namespace VectorUI
                 case "SlideOut":
                     block = new SlideBlock( _layer, _marker.MarkerType.EndsWith( "In" ), 0.3f, 200f, _marker.Angle );
                     break;
+                case "Blink":
+                    block = new BlinkBlock( _layer, 2f );
+                    break;
+                case "Pulse":
+                    block = new PulseBlock( _layer, 1f );
+                    break;
                 case "FadeIn":
                 case "FadeOut":
                     block = new FadeBlock( _layer, _marker.MarkerType.EndsWith( "In" ), 0.3f );
