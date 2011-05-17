@@ -393,7 +393,7 @@ namespace VectorLevelProcessor
         internal Marker ReadMarker()
         {
             string strMarkerName        = mXmlReader.GetAttribute( "id" );
-            string strImagePath         = mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" );
+            string strImagePath         = System.Web.HttpUtility.UrlDecode( mXmlReader.GetAttribute( "href", "http://www.w3.org/1999/xlink" ) );
             string strMarkerType        = System.IO.Path.GetFileNameWithoutExtension( strImagePath );
 
             if( ! strImagePath.Contains("://" ) && ! System.IO.Path.IsPathRooted( strImagePath ) )
