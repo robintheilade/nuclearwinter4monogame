@@ -19,6 +19,8 @@ namespace VectorUI.Widgets
         {
             Position    = _marker.Position;
             Size        = _marker.Size;
+
+            HitRectangle = new Rectangle( (int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y );
         }
 
         //----------------------------------------------------------------------
@@ -35,7 +37,8 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public Action<Widget>   OnDraw;
 
-        public Vector2          Position    { get; private set; }
-        public Vector2          Size        { get; private set; }
+        public Vector2          Position        { get; private set; }
+        public Vector2          Size            { get; private set; }
+        public Rectangle        HitRectangle    { get; private set; }
     }
 }
