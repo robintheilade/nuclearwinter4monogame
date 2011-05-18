@@ -23,6 +23,13 @@ namespace NuclearWinter.Animation
     public abstract class AnimatedValue
     {
         //----------------------------------------------------------------------
+        public void SetTime( float _fTotalTime )
+        {
+            Time = _fTotalTime;
+            UpdateDirection();
+        }
+
+        //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
             if( Direction == AnimationDirection.Stopped )
@@ -32,6 +39,12 @@ namespace NuclearWinter.Animation
 
             Time += ( (Direction == AnimationDirection.Forward) ? _fElapsedTime : -_fElapsedTime );
 
+            UpdateDirection();
+        }
+
+        //----------------------------------------------------------------------
+        void UpdateDirection()
+        {
             if( Time >= Delay + Duration )
             {
                 switch( Loop )
