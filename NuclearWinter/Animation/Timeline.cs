@@ -28,22 +28,33 @@ namespace NuclearWinter.Animation
         {
             mlEvents.Add( _event );
 
-            mlEvents.Sort( delegate( TimelineEvent _a, TimelineEvent _b ) { return _b.Time.CompareTo( _a.Time ); } );
+            mlEvents.Sort( delegate( TimelineEvent _a, TimelineEvent _b ) { return _a.Time.CompareTo( _b.Time ); } );
         }
 
         public void Update( float _fElapsedTime )
         {
             mfTime += _fElapsedTime;
 
-            while( mlEvents.Count > 0 && mlEvents[ mlEvents.Count - 1 ].Time <= mfTime )
+            while( miEventOffset < mlEvents.Count && mlEvents[ miEventOffset ].Time <= mfTime )
             {
-                mlEvents[ mlEvents.Count - 1 ].Action();
-                mlEvents.RemoveAt( mlEvents.Count - 1 );
+                // NOTE: We must increment miEventOffset before calling the
+                // Action, in case the Action calls Reset() or does any other
+                // change to the timeline
+                miEventOffset++;
+
+                mlEvents[ miEventOffset - 1 ].Action();
             }
+        }
+
+        public void Reset()
+        {
+            mfTime = 0f;
+            miEventOffset = 0;
         }
 
         /// Time-sorted list of events
         List<TimelineEvent>     mlEvents;
         float                   mfTime;
+        int                     miEventOffset;
     }
 }
