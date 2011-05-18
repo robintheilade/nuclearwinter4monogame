@@ -26,6 +26,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public Vector2                      Offset  = Vector2.Zero;
         public float                        Opacity = 1f;
+        public Vector2                      Scale   = Vector2.One;
 
         //----------------------------------------------------------------------
         public Action<Widget>               OnClick;

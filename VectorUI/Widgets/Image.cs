@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace VectorUI.Widgets
 {
-    class Image: Widget
+    public class Image: Widget
     {
         //----------------------------------------------------------------------
         public Image( UISheet _sheet, Marker _marker )
@@ -37,7 +37,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.Draw( mTexture, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            UISheet.Game.SpriteBatch.Draw( mTexture, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale * Scale, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------

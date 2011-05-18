@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using NuclearWinter.Animation;
 
 namespace VectorUI.Animation
 {
@@ -13,24 +14,25 @@ namespace VectorUI.Animation
         : base( _parentLayer, _fDuration )
         {
             mfDuration = _fDuration;
+            mScaleAnim = new SmoothValue( 1f, 1.2f, mfDuration / 2f, AnimationLoop.LoopBackAndForth );
         }
 
         //----------------------------------------------------------------------
         public override bool Update( float _fTotalTime )
         {
-            /*
-            bool bVisible = ( _fTotalTime % mfDuration ) < mfDuration / 2f;
+            mScaleAnim.SetTime( _fTotalTime );
+            float fScale = mScaleAnim.CurrentValue;
 
             foreach( Widgets.Widget widget in TargetWidgets )
             {
-                widget.Opacity = bVisible ? 1f : 0f;
+                widget.Scale = new Vector2( fScale );
             }
-            */
 
             return _fTotalTime >= Duration;
         }
 
         //----------------------------------------------------------------------
-        float       mfDuration;
+        float           mfDuration;
+        SmoothValue     mScaleAnim;
     }
 }

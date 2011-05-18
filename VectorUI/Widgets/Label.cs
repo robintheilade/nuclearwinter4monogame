@@ -33,7 +33,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, mfScale );
+            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, mfScale * Scale.X );
         }
 
         //----------------------------------------------------------------------
