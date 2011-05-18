@@ -193,10 +193,13 @@ namespace VectorUI.Widgets
 
             UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), Config.FrameCornerSize, mColor * Opacity );
             
-            Rectangle savedRectangle = UISheet.Game.GraphicsDevice.ScissorRectangle;
+            UISheet.Game.SpriteBatch.End();
 
+            Rectangle savedRectangle = UISheet.Game.GraphicsDevice.ScissorRectangle;
             // FIXME: The scissor rectangle will be too big if actualPosition has a negative coordinate!
             UISheet.Game.GraphicsDevice.ScissorRectangle = new Rectangle( Math.Max( 0, actualPosition.X + Config.FramePadding ), Math.Max( 0, actualPosition.Y + Config.FramePadding ), Size.X - Config.FramePadding * 2, Size.Y - Config.FramePadding * 2 );
+
+            UISheet.Game.SpriteBatch.Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, UISheet.RasterizerState );
 
             for( int iEntry = 0; iEntry < ListData.Entries.Count; iEntry++ )
             {
@@ -254,7 +257,10 @@ namespace VectorUI.Widgets
                 iOffsetX += ListData.Columns[iColumn].Size;
             }
 
+            UISheet.Game.SpriteBatch.End();
             UISheet.Game.GraphicsDevice.ScissorRectangle = savedRectangle;
+            UISheet.Game.SpriteBatch.Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, UISheet.RasterizerState );
+
         }
 
         //----------------------------------------------------------------------

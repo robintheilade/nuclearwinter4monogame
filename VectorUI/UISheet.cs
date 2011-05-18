@@ -23,8 +23,8 @@ namespace VectorUI
             Game            = _game;
             Content         = new ContentManager( Game.Services, "Content" );
 
-            mRasterizerState = new RasterizerState();
-            mRasterizerState.ScissorTestEnable = true;
+            RasterizerState = new RasterizerState();
+            RasterizerState.ScissorTestEnable = true;
 
             Font            = _game.Content.Load<SpriteFont>( "Fonts/UIFont" );
             SmallFont       = _game.Content.Load<SpriteFont>( "Fonts/UISmallFont" );
@@ -263,7 +263,7 @@ namespace VectorUI
         //----------------------------------------------------------------------
         public void Draw()
         {
-            Game.SpriteBatch.Begin( SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, mRasterizerState );
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, RasterizerState );
 
             foreach( Widgets.Widget widget in mlWidgets )
             {
@@ -315,6 +315,6 @@ namespace VectorUI
 
         public Dictionary<string,AnimationLayer>    AnimationLayers { get; private set; }
 
-        public RasterizerState      mRasterizerState;
+        public RasterizerState      RasterizerState;
     }
 }
