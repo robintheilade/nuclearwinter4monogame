@@ -110,24 +110,27 @@ namespace VectorUI.Widgets
 #endif
                     )
                     {
-                        if( mbDragging )
+                        if( AllowDrag )
                         {
-                            Scroll = mfDragOffset - vPos.Y;
-                            ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
-                            mfDragPreviousY = vPos.Y;
-                        }
-                        else
-                        if( AllowDrag && bHitRectangle )
-                        {
-                            SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
-                            if( ListData.Entries[SelectedItemIndex].Disabled )
+                            if( mbDragging )
+                            {
+                                Scroll = mfDragOffset - vPos.Y;
+                                ScrollInertia = ( ScrollInertia + ( mfDragPreviousY - vPos.Y ) ) / 2f;
+                                mfDragPreviousY = vPos.Y;
+                            }
+                            else
+                            if( bHitRectangle )
+                            {
+                                SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+                                if( ListData.Entries[SelectedItemIndex].Disabled )
+                                {
+                                    SelectedItemIndex = -1;
+                                }
+                            }
+                            else
                             {
                                 SelectedItemIndex = -1;
                             }
-                        }
-                        else
-                        {
-                            SelectedItemIndex = -1;
                         }
                     }
 
