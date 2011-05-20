@@ -41,6 +41,7 @@ namespace VectorUI.Widgets
             SelectedItemIndex = -1;
             Scroll = 0f;
             mfBoundedScroll = 0f;
+            AllowDrag = true;
         }
 
         //----------------------------------------------------------------------
@@ -70,9 +71,16 @@ namespace VectorUI.Widgets
                             mfDragPreviousY = vPos.Y;
 
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
+
                             if( ListData.Entries[SelectedItemIndex].Disabled )
                             {
                                 SelectedItemIndex = -1;
+                            }
+                            else
+                            if( ! AllowDrag && OnSelectItem != null )
+                            {
+                                UISheet.MenuClickSFX.Play();
+                                OnSelectItem( this, SelectedItemIndex, vPos );
                             }
                         }
                         else
@@ -84,7 +92,7 @@ namespace VectorUI.Widgets
 #endif
                         )
                         {
-                            if( ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
+                            if( AllowDrag && ! mbDragging && Math.Abs( mfDragPreviousY - vPos.Y ) > 10f )
                             {
                                 SelectedItemIndex = -1;
                                 mbDragging = true;
@@ -109,7 +117,7 @@ namespace VectorUI.Widgets
                             mfDragPreviousY = vPos.Y;
                         }
                         else
-                        if( bHitRectangle )
+                        if( AllowDrag && bHitRectangle )
                         {
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
                             if( ListData.Entries[SelectedItemIndex].Disabled )
@@ -137,7 +145,7 @@ namespace VectorUI.Widgets
                             mbDragging = false;
                         }
                         else
-                        if( OnSelectItem != null && bHitRectangle )
+                        if( AllowDrag && OnSelectItem != null && bHitRectangle )
                         {
                             SelectedItemIndex = (int)( ( vPos.Y - ( Position.Y + Config.FramePadding ) + Scroll ) / Config.ItemHeight );
                             if( ListData.Entries[SelectedItemIndex].Disabled )
@@ -306,6 +314,8 @@ namespace VectorUI.Widgets
         Texture2D                       mDisabledItemTex;
 
         Dictionary<string,Texture2D>    ItemTextures;
+
+        public bool                     AllowDrag;
 
         public float                    Scroll
         {
