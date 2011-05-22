@@ -26,6 +26,7 @@ namespace VectorLevel.Puppet
         {
             CurrentAnimation    = mPuppetDef.Animations[ _strAnimationName ];
             Texture             = mLevelRenderer.Content.Load<Texture2D>( CurrentAnimation.TextureName );
+            Time                = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -43,15 +44,18 @@ namespace VectorLevel.Puppet
         //----------------------------------------------------------------------
         public void Draw( Vector2 _vPosition, Color _color, float _fAngle, Vector2 _vOrigin )
         {
-            Draw( _vPosition, _color, _fAngle, _vOrigin, 1f );
+            Draw( _vPosition, _color, _fAngle, _vOrigin, 1f, SpriteEffects.None );
         }
 
         //----------------------------------------------------------------------
-        public void Draw( Vector2 _vPosition, Color _color, float _fAngle, Vector2 _vOrigin, float _fScale )
+        public void Draw( Vector2 _vPosition, Color _color, float _fAngle, Vector2 _vOrigin, float _fScale, SpriteEffects _spriteEffects )
         {
-            Rectangle sourceRect = GetFrameRect( (int)( Time / CurrentAnimation.FrameDuration ) % ( Texture.Width / CurrentAnimation.FrameWidth ) );
+            int iFrameCount = Texture.Width / CurrentAnimation.FrameWidth;
+            int iFrame = CurrentAnimation.IsLooping ? (int)( Time / CurrentAnimation.FrameDuration ) % iFrameCount : Math.Min( (int)( Time / CurrentAnimation.FrameDuration ), iFrameCount - 1 );
 
-            mLevelRenderer.DrawSprite( Texture, _vPosition, sourceRect, _color, _fAngle, _vOrigin, _fScale );
+            Rectangle sourceRect = GetFrameRect( iFrame );
+
+            mLevelRenderer.DrawSprite( Texture, _vPosition, sourceRect, _color, _fAngle, _vOrigin, new Vector2( _fScale ), _spriteEffects );
         }
 
         //----------------------------------------------------------------------

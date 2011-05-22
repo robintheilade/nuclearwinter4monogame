@@ -124,23 +124,23 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         public void DrawSprite( Texture2D _texture, Vector2 _vPosition, Color _color, float _fRotation, Vector2 _vOrigin, float _fScale )
         {
-            DrawSprite( _texture, _vPosition, Rectangle.Empty, _color, _fRotation, _vOrigin, new Vector2( _fScale ) );
+            DrawSprite( _texture, _vPosition, Rectangle.Empty, _color, _fRotation, _vOrigin, new Vector2( _fScale ), SpriteEffects.None );
         }
 
         //----------------------------------------------------------------------
         public void DrawSprite( Texture2D _texture, Vector2 _vPosition, Color _color, float _fRotation, Vector2 _vOrigin, Vector2 _vScale )
         {
-            DrawSprite( _texture, _vPosition, Rectangle.Empty, _color, _fRotation, _vOrigin, _vScale );
+            DrawSprite( _texture, _vPosition, Rectangle.Empty, _color, _fRotation, _vOrigin, _vScale, SpriteEffects.None );
         }
 
         //----------------------------------------------------------------------
         public void DrawSprite( Texture2D _texture, Vector2 _vPosition, Rectangle _sourceRectangle, Color _color, float _fRotation, Vector2 _vOrigin, float _fScale )
         {
-            DrawSprite( _texture, _vPosition, _sourceRectangle, _color, _fRotation, _vOrigin, new Vector2( _fScale ) );
+            DrawSprite( _texture, _vPosition, _sourceRectangle, _color, _fRotation, _vOrigin, new Vector2( _fScale ), SpriteEffects.None );
         }
 
         //----------------------------------------------------------------------
-        public void DrawSprite( Texture2D _texture, Vector2 _vPosition, Rectangle _sourceRectangle, Color _color, float _fRotation, Vector2 _vOrigin, Vector2 _vScale )
+        public void DrawSprite( Texture2D _texture, Vector2 _vPosition, Rectangle _sourceRectangle, Color _color, float _fRotation, Vector2 _vOrigin, Vector2 _vScale, SpriteEffects _spriteEffects )
         {
             Effect.Texture = _texture;
             Effect.CurrentTechnique.Passes[0].Apply();
@@ -157,26 +157,50 @@ namespace VectorLevel
             mavBatchVertices[1] = ( -_vOrigin + new Vector2( fWidth, 0f ) )       * _vScale;
             mavBatchVertices[2] = ( -_vOrigin + new Vector2( 0f, fHeight ) )      * _vScale;
             mavBatchVertices[3] = ( -_vOrigin + new Vector2( fWidth, fHeight ) )  * _vScale;
-            
+
             Matrix rotationMatrix = new Matrix();
             Matrix.CreateRotationZ( _fRotation, out rotationMatrix );
             Vector2.Transform( mavBatchVertices, ref rotationMatrix, mavBatchVertices );
 
             mavSpriteQuad[0].Position = new Vector3( _vPosition + mavBatchVertices[0], 0f );
-            mavSpriteQuad[0].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
             mavSpriteQuad[0].Color = _color;
 
             mavSpriteQuad[1].Position = new Vector3( _vPosition + mavBatchVertices[1], 0f );
-            mavSpriteQuad[1].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
             mavSpriteQuad[1].Color = _color;
 
             mavSpriteQuad[2].Position = new Vector3( _vPosition + mavBatchVertices[2], 0f );
-            mavSpriteQuad[2].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
             mavSpriteQuad[2].Color = _color;
 
             mavSpriteQuad[3].Position = new Vector3( _vPosition + mavBatchVertices[3], 0f );
-            mavSpriteQuad[3].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
             mavSpriteQuad[3].Color = _color;
+
+            switch( _spriteEffects )
+            {
+                case SpriteEffects.FlipHorizontally:
+                    mavSpriteQuad[0].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[1].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[2].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[3].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    break;
+                case SpriteEffects.FlipVertically:
+                    mavSpriteQuad[0].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[1].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[2].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[3].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    break;
+                case SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically:
+                    mavSpriteQuad[0].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[1].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[2].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[3].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    break;
+                case SpriteEffects.None:
+                    mavSpriteQuad[0].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[1].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Top / _texture.Height );
+                    mavSpriteQuad[2].TextureCoordinate = new Vector2( (float)_sourceRectangle.Left / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    mavSpriteQuad[3].TextureCoordinate = new Vector2( (float)_sourceRectangle.Right / _texture.Width, (float)_sourceRectangle.Bottom / _texture.Height );
+                    break;
+            }
 
             Game.GraphicsDevice.DrawUserPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleStrip, mavSpriteQuad, 0, 2 );
         }
