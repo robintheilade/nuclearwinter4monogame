@@ -212,6 +212,12 @@ namespace NuclearWinter.Input
         {
             return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
         }
+
+        //----------------------------------------------------------------------
+        public bool WasKeyJustReleased( Keys _key )
+        {
+            return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+        }
 #endif
 
         //----------------------------------------------------------------------
