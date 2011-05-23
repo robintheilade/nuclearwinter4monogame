@@ -33,9 +33,9 @@ namespace NuclearWinter.Animation
 
         public void Update( float _fElapsedTime )
         {
-            mfTime += _fElapsedTime;
+            Time += _fElapsedTime;
 
-            while( miEventOffset < mlEvents.Count && mlEvents[ miEventOffset ].Time <= mfTime )
+            while( miEventOffset < mlEvents.Count && mlEvents[ miEventOffset ].Time <= Time )
             {
                 // NOTE: We must increment miEventOffset before calling the
                 // Action, in case the Action calls Reset() or does any other
@@ -48,13 +48,14 @@ namespace NuclearWinter.Animation
 
         public void Reset()
         {
-            mfTime = 0f;
+            Time = 0f;
             miEventOffset = 0;
         }
 
+        public float            Time;
+
         /// Time-sorted list of events
         List<TimelineEvent>     mlEvents;
-        float                   mfTime;
         int                     miEventOffset;
     }
 }
