@@ -253,12 +253,12 @@ namespace VectorUI.Widgets
                     case Models.ListColumnType.Text:
                         foreach( var entry in ListData.Entries )
                         {
-                            UISheet.Game.SpriteBatch.DrawString( UISheet.SmallFont,
+                            UISheet.Game.DrawBlurredText( UISheet.SmallFont,
                                 entry.Values[iColumn],
                                 new Vector2(
                                     actualPosition.X + iOffsetX + Config.FramePadding + Config.ItemPadding,
                                     actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
-                                Color.Black * Opacity );
+                                Config.TextColor * Opacity, Config.TextBlurColor );
                             iEntry++;
                         }
 

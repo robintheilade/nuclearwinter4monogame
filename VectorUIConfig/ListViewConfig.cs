@@ -20,6 +20,9 @@ namespace VectorUI.Widgets
         public int      ItemCornerSize;
         public int      ItemPadding;
         public int      ItemHeight;
+
+        public Color    TextColor;
+        public Color    TextBlurColor;
     }
 
 }
