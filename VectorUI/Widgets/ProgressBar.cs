@@ -40,11 +40,11 @@ namespace VectorUI.Widgets
         {
             Point actualPosition = new Point( Position.X + (int)Offset.X, Position.Y + (int)Offset.Y );
 
-            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), 20, mColor * Opacity );
+            UISheet.DrawBox( mBorderTex, new Rectangle( actualPosition.X, actualPosition.Y, Size.X, Size.Y ), 15, mColor * Opacity );
             
             if( Value > 0 )
             {
-                UISheet.DrawBox( mBarTex, new Rectangle( actualPosition.X, actualPosition.Y, (int)(Size.X * mfSmoothValue), Size.Y ), 20, mColor * Opacity );
+                UISheet.DrawBox( mBarTex, new Rectangle( actualPosition.X, actualPosition.Y, (int)(Size.X * mfSmoothValue), Size.Y ), 15, mColor * Opacity );
             }
         }
 
