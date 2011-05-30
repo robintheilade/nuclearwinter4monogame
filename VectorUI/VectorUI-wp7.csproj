@@ -90,6 +90,7 @@
     <Compile Include="Widgets\Image.cs" />
     <Compile Include="Widgets\Label.cs" />
     <Compile Include="Widgets\ListView.cs" />
+    <Compile Include="Widgets\ProgressBar.cs" />
     <Compile Include="Widgets\Widget.cs" />
   </ItemGroup>
   <ItemGroup>

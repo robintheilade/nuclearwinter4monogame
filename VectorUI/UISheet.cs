@@ -122,6 +122,11 @@ namespace VectorUI
                 mlWidgets.Add( new Widgets.Canvas( this, _marker ) );
             }
             else
+            if( _marker.MarkerType.StartsWith( "ProgressBar" ) )
+            {
+                mlWidgets.Add( new Widgets.ProgressBar( this, _marker ) );
+            }
+            else
             {
                 mlWidgets.Add( new Widgets.Image( this, _marker ) );
             }
