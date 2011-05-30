@@ -39,7 +39,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
-            if( ! _bHandleInput )
+            if( ! _bHandleInput || ! Enabled )
             {
                 return;
             }
@@ -90,10 +90,15 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.SpriteBatch.Draw( mbPressed ? mPressedTexture : mIdleTexture, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            if( Enabled )
+            {
+                UISheet.Game.SpriteBatch.Draw( mbPressed ? mPressedTexture : mIdleTexture, mvPosition + Offset, null, mColor * Opacity, mfAngle, mvOrigin, mvScale, SpriteEffects.None, 0f );
+            }
         }
 
         //----------------------------------------------------------------------
+        public bool     Enabled = true;
+
         Texture2D       mIdleTexture;
         Texture2D       mPressedTexture;
 
