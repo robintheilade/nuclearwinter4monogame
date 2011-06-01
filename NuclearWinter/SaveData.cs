@@ -66,28 +66,35 @@ namespace NuclearWinter
                 {
                     if( store.FileExists( FileName ) )
                     {
-                        var stream = store.OpenFile( FileName, FileMode.Open );
-
-                        if( stream != null )
+                        try
                         {
-                            using ( var input = new BinaryReader( stream ) )
-                            {
-                                uint magicNumber = 0xffffffff;
-                                try
-                                {
-                                    magicNumber = input.ReadUInt32();
+                            var stream = store.OpenFile( FileName, FileMode.Open );
 
-                                    if( ReadDataActions.ContainsKey( magicNumber ) )
+                            if( stream != null )
+                            {
+                                using ( var input = new BinaryReader( stream ) )
+                                {
+                                    uint magicNumber = 0xffffffff;
+
+                                    try
                                     {
-                                        ReadDataActions[ magicNumber ]( input );
+                                        magicNumber = input.ReadUInt32();
+
+                                        if( ReadDataActions.ContainsKey( magicNumber ) )
+                                        {
+                                            ReadDataActions[ magicNumber ]( input );
+                                        }
+                                    }
+                                    catch
+                                    {
                                     }
                                 }
-                                catch
-                                {
-                                }
-                            }
 
-                            stream.Close();
+                                stream.Close();
+                            }
+                        }
+                        catch
+                        {
                         }
                     }
                 }
