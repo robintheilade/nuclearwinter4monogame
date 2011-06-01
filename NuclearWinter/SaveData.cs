@@ -76,15 +76,14 @@ namespace NuclearWinter
                                 try
                                 {
                                     magicNumber = input.ReadUInt32();
+
+                                    if( ReadDataActions.ContainsKey( magicNumber ) )
+                                    {
+                                        ReadDataActions[ magicNumber ]( input );
+                                    }
                                 }
                                 catch
                                 {
-                                    Debug.Assert( false );
-                                }
-
-                                if( ReadDataActions.ContainsKey( magicNumber ) )
-                                {
-                                    ReadDataActions[ magicNumber ]( input );
                                 }
                             }
 
