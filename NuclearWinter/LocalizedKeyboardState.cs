@@ -1,4 +1,6 @@
 ﻿#if WINDOWS
+// Based on http://www.luminance.org/gruedorf/2009/08/14/supporting-alternate-keyboard-layouts-in-xna-games
+
 using System;
 using Microsoft.Xna.Framework.Input;
 using System.Runtime.InteropServices;
