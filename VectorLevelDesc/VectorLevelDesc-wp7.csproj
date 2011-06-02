@@ -51,6 +51,8 @@
     <Compile Include="LevelPack\LevelPack.cs" />
     <Compile Include="LevelPack\LevelPackReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Puppet\PuppetAnimation.cs" />
+    <Compile Include="Puppet\PuppetDef.cs" />
     <Compile Include="VectorLevelReader.cs" />
   </ItemGroup>
   <ItemGroup>
