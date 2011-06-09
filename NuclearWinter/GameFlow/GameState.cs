@@ -45,9 +45,9 @@ namespace NuclearWinter.GameFlow
         /// Draws while fading in.
         /// </summary>
         /// <param name="_time"></param>
-        public virtual void DrawFadeIn( Microsoft.Xna.Framework.GameTime _time )
+        public virtual void DrawFadeIn()
         {
-            Draw( _time );
+            Draw();
         }
 
         //----------------------------------------------------------------------
@@ -66,9 +66,9 @@ namespace NuclearWinter.GameFlow
         /// Draws while fading out.
         /// </summary>
         /// <param name="_time"></param>
-        public virtual void DrawFadeOut( Microsoft.Xna.Framework.GameTime _time )
+        public virtual void DrawFadeOut()
         {
-            Draw( _time );
+            Draw();
         }
 
         //----------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace NuclearWinter.GameFlow
         /// Draws the GameState.
         /// </summary>
         /// <param name="_time"></param>
-        public abstract void Draw( Microsoft.Xna.Framework.GameTime _time );
+        public abstract void Draw();
 
         //----------------------------------------------------------------------
         public readonly NuclearGame         Game;

@@ -17,7 +17,6 @@ namespace NuclearWinter.GameFlow
         public GameStateMgr( Game game )
             : base( game )
         {
-            
         }
 
         //----------------------------------------------------------------------
@@ -123,23 +122,23 @@ namespace NuclearWinter.GameFlow
         {
             if( mbExit )
             {
-                CurrentState.DrawFadeOut( _time );
+                CurrentState.DrawFadeOut();
             }
             else
             if( NextState != null )
             {
                 if( CurrentState != null )
                 {
-                    CurrentState.DrawFadeOut( _time );
+                    CurrentState.DrawFadeOut();
                 }
                 else
                 {
-                    NextState.DrawFadeIn( _time );
+                    NextState.DrawFadeIn();
                 }
             }
             else
             {
-                CurrentState.Draw( _time );
+                CurrentState.Draw();
             }
         }
         
