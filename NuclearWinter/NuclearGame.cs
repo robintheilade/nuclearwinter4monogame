@@ -47,11 +47,6 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void Initialize()
         {
-            if( SaveGame != null )
-            {
-                SaveGame.Load();
-            }
-
             SpriteBatch = new SpriteBatch( GraphicsDevice );
 
             GameStateMgr = new GameFlow.GameStateMgr( this );
