@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace NuclearWinter
 {
@@ -69,22 +70,11 @@ namespace NuclearWinter
             }
 
             SortedScreenModes.Sort();
-
-            /*
-            SortedScreenModes.Add( new ScreenMode( 800, 450, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1024, 768, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1280, 720, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1280, 800, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1440, 900, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1680, 1050, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1920, 1080, true ) );
-            SortedScreenModes.Add( new ScreenMode( 1920, 1200, true ) );
-            */
         }
 
         //----------------------------------------------------------------------
         // Initialize the best Resolution available
-        public static int Initialize( GraphicsDeviceManager _graphics )
+        public static ScreenMode Initialize( GraphicsDeviceManager _graphics )
         {
 
             List<ScreenMode> lReversedScreenModes = new List<ScreenMode>( SortedScreenModes );
@@ -95,12 +85,15 @@ namespace NuclearWinter
             {
                 if( SetScreenMode( _graphics, mode, true ) )
                 {
-                    return lReversedScreenModes.Count - ( i + 1 );
+                    return mode;
                 }
                 i++;
             }
 
-            return 0;
+            // Cannot happen
+            Debug.Assert( false );
+
+            return new ScreenMode( 0, 0 );
         }
 
         //----------------------------------------------------------------------
