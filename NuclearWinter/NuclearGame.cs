@@ -95,9 +95,9 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected void OnDeactivated( object _sender, DeactivatedEventArgs _args )
         {
-            if( SaveGame != null )
+            if( NuclearSaveHandler != null )
             {
-                SaveGame.Save();
+                NuclearSaveHandler.Save();
             }
 
             if( MediaPlayer.GameHasControl )
@@ -111,9 +111,9 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         void OnClosing( object _sender, ClosingEventArgs _args )
         {
-            if( SaveGame != null )
+            if( NuclearSaveHandler != null )
             {
-                SaveGame.Save();
+                NuclearSaveHandler.Save();
             }
 
             if( MediaPlayer.GameHasControl )
@@ -174,9 +174,10 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void OnExiting(object sender, EventArgs args)
         {
-            if( SaveGame != null )
+            if( NuclearSaveHandler != null )
             {
-                SaveGame.Save();
+                NuclearSaveHandler.SaveGameSettings();
+                NuclearSaveHandler.SaveGameData();
             }
 
             base.OnExiting(sender, args);
@@ -316,7 +317,7 @@ namespace NuclearWinter
         public PlayerIndex?                                 PlayerInCharge;
 #endif
 
-        public SaveData                                     SaveGame;
+        public SaveHandler                                  NuclearSaveHandler;
 #if WINDOWS || XBOX
         public StorageDevice                                SaveGameStorageDevice;
         bool                                                mbShouldDisplayStorageSelector;
