@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Storage;
+using Microsoft.Xna.Framework.GamerServices;
 
 #if WINDOWS_PHONE
 using Microsoft.Phone.Shell;
@@ -74,7 +75,7 @@ namespace NuclearWinter
 #if WINDOWS || XBOX
         protected override void Update( GameTime _time )
         {
-#if GAMERSERVICES
+#if GAMERSERVICES || XBOX
             if( ! Guide.IsVisible )
             {
 #endif
@@ -83,7 +84,7 @@ namespace NuclearWinter
                     StorageDevice.BeginShowSelector( PlayerInCharge.Value, new AsyncCallback( StorageDeviceCallback ), null );
                     mbShouldDisplayStorageSelector= false;
                 }
-#if GAMERSERVICES
+#if GAMERSERVICES || XBOX
             }
 #endif
 

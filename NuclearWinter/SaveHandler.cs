@@ -84,10 +84,14 @@ namespace NuclearWinter
             }
         }
 
+        protected abstract void ResetSettings();
+
         //----------------------------------------------------------------------
         // Load game settings
         public void LoadGameSettings()
         {
+            ResetSettings();
+
             try
             {
 #if WINDOWS
@@ -159,7 +163,7 @@ namespace NuclearWinter
                         if( stream != null )
                         {
                             var output = new BinaryWriter( stream );
-                            output.Write( SettingsMagicNumber );
+                            output.Write( DataMagicNumber );
                             WriteData( output );
 
                             stream.Close();
@@ -178,10 +182,14 @@ namespace NuclearWinter
             }
         }
 
+        protected abstract void ResetData();
+
         //---------------------------------------------------------------------
         // Load game data
         public void LoadGameData()
         {
+            ResetData();
+
             try
             {
                 if( Game.SaveGameStorageDevice != null && Game.SaveGameStorageDevice.IsConnected )
