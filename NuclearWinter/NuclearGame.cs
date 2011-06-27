@@ -67,7 +67,7 @@ namespace NuclearWinter
 
 #if WINDOWS_PHONE
         //----------------------------------------------------------------------
-        protected void OnDeactivated( object _sender, DeactivatedEventArgs _args )
+        protected virtual void OnDeactivated( object _sender, DeactivatedEventArgs _args )
         {
             if( SaveGame != null )
             {
