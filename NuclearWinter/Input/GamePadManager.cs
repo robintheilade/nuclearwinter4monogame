@@ -21,6 +21,7 @@ namespace NuclearWinter.Input
 
         public LocalizedKeyboardState       KeyboardState;
         public LocalizedKeyboardState       PreviousKeyboardState;
+        public PlayerIndex?                 KeyboardPlayerIndex;
 #endif
 
         Buttons[]                           maLastPressedButtons;
@@ -62,7 +63,18 @@ namespace NuclearWinter.Input
 
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
+
+            KeyboardPlayerIndex = null;
+            for( int i = 0; i < siMaxInput; i++ )
+            {
+                if( ! GamePadStates[i].IsConnected )
+                {
+                    KeyboardPlayerIndex = (PlayerIndex)i;
+                    break;
+                }
+            }
 #endif
+
 
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
             {
@@ -296,7 +308,7 @@ namespace NuclearWinter.Input
                 // Keyboard controls
                 Keys key = GetKeyboardMapping( _button );
 
-                if( key != Keys.None && KeyboardState.IsKeyDown( key ) && ! PreviousKeyboardState.IsKeyDown( key ) )
+                if( _playerIndex == KeyboardPlayerIndex && key != Keys.None && KeyboardState.IsKeyDown( key ) && ! PreviousKeyboardState.IsKeyDown( key ) )
                 {
                     bButtonPressed = true;
                 }
