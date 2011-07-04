@@ -1122,5 +1122,7 @@ namespace Box2D.XNA
         internal object _userData;
 
         internal float _intertiaScale;
+
+        public bool WasDestroyed;
     }
 }

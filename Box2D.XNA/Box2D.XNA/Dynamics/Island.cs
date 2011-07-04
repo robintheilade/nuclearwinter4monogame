@@ -33,9 +33,9 @@ namespace Box2D.XNA
 
         public void Reset(int bodyCapacity, int contactCapacity, int jointCapacity, IContactListener listener)
         {
-            _bodyCapacity = bodyCapacity;
-	        _contactCapacity = contactCapacity;
-	        _jointCapacity	 = jointCapacity;
+            _bodyCapacity       = Math.Max( _bodies.Length, bodyCapacity );
+	        _contactCapacity    = Math.Max( _contacts.Length, contactCapacity );
+	        _jointCapacity	    = Math.Max( _joints.Length, jointCapacity );
 	        _bodyCount = 0;
 	        _jointCount = 0;
 

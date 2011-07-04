@@ -288,5 +288,7 @@ namespace Box2D.XNA
 	    internal Vector2 _localCenterA, _localCenterB;
 	    internal float _invMassA, _invIA;
 	    internal float _invMassB, _invIB;
+
+        public bool WasDestroyed;
     }
 }

@@ -125,6 +125,13 @@ namespace Box2D.XNA
 	    /// @warning This function is locked during callbacks.
 	    public void DestroyBody(Body b)
         {
+            if( b.WasDestroyed )
+            {
+                Debug.Assert( false );
+                return;
+            }
+            b.WasDestroyed = true;
+
             Debug.Assert(_bodyCount > 0);
 	        Debug.Assert(!IsLocked);
 	        if (IsLocked)
@@ -271,6 +278,13 @@ namespace Box2D.XNA
 	    /// @warning This function is locked during callbacks.
 	    public void DestroyJoint(Joint j)
         {
+            if( j.WasDestroyed )
+            {
+                Debug.Assert( false );
+                return;
+            }
+            j.WasDestroyed = true;
+
 	        Debug.Assert(!IsLocked);
 	        if (IsLocked)
 	        {
