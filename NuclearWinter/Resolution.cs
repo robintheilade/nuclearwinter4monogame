@@ -59,7 +59,7 @@ namespace NuclearWinter
 
             foreach( DisplayMode displayMode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes )
             {
-                if( displayMode.AspectRatio > 1f && displayMode.Width >= 800f )
+                if( displayMode.AspectRatio > 1f && displayMode.Width >= 800f && displayMode.Width <= InternalMode.Width && displayMode.Height <= InternalMode.Height )
                 {
                     ScreenMode screenMode = new ScreenMode( displayMode.Width, displayMode.Height );
                     if( ! SortedScreenModes.Contains( screenMode ) )
@@ -76,7 +76,6 @@ namespace NuclearWinter
         // Initialize the best Resolution available
         public static ScreenMode Initialize( GraphicsDeviceManager _graphics )
         {
-
             List<ScreenMode> lReversedScreenModes = new List<ScreenMode>( SortedScreenModes );
             lReversedScreenModes.Reverse();
 
@@ -98,10 +97,10 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Initialize the Resolution using the specified ScreenMode
-        public static void Initialize( GraphicsDeviceManager _graphics, ScreenMode _mode, bool _bFullscreen )
+        public static bool Initialize( GraphicsDeviceManager _graphics, ScreenMode _mode, bool _bFullscreen )
         {
             InternalMode = new ScreenMode( 1920, 1080 );
-            SetScreenMode( _graphics, _mode, _bFullscreen );
+            return SetScreenMode( _graphics, _mode, _bFullscreen );
         }
 
         //----------------------------------------------------------------------
@@ -116,7 +115,14 @@ namespace NuclearWinter
                     if( (_mode.Width == displayMode.Width)
                     &&  (_mode.Height == displayMode.Height) )
                     {
-                        ApplyScreenMode( _graphics, _mode, true );
+                        try
+                        {
+                            ApplyScreenMode( _graphics, _mode, true );
+                        }
+                        catch
+                        {
+                            return false;
+                        }
                         return true;
                     }
                 }
