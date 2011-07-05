@@ -94,6 +94,7 @@
     <Compile Include="Models\ListData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UISheet.cs" />
+    <Compile Include="UIStyle.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Canvas.cs" />
     <Compile Include="Widgets\Checkbox.cs" />

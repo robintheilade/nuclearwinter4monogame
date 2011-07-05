@@ -20,7 +20,14 @@ namespace VectorUI.Widgets
             mfScale = _text.FontSize / 40f /* FIXME: Hard-coded since there is no way to get the base font size from SpriteFront */;
 
             mAnchor = _text.Anchor;
-            Text = UISheet.Game.GetUIString( _text.TextSpans[0].Value.Substring( "String".Length ) );
+
+            string strId = _text.TextSpans[0].Value;
+            if( strId.StartsWith( "String" ) ) // Legacy stuff
+            {
+                strId = strId.Substring( "String".Length );
+            }
+
+            Text = UISheet.Game.GetUIString( strId );
 
             mColor = _text.FillColor;
         }
@@ -33,7 +40,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            UISheet.Game.DrawBlurredText( UISheet.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, mfScale * Scale.X );
+            UISheet.Game.DrawBlurredText( UISheet.Style.Font, Text, mvPosition + Offset, mColor * Opacity, mvOrigin, mfScale * Scale.X );
         }
 
         //----------------------------------------------------------------------
@@ -52,10 +59,10 @@ namespace VectorUI.Widgets
                         mvOrigin = new Vector2( 0f, 0f );
                         break;
                     case TextAnchor.Middle:
-                        mvOrigin = new Vector2( UISheet.Font.MeasureString( mstrText ).X / 2f, 0f );
+                        mvOrigin = new Vector2( UISheet.Style.Font.MeasureString( mstrText ).X / 2f, 0f );
                         break;
                     case TextAnchor.End:
-                        mvOrigin = new Vector2( UISheet.Font.MeasureString( mstrText ).X, 0f );
+                        mvOrigin = new Vector2( UISheet.Style.Font.MeasureString( mstrText ).X, 0f );
                         break;
                 }
             }
@@ -73,7 +80,7 @@ namespace VectorUI.Widgets
                 mAnchor = value;
                 if( mAnchor == TextAnchor.Middle )
                 {
-                    mvOrigin = new Vector2( UISheet.Font.MeasureString( Text ).X / 2f, 0f );
+                    mvOrigin = new Vector2( UISheet.Style.Font.MeasureString( Text ).X / 2f, 0f );
                 }
             }
         }

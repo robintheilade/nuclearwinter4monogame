@@ -79,7 +79,7 @@ namespace VectorUI.Widgets
                             else
                             if( ! AllowDrag && OnSelectItem != null )
                             {
-                                UISheet.MenuClickSFX.Play();
+                                UISheet.Style.MenuClickSFX.Play();
                                 OnSelectItem( this, SelectedItemIndex, vPos );
                             }
                         }
@@ -157,7 +157,7 @@ namespace VectorUI.Widgets
                             }
                             else
                             {
-                                UISheet.MenuClickSFX.Play();
+                                UISheet.Style.MenuClickSFX.Play();
                                 OnSelectItem( this, SelectedItemIndex, vPos );
                             }
                         }
@@ -253,11 +253,11 @@ namespace VectorUI.Widgets
                     case Models.ListColumnType.Text:
                         foreach( var entry in ListData.Entries )
                         {
-                            UISheet.Game.DrawBlurredText( UISheet.SmallFont,
+                            UISheet.Game.DrawBlurredText( UISheet.Style.SmallFont,
                                 entry.Values[iColumn],
                                 new Vector2(
                                     actualPosition.X + iOffsetX + Config.FramePadding + Config.ItemPadding,
-                                    actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - UISheet.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
+                                    actualPosition.Y + Config.FramePadding + Config.ItemPadding + Config.ItemHeight * iEntry - (int)Scroll + Config.ItemHeight / 2 - UISheet.Style.SmallFont.MeasureString( entry.Values[iColumn] ).Y / 2 ),
                                 Config.TextColor * Opacity, Config.TextBlurColor );
                             iEntry++;
                         }

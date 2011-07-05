@@ -84,7 +84,7 @@ namespace VectorUI.Widgets
                     {
                         if( mbPressed )
                         {
-                            UISheet.MenuClickSFX.Play();
+                            UISheet.Style.MenuClickSFX.Play();
                             IsOn = ! IsOn;
 
                             if( OnClick != null )

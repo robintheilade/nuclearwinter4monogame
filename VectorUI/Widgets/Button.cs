@@ -75,7 +75,7 @@ namespace VectorUI.Widgets
 #endif
                         && OnClick != null )
                     {
-                        UISheet.MenuClickSFX.Play();
+                        UISheet.Style.MenuClickSFX.Play();
                         OnClick( this );
                     }
 #if WINDOWS_PHONE

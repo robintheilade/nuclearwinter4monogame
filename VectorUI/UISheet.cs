@@ -18,7 +18,7 @@ namespace VectorUI
     public class UISheet
     {
         //----------------------------------------------------------------------
-        public UISheet( NuclearGame _game, LevelDesc _uiDesc )
+        public UISheet( NuclearGame _game, LevelDesc _uiDesc, UIStyle _style )
         {
             Game            = _game;
             Content         = new ContentManager( Game.Services, "Content" );
@@ -26,11 +26,7 @@ namespace VectorUI
             RasterizerState = new RasterizerState();
             RasterizerState.ScissorTestEnable = true;
 
-            Font            = _game.Content.Load<SpriteFont>( "Fonts/UIFont" );
-            SmallFont       = _game.Content.Load<SpriteFont>( "Fonts/UISmallFont" );
-
-            MenuValidateSFX = _game.Content.Load<SoundEffect>( "Sounds/MenuValidate01" );
-            MenuClickSFX    = _game.Content.Load<SoundEffect>( "Sounds/MenuClick01" );
+            Style           = _style;
 
             mlWidgets       = new List<Widgets.Widget>();
             AnimationLayers = new Dictionary<string,AnimationLayer>();
@@ -268,7 +264,7 @@ namespace VectorUI
         //----------------------------------------------------------------------
         public void Draw()
         {
-            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, RasterizerState );
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, RasterizerState, null, Style.SpriteMatrix );
 
             foreach( Widgets.Widget widget in mlWidgets )
             {
@@ -308,11 +304,8 @@ namespace VectorUI
         //----------------------------------------------------------------------
         public NuclearGame          Game;
         public ContentManager       Content;
-        public SpriteFont           Font;
-        public SpriteFont           SmallFont;
 
-        public SoundEffect          MenuValidateSFX;
-        public SoundEffect          MenuClickSFX;
+        public UIStyle              Style;
 
         //----------------------------------------------------------------------
         List<Widgets.Widget>                        mlWidgets;
