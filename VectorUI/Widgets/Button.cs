@@ -51,6 +51,8 @@ namespace VectorUI.Widgets
                 Vector2 vPos = touch.Position;
 #elif WINDOWS
                 Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+#elif XBOX
+                Vector2 vPos = Vector2.Zero;
 #endif
                 vPos -= mvOrigin;
                 vPos = Vector2.Transform( vPos, Matrix.CreateRotationZ( -mfAngle ) );
@@ -72,6 +74,8 @@ namespace VectorUI.Widgets
                         touch.State == TouchLocationState.Released
 #elif WINDOWS
                         UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#elif XBOX
+                        false
 #endif
                         && OnClick != null )
                     {

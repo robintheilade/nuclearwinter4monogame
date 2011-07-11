@@ -43,6 +43,7 @@ namespace VectorUI.Widgets
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime, bool _bHandleInput )
         {
+
             if( _bHandleInput )
             {
 #if WINDOWS_PHONE
@@ -51,6 +52,8 @@ namespace VectorUI.Widgets
                     Vector2 vPos = touch.Position;
 #elif WINDOWS
                     Vector2 vPos = new Vector2( UISheet.Game.GamePadMgr.MouseState.X, UISheet.Game.GamePadMgr.MouseState.Y );
+#elif XBOX
+                    Vector2 vPos = Vector2.Zero;
 #endif
                 
                     if(
@@ -58,6 +61,8 @@ namespace VectorUI.Widgets
                             touch.State == TouchLocationState.Pressed
 #elif WINDOWS
                             UISheet.Game.GamePadMgr.WasMouseButtonJustPressed( 0 )
+#elif XBOX
+                            false
 #endif
                     )
                     {
@@ -79,6 +84,8 @@ namespace VectorUI.Widgets
                         touch.State == TouchLocationState.Released
 #elif WINDOWS
                         UISheet.Game.GamePadMgr.WasMouseButtonJustReleased( 0 )
+#elif XBOX
+                        false
 #endif
                     )
                     {
@@ -99,8 +106,10 @@ namespace VectorUI.Widgets
                     if(
 #if WINDOWS_PHONE
                         touch.State == TouchLocationState.Moved
-#else
+#elif WINDOWS
                         UISheet.Game.GamePadMgr.MouseState.LeftButton == ButtonState.Pressed
+#else
+                        false
 #endif
                     )
                     {
