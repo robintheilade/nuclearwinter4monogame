@@ -43,6 +43,20 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         public int      Width;
         public int      Height;
+
+        public Vector2  Size
+        {
+            get {
+                return new Vector2( Width, Height );
+            }
+        }
+
+        public Rectangle Rectangle
+        {
+            get {
+                return new Rectangle( 0, 0, Width, Height );
+            }
+        }
     }
 
     //--------------------------------------------------------------------------

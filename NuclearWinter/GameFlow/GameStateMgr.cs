@@ -15,7 +15,7 @@ namespace NuclearWinter.GameFlow
     {
         //----------------------------------------------------------------------
         public GameStateMgr( Game game )
-            : base( game )
+        : base( game )
         {
         }
 

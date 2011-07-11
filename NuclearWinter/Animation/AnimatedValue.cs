@@ -42,6 +42,12 @@ namespace NuclearWinter.Animation
             UpdateDirection();
         }
 
+        public bool IsOver {
+            get {
+                return ( Loop == AnimationLoop.NoLoop && Time >= Delay + Duration );
+            }
+        }
+
         //----------------------------------------------------------------------
         void UpdateDirection()
         {
