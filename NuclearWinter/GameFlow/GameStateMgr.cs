@@ -11,7 +11,7 @@ namespace NuclearWinter.GameFlow
 
     //--------------------------------------------------------------------------
     // Game Component that handles game states and their transitions
-    public class GameStateMgr: DrawableGameComponent
+    public class GameStateMgr<T>: DrawableGameComponent where T:NuclearGame
     {
         //----------------------------------------------------------------------
         public GameStateMgr( Game game )
@@ -30,7 +30,7 @@ namespace NuclearWinter.GameFlow
         /// Switches current GameState.
         /// </summary>
         /// <param name="_newGameState"></param>
-        public void SwitchState( GameState _newState )
+        public void SwitchState( IGameState<T> _newState )
         {
             //------------------------------
             // precondition
@@ -53,11 +53,13 @@ namespace NuclearWinter.GameFlow
         /// <param name="_time">Provides a snapshot of timing values.</param>
         public override void Update( Microsoft.Xna.Framework.GameTime _time )
         {
+            float _fElapsedTime = (float)_time.ElapsedGameTime.TotalSeconds;
+
             if( mbExit )
             {
                 //---------------------------------------------------------
                 // Fade out current state
-                if( CurrentState.UpdateFadeOut( _time ) )
+                if( CurrentState.UpdateFadeOut( _fElapsedTime ) )
                 {
                     // We're done
                     CurrentState.Stop();
@@ -74,7 +76,7 @@ namespace NuclearWinter.GameFlow
                 {
                     //---------------------------------------------------------
                     // Fade out current state
-                    if( CurrentState.UpdateFadeOut( _time ) )
+                    if( CurrentState.UpdateFadeOut( _fElapsedTime ) )
                     {
                         // We're done fading out
                         CurrentState.Stop();
@@ -94,13 +96,13 @@ namespace NuclearWinter.GameFlow
                 {
                     //---------------------------------------------------------
                     // Fade in next state
-                    if( NextState.UpdateFadeIn( _time ) )
+                    if( NextState.UpdateFadeIn( _fElapsedTime ) )
                     {
                         // We're done fading in
                         CurrentState = NextState;
                         NextState = null;
                         
-                        CurrentState.Update( _time );
+                        CurrentState.Update( _fElapsedTime );
                     }
                 }
             }
@@ -109,7 +111,7 @@ namespace NuclearWinter.GameFlow
             // Update current GameState
             else
             {
-                CurrentState.Update( _time );
+                CurrentState.Update( _fElapsedTime );
             }
         }
 
@@ -148,8 +150,8 @@ namespace NuclearWinter.GameFlow
         }
 
         //---------------------------------------------------------------------
-        public GameState                        CurrentState    { get; private set; }   // Current game state
-        public GameState                        NextState       { get; private set; }   // Next game state to be started, stored while the current state is fading out
+        public IGameState<T>                    CurrentState    { get; private set; }   // Current game state
+        public IGameState<T>                    NextState       { get; private set; }   // Next game state to be started, stored while the current state is fading out
         private bool                            mbExit;                                 // Is the game exiting?
     }
 }

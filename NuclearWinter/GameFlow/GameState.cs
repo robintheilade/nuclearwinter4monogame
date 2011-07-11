@@ -1,91 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.GameFlow
 {
     //--------------------------------------------------------------------------
     /// Each GameState handles part of the game : menu, in-game, settings, etc.
-    public abstract class GameState
+    public abstract class GameState<T>: IGameState<T> where T:NuclearGame
     {
         //----------------------------------------------------------------------
-        public GameState( NuclearGame _game )
+        public GameState( T _game )
         {
             Game = _game;
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Starts the GameState, called when it becomes the current one.
-        /// </summary>
+        // Start the GameState, called when it becomes the current one
         public abstract void Start();
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Stops the GameState, called when switching to another one.
-        /// </summary>
+        // Stop the GameState, called when switching to another one
         public abstract void Stop();
 
         //----------------------------------------------------------------------
         public virtual void OnActivated() {}
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Called repeatedly when starting the GameState, until it returns true
-        /// </summary>
-        /// <returns>false while fading in, true when done</returns>
-        public virtual bool UpdateFadeIn( Microsoft.Xna.Framework.GameTime _time )
+        // Called repeatedly when starting the GameState, until it returns true
+        public virtual bool UpdateFadeIn( float _fElapsedTime )
         {
             // NOTE: Don't call Update() here, it'll be done automatically since we return true
             return true;
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Draws while fading in.
-        /// </summary>
-        /// <param name="_time"></param>
+        // Draw while fading in
         public virtual void DrawFadeIn()
         {
             Draw();
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Called repeatedly when stopping the GameState, until it returns true
-        /// </summary>
-        /// <returns>false while fading out, true when done</returns>
-        public virtual bool UpdateFadeOut( Microsoft.Xna.Framework.GameTime _time )
+        // Called repeatedly when stopping the GameState, until it returns true
+        public virtual bool UpdateFadeOut( float _fElapsedTime )
         {
             // NOTE: Don't call Update() here, it'll be done automatically since we return true
             return true;
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Draws while fading out.
-        /// </summary>
-        /// <param name="_time"></param>
+        // Draw while fading out
         public virtual void DrawFadeOut()
         {
             Draw();
         }
 
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Updates the GameState.
-        /// </summary>
-        /// <param name="_elapsedTime"></param>
-        public abstract void Update( Microsoft.Xna.Framework.GameTime _time );
+        // Updates the GameState
+        public abstract void Update( float _fElapsedTime );
         
         //----------------------------------------------------------------------
-        /// <summary>
-        /// Draws the GameState.
-        /// </summary>
-        /// <param name="_time"></param>
+        // Draw the GameState
         public abstract void Draw();
 
         //----------------------------------------------------------------------
-        public readonly NuclearGame         Game;
+        public readonly T           Game;
     }
 }

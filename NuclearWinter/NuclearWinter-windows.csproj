@@ -93,7 +93,9 @@
     <Compile Include="Animation\Timeline.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
+    <Compile Include="GameFlow\GameStateFadeTransition.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
+    <Compile Include="GameFlow\IGameState.cs" />
     <Compile Include="Input\Accelerometer.cs" />
     <Compile Include="SaveHandler.cs" />
     <Compile Include="Input\GamePadManager.cs" />

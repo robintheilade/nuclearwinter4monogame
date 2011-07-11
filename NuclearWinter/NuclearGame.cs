@@ -25,6 +25,9 @@ namespace NuclearWinter
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
+        public Texture2D        WhitePixelTex { get; protected set; }
+
+        //----------------------------------------------------------------------
         public NuclearGame( TargetPlatform _platform )
         {
 #if WINDOWS_PHONE
@@ -56,7 +59,7 @@ namespace NuclearWinter
         {
             SpriteBatch = new SpriteBatch( GraphicsDevice );
 
-            GameStateMgr = new GameFlow.GameStateMgr( this );
+            GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
             Components.Add( GameStateMgr );
 
 #if WINDOWS || XBOX
@@ -123,6 +126,12 @@ namespace NuclearWinter
             }
         }
 #endif
+
+        //----------------------------------------------------------------------
+        protected override void LoadContent()
+        {
+            WhitePixelTex           = Content.Load<Texture2D>( "Sprites/WhitePixel" );
+        }
 
 #if WINDOWS || XBOX
         //----------------------------------------------------------------------
@@ -331,7 +340,7 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Game States
-        public GameFlow.GameStateMgr                        GameStateMgr        { get; private set; }
+        public GameFlow.GameStateMgr<NuclearGame>           GameStateMgr        { get; private set; }
 
 #if WINDOWS || XBOX
         public Input.GamePadManager                         GamePadMgr          { get; private set; }
