@@ -23,6 +23,8 @@ namespace NuclearWinter.GameFlow
             bool bFadeInDone = ( mfTransition >= sfTransitionDuration );
             mfTransition = Math.Min( mfTransition + _fTime, sfTransitionDuration );
 
+            Update( _fTime );
+
             return bFadeInDone;
         }
 
@@ -31,6 +33,8 @@ namespace NuclearWinter.GameFlow
         {
             bool bFadeOutDone = ( mfTransition <= 0f );
             mfTransition = Math.Max( mfTransition - _fTime, sfTransitionDuration );
+
+            Update( _fTime );
 
             return bFadeOutDone;
         }
