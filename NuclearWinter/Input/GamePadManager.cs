@@ -9,28 +9,28 @@ namespace NuclearWinter.Input
 {
     public class GamePadManager: GameComponent
     {
-        public const int                    siMaxInput              = 4;
-        public const float                  sfStickThreshold        = 0.4f;
+        public const int                            siMaxInput              = 4;
+        public const float                          sfStickThreshold        = 0.4f;
 
-        public readonly GamePadState[]      GamePadStates;
-        public readonly GamePadState[]      PreviousGamePadStates;
+        public readonly GamePadState[]              GamePadStates;
+        public readonly GamePadState[]              PreviousGamePadStates;
 
 #if WINDOWS
-        public MouseState                   MouseState;
-        public MouseState                   PreviousMouseState;
+        public MouseState                           MouseState              { get; private set; }
+        public MouseState                           PreviousMouseState      { get; private set; }
 
-        public LocalizedKeyboardState       KeyboardState;
-        public LocalizedKeyboardState       PreviousKeyboardState;
-        public PlayerIndex?                 KeyboardPlayerIndex;
+        public LocalizedKeyboardState               KeyboardState           { get; private set; }
+        public LocalizedKeyboardState               PreviousKeyboardState   { get; private set; }
+        public PlayerIndex?                         KeyboardPlayerIndex     { get; private set; }
 #endif
 
-        Buttons[]                           maLastPressedButtons;
-        float[]                             mafRepeatTimers;
-        bool[]                              mabRepeatButtons;
-        const float                         sfButtonRepeatDelay     = 0.3f;
-        const float                         sfButtonRepeatInterval  = 0.1f;
+        Buttons[]                                   maLastPressedButtons;
+        float[]                                     mafRepeatTimers;
+        bool[]                                      mabRepeatButtons;
+        const float                                 sfButtonRepeatDelay     = 0.3f;
+        const float                                 sfButtonRepeatInterval  = 0.1f;
 
-        List<Buttons>                       lButtons;
+        List<Buttons>                               lButtons;
 
         //---------------------------------------------------------------------
         public GamePadManager( Game _game )
