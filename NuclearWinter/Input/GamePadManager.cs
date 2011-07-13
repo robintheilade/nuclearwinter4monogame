@@ -326,6 +326,82 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
+        public bool WasButtonJustReleased( Buttons _button, PlayerIndex _controllingPlayer )
+        {
+            PlayerIndex discardedPlayerIndex;
+            return WasButtonJustReleased( _button, _controllingPlayer, out discardedPlayerIndex );
+        }
+
+        //----------------------------------------------------------------------
+        public bool WasButtonJustReleased( Buttons _button, PlayerIndex? _controllingPlayer, out PlayerIndex _playerIndex )
+        {
+            if( _controllingPlayer.HasValue )
+            {
+                _playerIndex = _controllingPlayer.Value;
+                int iGamePad = (int)_playerIndex;
+
+                //--------------------------------------------------------------
+                bool bButtonPressed;
+
+                switch( _button )
+                {
+                    // Override for left stick
+                    case Buttons.LeftThumbstickLeft:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.X > -sfStickThreshold;
+                        break;
+                    case Buttons.LeftThumbstickRight:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.X < sfStickThreshold;
+                        break;
+                    case Buttons.LeftThumbstickDown:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.Y > -sfStickThreshold;
+                        break;
+                    case Buttons.LeftThumbstickUp:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.Y < sfStickThreshold;
+                        break;
+
+                    // Override for right stick
+                    case Buttons.RightThumbstickLeft:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.X > -sfStickThreshold;
+                        break;
+                    case Buttons.RightThumbstickRight:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.X < sfStickThreshold;
+                        break;
+                    case Buttons.RightThumbstickDown:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.Y > -sfStickThreshold;
+                        break;
+                    case Buttons.RightThumbstickUp:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
+                        break;
+                    
+                    // Default button behavior for the rest
+                    default:
+                        bButtonPressed = PreviousGamePadStates[ iGamePad ].IsButtonDown( _button ) && GamePadStates[ iGamePad ].IsButtonUp( _button );
+                        break;
+                }
+                
+#if WINDOWS
+                //--------------------------------------------------------------
+                // Keyboard controls
+                Keys key = GetKeyboardMapping( _button );
+
+                if( _playerIndex == KeyboardPlayerIndex && key != Keys.None && PreviousKeyboardState.IsKeyDown( key ) && ! KeyboardState.IsKeyDown( key ) )
+                {
+                    bButtonPressed = true;
+                }
+#endif
+
+                return bButtonPressed;
+            }
+            else
+            {
+                return  WasButtonJustReleased( _button, PlayerIndex.One, out _playerIndex )
+                    ||  WasButtonJustReleased( _button, PlayerIndex.Two, out _playerIndex )
+                    ||  WasButtonJustReleased( _button, PlayerIndex.Three, out _playerIndex )
+                    ||  WasButtonJustReleased( _button, PlayerIndex.Four, out _playerIndex );
+            }
+        }
+
+        //----------------------------------------------------------------------
         public Keys GetKeyboardMapping( Buttons button )
         {
             switch( button )
