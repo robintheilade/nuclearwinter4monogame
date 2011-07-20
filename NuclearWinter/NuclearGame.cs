@@ -245,7 +245,7 @@ namespace NuclearWinter
             DrawBlurredText( _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
         }
 
-        int BlurRadius = 4;
+        protected int BlurRadius = 4;
 
         //----------------------------------------------------------------------
         public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
