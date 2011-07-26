@@ -75,7 +75,6 @@ namespace NuclearWinter.Input
             }
 #endif
 
-
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
             {
                 mabRepeatButtons[ iGamePad ] = false;
@@ -216,7 +215,6 @@ namespace NuclearWinter.Input
                 default:
                     return false;
             }
-
         }
 
         //----------------------------------------------------------------------
@@ -229,6 +227,12 @@ namespace NuclearWinter.Input
         public bool WasKeyJustReleased( Keys _key )
         {
             return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+        }
+
+        //----------------------------------------------------------------------
+        public int GetMouseWheelDelta()
+        {
+            return MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue;
         }
 #endif
 
