@@ -32,7 +32,7 @@ namespace NuclearWinter.GameFlow
         public override bool UpdateFadeOut( float _fTime )
         {
             bool bFadeOutDone = ( mfTransition <= 0f );
-            mfTransition = Math.Max( mfTransition - _fTime, sfTransitionDuration );
+            mfTransition = Math.Max( mfTransition - _fTime, 0f );
 
             Update( _fTime );
 
@@ -42,13 +42,13 @@ namespace NuclearWinter.GameFlow
         //----------------------------------------------------------------------
         public override void DrawFadeIn()
         {
-            Draw( mfTransition );
+            Draw( mfTransition / sfTransitionDuration );
         }
 
         //----------------------------------------------------------------------
         public override void DrawFadeOut()
         {
-            Draw( mfTransition );
+            Draw( mfTransition / sfTransitionDuration );
         }
 
         //----------------------------------------------------------------------
