@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
+using System.Linq;
+
 namespace NuclearWinter.Input
 {
     public class GamePadManager: GameComponent
@@ -227,6 +229,14 @@ namespace NuclearWinter.Input
         public bool WasKeyJustReleased( Keys _key )
         {
             return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+        }
+
+        public IEnumerable<Keys> GetJustPressedKeys()
+        {
+            Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
+            Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
+            
+            return currentPressedKeys.Except( previousPressedKeys );
         }
 
         //----------------------------------------------------------------------
