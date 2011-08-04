@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace VectorLevel
 {
@@ -30,39 +31,21 @@ namespace VectorLevel
         }
 
         //----------------------------------------------------------------------
-        public void CreateBody( Box2D.XNA.World _physics, float _fPhysicsRatio, float _fFriction, float _fRestitution )
+        // Setup the block's AABB (used to optimize shadow rendering)
+        public void SetupAABB()
         {
-            //------------------------------------------------------------------
-            // Body def
-            Box2D.XNA.BodyDef bodyDef = new Box2D.XNA.BodyDef();
-            
-            var pathBodyDef = new Box2D.XNA.BodyDef();
-            pathBodyDef.type = Box2D.XNA.BodyType.Static;
-            Body = _physics.CreateBody( pathBodyDef );
-
             //------------------------------------------------------------------
             // Setup minimal bounding box
             AABB.lowerBound.X = Path.Subpaths[0].Vertices[0].X;
             AABB.upperBound.X = Path.Subpaths[0].Vertices[0].X;
             AABB.lowerBound.Y = Path.Subpaths[0].Vertices[0].Y;
             AABB.upperBound.Y = Path.Subpaths[0].Vertices[0].Y;
-            
-            //------------------------------------------------------------------
-            // Create edges
-            var fixtureDef = new Box2D.XNA.FixtureDef();
-            fixtureDef.density = 0f;
-            fixtureDef.friction = _fFriction;
-            fixtureDef.restitution = _fRestitution;
-
-            var shape = new Box2D.XNA.LoopShape();
-
-            List<Vector2> lvVertices = new List<Vector2>();
 
             int j = Path.Subpaths[0].Vertices.Count - 1;
             for( int i = 0; i < Path.Subpaths[0].Vertices.Count; i++ )
             {
                 //--------------------------------------------------
-                // Extend the path's bounding box (used to optimize shadow rendering)
+                // Extend the path's bounding box 
                 if( Path.Subpaths[0].Vertices[i].X < AABB.lowerBound.X )
                 {
                     AABB.lowerBound.X = Path.Subpaths[0].Vertices[i].X;
@@ -82,7 +65,34 @@ namespace VectorLevel
                 {
                     AABB.upperBound.Y = Path.Subpaths[0].Vertices[i].Y;
                 }
+            }
+        }
 
+        //----------------------------------------------------------------------
+        public void CreateBody( Box2D.XNA.World _physics, float _fPhysicsRatio, float _fFriction, float _fRestitution )
+        {
+            //------------------------------------------------------------------
+            // Body def
+            Box2D.XNA.BodyDef bodyDef = new Box2D.XNA.BodyDef();
+            
+            var pathBodyDef = new Box2D.XNA.BodyDef();
+            pathBodyDef.type = Box2D.XNA.BodyType.Static;
+            Body = _physics.CreateBody( pathBodyDef );
+            
+            //------------------------------------------------------------------
+            // Create edges
+            var fixtureDef = new Box2D.XNA.FixtureDef();
+            fixtureDef.density = 0f;
+            fixtureDef.friction = _fFriction;
+            fixtureDef.restitution = _fRestitution;
+
+            var shape = new Box2D.XNA.LoopShape();
+
+            List<Vector2> lvVertices = new List<Vector2>();
+
+            int j = Path.Subpaths[0].Vertices.Count - 1;
+            for( int i = 0; i < Path.Subpaths[0].Vertices.Count; i++ )
+            {
                 //--------------------------------------------------
                 // NOTE: We're checking if the edge is not too small
                 // otherwise it could cause asserts to fire in Box2D
@@ -90,16 +100,7 @@ namespace VectorLevel
                 Vector2 vDiff = Path.Subpaths[0].Vertices[ j ] - Path.Subpaths[0].Vertices[ i ];
                 if( vDiff.Length() / _fPhysicsRatio > 1f )
                 {
-                    //lvActualPolygon.Insert( 0, Path.Subpaths[0].Vertices[ i ] / PhysicsRatio );
-                    /*var shape = new Box2D.XNA.PolygonShape();
-                    shape.SetAsEdge( Path.Subpaths[0].Vertices[ j ] / _fPhysicsRatio, Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
-                    
-                    fixtureDef.shape = shape;
-                    Body.CreateFixture( fixtureDef );
-                    */
-
                     lvVertices.Add( Path.Subpaths[0].Vertices[ i ] / _fPhysicsRatio );
-
                     j = i;
                 }
             }
@@ -456,6 +457,8 @@ namespace VectorLevel
         //----------------------------------------------------------------------
         public void DrawShadow( Light _light )
         {
+            Debug.Assert( AABB.lowerBound != AABB.upperBound, "AABB has not been initialized" );
+
             // Quick AABB test to avoid drawing shadows that won't affect the light texture
             bool bOutsideBoundingBox =
                 ( _light.Position.X < AABB.lowerBound.X - _light.Range )
