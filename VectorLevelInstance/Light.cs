@@ -21,6 +21,8 @@ namespace VectorLevel
             Range       = _fRange;
             LightTex    = _texture;
             Color       = _color;
+
+            IsEnabled   = false;
         }
         
         //---------------------------------------------------------------------
@@ -29,5 +31,7 @@ namespace VectorLevel
         public float        Range;
         public Texture2D    LightTex;
         public Color        Color;
+
+        public bool         IsEnabled;
     }
 }
