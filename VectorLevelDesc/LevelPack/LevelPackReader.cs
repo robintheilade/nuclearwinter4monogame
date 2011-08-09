@@ -34,6 +34,7 @@ namespace VectorLevel.LevelPack
                 LevelInfo.Difficulty    levelDifficulty     = (LevelInfo.Difficulty)_input.ReadByte();
 
                 levelPack.Levels.Add( new LevelInfo( strLevelFilepath, strLevelTitle, levelDifficulty ) );
+                levelPack.LevelsByFilepath[ strLevelFilepath ] = levelPack.Levels[levelPack.Levels.Count - 1];
             }
             
             return levelPack;
