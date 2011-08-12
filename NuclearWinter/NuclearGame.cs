@@ -207,7 +207,7 @@ namespace NuclearWinter
 
             foreach( string strWord in aWords )
             {
-                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
+                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
                 {
                     lText.Add( strLine );
                     strLine = string.Empty;
