@@ -31,6 +31,9 @@ namespace VectorUI
             mlWidgets       = new List<Widgets.Widget>();
             AnimationLayers = new Dictionary<string,AnimationLayer>();
 
+            Width           = _uiDesc.MapWidth;
+            Height          = _uiDesc.MapHeight;
+
             CreateUIFromDesc( _uiDesc );
 
             maWidgets   = new Dictionary<string,Widgets.Widget>();
@@ -314,5 +317,8 @@ namespace VectorUI
         public Dictionary<string,AnimationLayer>    AnimationLayers { get; private set; }
 
         public RasterizerState      RasterizerState;
+
+        public uint                                 Width;
+        public uint                                 Height;
     }
 }

@@ -43,6 +43,20 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         public int      Width;
         public int      Height;
+
+        public Vector2  Size
+        {
+            get {
+                return new Vector2( Width, Height );
+            }
+        }
+
+        public Rectangle Rectangle
+        {
+            get {
+                return new Rectangle( 0, 0, Width, Height );
+            }
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -151,7 +165,8 @@ namespace NuclearWinter
             _graphics.IsFullScreen              = _bFullscreen;
             _graphics.ApplyChanges();
 
-            Scale = Matrix.CreateScale( (float)( Mode.Width * 9 / 16 ) / (float)InternalMode.Height );
+            ScaleFactor = (float)( Mode.Width * 9 / 16 ) / (float)InternalMode.Height;
+            Scale = Matrix.CreateScale( ScaleFactor );
 
             DefaultViewport = _graphics.GraphicsDevice.Viewport;
 
@@ -175,6 +190,6 @@ namespace NuclearWinter
         public static Viewport      Viewport            { get { return mViewport; } }
 
         public static Matrix        Scale               { get; private set; }
-
+        public static float         ScaleFactor         { get; private set; }
     }
 }

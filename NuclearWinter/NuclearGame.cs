@@ -25,6 +25,9 @@ namespace NuclearWinter
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
+        public Texture2D        WhitePixelTex { get; protected set; }
+
+        //----------------------------------------------------------------------
         public NuclearGame( TargetPlatform _platform )
         {
 #if WINDOWS_PHONE
@@ -56,7 +59,7 @@ namespace NuclearWinter
         {
             SpriteBatch = new SpriteBatch( GraphicsDevice );
 
-            GameStateMgr = new GameFlow.GameStateMgr( this );
+            GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
             Components.Add( GameStateMgr );
 
 #if WINDOWS || XBOX
@@ -123,6 +126,12 @@ namespace NuclearWinter
             }
         }
 #endif
+
+        //----------------------------------------------------------------------
+        protected override void LoadContent()
+        {
+            WhitePixelTex           = Content.Load<Texture2D>( "Sprites/WhitePixel" );
+        }
 
 #if WINDOWS || XBOX
         //----------------------------------------------------------------------
@@ -198,7 +207,7 @@ namespace NuclearWinter
 
             foreach( string strWord in aWords )
             {
-                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
+                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
                 {
                     lText.Add( strLine );
                     strLine = string.Empty;
@@ -236,7 +245,7 @@ namespace NuclearWinter
             DrawBlurredText( _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
         }
 
-        int BlurRadius = 4;
+        protected int BlurRadius = 4;
 
         //----------------------------------------------------------------------
         public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
@@ -331,7 +340,7 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Game States
-        public GameFlow.GameStateMgr                        GameStateMgr        { get; private set; }
+        public GameFlow.GameStateMgr<NuclearGame>           GameStateMgr        { get; private set; }
 
 #if WINDOWS || XBOX
         public Input.GamePadManager                         GamePadMgr          { get; private set; }
