@@ -422,8 +422,9 @@ namespace NuclearWinter.Input
             {
                 case Buttons.A:
                     return Keys.Space;
-                case Buttons.Start:
-                    return Keys.Enter;
+                // Keys.Enter is not a good match for the Start button
+                /*case Buttons.Start:
+                    return Keys.Enter;*/
                 case Buttons.Back:
                     return Keys.Escape;
                 case Buttons.LeftThumbstickLeft:
