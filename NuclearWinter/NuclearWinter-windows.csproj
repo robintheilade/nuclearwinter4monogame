@@ -105,6 +105,26 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resolution.cs" />
     <Compile Include="StringBuilderExtNumeric.cs" />
+    <Compile Include="UI\BoxGroup.cs" />
+    <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\Common.cs" />
+    <Compile Include="UI\DropDownBox.cs" />
+    <Compile Include="UI\EditBox.cs" />
+    <Compile Include="UI\FixedGroup.cs" />
+    <Compile Include="UI\GridGroup.cs" />
+    <Compile Include="UI\Group.cs" />
+    <Compile Include="UI\Image.cs" />
+    <Compile Include="UI\Label.cs" />
+    <Compile Include="UI\ListView.cs" />
+    <Compile Include="UI\Panel.cs" />
+    <Compile Include="UI\RadioButtonSet.cs" />
+    <Compile Include="UI\RootGroup.cs" />
+    <Compile Include="UI\Screen.cs" />
+    <Compile Include="UI\Slider.cs" />
+    <Compile Include="UI\SpinningWheel.cs" />
+    <Compile Include="UI\Style.cs" />
+    <Compile Include="UI\Widget.cs" />
+    <Compile Include="UI\WidgetProxy.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
