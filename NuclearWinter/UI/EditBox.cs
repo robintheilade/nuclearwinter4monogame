@@ -166,7 +166,7 @@ namespace NuclearWinter.UI
                     if( Text.Length > 0 && CaretOffset > 0 )
                     {
                         Text = Text.Substring( 0, CaretOffset - 1 ) + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                        CaretOffset--;
+                        //CaretOffset--;
                     }
                     break;
                 case Keys.Space:
