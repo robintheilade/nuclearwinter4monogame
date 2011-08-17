@@ -309,7 +309,7 @@ namespace NuclearWinter.UI
                 Color.White
             );
 
-            Screen.Game.DrawBlurredText( Screen.Style.MediumFont, mlValues[SelectedValueIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) );
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[SelectedValueIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) );
         }
 
         //----------------------------------------------------------------------
@@ -347,7 +347,7 @@ namespace NuclearWinter.UI
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top, Size.X - Padding.Horizontal, siLineHeight ), 10, Color.White );
                     }
 
-                    Screen.Game.DrawBlurredText( Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top ) );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top ) );
                 }
             }
         }

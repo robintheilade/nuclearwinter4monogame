@@ -11,6 +11,8 @@ namespace NuclearWinter.UI
      */
     public class Style
     {
+        public int              BlurRadius = 4;
+
         public SpriteFont       SmallFont;
         public SpriteFont       MediumFont;
         public SpriteFont       BigFont;

@@ -244,6 +244,7 @@ namespace NuclearWinter.UI
                 Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
             else
+            if( mPressedAnim.CurrentValue > 0f )
             {
                 Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
             }
