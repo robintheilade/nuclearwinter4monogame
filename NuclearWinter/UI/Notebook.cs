@@ -76,11 +76,16 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        bool IsInTabs( Point _hitPoint )
+        {
+            return _hitPoint.Y < Position.Y + TabHeight && _hitPoint.X >= Position.X + 20 && _hitPoint.X < Position.X  + 20 + mTabs.ContentWidth;
+        }
+
         public override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
 
-            if( _hitPoint.Y < Position.Y + TabHeight )
+            if( IsInTabs( _hitPoint ) )
             {
                 mbIsMouseInTabs = true;
                 mTabs.OnMouseEnter( _hitPoint );
@@ -110,7 +115,7 @@ namespace NuclearWinter.UI
         {
             base.OnMouseMove( _hitPoint );
 
-            if( _hitPoint.Y < Position.Y + TabHeight || mbIsTabPressed )
+            if( IsInTabs( _hitPoint ) || mbIsTabPressed )
             {
                 if( ! mbIsMouseInTabs )
                 {
