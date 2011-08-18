@@ -86,6 +86,13 @@ namespace NuclearWinter.UI
             }
         }
 
+        public override Widget HitTest( Point _point )
+        {
+            if( Child == null ) return null;
+            
+            return Child.HitTest( _point );
+        }
+
         public override void Draw()
         {
             Child.Draw();

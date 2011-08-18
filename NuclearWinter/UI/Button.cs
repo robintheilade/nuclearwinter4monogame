@@ -51,6 +51,19 @@ namespace NuclearWinter.UI
             }
         }
 
+        Anchor mAnchor;
+        public Anchor Anchor
+        {
+            get {
+                return mAnchor;
+            }
+
+            set
+            {
+                mAnchor = value;
+            }
+        }
+
         public override bool CanFocus { get { return true; } }
 
         public Texture2D        ButtonFrame             { get; set; }
@@ -62,7 +75,7 @@ namespace NuclearWinter.UI
         public Action<Button>   ClickHandler;
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, string _strText, Texture2D _iconTex )
+        public Button( Screen _screen, string _strText, Texture2D _iconTex, Anchor _anchor )
         : base( _screen )
         {
             mLabel          = new Label( _screen );
@@ -71,7 +84,9 @@ namespace NuclearWinter.UI
             mIcon.Texture   = _iconTex;
             mIcon.Padding   = new Box( 10, 0, 10, 20 );
 
-            Text = _strText;
+            Text            = _strText;
+
+            Anchor          = _anchor;
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
@@ -85,15 +100,21 @@ namespace NuclearWinter.UI
             UpdateContentSize();
         }
 
+        public Button( Screen _screen, string _strText, Texture2D _iconTex )
+        : this( _screen, _strText, _iconTex, Anchor.Center )
+        {
+
+        }
+
         //----------------------------------------------------------------------
         public Button( Screen _screen, string _strText )
-        : this( _screen, _strText, null )
+        : this( _screen, _strText, null, Anchor.Center )
         {
         }
 
         //----------------------------------------------------------------------
         public Button( Screen _screen )
-        : this( _screen, "", null )
+        : this( _screen, "", null, Anchor.Center )
         {
         }
 
@@ -122,21 +143,38 @@ namespace NuclearWinter.UI
                 Size = new Point( _rect.Value.Width, _rect.Value.Height );
             }
 
+            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
-
-            if( mIcon.Texture != null )
+            switch( mAnchor )
             {
-                mIcon.Position = new Point( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
-            }
+                case UI.Anchor.Start:
+                    if( mIcon.Texture != null )
+                    {
+                        mIcon.Position = new Point( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
+                    }
 
-            mLabel.DoLayout(
-                new Rectangle(
-                    pCenter.X - ContentWidth / 2 + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
-                    mLabel.ContentWidth, mLabel.ContentHeight
-                )
-            );
+                    mLabel.DoLayout(
+                        new Rectangle(
+                            Position.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            mLabel.ContentWidth, mLabel.ContentHeight
+                        )
+                    );
+                    break;
+                case UI.Anchor.Center:
+                    if( mIcon.Texture != null )
+                    {
+                        mIcon.Position = new Point( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
+                    }
+
+                    mLabel.DoLayout(
+                        new Rectangle(
+                            pCenter.X - ContentWidth / 2 + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            mLabel.ContentWidth, mLabel.ContentHeight
+                        )
+                    );
+                    break;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -255,6 +293,7 @@ namespace NuclearWinter.UI
             }
 
             mLabel.Draw();
+
             mIcon.Draw();
         }
     }

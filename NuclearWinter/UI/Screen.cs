@@ -147,7 +147,7 @@ namespace NuclearWinter.UI
             // Mouse buttons
             Point mouseHitPoint = new Point(
                 (int)( Game.GamePadMgr.MouseState.X / Resolution.ScaleFactor ),
-                (int)( ( Game.GamePadMgr.MouseState.Y - Resolution.Viewport.Y ) / Resolution.ScaleFactor )
+                (int)( ( Game.GamePadMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
             );
 
             if( Game.GamePadMgr.WasMouseButtonJustPressed( 0 ) )
@@ -179,7 +179,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                Widget hoveredWidget = FocusedWidget == null ? null : ( FocusedWidget.HitTest( mouseHitPoint ) ?? Root.HitTest( mouseHitPoint ) );
+                Widget hoveredWidget = ( FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint ) ) ?? Root.HitTest( mouseHitPoint );
 
                 if( mClickedWidget == null )
                 {
