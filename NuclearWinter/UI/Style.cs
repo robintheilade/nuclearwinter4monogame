@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
 {
@@ -17,6 +18,8 @@ namespace NuclearWinter.UI
         public SpriteFont       MediumFont;
         public SpriteFont       BigFont;
 
+        public int              ButtonCornerSize = 30;
+        public Color            ButtonTextColor;
         public Texture2D        ButtonFrame;
         public Texture2D        ButtonFrameHover;
         public Texture2D        ButtonFrameDown;
@@ -40,5 +43,12 @@ namespace NuclearWinter.UI
         public Texture2D        GridBoxFrameHover;
         public Texture2D        GridBoxFrameSelected;
         public Texture2D        GridBoxFrameFocused;
+
+        public Texture2D        Panel;
+        public int              PanelCornerSize = 10;
+
+        public Texture2D        NotebookTab;
+        public Texture2D        NotebookActiveTab;
+        public int              NotebookTabCornerSize = 10;
     }
 }

@@ -116,6 +116,7 @@
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListView.cs" />
+    <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
     <Compile Include="UI\RootGroup.cs" />

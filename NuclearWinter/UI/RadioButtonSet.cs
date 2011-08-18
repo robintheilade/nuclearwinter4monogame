@@ -4,22 +4,95 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using NuclearWinter.Animation;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
     public class RadioButtonSet: Widget
     {
+        //----------------------------------------------------------------------
+        public struct RadioButtonSetStyle
+        {
+            //------------------------------------------------------------------
+            public int                      CornerSize;
+
+            public Texture2D                ButtonFrameLeft;
+            public Texture2D                ButtonFrameMiddle;
+            public Texture2D                ButtonFrameRight;
+
+            public Texture2D                ButtonFrameLeftDown;
+            public Texture2D                ButtonFrameMiddleDown;
+            public Texture2D                ButtonFrameRightDown;
+
+            public Texture2D                ButtonFrameFocused;
+            public Texture2D                ButtonFrameDownFocused;
+
+            //------------------------------------------------------------------
+            public RadioButtonSetStyle(
+                int         _iCornerSize,
+
+                Texture2D   _buttonFrameLeft,
+                Texture2D   _buttonFrameMiddle,
+                Texture2D   _buttonFrameRight,
+
+                Texture2D   _buttonFrameLeftDown,
+                Texture2D   _buttonFrameMiddleDown,
+                Texture2D   _buttonFrameRightDown,
+
+                Texture2D   _buttonFrameFocused,
+                Texture2D   _buttonFrameDownFocused
+            )
+            {
+                CornerSize              = _iCornerSize;
+                ButtonFrameLeft         = _buttonFrameLeft;
+                ButtonFrameMiddle       = _buttonFrameMiddle;
+                ButtonFrameRight        = _buttonFrameRight;
+
+                ButtonFrameLeftDown     = _buttonFrameLeftDown;
+                ButtonFrameMiddleDown   = _buttonFrameMiddleDown;
+                ButtonFrameRightDown    = _buttonFrameRightDown;
+
+                ButtonFrameFocused      = _buttonFrameFocused;
+                ButtonFrameDownFocused  = _buttonFrameDownFocused;
+           }
+        }
+
+        //----------------------------------------------------------------------
         List<Button>                    mlButtons;
 
-        public Action<RadioButtonSet>   ClickHandler;
+        public bool                     Expand;
 
         int                             miHoveredButton;
         bool                            mbIsPressed;
 
-        public override bool    CanFocus { get { return false; } }
+        RadioButtonSetStyle             mStyle;
+        public RadioButtonSetStyle Style
+        {
+            get { return mStyle; }
+            set {
+                mStyle = value;
 
-        int                                 miSelectedButtonIndex = 0;
-        public int                          SelectedButtonIndex
+                foreach( Button button in mlButtons )
+                {
+                    button.Parent = this;
+                    button.Padding = new Box( 0, 0, 0, 0 );
+
+                    button.Style.FrameDown  = Style.ButtonFrameMiddleDown;
+                    button.ClickHandler     = ButtonClicked;
+                }
+
+                Button firstButton = mlButtons.First();
+                firstButton.Style.FrameDown = Style.ButtonFrameLeftDown;
+
+                Button lastButton = mlButtons.Last();
+                lastButton.Style.FrameDown = Style.ButtonFrameRightDown;
+            }
+        }
+
+        public override bool            CanFocus { get { return false; } }
+        public Action<RadioButtonSet>   ClickHandler;
+        int                             miSelectedButtonIndex = 0;
+        public int                      SelectedButtonIndex
         {
             get {
                 return miSelectedButtonIndex;
@@ -32,45 +105,48 @@ namespace NuclearWinter.UI
                 {
                     Button button = mlButtons[iButton];
 
+                    button.Style.CornerSize     = Style.CornerSize;
+
                     if( iButton == miSelectedButtonIndex )
                     {
-                        button.ButtonFrameFocused   = Screen.Style.ButtonFrameDownFocused;
+                        button.Style.FrameFocused   = Style.ButtonFrameDownFocused;
                         if( iButton == 0 )
                         {
-                            button.ButtonFrame          = Screen.Style.ButtonFrameLeftDown;
+                            button.Style.Frame          = Style.ButtonFrameLeftDown;
                         }
                         else
                         if( iButton == mlButtons.Count - 1 )
                         {
-                            button.ButtonFrame          = Screen.Style.ButtonFrameRightDown;
+                            button.Style.Frame          = Style.ButtonFrameRightDown;
                         }
                         else
                         {
-                            button.ButtonFrame          = Screen.Style.ButtonFrameMiddleDown;
+                            button.Style.Frame          = Style.ButtonFrameMiddleDown;
                         }
                     }
                     else
                     {
-                        button.ButtonFrameFocused   = Screen.Style.ButtonFrameFocused;
+                        button.Style.FrameFocused   = Style.ButtonFrameFocused;
 
                         if( iButton == 0 )
                         {
-                            button.ButtonFrame          = Screen.Style.ButtonFrameLeft;
+                            button.Style.Frame          = Style.ButtonFrameLeft;
                         }
                         else
                         if( iButton == mlButtons.Count - 1 )
                         {
-                            button.ButtonFrame      = Screen.Style.ButtonFrameRight;
+                            button.Style.Frame      = Style.ButtonFrameRight;
                         }
                         else
                         {
-                            button.ButtonFrame      = Screen.Style.ButtonFrameMiddle;
+                            button.Style.Frame      = Style.ButtonFrameMiddle;
                         }
                     }
                 }
             }
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
             switch( _direction )
@@ -82,6 +158,7 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
             int iIndex = mlButtons.IndexOf( (Button)_child );
@@ -110,20 +187,20 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             mlButtons = _lButtons;
-            foreach( Button button in mlButtons )
-            {
-                button.Parent = this;
-                button.Padding = new Box( 0, 0, 0, 0 );
 
-                button.ButtonFrameDown  = Screen.Style.ButtonFrameMiddleDown;
-                button.ClickHandler     = ButtonClicked;
-            }
+            Style = new RadioButtonSetStyle(
+                Screen.Style.ButtonCornerSize,
+                Screen.Style.ButtonFrameLeft,
+                Screen.Style.ButtonFrameMiddle,
+                Screen.Style.ButtonFrameRight,
 
-            Button firstButton = mlButtons.First();
-            firstButton.ButtonFrameDown = Screen.Style.ButtonFrameLeftDown;
+                Screen.Style.ButtonFrameLeft,
+                Screen.Style.ButtonFrameMiddle,
+                Screen.Style.ButtonFrameRight,
 
-            Button lastButton = mlButtons.Last();
-            lastButton.ButtonFrameDown = Screen.Style.ButtonFrameRightDown;
+                Screen.Style.ButtonFrameFocused,
+                Screen.Style.ButtonFrameDownFocused
+            );
 
             SelectedButtonIndex = _iInitialButtonIndex;
 
@@ -133,7 +210,24 @@ namespace NuclearWinter.UI
         public RadioButtonSet( Screen _screen, List<Button> _lButtons )
         : this( _screen, _lButtons, 0 )
         {
+        }
 
+        //----------------------------------------------------------------------
+        public RadioButtonSet( Screen _screen, RadioButtonSetStyle _style, List<Button> _lButtons, int _iInitialButtonIndex )
+        : base( _screen )
+        {
+            mlButtons = _lButtons;
+
+            Style = _style;
+
+            SelectedButtonIndex = _iInitialButtonIndex;
+
+            UpdateContentSize();
+        }
+
+        public RadioButtonSet( Screen _screen, RadioButtonSetStyle _style, List<Button> _lButtons )
+        : this( _screen, _style, _lButtons, 0 )
+        {
         }
 
         //----------------------------------------------------------------------
@@ -161,11 +255,13 @@ namespace NuclearWinter.UI
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
+            int iHeight = Expand ? Size.Y : ContentHeight;
+
             HitBox = new Rectangle(
                 pCenter.X - ContentWidth / 2,
-                pCenter.Y - ContentHeight / 2,
+                pCenter.Y - iHeight / 2,
                 ContentWidth,
-                ContentHeight
+                iHeight
             );
 
             int iButton = 0;
@@ -173,8 +269,8 @@ namespace NuclearWinter.UI
             foreach( Button button in mlButtons )
             {
                 button.DoLayout( new Rectangle(
-                    HitBox.X + iButtonX, pCenter.Y - ContentHeight / 2,
-                    button.ContentWidth, ContentHeight
+                    HitBox.X + iButtonX, pCenter.Y - iHeight / 2,
+                    button.ContentWidth, iHeight
                 ) );
 
                 iButtonX += button.ContentWidth;

@@ -14,6 +14,37 @@ namespace NuclearWinter.UI
      */
     public class Button: Widget
     {
+        //----------------------------------------------------------------------
+        public struct ButtonStyle
+        {
+            //------------------------------------------------------------------
+            public int              CornerSize;
+            public Texture2D        Frame;
+            public Texture2D        FrameDown;
+            public Texture2D        FrameHover;
+            public Texture2D        FramePressed;
+            public Texture2D        FrameFocused;
+
+            //------------------------------------------------------------------
+            public ButtonStyle(
+                int         _iCornerSize,
+                Texture2D   _buttonFrame,
+                Texture2D   _buttonFrameDown,
+                Texture2D   _buttonFrameHover,
+                Texture2D   _buttonFramePressed,
+                Texture2D   _buttonFrameFocused
+            )
+            {
+                CornerSize      = _iCornerSize;
+                Frame           = _buttonFrame;
+                FrameDown       = _buttonFrameDown;
+                FrameHover      = _buttonFrameHover;
+                FramePressed    = _buttonFramePressed;
+                FrameFocused    = _buttonFrameFocused;
+            }
+        }
+
+        //----------------------------------------------------------------------
         Label                   mLabel;
         Image                   mIcon;
         Buttons                 mBoundPadButton;
@@ -64,18 +95,20 @@ namespace NuclearWinter.UI
             }
         }
 
+        public Color TextColor
+        {
+            get { return mLabel.Color; }
+            set { mLabel.Color = value; }
+        }
+
         public override bool CanFocus { get { return true; } }
 
-        public Texture2D        ButtonFrame             { get; set; }
-        public Texture2D        ButtonFrameDown         { get; set; }
-        public Texture2D        ButtonFrameHover        { get; set; }
-        public Texture2D        ButtonFramePressed      { get; set; }
-        public Texture2D        ButtonFrameFocused      { get; set; }
+        public ButtonStyle Style;
 
         public Action<Button>   ClickHandler;
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, string _strText, Texture2D _iconTex, Anchor _anchor )
+        public Button( Screen _screen, ButtonStyle _style, string _strText, Texture2D _iconTex, Anchor _anchor )
         : base( _screen )
         {
             mLabel          = new Label( _screen );
@@ -91,15 +124,27 @@ namespace NuclearWinter.UI
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
-            ButtonFrame         = Screen.Style.ButtonFrame;
-            ButtonFrameDown     = Screen.Style.ButtonFrameDown;
-            ButtonFrameHover    = Screen.Style.ButtonFrameHover;
-            ButtonFramePressed  = Screen.Style.ButtonFramePressed;
-            ButtonFrameFocused  = Screen.Style.ButtonFrameFocused;
+            TextColor           = Screen.Style.ButtonTextColor;
+
+            Style = _style;
 
             UpdateContentSize();
         }
 
+        //----------------------------------------------------------------------
+        public Button( Screen _screen, string _strText, Texture2D _iconTex, Anchor _anchor )
+        : this( _screen, new ButtonStyle(
+                _screen.Style.ButtonCornerSize,
+                _screen.Style.ButtonFrame,
+                _screen.Style.ButtonFrameDown,
+                _screen.Style.ButtonFrameHover,
+                _screen.Style.ButtonFramePressed,
+                _screen.Style.ButtonFrameFocused
+            ), _strText, _iconTex, _anchor )
+        {
+        }
+
+        //----------------------------------------------------------------------
         public Button( Screen _screen, string _strText, Texture2D _iconTex )
         : this( _screen, _strText, _iconTex, Anchor.Center )
         {
@@ -275,21 +320,21 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( (!mbIsPressed) ? ButtonFrame  : ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( (!mbIsPressed) ? Style.Frame : Style.FrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
-                Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                Screen.DrawBox( Style.FrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
             }
             else
             if( mPressedAnim.CurrentValue > 0f )
             {
-                Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
+                Screen.DrawBox( Style.FramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
             }
 
             if( HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( ButtonFrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                Screen.DrawBox( Style.FrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
             }
 
             mLabel.Draw();
