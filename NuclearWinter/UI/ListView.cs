@@ -13,16 +13,48 @@ namespace NuclearWinter.UI
      */
     public class ListViewColumn
     {
-        public ListViewColumn( ListView _listView, string _strText, int _iWidth, Anchor _anchor )
+        //----------------------------------------------------------------------
+        public enum ColumnType
         {
+            Text,
+            Image
+        }
+
+        //----------------------------------------------------------------------
+        public ColumnType   Type;
+        public Label        Label { get; private set; }
+        public int          Width;
+        public Anchor       Anchor;
+
+        //----------------------------------------------------------------------
+        public ListViewColumn( ListView _listView, ColumnType _type, string _strText, int _iWidth, Anchor _anchor )
+        {
+            Type    = _type;
             Width   = _iWidth;
             Label   = new UI.Label( _listView.Screen, _strText );
             Anchor  = _anchor;
         }
+    }
 
-        public Label    Label { get; private set; }
-        public int      Width;
-        public Anchor   Anchor;
+    public struct ListViewCell
+    {
+        //----------------------------------------------------------------------
+        public string       Text;
+        public Texture2D    Image;
+
+        //----------------------------------------------------------------------
+        public ListViewCell( string _strText )
+        {
+            Text    = _strText;
+            Image   = null;
+        }
+
+        //----------------------------------------------------------------------
+        public ListViewCell( Texture2D _image )
+        {
+            Text    = null;
+            Image   = _image;
+        }
     }
 
     /*
@@ -30,13 +62,13 @@ namespace NuclearWinter.UI
      */
     public struct ListViewRow
     {
-        public ListViewRow( string[] _aFields, object _tag )
+        public ListViewRow( ListViewCell[] _aCells, object _tag )
         {
-            Fields  = _aFields;
+            Cells   = _aCells;
             Tag     = _tag;
         }
 
-        public string[]             Fields;
+        public ListViewCell[]       Cells;
         public object               Tag;
     }
 
@@ -47,19 +79,32 @@ namespace NuclearWinter.UI
     public class ListView: Widget
     {
         public int                  RowHeight = 60;
+        public int                  RowSpacing = 0;
+
 
         public List<ListViewColumn> Columns             { get; private set; }
+        public bool                 DisplayColumnHeaders    = true;
+        public bool                 MergeColumns            = false;
+
         public List<ListViewRow>    Rows                { get; private set; }
         public int                  SelectedRowIndex    { get; private set; }
+
+        public Color                TextColor           = Color.White;
 
         bool                        mbIsHovered;
         Point                       mHoverPoint;
 
+
         public override bool CanFocus { get { return true; } }
+
+        public void AddColumn( string _strText, ListViewColumn.ColumnType _type, int _iWidth, Anchor _anchor )
+        {
+            Columns.Add( new ListViewColumn( this, _type, _strText, _iWidth, _anchor ) );
+        }
 
         public void AddColumn( string _strText, int _iWidth, Anchor _anchor )
         {
-            Columns.Add( new ListViewColumn( this, _strText, _iWidth, _anchor ) );
+            Columns.Add( new ListViewColumn( this, ListViewColumn.ColumnType.Text, _strText, _iWidth, _anchor ) );
         }
 
         //----------------------------------------------------------------------
@@ -150,6 +195,7 @@ namespace NuclearWinter.UI
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
+            if( DisplayColumnHeaders )
             {
                 int iColX = 0;
                 foreach( ListViewColumn col in Columns )
@@ -163,46 +209,80 @@ namespace NuclearWinter.UI
             int iHoverRow = -1;
             if( mbIsHovered )
             {
-                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + RowHeight ) ) / RowHeight;
+                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + RowHeight + RowSpacing ) ) / ( RowHeight + RowSpacing );
             }
 
             int iRow = 0;
             foreach( ListViewRow row in Rows )
             {
-                int iRowY = iRow * RowHeight;
-                int iColX = 0;
-                for( int i = 0; i < row.Fields.Length; i++ )
+                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing );
+                if( MergeColumns )
                 {
-                    ListViewColumn col = Columns[i];
-
-                    Screen.DrawBox( SelectedRowIndex == iRow ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + RowHeight + iRowY, col.Width, RowHeight ), 30, Color.White );
+                    Screen.DrawBox( SelectedRowIndex == iRow ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), 30, Color.White );
 
                     if( HasFocus && SelectedRowIndex == iRow )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + RowHeight + iRowY, col.Width, RowHeight ), 30, Color.White );
+                        Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), 30, Color.White );
                     }
 
                     if( iHoverRow == iRow )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + RowHeight + iRowY, col.Width, RowHeight ), 30, Color.White );
+                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), 30, Color.White );
                     }
+                }
 
-                    float fTextWidth = Screen.Style.MediumFont.MeasureString( row.Fields[i] ).X;
-                    Vector2 vTextPos = new Vector2( Position.X + iColX + 10, Position.Y + 10 + RowHeight + 30 - ( Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f + iRowY );
-                    switch( col.Anchor )
+                int iColX = 0;
+                for( int i = 0; i < row.Cells.Length; i++ )
+                {
+                    ListViewColumn col = Columns[i];
+
+                    if( ! MergeColumns )
                     {
-                        case Anchor.Start:
-                            vTextPos.X += 10;
+                        Screen.DrawBox( SelectedRowIndex == iRow ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), 30, Color.White );
+
+                        if( HasFocus && SelectedRowIndex == iRow )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), 30, Color.White );
+                        }
+
+                        if( iHoverRow == iRow )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), 30, Color.White );
+                        }
+                    }
+
+                    switch( col.Type )
+                    {
+                        case ListViewColumn.ColumnType.Text:
+                            {
+                                float fTextWidth = Screen.Style.MediumFont.MeasureString( row.Cells[i].Text ).X;
+                                Vector2 vTextPos = new Vector2( Position.X + iColX + 10, Position.Y + 10 + iRowY + RowHeight / 2 - ( Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
+                                switch( col.Anchor )
+                                {
+                                    case Anchor.Start:
+                                        vTextPos.X += 10;
+                                        break;
+                                    case Anchor.Center:
+                                        vTextPos.X += col.Width / 2f - fTextWidth / 2f;
+                                        break;
+                                    case Anchor.End:
+                                        vTextPos.X += col.Width - fTextWidth - 10;
+                                        break;
+                                }
+
+                                Screen.Game.SpriteBatch.DrawString( Screen.Style.MediumFont, row.Cells[i].Text, vTextPos, TextColor );
+                            }
                             break;
-                        case Anchor.Center:
-                            vTextPos.X += col.Width / 2f - fTextWidth / 2f;
-                            break;
-                        case Anchor.End:
-                            vTextPos.X += col.Width - fTextWidth - 10;
+                        case ListViewColumn.ColumnType.Image:
+                            {
+                                Texture2D image = row.Cells[i].Image;
+                                Vector2 vImagePos = new Vector2( Position.X + iColX + 10 + col.Width / 2f - image.Width / 2f, Position.Y + 10 + iRowY + RowHeight / 2 - image.Height / 2f );
+                                Screen.Game.SpriteBatch.Draw( image, vImagePos, Color.White );
+                            }
                             break;
                     }
 
-                    Screen.Game.SpriteBatch.DrawString( Screen.Style.MediumFont, row.Fields[i], vTextPos, Color.White );
+
                     iColX += col.Width;
                 }
 
