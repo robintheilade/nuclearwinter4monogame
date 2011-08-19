@@ -39,7 +39,7 @@ namespace NuclearWinter.UI
                 _screen.Style.NotebookActiveTab,
 
                 _screen.Style.ButtonFrameFocused,
-                _screen.Style.ButtonFrameFocused // FIXME: FocusedActiveTab
+                _screen.Style.NotebookActiveTabFocused
             );
 
             mTabs = new RadioButtonSet( Screen, mTabStyle, _lButtons );
