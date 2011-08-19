@@ -139,7 +139,7 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonFrameDown,
                 _screen.Style.ButtonFrameHover,
                 _screen.Style.ButtonFramePressed,
-                _screen.Style.ButtonFrameFocused
+                _screen.Style.ButtonFrameFocus
             ), _strText, _iconTex, _anchor )
         {
         }

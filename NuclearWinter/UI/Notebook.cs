@@ -38,7 +38,7 @@ namespace NuclearWinter.UI
                 _screen.Style.NotebookActiveTab,
                 _screen.Style.NotebookActiveTab,
 
-                _screen.Style.ButtonFrameFocused,
+                _screen.Style.ButtonFrameFocus,
                 _screen.Style.NotebookActiveTabFocused
             );
 

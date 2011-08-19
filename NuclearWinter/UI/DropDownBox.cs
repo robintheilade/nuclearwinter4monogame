@@ -301,7 +301,7 @@ namespace NuclearWinter.UI
 
             if( HasFocus && ! mbIsOpen )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
 
             Screen.Game.SpriteBatch.Draw( Screen.Style.DropDownArrow,

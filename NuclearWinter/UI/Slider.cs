@@ -145,7 +145,7 @@ namespace NuclearWinter.UI
 
             if( HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameFocused, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             }
         }
     }

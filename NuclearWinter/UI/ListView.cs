@@ -260,12 +260,28 @@ namespace NuclearWinter.UI
 
                     if( HasFocus && miFocusedRowIndex == iRow )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        if( SelectedRowIndex != iRow )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameFocus, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        }
+                        else
+                        if( Screen.Style.GridBoxFrameSelectedFocus != null )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameSelectedFocus, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        }
                     }
 
                     if( iHoverRow == iRow )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        if( SelectedRowIndex != iRow )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        }
+                        else
+                        if( Screen.Style.GridBoxFrameSelectedHover != null )
+                        {
+                            Screen.DrawBox( Screen.Style.GridBoxFrameSelectedHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        }
                     }
                 }
 
@@ -280,12 +296,28 @@ namespace NuclearWinter.UI
 
                         if( HasFocus && miFocusedRowIndex == iRow )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            if( SelectedRowIndex != iRow )
+                            {
+                                Screen.DrawBox( Screen.Style.GridBoxFrameFocus, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            }
+                            else
+                            if( Screen.Style.GridBoxFrameSelectedFocus != null )
+                            {
+                                Screen.DrawBox( Screen.Style.GridBoxFrameSelectedFocus, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            }
                         }
 
                         if( iHoverRow == iRow )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            if( SelectedRowIndex != iRow )
+                            {
+                                Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            }
+                            else
+                            if( Screen.Style.GridBoxFrameSelectedHover != null )
+                            {
+                                Screen.DrawBox( Screen.Style.GridBoxFrameSelectedHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            }
                         }
                     }
 

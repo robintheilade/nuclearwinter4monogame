@@ -198,8 +198,8 @@ namespace NuclearWinter.UI
                 Screen.Style.ButtonFrameMiddle,
                 Screen.Style.ButtonFrameRight,
 
-                Screen.Style.ButtonFrameFocused,
-                Screen.Style.ButtonFrameDownFocused
+                Screen.Style.ButtonFrameFocus,
+                Screen.Style.ButtonFrameDownFocus
             );
 
             SelectedButtonIndex = _iInitialButtonIndex;

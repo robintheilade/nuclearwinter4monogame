@@ -25,8 +25,8 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameDown;
         public Texture2D        ButtonFramePressed;
 
-        public Texture2D        ButtonFrameFocused;
-        public Texture2D        ButtonFrameDownFocused;
+        public Texture2D        ButtonFrameFocus;
+        public Texture2D        ButtonFrameDownFocus;
 
         public Texture2D        ButtonFrameLeft;
         public Texture2D        ButtonFrameLeftDown;
@@ -41,10 +41,14 @@ namespace NuclearWinter.UI
         public Texture2D        GridHeaderFrame;
 
         public int              GridBoxFrameCornerSize = 30;
+
         public Texture2D        GridBoxFrame;
         public Texture2D        GridBoxFrameHover;
+        public Texture2D        GridBoxFrameFocus;
+
         public Texture2D        GridBoxFrameSelected;
-        public Texture2D        GridBoxFrameFocused;
+        public Texture2D        GridBoxFrameSelectedFocus;
+        public Texture2D        GridBoxFrameSelectedHover;
 
         public Texture2D        Panel;
         public int              PanelCornerSize = 10;
