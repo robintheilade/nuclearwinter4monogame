@@ -39,6 +39,8 @@ namespace NuclearWinter.UI
 
         public Texture2D        GridFrame;
         public Texture2D        GridHeaderFrame;
+
+        public int              GridBoxFrameCornerSize = 30;
         public Texture2D        GridBoxFrame;
         public Texture2D        GridBoxFrameHover;
         public Texture2D        GridBoxFrameSelected;
