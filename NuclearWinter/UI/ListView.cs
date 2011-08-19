@@ -78,25 +78,27 @@ namespace NuclearWinter.UI
      */
     public class ListView: Widget
     {
-        public int                  RowHeight = 60;
-        public int                  RowSpacing = 0;
-
-
         public List<ListViewColumn> Columns             { get; private set; }
         public bool                 DisplayColumnHeaders    = true;
         public bool                 MergeColumns            = false;
+        public bool                 SelectFocusedRow        = true;
 
         public List<ListViewRow>    Rows                { get; private set; }
-        public int                  SelectedRowIndex    { get; private set; }
+        public int                  RowHeight = 60;
+        public int                  RowSpacing = 0;
 
-        public Color                TextColor           = Color.White;
+        public int                  SelectedRowIndex;
+        public Action<ListView>     SelectHandler;
 
+        int                         miFocusedRowIndex;
         bool                        mbIsHovered;
         Point                       mHoverPoint;
 
+        public Color                TextColor           = Color.White;
 
         public override bool CanFocus { get { return true; } }
 
+        //----------------------------------------------------------------------
         public void AddColumn( string _strText, ListViewColumn.ColumnType _type, int _iWidth, Anchor _anchor )
         {
             Columns.Add( new ListViewColumn( this, _type, _strText, _iWidth, _anchor ) );
@@ -114,6 +116,7 @@ namespace NuclearWinter.UI
             Columns = new List<ListViewColumn>();
             Rows    = new List<ListViewRow>();
             SelectedRowIndex = -1;
+            miFocusedRowIndex = -1;
 
             UpdateContentSize();
         }
@@ -164,11 +167,31 @@ namespace NuclearWinter.UI
         public override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
+            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) ) / ( RowHeight + RowSpacing ) );
+            if( miFocusedRowIndex > Rows.Count - 1 )
+            {
+                miFocusedRowIndex = -1;
+            }
         }
 
         public override void OnMouseUp( Point _hitPoint )
         {
-            SelectedRowIndex = (int)MathHelper.Clamp( ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) ) / ( RowHeight + RowSpacing ), 0, Rows.Count - 1 );
+            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) ) / ( RowHeight + RowSpacing ) );
+
+            if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
+            {
+                SelectedRowIndex = miFocusedRowIndex;
+                if( SelectHandler != null ) SelectHandler( this );
+            }
+        }
+
+        public override void OnActivateUp()
+        {
+            if( miFocusedRowIndex != SelectedRowIndex && miFocusedRowIndex != -1 )
+            {
+                SelectedRowIndex = miFocusedRowIndex;
+                if( SelectHandler != null ) SelectHandler( this );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -176,12 +199,22 @@ namespace NuclearWinter.UI
         {
             if( _direction == Direction.Up )
             {
-                SelectedRowIndex = Math.Max( 0, SelectedRowIndex - 1 );
+                miFocusedRowIndex = Math.Max( 0, miFocusedRowIndex - 1 );
+
+                if( SelectFocusedRow )
+                {
+                    SelectedRowIndex = miFocusedRowIndex;
+                }
             }
             else
             if( _direction == Direction.Down )
             {
-                SelectedRowIndex = Math.Min( Rows.Count - 1, SelectedRowIndex + 1 );
+                miFocusedRowIndex = Math.Min( Rows.Count - 1, miFocusedRowIndex + 1 );
+
+                if( SelectFocusedRow )
+                {
+                    SelectedRowIndex = miFocusedRowIndex;
+                }
             }
             else
             {
@@ -189,6 +222,11 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
+        public override void OnBlur()
+        {
+            miFocusedRowIndex = -1;
+        }
 
         //----------------------------------------------------------------------
         public override void Draw()
@@ -220,7 +258,7 @@ namespace NuclearWinter.UI
                 {
                     Screen.DrawBox( SelectedRowIndex == iRow ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
 
-                    if( HasFocus && SelectedRowIndex == iRow )
+                    if( HasFocus && miFocusedRowIndex == iRow )
                     {
                         Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
                     }
@@ -240,7 +278,7 @@ namespace NuclearWinter.UI
                     {
                         Screen.DrawBox( SelectedRowIndex == iRow ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
 
-                        if( HasFocus && SelectedRowIndex == iRow )
+                        if( HasFocus && miFocusedRowIndex == iRow )
                         {
                             Screen.DrawBox( Screen.Style.GridBoxFrameFocused, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
