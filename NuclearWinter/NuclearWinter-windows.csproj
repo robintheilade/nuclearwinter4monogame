@@ -121,6 +121,7 @@
     <Compile Include="UI\Menu\MenuManager.cs" />
     <Compile Include="UI\Menu\MessagePopupPane.cs" />
     <Compile Include="UI\Menu\Pane.cs" />
+    <Compile Include="UI\Menu\PopupPane.cs" />
     <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />

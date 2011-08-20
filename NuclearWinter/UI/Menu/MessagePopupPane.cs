@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
-    public class MessagePopupPane: ManagerPane<IMenuManager>
+    public class MessagePopupPane: PopupPane<IMenuManager>
     {
         public const int        Width   = 800;
         public const int        Height  = 450;

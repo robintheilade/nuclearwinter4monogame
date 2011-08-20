@@ -54,6 +54,7 @@ namespace NuclearWinter.UI
         public void DisplayPopup( Pane _popupPane )
         {
             Debug.Assert( mActivePopupPane == null );
+            Debug.Assert( _popupPane.FixedGroup.Screen == PopupScreen );
 
             mActivePopupPane = _popupPane;
             PopupScreenPaneAnchor.Child = mActivePopupPane.FixedGroup;
