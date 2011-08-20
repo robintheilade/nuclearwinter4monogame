@@ -116,6 +116,11 @@
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListView.cs" />
+    <Compile Include="UI\Menu\IMenuManager.cs" />
+    <Compile Include="UI\Menu\ManagerPane.cs" />
+    <Compile Include="UI\Menu\MenuManager.cs" />
+    <Compile Include="UI\Menu\MessagePopupPane.cs" />
+    <Compile Include="UI\Menu\Pane.cs" />
     <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
