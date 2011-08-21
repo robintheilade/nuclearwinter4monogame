@@ -6,10 +6,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 using System.Linq;
+using System.Collections;
+using System.Diagnostics;
 
 namespace NuclearWinter.Input
 {
-    public class GamePadManager: GameComponent
+    public class InputManager: GameComponent
     {
         public const int                            siMaxInput              = 4;
         public const float                          sfStickThreshold        = 0.4f;
@@ -24,6 +26,13 @@ namespace NuclearWinter.Input
         public LocalizedKeyboardState               KeyboardState           { get; private set; }
         public LocalizedKeyboardState               PreviousKeyboardState   { get; private set; }
         public PlayerIndex?                         KeyboardPlayerIndex     { get; private set; }
+        /*Keys                                        mLastKeyPressed;
+        bool                                        mbRepeatKey;
+        float                                       mfRepeatKeyTimer;*/
+
+        public List<char>                           EnteredText             { get; private set; }
+        public List<Keys>                           JustPressedKeys         { get; private set; }
+        TextInput                                   mTextInput;
 #endif
 
         Buttons[]                                   maLastPressedButtons;
@@ -35,7 +44,7 @@ namespace NuclearWinter.Input
         List<Buttons>                               lButtons;
 
         //---------------------------------------------------------------------
-        public GamePadManager( Game _game )
+        public InputManager( Game _game )
         : base ( _game )
         {
             GamePadStates           = new GamePadState[ siMaxInput ];
@@ -46,6 +55,16 @@ namespace NuclearWinter.Input
             mabRepeatButtons        = new bool[ siMaxInput ];
 
             lButtons                = Utils.GetValues<Buttons>();
+
+#if WINDOWS
+            EnteredText             = new List<char>();
+            JustPressedKeys         = new List<Keys>();
+
+            mTextInput              = new TextInput( Game.Window.Handle );
+            mTextInput.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
+            mTextInput.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
+
+#endif
         }
 
         //---------------------------------------------------------------------
@@ -66,6 +85,47 @@ namespace NuclearWinter.Input
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
 
+            /*
+            Keys[] pressedKeys = KeyboardState.Native.GetPressedKeys();
+
+            mbRepeatKey = false;
+            bool bIsKeyStillDown = false;
+            if( pressedKeys.Length > 0 )
+            {
+                if( pressedKeys[0] != mLastKeyPressed )
+                {
+                    mLastKeyPressed = pressedKeys[0];
+                    mfRepeatKeyTimer = 0f;
+                }
+                else
+                {
+                    bIsKeyStillDown = true;
+                }
+            }
+            else
+            {
+                mLastKeyPressed = Keys.None;
+            }
+
+            if( bIsKeyStillDown )
+            {
+                float fRepeatValue      = ( mfRepeatKeyTimer - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
+                float fNewRepeatValue   = ( mfRepeatKeyTimer + fElapsedTime - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
+
+                if( mfRepeatKeyTimer < sfButtonRepeatDelay && mfRepeatKeyTimer + fElapsedTime >= sfButtonRepeatDelay )
+                {
+                    mbRepeatKey = true;
+                }
+                else
+                if( mfRepeatKeyTimer > sfButtonRepeatDelay && fRepeatValue > fNewRepeatValue )
+                {
+                    mbRepeatKey = true;
+                }
+
+                mfRepeatKeyTimer += fElapsedTime;
+            }
+            */
+
             KeyboardPlayerIndex = null;
             for( int i = 0; i < siMaxInput; i++ )
             {
@@ -75,6 +135,9 @@ namespace NuclearWinter.Input
                     break;
                 }
             }
+
+            EnteredText.Clear();
+            JustPressedKeys.Clear();
 #endif
 
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
@@ -231,13 +294,28 @@ namespace NuclearWinter.Input
             return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
         }
 
+        /*
         public IEnumerable<Keys> GetJustPressedKeys()
         {
+
             Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
             Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
             
-            return currentPressedKeys.Except( previousPressedKeys );
+            List<Keys> keys = currentPressedKeys.Except( previousPressedKeys ).ToList();
+
+            if( mbRepeatKey )
+            {
+                Debug.Assert( mLastKeyPressed != Keys.None );
+
+                if( ! keys.Contains( mLastKeyPressed ) )
+                {
+                    keys.Add( mLastKeyPressed );
+                }
+            }
+
+            return keys;
         }
+        */
 
         //----------------------------------------------------------------------
         public int GetMouseWheelDelta()

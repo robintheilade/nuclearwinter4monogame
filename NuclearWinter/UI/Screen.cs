@@ -82,12 +82,12 @@ namespace NuclearWinter.UI
 
                 bool bPressed;
 
-                if( Game.GamePadMgr.WasButtonJustPressed( button, Game.PlayerInCharge, out playerIndex, true ) )
+                if( Game.InputMgr.WasButtonJustPressed( button, Game.PlayerInCharge, out playerIndex, true ) )
                 {
                     bPressed = true;
                 }
                 else
-                if( Game.GamePadMgr.WasButtonJustReleased( button, Game.PlayerInCharge, out playerIndex ) )
+                if( Game.InputMgr.WasButtonJustReleased( button, Game.PlayerInCharge, out playerIndex ) )
                 {
                     bPressed = false;
                 }
@@ -146,11 +146,11 @@ namespace NuclearWinter.UI
 #if WINDOWS
             // Mouse buttons
             Point mouseHitPoint = new Point(
-                (int)( Game.GamePadMgr.MouseState.X / Resolution.ScaleFactor ),
-                (int)( ( Game.GamePadMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
+                (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
+                (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
             );
 
-            if( Game.GamePadMgr.WasMouseButtonJustPressed( 0 ) )
+            if( Game.InputMgr.WasMouseButtonJustPressed( 0 ) )
             {
                 mClickedWidget = null;
                 if( FocusedWidget != null )
@@ -169,7 +169,7 @@ namespace NuclearWinter.UI
                 }
             }
             else
-            if( Game.GamePadMgr.WasMouseButtonJustReleased( 0 ) )
+            if( Game.InputMgr.WasMouseButtonJustReleased( 0 ) )
             {
                 if( mClickedWidget != null )
                 {
@@ -208,7 +208,7 @@ namespace NuclearWinter.UI
             }
 
             // Mouse wheel
-            int iWheelDelta = Game.GamePadMgr.GetMouseWheelDelta();
+            int iWheelDelta = Game.InputMgr.GetMouseWheelDelta();
             if( iWheelDelta != 0 )
             {
                 if( FocusedWidget != null )
@@ -220,9 +220,14 @@ namespace NuclearWinter.UI
             // Keyboard
             if( FocusedWidget != null )
             {
-                foreach( Keys key in Game.GamePadMgr.GetJustPressedKeys() )
+                foreach( Keys key in Game.InputMgr.JustPressedKeys )
                 {
                     FocusedWidget.OnKeyPress( key );
+                }
+
+                foreach( char character in Game.InputMgr.EnteredText )
+                {
+                    FocusedWidget.OnTextEntered( character );
                 }
             }
 #endif

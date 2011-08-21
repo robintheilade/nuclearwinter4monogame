@@ -136,6 +136,7 @@ namespace NuclearWinter.UI
         public virtual void     OnMouseWheel( int _iDelta ) {}
 
         public virtual void     OnKeyPress  ( Keys _key ) {}
+        public virtual void     OnTextEntered( char _char ) {}
 
         public virtual void     OnActivateDown() {}
         public virtual void     OnActivateUp() {}

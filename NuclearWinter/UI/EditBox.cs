@@ -35,6 +35,7 @@ namespace NuclearWinter.UI
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+                mfTimer = 0f;
             }
         }
         int     miCaretX;
@@ -149,6 +150,15 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public override void OnTextEntered( char _char )
+        {
+            if( ! char.IsControl( _char ) )
+            {
+                Text = Text.Insert( CaretOffset, _char.ToString() );
+                CaretOffset++;
+            }
+        }
+
         public override void OnKeyPress( Keys _key )
         {
             switch( _key )
@@ -156,32 +166,30 @@ namespace NuclearWinter.UI
                 case Keys.Enter:
                     if( ValidateHandler != null ) ValidateHandler( this );
                     break;
+                case Keys.Back:
+                    if( Text.Length > 0 && CaretOffset > 0 )
+                    {
+                        CaretOffset--;
+                        Text = Text.Remove( CaretOffset, 1 );
+                    }
+                    break;
+                case Keys.Delete:
+                    if( Text.Length > 0 && CaretOffset < Text.Length )
+                    {
+                        Text = Text.Remove( CaretOffset, 1 );
+                    }
+                    break;
                 case Keys.Left:
                     CaretOffset--;
                     break;
                 case Keys.Right:
                     CaretOffset++;
                     break;
-                case Keys.Back:
-                    if( Text.Length > 0 && CaretOffset > 0 )
-                    {
-                        Text = Text.Substring( 0, CaretOffset - 1 ) + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                        //CaretOffset--;
-                    }
+                case Keys.End:
+                    CaretOffset = Text.Length;
                     break;
-                case Keys.Space:
-                    Text = Text.Substring( 0, CaretOffset ) + " " + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                    CaretOffset++;
-                    break;
-                default:
-                    if( _key >= Keys.A && _key <= Keys.Z )
-                    {
-                        string key = _key.ToString();
-                        bool bShift = Screen.Game.GamePadMgr.KeyboardState.Native.IsKeyDown( Keys.LeftShift ) || Screen.Game.GamePadMgr.KeyboardState.Native.IsKeyDown( Keys.RightShift );
-
-                        Text = Text.Substring( 0, CaretOffset ) + ( bShift ? key : key.ToLower() ) + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                        CaretOffset++;
-                    }
+                case Keys.Home:
+                    CaretOffset = 0;
                     break;
             }
         }

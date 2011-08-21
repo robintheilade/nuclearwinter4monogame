@@ -97,9 +97,10 @@
     <Compile Include="GameFlow\GameStateMgr.cs" />
     <Compile Include="GameFlow\IGameState.cs" />
     <Compile Include="Input\Accelerometer.cs" />
+    <Compile Include="Input\TextInput.cs" />
     <Compile Include="SaveHandler.cs" />
-    <Compile Include="Input\GamePadManager.cs" />
-    <Compile Include="Input\TouchManager.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Input\TouchInputManager.cs" />
     <Compile Include="LocalizedKeyboardState.cs" />
     <Compile Include="NuclearGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -169,6 +170,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Private>False</Private>
     </Reference>

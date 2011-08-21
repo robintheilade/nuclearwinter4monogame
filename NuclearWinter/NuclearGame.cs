@@ -45,8 +45,8 @@ namespace NuclearWinter
             Components.Add( GameStateMgr );
 
 #if WINDOWS || XBOX
-            GamePadMgr                = new Input.GamePadManager( this );
-            Components.Add( GamePadMgr );
+            InputMgr                = new Input.InputManager( this );
+            Components.Add( InputMgr );
 #endif
 
 #if WINDOWS_PHONE
@@ -329,7 +329,7 @@ namespace NuclearWinter
         public GameFlow.GameStateMgr<NuclearGame>           GameStateMgr        { get; private set; }
 
 #if WINDOWS || XBOX
-        public Input.GamePadManager                         GamePadMgr          { get; private set; }
+        public Input.InputManager                         InputMgr          { get; private set; }
 #endif
 
 #if WINDOWS_PHONE
