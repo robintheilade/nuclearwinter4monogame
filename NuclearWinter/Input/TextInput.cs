@@ -8,8 +8,9 @@ using System.Runtime.InteropServices;
 namespace NuclearWinter.Input
 {
     //-------------------------------------------------------------------------
+    // Inspired by Nuclex.Input and
     // http://stackoverflow.com/questions/375316/xna-keyboard-text-input
-    internal class TextInput: NativeWindow, IDisposable
+    internal class TextInput: IMessageFilter, IDisposable
     {
         //---------------------------------------------------------------------
         public Action<Keys>     KeyUpHandler;
@@ -31,7 +32,7 @@ namespace NuclearWinter.Input
         //---------------------------------------------------------------------
         public TextInput( IntPtr _hWnd )
         {
-            AssignHandle( _hWnd );
+            Application.AddMessageFilter( this );
         }
 
         //---------------------------------------------------------------------
@@ -45,31 +46,26 @@ namespace NuclearWinter.Input
         {
             if( ! mbIsDisposed )
             {
-                ReleaseHandle();
+                Application.RemoveMessageFilter( this );
                 mbIsDisposed = true;
             }
             }
 
         //---------------------------------------------------------------------
-        protected override void WndProc( ref Message _message )
+        bool IMessageFilter.PreFilterMessage( ref Message _message )
         {
-            base.WndProc( ref _message );
-
             switch( _message.Msg )
             {
-                case WM_GETDLGCODE: {
-	                int returnCode = _message.Result.ToInt32();
-	                returnCode |= ( DLGC_WANTALLKEYS  | DLGC_WANTCHARS );
-	                _message.Result = new IntPtr( returnCode );
-                    break;
-                }
-                 case WM_KEYDOWN: {
+                case WM_KEYDOWN: {
                     int virtualKeyCode = _message.WParam.ToInt32();
                     if( KeyDownHandler != null )
                     {
                         KeyDownHandler( (Keys)virtualKeyCode );
                     }
-                    break;
+
+                    TranslateMessage( ref _message );
+
+                    return true;
                 }
                 case WM_KEYUP: {
                     int virtualKeyCode = _message.WParam.ToInt32();
@@ -77,7 +73,8 @@ namespace NuclearWinter.Input
                     {
                         KeyUpHandler( (Keys)virtualKeyCode );
                     }
-                    break;
+
+                    return true;
                 }
                 case WM_CHAR: {
                     char character = (char)_message.WParam.ToInt32();
@@ -86,9 +83,15 @@ namespace NuclearWinter.Input
                         CharacterHandler( character );
                     }
 
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
+
+        //---------------------------------------------------------------------
+        [DllImport("user32", SetLastError = true)]
+        public extern static bool TranslateMessage(ref Message message);
     }
 }
