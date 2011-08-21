@@ -170,7 +170,7 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.Space:
-                    Text += " ";
+                    Text = Text.Substring( 0, CaretOffset ) + " " + Text.Substring( CaretOffset, Text.Length - CaretOffset );
                     CaretOffset++;
                     break;
                 default:
