@@ -19,6 +19,7 @@ namespace NuclearWinter.UI
         public SpriteFont       BigFont;
 
         public int              ButtonCornerSize = 30;
+        public int              DefaultButtonHeight = 80;
         public Color            ButtonTextColor;
         public Texture2D        ButtonFrame;
         public Texture2D        ButtonFrameHover;

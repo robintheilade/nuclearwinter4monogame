@@ -39,7 +39,7 @@ namespace NuclearWinter.UI
         {
             FixedGroup = new NuclearWinter.UI.FixedGroup( Manager.PopupScreen );
 
-            Rectangle paneRect = new Rectangle( Resolution.InternalMode.Width / 2 - Width / 2, Resolution.InternalMode.Height / 2 - Height / 2, Width, Height );
+            Rectangle paneRect = new Rectangle( Manager.PopupScreen.Width / 2 - Width / 2, Manager.PopupScreen.Height / 2 - Height / 2, Width, Height );
 
             NuclearWinter.UI.Panel panel = new NuclearWinter.UI.Panel( FixedGroup.Screen, Manager.Content.Load<Texture2D>( "Sprites/Menu/PanelFrame" ), 20 );
             FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( panel, paneRect ) );
@@ -61,7 +61,7 @@ namespace NuclearWinter.UI
 
                 // Actions
                 NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Direction.Left, false, 10 );
-                FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( actionsGroup, new Rectangle( paneRect.Left + 20, paneRect.Bottom - 20 - 80, paneRect.Width - 40, 80 ) ) );
+                FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( actionsGroup, new Rectangle( paneRect.Left + 20, paneRect.Bottom - 20 - FixedGroup.Screen.Style.DefaultButtonHeight, paneRect.Width - 40, FixedGroup.Screen.Style.DefaultButtonHeight ) ) );
 
                 // Close
                 // FIXME: i18n
