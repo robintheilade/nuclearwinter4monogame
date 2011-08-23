@@ -77,7 +77,7 @@ namespace NuclearWinter.UI
         {
             mstrText    = _strText;
             mFont       = _screen.Style.MediumFont;
-            mPadding    = new Box( 10 );
+            mPadding    = new Box( 15 );
 
             UpdateContentSize();
         }
