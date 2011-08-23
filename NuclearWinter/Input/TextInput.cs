@@ -20,11 +20,6 @@ namespace NuclearWinter.Input
         //---------------------------------------------------------------------
         bool                    mbIsDisposed;
 
-        const int               DLGC_WANTCHARS      = 0x0080;
-        const int               DLGC_WANTALLKEYS    = 0x0004;
-
-        const int               WM_GETDLGCODE       = 0x0087;
-
         const int               WM_CHAR             = 0x0102;
         const int               WM_KEYDOWN          = 0x0100;
         const int               WM_KEYUP            = 0x0101;
