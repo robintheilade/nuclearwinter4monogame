@@ -12,8 +12,8 @@ namespace NuclearWinter.UI
     //--------------------------------------------------------------------------
     public class FixedWidget: Widget
     {
+        //----------------------------------------------------------------------
         Widget mChild;
-
         public Widget       Child {
             get { return mChild; }
             set {
@@ -23,45 +23,125 @@ namespace NuclearWinter.UI
                     mChild.Parent = null;
                 }
 
-                Debug.Assert( value.Parent == null );
                 mChild = value;
-                mChild.Parent = this;
+                if( mChild != null )
+                {
+                    Debug.Assert( mChild.Parent == null );
+                    mChild.Parent = this;
+                }
+
+                UpdateContentSize();
             }
         }
 
-        public Rectangle    ChildRectangle;
+        //----------------------------------------------------------------------
+        public Rectangle        ChildRectangle;
 
-        Anchor              mAnchor;
+        public Box              ChildBox;
+        public BoxAnchor        ChildBoxAnchor;
 
-        public override Widget GetFirstFocusableDescendant(Direction _direction)
-        {
-            return Child.GetFirstFocusableDescendant( _direction );
-        }
+        Anchor                  mContentAnchor;
 
-        public override bool CanFocus
-        {
-            get { return false; }
-        }
-        //public override bool CanFocus { get { return Child != null && Child.CanFocus; } }
-
-        public FixedWidget( Widget _child, Rectangle _rect, Anchor _anchor )
-        : base( _child.Screen )
+        //----------------------------------------------------------------------
+        FixedWidget( Screen _screen, Widget _child, Rectangle _rect, Anchor _contentAnchor )
+        : base( _screen )
         {
             Child           = _child;
+            
             ChildRectangle  = _rect;
-            mAnchor         = _anchor;
+
+            ChildBox        = new Box(0);
+            ChildBoxAnchor  = BoxAnchor.None;
+
+            mContentAnchor  = _contentAnchor;
+        }
+
+        //----------------------------------------------------------------------
+        public FixedWidget( Screen _screen, Rectangle _rect, Anchor _contentAnchor )
+        : this( _screen, null, _rect, _contentAnchor )
+        {
+
+        }
+
+        public FixedWidget( Screen _screen, Rectangle _rect )
+        : this( _screen, null, _rect, Anchor.Center )
+        {
+
+        }
+
+        //----------------------------------------------------------------------
+        public FixedWidget( Widget _child, Rectangle _rect, Anchor _contentAnchor )
+        : this( _child.Screen, _child, _rect, _contentAnchor )
+        {
         }
 
         public FixedWidget( Widget _child, Rectangle _rect )
-        : this( _child, _rect, Anchor.Center )
+        : this( _child.Screen, _child, _rect, Anchor.Center )
         {
         }
 
+        //----------------------------------------------------------------------
+        FixedWidget( Screen _screen, Widget _child, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
+        : base( _screen )
+        {
+            Child           = _child;
 
+            ChildRectangle  = Rectangle.Empty;
+
+            ChildBox        = _box;
+            ChildBoxAnchor  = _anchor;
+
+            mContentAnchor  = _contentAnchor;
+        }
+
+        //----------------------------------------------------------------------
+        public FixedWidget( Widget _child, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
+        : this( _child.Screen, _child, _box, _anchor, _contentAnchor )
+        {
+
+        }
+
+        public FixedWidget( Widget _child, Box _box, BoxAnchor _anchor )
+        : this( _child.Screen, _child, _box, _anchor, Anchor.Center )
+        {
+        }
+
+        //----------------------------------------------------------------------
+        public FixedWidget( Screen _screen, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
+        : this( _screen, null, _box, _anchor, _contentAnchor )
+        {
+
+        }
+
+        public FixedWidget( Screen _screen, Box _box, BoxAnchor _anchor )
+        : this( _screen, null, _box, _anchor, Anchor.Center )
+        {
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return ( Child != null ) ? Child.GetFirstFocusableDescendant( _direction ) : null;
+        }
+
+        public override bool CanFocus { get { return false; } }
+
+        //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {
+            if( mChild != null )
+            {
+                ContentWidth    = mChild.ContentWidth;
+                ContentHeight   = mChild.ContentHeight;
+            }
+            else
+            {
+                ContentWidth = 0;
+                ContentHeight = 0;
+            }
         }
 
+        //----------------------------------------------------------------------
         public override void DoLayout( Rectangle? _rect )
         {
             if( _rect.HasValue )
@@ -72,7 +152,7 @@ namespace NuclearWinter.UI
             Position = ChildRectangle.Location;
             Size = new Point( ChildRectangle.Width, ChildRectangle.Height );
 
-            switch( mAnchor )
+            switch( mContentAnchor )
             {
                 case Anchor.Start:
                     Child.DoLayout( new Rectangle( Position.X, Position.Y, Child.ContentWidth, ChildRectangle.Height ) );
@@ -86,29 +166,126 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            if( Child == null ) return null;
-            
-            return Child.HitTest( _point );
+            if( Child != null )
+            {
+                return Child.HitTest( _point );
+            }
+            else
+            {
+                return base.HitTest( _point );
+            }
         }
 
+        public override void OnMouseDown( Point _hitPoint )
+        {
+            if( Child != null )
+            {
+                Child.OnMouseDown( _hitPoint );
+            }
+            else
+            {
+                base.OnMouseDown( _hitPoint );
+            }
+        }
+
+        public override void OnMouseUp( Point _hitPoint )
+        {
+            if( Child != null )
+            {
+                Child.OnMouseUp( _hitPoint );
+            }
+            else
+            {
+                base.OnMouseUp( _hitPoint );
+            }
+        }
+
+        public override void OnMouseEnter( Point _hitPoint )
+        {
+            if( Child != null )
+            {
+                Child.OnMouseEnter( _hitPoint );
+            }
+            else
+            {
+                base.OnMouseEnter( _hitPoint );
+            }
+        }
+
+        public override void OnMouseOut( Point _hitPoint )
+        {
+            if( Child != null )
+            {
+                Child.OnMouseOut( _hitPoint );
+            }
+            else
+            {
+                base.OnMouseOut( _hitPoint );
+            }
+        }
+
+        public override void OnMouseMove( Point _hitPoint )
+        {
+            if( Child != null )
+            {
+                Child.OnMouseMove( _hitPoint );
+            }
+            else
+            {
+                base.OnMouseMove( _hitPoint );
+            }
+        }
+
+        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        {
+            if( Child != null )
+            {
+                return Child.OnPadButton( _button, _bIsDown );
+            }
+            else
+            {
+                return base.OnPadButton(_button, _bIsDown);
+            }
+        }
+
+        public override bool Update( float _fElapsedTime )
+        {
+            if( Child != null )
+            {
+                return Child.Update( _fElapsedTime );
+            }
+            else
+            {
+                return base.Update( _fElapsedTime );
+            }
+        }
+
+        //----------------------------------------------------------------------
         public override void Draw()
         {
-            Child.Draw();
+            if( Child != null )
+            {
+                Child.Draw();
+            }
         }
     }
 
     //--------------------------------------------------------------------------
     public class FixedGroup: Widget
     {
+        //----------------------------------------------------------------------
         List<FixedWidget>           mlChildren;
 
+        //----------------------------------------------------------------------
         public void Clear()
         {
             mlChildren.RemoveAll( delegate(FixedWidget _widget) { _widget.Parent = null; return true; } );
         }
 
+        //----------------------------------------------------------------------
         public void AddChild( FixedWidget _fixedWidget )
         {
             Debug.Assert( _fixedWidget.Parent == null );
@@ -117,6 +294,7 @@ namespace NuclearWinter.UI
             mlChildren.Add( _fixedWidget );
         }
 
+        //----------------------------------------------------------------------
         public void RemoveChild( FixedWidget _fixedWidget )
         {
             Debug.Assert( _fixedWidget.Parent == this );
@@ -125,6 +303,7 @@ namespace NuclearWinter.UI
             mlChildren.Remove( _fixedWidget );
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
             FixedWidget firstChild = null;
@@ -184,6 +363,7 @@ namespace NuclearWinter.UI
             return focusableDescendant;
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
             FixedWidget nearestSibling = null;
@@ -269,9 +449,82 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void DoLayout( Rectangle? _rect )
         {
+            Debug.Assert( _rect != null );
+
             foreach( FixedWidget fixedWidget in mlChildren )
             {
-                fixedWidget.DoLayout( fixedWidget.ChildRectangle );
+
+                // FIXME: Handle all cases and fix existing ones
+                switch( fixedWidget.ChildBoxAnchor )
+                {
+                    case BoxAnchor.None:
+                        fixedWidget.DoLayout( null );
+                        break;
+                    case BoxAnchor.Right: {
+                        int iX = _rect.Value.Right - fixedWidget.ContentWidth - fixedWidget.ChildBox.Right;
+                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
+                        fixedWidget.DoLayout( new Rectangle(
+                            iX,
+                            iY,
+                            _rect.Value.Right - iX,
+                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
+                            )
+                        );
+                        break;
+                    }
+                    case BoxAnchor.BottomRight: {
+                        int iX = _rect.Value.Right - fixedWidget.ContentWidth;
+                        int iY = _rect.Value.Bottom - fixedWidget.ContentHeight - fixedWidget.ChildBox.Bottom;
+                        fixedWidget.DoLayout( new Rectangle(
+                            iX,
+                            iY,
+                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
+                            _rect.Value.Bottom - iY
+                            )
+                        );
+                        break;
+                    }
+                    case BoxAnchor.BottomLeft: {
+                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
+                        int iY = _rect.Value.Bottom - fixedWidget.ContentHeight - fixedWidget.ChildBox.Bottom;
+                        fixedWidget.DoLayout( new Rectangle(
+                            iX,
+                            iY,
+                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
+                            _rect.Value.Bottom - iY
+                            )
+                        );
+                        break;
+                    }
+                    case BoxAnchor.Vertical:
+                    case BoxAnchor.Vertical | BoxAnchor.Left: {
+                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
+                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
+
+                        fixedWidget.DoLayout( new Rectangle(
+                            iX,
+                            iY,
+                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
+                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
+                            )
+                        );
+                        break;
+                        break;
+                    }
+                    case BoxAnchor.Full: {
+                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
+                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
+
+                        fixedWidget.DoLayout( new Rectangle(
+                            iX,
+                            iY,
+                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
+                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
+                            )
+                        );
+                        break;
+                    }
+                }
             }
             
             HitBox = Resolution.InternalMode.Rectangle;

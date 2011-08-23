@@ -7,11 +7,11 @@ using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    public class GridGroupTile: WidgetProxy
+    public class GridGroupTile: FixedWidget
     {
         //----------------------------------------------------------------------
-        public GridGroupTile( Screen _screen, Widget _child, int _iColumn, int _iRow )
-        : base( _screen, _child )
+        public GridGroupTile( Screen _screen, int _iColumn, int _iRow )
+        : base( _screen, Rectangle.Empty )
         {
             Column  = _iColumn;
             Row     = _iRow;
@@ -47,7 +47,7 @@ namespace NuclearWinter.UI
             {
                 for( int iColumn = 0; iColumn < _iCols; iColumn++ )
                 {
-                    GridGroupTile tile = new GridGroupTile( Screen, null, iColumn, iRow );
+                    GridGroupTile tile = new GridGroupTile( Screen, iColumn, iRow );
                     tile.Parent = this;
                     maTiles[ iColumn, iRow ] = tile;
                 }

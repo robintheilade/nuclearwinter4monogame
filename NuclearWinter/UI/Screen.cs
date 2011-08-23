@@ -22,8 +22,9 @@ namespace NuclearWinter.UI
 
         public int          Width               { get; private set; }
         public int          Height              { get; private set; }
+        public Rectangle    Bounds              { get { return new Rectangle( 0, 0, Width, Height ); } }
 
-        public Group        Root                { get; private set; }
+        public FixedGroup   Root                { get; private set; }
 
         List<Widget>        mlUpdateList;
 
@@ -40,10 +41,18 @@ namespace NuclearWinter.UI
             Width   = _iWidth;
             Height  = _iHeight;
 
-            Root    = new RootGroup( this );
+
+            Root    = new FixedGroup( this );
             mlUpdateList = new List<Widget>();
         }
-        
+
+        //----------------------------------------------------------------------
+        public void Resize( int _iWidth, int _iHeight )
+        {
+            Width = _iWidth;
+            Height = _iHeight;
+        }
+
         //----------------------------------------------------------------------
         public void AddWidgetToUpdateList( Widget _widget )
         {
@@ -56,7 +65,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            Root.DoLayout( null );
+            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
 
             List<Widget> lUpdateRemovedWidgets = new List<Widget>();
             foreach( Widget widget in mlUpdateList )

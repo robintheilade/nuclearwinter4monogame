@@ -21,7 +21,7 @@ namespace NuclearWinter.UI
         // Popup
         Screen mPopupScreen;
         public Screen           PopupScreen             { get { return mPopupScreen; } }
-        public WidgetProxy      PopupScreenPaneAnchor   { get; private set; }
+        public FixedWidget      PopupScreenPaneAnchor   { get; private set; }
         Pane                    mActivePopupPane;
         public MessagePopupPane MessagePopupPane        { get; private set; }
 
@@ -41,9 +41,9 @@ namespace NuclearWinter.UI
 
             NuclearWinter.UI.Image fade = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
             fade.Color = Color.Black * 0.3f;
-            PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, new Rectangle( 0, 0, PopupScreen.Width, PopupScreen.Height ) ) );
+            PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, new Box(0), BoxAnchor.Full ) );
 
-            PopupScreenPaneAnchor   = new NuclearWinter.UI.WidgetProxy( PopupScreen, null );
+            PopupScreenPaneAnchor   = new NuclearWinter.UI.FixedWidget( PopupScreen, new Box(0), BoxAnchor.Full );
             PopupScreen.Root.AddChild( PopupScreenPaneAnchor );
 
             //------------------------------------------------------------------

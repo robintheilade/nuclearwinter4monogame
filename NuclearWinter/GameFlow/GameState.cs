@@ -20,7 +20,10 @@ namespace NuclearWinter.GameFlow
 
         //----------------------------------------------------------------------
         // Start the GameState, called when it becomes the current one
-        public abstract void Start();
+        public virtual void Start()
+        {
+            Game.ResetElapsedTime();
+        }
 
         //----------------------------------------------------------------------
         // Stop the GameState, called when switching to another one

@@ -41,6 +41,24 @@ namespace NuclearWinter.UI
         }
     }
 
+    [Flags]
+    public enum BoxAnchor
+    {
+        None = 0x1 << 0,
+        Left = 0x1 << 1,
+        Top = 0x1 << 2,
+        Right = 0x1 << 3,
+        Bottom = 0x1 << 4,
+
+        TopLeft = Left | Top,
+
+        Full = Left | Top | Right | Bottom,
+        Vertical = Top | Bottom,
+        Horizontal = Left | Right,
+        BottomLeft = Bottom | Left,
+        BottomRight = Bottom | Right,
+    }
+
     public abstract class Widget
     {
         //----------------------------------------------------------------------

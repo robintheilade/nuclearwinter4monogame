@@ -132,7 +132,6 @@
     <Compile Include="UI\SpinningWheel.cs" />
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\Widget.cs" />
-    <Compile Include="UI\WidgetProxy.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

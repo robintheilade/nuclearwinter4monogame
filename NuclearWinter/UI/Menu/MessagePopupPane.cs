@@ -16,7 +16,7 @@ namespace NuclearWinter.UI
         public NuclearWinter.UI.Label         MessageLabel    { get; private set; }
         public NuclearWinter.UI.Button        CloseButton     { get; private set; }
 
-        NuclearWinter.UI.WidgetProxy          mSpinningWheelAnchor;
+        NuclearWinter.UI.FixedWidget          mSpinningWheelAnchor;
         NuclearWinter.UI.SpinningWheel        mSpinningWheel;
 
         public bool ShowSpinningWheel {
@@ -50,8 +50,8 @@ namespace NuclearWinter.UI
 
             {
                 mSpinningWheel = new NuclearWinter.UI.SpinningWheel( FixedGroup.Screen, Manager.Content.Load<Texture2D>( "Sprites/Menu/SpinningWheel" ) );
-                mSpinningWheelAnchor = new NuclearWinter.UI.WidgetProxy( FixedGroup.Screen, null );
-                FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( mSpinningWheelAnchor, new Rectangle( paneRect.Center.X - mSpinningWheel.ContentWidth / 2, paneRect.Center.Y - mSpinningWheel.ContentHeight / 2, mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight ) ) );
+                mSpinningWheelAnchor = new NuclearWinter.UI.FixedWidget( FixedGroup.Screen, new Rectangle( paneRect.Center.X - mSpinningWheel.ContentWidth / 2, paneRect.Center.Y - mSpinningWheel.ContentHeight / 2, mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight ) );
+                FixedGroup.AddChild( mSpinningWheelAnchor );
 
                 // Hostname label
                 MessageLabel = new NuclearWinter.UI.Label( FixedGroup.Screen, "", NuclearWinter.UI.Anchor.Start );
