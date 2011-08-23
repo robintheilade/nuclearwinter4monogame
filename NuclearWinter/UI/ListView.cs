@@ -346,7 +346,20 @@ namespace NuclearWinter.UI
                         case ListViewColumn.ColumnType.Image:
                             {
                                 Texture2D image = row.Cells[i].Image;
+
                                 Vector2 vImagePos = new Vector2( Position.X + iColX + 10 + col.Width / 2f - image.Width / 2f, Position.Y + 10 + iRowY + RowHeight / 2 - image.Height / 2f );
+                                switch( col.Anchor )
+                                {
+                                    case Anchor.Start:
+                                        vImagePos.X += 10;
+                                        break;
+                                    case Anchor.Center:
+                                        vImagePos.X += col.Width / 2f - image.Width / 2f;
+                                        break;
+                                    case Anchor.End:
+                                        vImagePos.X += col.Width - image.Width - 10;
+                                        break;
+                                }
                                 Screen.Game.SpriteBatch.Draw( image, vImagePos, Color.White );
                             }
                             break;
