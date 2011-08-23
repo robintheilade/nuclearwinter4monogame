@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NuclearWinter.Animation;
+using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
@@ -89,6 +90,7 @@ namespace NuclearWinter.UI
 
         public int                  SelectedRowIndex;
         public Action<ListView>     SelectHandler;
+        public Action<ListView>     ValidateHandler;
 
         int                         miFocusedRowIndex;
         bool                        mbIsHovered;
@@ -97,6 +99,18 @@ namespace NuclearWinter.UI
         public Color                TextColor           = Color.White;
 
         public override bool CanFocus { get { return true; } }
+
+        //----------------------------------------------------------------------
+        public ListView( Screen _screen )
+        : base( _screen )
+        {
+            Columns = new List<ListViewColumn>();
+            Rows    = new List<ListViewRow>();
+            SelectedRowIndex = -1;
+            miFocusedRowIndex = -1;
+
+            UpdateContentSize();
+        }
 
         //----------------------------------------------------------------------
         public void AddColumn( string _strText, ListViewColumn.ColumnType _type, int _iWidth, Anchor _anchor )
@@ -110,15 +124,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public ListView( Screen _screen )
-        : base( _screen )
+        public void Clear()
         {
-            Columns = new List<ListViewColumn>();
-            Rows    = new List<ListViewRow>();
+            Rows.Clear();
             SelectedRowIndex = -1;
             miFocusedRowIndex = -1;
-
-            UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -192,6 +202,10 @@ namespace NuclearWinter.UI
                 SelectedRowIndex = miFocusedRowIndex;
                 if( SelectHandler != null ) SelectHandler( this );
             }
+            else
+            {
+                if( ValidateHandler != null ) ValidateHandler( this );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -219,6 +233,17 @@ namespace NuclearWinter.UI
             else
             {
                 base.OnPadMove( _direction );
+            }
+        }
+
+        //----------------------------------------------------------------------
+        public override void OnKeyPress( Keys _key )
+        {
+            switch( _key )
+            {
+                case Keys.Enter:
+                    if( SelectedRowIndex != -1 && ValidateHandler != null ) ValidateHandler( this );
+                    break;
             }
         }
 
