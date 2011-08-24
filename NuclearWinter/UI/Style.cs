@@ -58,5 +58,8 @@ namespace NuclearWinter.UI
         public Texture2D        NotebookActiveTab;
         public int              NotebookTabCornerSize = 10;
         public Texture2D        NotebookActiveTabFocused;
+
+        public int              PopupFrameCornerSize;
+        public Texture2D        PopupFrame;
     }
 }
