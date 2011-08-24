@@ -41,9 +41,9 @@ namespace NuclearWinter.UI
 
             NuclearWinter.UI.Image fade = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
             fade.Color = Color.Black * 0.3f;
-            PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, new Box(0), BoxAnchor.Full ) );
+            PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, AnchoredRect.CreateFull(0) ) );
 
-            PopupScreenPaneAnchor   = new NuclearWinter.UI.FixedWidget( PopupScreen, new Box(0), BoxAnchor.Full );
+            PopupScreenPaneAnchor   = new NuclearWinter.UI.FixedWidget( PopupScreen, AnchoredRect.CreateFull(0) );
             PopupScreen.Root.AddChild( PopupScreenPaneAnchor );
 
             //------------------------------------------------------------------
@@ -71,17 +71,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            if( Game.IsActive )
-            {
-                if( mActivePopupPane != null )
-                {
-                    PopupScreen.HandleInput();
-                }
-                else
-                {
-                    MenuScreen.HandleInput();
-                }
-            }
+            MenuScreen.IsActive     = Game.IsActive && mActivePopupPane == null;
+            PopupScreen.IsActive    = Game.IsActive && mActivePopupPane != null;
 
             MenuScreen.Update( _fElapsedTime );
             if( mActivePopupPane != null )

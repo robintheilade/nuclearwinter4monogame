@@ -98,13 +98,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
 
@@ -216,9 +213,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.EditBoxFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
-            if( mbIsHovered )
+            if( Screen.IsActive && mbIsHovered )
             {
                 Screen.DrawBox( Screen.Style.ButtonFramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
@@ -227,7 +224,7 @@ namespace NuclearWinter.UI
 
             const float fBlinkInterval = 0.3f;
 
-            if( HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
+            if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX, Position.Y + Padding.Top, 3, Size.Y - Padding.Vertical ), Color.White );
             }

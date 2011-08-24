@@ -18,6 +18,8 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public NuclearGame  Game                { get; private set; }
+        public bool         IsActive;
+
         public Style        Style               { get; private set; }
 
         public int          Width               { get; private set; }
@@ -65,6 +67,12 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
+            if( IsActive )
+            {
+                HandleInput();
+            }
+
+
             Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
 
             List<Widget> lUpdateRemovedWidgets = new List<Widget>();
@@ -83,7 +91,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void HandleInput()
+        void HandleInput()
         {
             foreach( Buttons button in Enum.GetValues(typeof(Buttons)) )
             {
@@ -284,7 +292,7 @@ namespace NuclearWinter.UI
         {
             Root.Draw();
 
-            if( FocusedWidget != null )
+            if( FocusedWidget != null && IsActive )
             {
                 FocusedWidget.DrawFocused();
             }

@@ -151,15 +151,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-                HitBox = _rect.Value;
-            }
-
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
+            HitBox = _rect;
+        
             int iColX = 0;
             foreach( ListViewColumn col in Columns )
             {

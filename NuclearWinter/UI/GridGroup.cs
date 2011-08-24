@@ -11,7 +11,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public GridGroupTile( Screen _screen, int _iColumn, int _iRow )
-        : base( _screen, Rectangle.Empty )
+        : base( _screen, AnchoredRect.CreateFull(0) )
         {
             Column  = _iColumn;
             Row     = _iRow;
@@ -192,13 +192,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position        = _rect.Value.Location;
-                Size            = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position        = _rect.Location;
+            Size            = new Point( _rect.Width, _rect.Height );
 
             Debug.Assert( Size.X != 0 && Size.Y != 0 );
 

@@ -46,14 +46,14 @@ namespace NuclearWinter.UI
         public Anchor   Anchor
         {
             get { return mAnchor; }
-            set { mAnchor = value; DoLayout( null ); }
+            set { mAnchor = value; UpdateContentSize(); }
         }
 
         bool    mbWrapText;
         public bool WrapText
         {
             get { return mbWrapText; }
-            set { mbWrapText = value; UpdateContentSize(); DoLayout( null ); }
+            set { mbWrapText = value; UpdateContentSize(); }
         }
 
         public override bool CanFocus { get { return false; } }
@@ -128,15 +128,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-
-                DoWrapText();
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
+            DoWrapText();
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 

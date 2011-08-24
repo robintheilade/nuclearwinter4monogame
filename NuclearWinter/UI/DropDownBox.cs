@@ -69,13 +69,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
@@ -292,14 +289,17 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered && ! mbIsOpen && mPressedAnim.IsOver )
             {
-                Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                if( Screen.IsActive )
+                {
+                    Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                }
             }
             else
             {
                 Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
             }
 
-            if( HasFocus && ! mbIsOpen )
+            if( Screen.IsActive && HasFocus && ! mbIsOpen )
             {
                 Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
@@ -342,7 +342,7 @@ namespace NuclearWinter.UI
                 int iMaxIndex = Math.Min( mlValues.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
-                    if( miHoveredValueIndex == iIndex )
+                    if( Screen.IsActive && miHoveredValueIndex == iIndex )
                     {
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top, Size.X - Padding.Horizontal, siLineHeight ), 10, Color.White );
                     }

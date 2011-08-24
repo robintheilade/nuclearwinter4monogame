@@ -22,12 +22,17 @@ namespace NuclearWinter.UI
         public int              DefaultButtonHeight = 80;
         public Color            ButtonTextColor;
         public Texture2D        ButtonFrame;
+
         public Texture2D        ButtonFrameHover;
+
         public Texture2D        ButtonFrameDown;
         public Texture2D        ButtonFramePressed;
 
         public Texture2D        ButtonFrameFocus;
         public Texture2D        ButtonFrameDownFocus;
+
+        public int              ButtonVerticalPadding = 10;
+        public int              ButtonHorizontalPadding = 20;
 
         public Texture2D        ButtonFrameLeft;
         public Texture2D        ButtonFrameLeftDown;
@@ -35,6 +40,8 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameMiddleDown;
         public Texture2D        ButtonFrameRight;
         public Texture2D        ButtonFrameRightDown;
+
+        public Texture2D        EditBoxFrame;
 
         public Texture2D        DropDownArrow;
 
@@ -54,10 +61,11 @@ namespace NuclearWinter.UI
         public Texture2D        Panel;
         public int              PanelCornerSize = 10;
 
+        public int              NotebookTabCornerSize = 10;
         public Texture2D        NotebookTab;
         public Texture2D        NotebookActiveTab;
-        public int              NotebookTabCornerSize = 10;
-        public Texture2D        NotebookActiveTabFocused;
+        public Texture2D        NotebookTabFocus;
+        public Texture2D        NotebookActiveTabFocus;
 
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;

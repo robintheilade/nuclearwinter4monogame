@@ -33,13 +33,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
         }

@@ -24,6 +24,8 @@ namespace NuclearWinter.UI
             public Texture2D        FrameHover;
             public Texture2D        FramePressed;
             public Texture2D        FrameFocused;
+            public int              VerticalPadding;
+            public int              HorizontalPadding;
 
             //------------------------------------------------------------------
             public ButtonStyle(
@@ -32,7 +34,9 @@ namespace NuclearWinter.UI
                 Texture2D   _buttonFrameDown,
                 Texture2D   _buttonFrameHover,
                 Texture2D   _buttonFramePressed,
-                Texture2D   _buttonFrameFocused
+                Texture2D   _buttonFrameFocused,
+                int         _iVerticalPadding,
+                int         _iHorizontalPadding
             )
             {
                 CornerSize      = _iCornerSize;
@@ -41,6 +45,9 @@ namespace NuclearWinter.UI
                 FrameHover      = _buttonFrameHover;
                 FramePressed    = _buttonFramePressed;
                 FrameFocused    = _buttonFrameFocused;
+
+                VerticalPadding     = _iVerticalPadding;
+                HorizontalPadding   = _iHorizontalPadding;
             }
         }
 
@@ -64,7 +71,7 @@ namespace NuclearWinter.UI
             set
             {
                 mLabel.Text = value;
-                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 20, 10, 20 ) : new Box( 10, 20, 10, 0 );
+                mLabel.Padding = mLabel.Text != "" ? new Box( Style.VerticalPadding, Style.HorizontalPadding ) : new Box( Style.VerticalPadding, Style.HorizontalPadding, Style.VerticalPadding, 0 );
                 UpdateContentSize();
             }
         }
@@ -111,11 +118,13 @@ namespace NuclearWinter.UI
         public Button( Screen _screen, ButtonStyle _style, string _strText, Texture2D _iconTex, Anchor _anchor )
         : base( _screen )
         {
+            Style = _style;
+
             mLabel          = new Label( _screen );
 
             mIcon           = new Image( _screen );
             mIcon.Texture   = _iconTex;
-            mIcon.Padding   = new Box( 10, 0, 10, 20 );
+            mIcon.Padding   = new Box( Style.VerticalPadding, 0, Style.VerticalPadding, Style.HorizontalPadding );
 
             Text            = _strText;
 
@@ -125,8 +134,6 @@ namespace NuclearWinter.UI
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
             TextColor           = Screen.Style.ButtonTextColor;
-
-            Style = _style;
 
             UpdateContentSize();
         }
@@ -139,7 +146,9 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonFrameDown,
                 _screen.Style.ButtonFrameHover,
                 _screen.Style.ButtonFramePressed,
-                _screen.Style.ButtonFrameFocus
+                _screen.Style.ButtonFrameFocus,
+                _screen.Style.ButtonVerticalPadding,
+                _screen.Style.ButtonHorizontalPadding
             ), _strText, _iconTex, _anchor )
         {
         }
@@ -178,15 +187,11 @@ namespace NuclearWinter.UI
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
         }
 
-
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
@@ -324,15 +329,18 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
-                Screen.DrawBox( Style.FrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                if( Screen.IsActive )
+                {
+                    Screen.DrawBox( Style.FrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                }
             }
             else
             if( mPressedAnim.CurrentValue > 0f )
             {
-                Screen.DrawBox( Style.FramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                Screen.DrawBox( Style.FramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
             }
 
-            if( HasFocus && ! mbIsPressed )
+            if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
                 Screen.DrawBox( Style.FrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
             }

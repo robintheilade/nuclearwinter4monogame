@@ -47,27 +47,28 @@ namespace NuclearWinter.UI
                 Width + iPadding * 2, Height + iPadding * 2 );
 
             NuclearWinter.UI.Panel panel = new NuclearWinter.UI.Panel( FixedGroup.Screen, FixedGroup.Screen.Style.PopupFrame, FixedGroup.Screen.Style.PopupFrameCornerSize );
-            FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( panel, paneRect ) );
+            FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( panel, AnchoredRect.CreateCentered( paneRect.Width, paneRect.Height ) ) );
+
+            FixedGroup page = new FixedGroup( FixedGroup.Screen );
+            FixedGroup.AddChild( new FixedWidget( page, AnchoredRect.CreateCentered( paneRect.Width, paneRect.Height ) ) );
 
             TitleLabel = new NuclearWinter.UI.Label( Manager.MenuScreen, "", NuclearWinter.UI.Anchor.Start );
             TitleLabel.Font = Manager.MenuScreen.Style.BigFont;
-
-            FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( TitleLabel, new Rectangle( paneRect.Left + iPadding, paneRect.Top + iPadding, paneRect.Width - iPadding * 2, 80 ) ) );
+            page.AddChild( new FixedWidget( TitleLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding, iPadding, 40 ) ) );
 
             {
                 mSpinningWheel = new NuclearWinter.UI.SpinningWheel( FixedGroup.Screen, Manager.Content.Load<Texture2D>( "Sprites/Menu/SpinningWheel" ) );
-                mSpinningWheelAnchor = new NuclearWinter.UI.FixedWidget( FixedGroup.Screen, new Rectangle( paneRect.Center.X - mSpinningWheel.ContentWidth / 2, paneRect.Center.Y - mSpinningWheel.ContentHeight / 2, mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight ) );
-                FixedGroup.AddChild( mSpinningWheelAnchor );
+                mSpinningWheelAnchor = new NuclearWinter.UI.FixedWidget( FixedGroup.Screen, AnchoredRect.CreateCentered( mSpinningWheel.ContentWidth , mSpinningWheel.ContentHeight ) );
+                page.AddChild( mSpinningWheelAnchor );
 
                 // Message label
                 MessageLabel = new NuclearWinter.UI.Label( FixedGroup.Screen, "", NuclearWinter.UI.Anchor.Start );
                 MessageLabel.WrapText = true;
-
-                FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( MessageLabel, new Rectangle( paneRect.Left + iPadding, paneRect.Top + iPadding + 80, paneRect.Width - iPadding * 2, 100 ) ) );
+                page.AddChild( new NuclearWinter.UI.FixedWidget( MessageLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding + 80, iPadding, 100 ) ) );
 
                 // Actions
                 NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Direction.Left, false, 10 );
-                FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( actionsGroup, new Rectangle( paneRect.Left + iPadding, paneRect.Bottom - iPadding - FixedGroup.Screen.Style.DefaultButtonHeight, paneRect.Width - iPadding * 2, FixedGroup.Screen.Style.DefaultButtonHeight ) ) );
+                page.AddChild( new FixedWidget( actionsGroup, AnchoredRect.CreateBottomAnchored( iPadding, iPadding, iPadding, 60 ) ) );
 
                 // Close
                 // FIXME: i18n

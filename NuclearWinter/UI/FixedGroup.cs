@@ -35,87 +35,42 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public AnchoredRect             ChildBox;
         public Rectangle        ChildRectangle;
-
-        public Box              ChildBox;
-        public BoxAnchor        ChildBoxAnchor;
 
         Anchor                  mContentAnchor;
 
         //----------------------------------------------------------------------
-        FixedWidget( Screen _screen, Widget _child, Rectangle _rect, Anchor _contentAnchor )
+        FixedWidget( Screen _screen, Widget _child, AnchoredRect _box, Anchor _contentAnchor )
         : base( _screen )
         {
             Child           = _child;
-            
-            ChildRectangle  = _rect;
-
-            ChildBox        = new Box(0);
-            ChildBoxAnchor  = BoxAnchor.None;
-
-            mContentAnchor  = _contentAnchor;
-        }
-
-        //----------------------------------------------------------------------
-        public FixedWidget( Screen _screen, Rectangle _rect, Anchor _contentAnchor )
-        : this( _screen, null, _rect, _contentAnchor )
-        {
-
-        }
-
-        public FixedWidget( Screen _screen, Rectangle _rect )
-        : this( _screen, null, _rect, Anchor.Center )
-        {
-
-        }
-
-        //----------------------------------------------------------------------
-        public FixedWidget( Widget _child, Rectangle _rect, Anchor _contentAnchor )
-        : this( _child.Screen, _child, _rect, _contentAnchor )
-        {
-        }
-
-        public FixedWidget( Widget _child, Rectangle _rect )
-        : this( _child.Screen, _child, _rect, Anchor.Center )
-        {
-        }
-
-        //----------------------------------------------------------------------
-        FixedWidget( Screen _screen, Widget _child, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
-        : base( _screen )
-        {
-            Child           = _child;
-
-            ChildRectangle  = Rectangle.Empty;
-
             ChildBox        = _box;
-            ChildBoxAnchor  = _anchor;
-
             mContentAnchor  = _contentAnchor;
         }
 
-        //----------------------------------------------------------------------
-        public FixedWidget( Widget _child, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
-        : this( _child.Screen, _child, _box, _anchor, _contentAnchor )
+        public FixedWidget( Screen _screen, AnchoredRect _box, Anchor _contentAnchor )
+        : this( _screen, null, _box, _contentAnchor )
         {
 
         }
 
-        public FixedWidget( Widget _child, Box _box, BoxAnchor _anchor )
-        : this( _child.Screen, _child, _box, _anchor, Anchor.Center )
-        {
-        }
-
-        //----------------------------------------------------------------------
-        public FixedWidget( Screen _screen, Box _box, BoxAnchor _anchor, Anchor _contentAnchor )
-        : this( _screen, null, _box, _anchor, _contentAnchor )
+        public FixedWidget( Screen _screen, AnchoredRect _box )
+        : this( _screen, null, _box, Anchor.Center )
         {
 
         }
 
-        public FixedWidget( Screen _screen, Box _box, BoxAnchor _anchor )
-        : this( _screen, null, _box, _anchor, Anchor.Center )
+        public FixedWidget( Widget _widget, AnchoredRect _box, Anchor _contentAnchor )
+        : this( _widget.Screen, _widget, _box, _contentAnchor )
         {
+
+        }
+
+        public FixedWidget( Widget _widget, AnchoredRect _box )
+        : this( _widget.Screen, _widget, _box, Anchor.Center )
+        {
+
         }
 
         //----------------------------------------------------------------------
@@ -142,15 +97,17 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                ChildRectangle = _rect.Value;
-            }
+            ChildRectangle = _rect;
 
             Position = ChildRectangle.Location;
             Size = new Point( ChildRectangle.Width, ChildRectangle.Height );
+
+            if( mChild == null )
+            {
+                return;
+            }
 
             switch( mContentAnchor )
             {
@@ -447,84 +404,75 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        public override void DoLayout( Rectangle _rect )
         {
-            Debug.Assert( _rect != null );
-
             foreach( FixedWidget fixedWidget in mlChildren )
             {
+                Rectangle childRectangle;
 
-                // FIXME: Handle all cases and fix existing ones
-                switch( fixedWidget.ChildBoxAnchor )
+                // Horizontal
+                if( fixedWidget.ChildBox.Left.HasValue )
                 {
-                    case BoxAnchor.None:
-                        fixedWidget.DoLayout( null );
-                        break;
-                    case BoxAnchor.Right: {
-                        int iX = _rect.Value.Right - fixedWidget.ContentWidth - fixedWidget.ChildBox.Right;
-                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
-                        fixedWidget.DoLayout( new Rectangle(
-                            iX,
-                            iY,
-                            _rect.Value.Right - iX,
-                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
-                            )
-                        );
-                        break;
+                    childRectangle.X = _rect.Left + fixedWidget.ChildBox.Left.Value;
+                    if( fixedWidget.ChildBox.Right.HasValue )
+                    {
+                        // Horizontally anchored
+                        childRectangle.Width = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.X;
                     }
-                    case BoxAnchor.BottomRight: {
-                        int iX = _rect.Value.Right - fixedWidget.ContentWidth;
-                        int iY = _rect.Value.Bottom - fixedWidget.ContentHeight - fixedWidget.ChildBox.Bottom;
-                        fixedWidget.DoLayout( new Rectangle(
-                            iX,
-                            iY,
-                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
-                            _rect.Value.Bottom - iY
-                            )
-                        );
-                        break;
-                    }
-                    case BoxAnchor.BottomLeft: {
-                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
-                        int iY = _rect.Value.Bottom - fixedWidget.ContentHeight - fixedWidget.ChildBox.Bottom;
-                        fixedWidget.DoLayout( new Rectangle(
-                            iX,
-                            iY,
-                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
-                            _rect.Value.Bottom - iY
-                            )
-                        );
-                        break;
-                    }
-                    case BoxAnchor.Vertical:
-                    case BoxAnchor.Vertical | BoxAnchor.Left: {
-                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
-                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
-
-                        fixedWidget.DoLayout( new Rectangle(
-                            iX,
-                            iY,
-                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
-                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
-                            )
-                        );
-                        break;
-                        break;
-                    }
-                    case BoxAnchor.Full: {
-                        int iX = _rect.Value.Left + fixedWidget.ChildBox.Left;
-                        int iY = _rect.Value.Top + fixedWidget.ChildBox.Top;
-
-                        fixedWidget.DoLayout( new Rectangle(
-                            iX,
-                            iY,
-                            _rect.Value.Right - fixedWidget.ChildBox.Right - iX,
-                            _rect.Value.Bottom - fixedWidget.ChildBox.Bottom - iY
-                            )
-                        );
-                        break;
+                    else
+                    {
+                        // Left-anchored
+                        childRectangle.Width = fixedWidget.ChildBox.Width;
                     }
                 }
+                else
+                {
+                    childRectangle.Width = fixedWidget.ChildBox.Width;
+
+                    if( fixedWidget.ChildBox.Right.HasValue )
+                    {
+                        // Right-anchored
+                        childRectangle.X = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.Width;
+                    }
+                    else
+                    {
+                        // Centered
+                        childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
+                    }
+                }
+
+                // Vertical
+                if( fixedWidget.ChildBox.Top.HasValue )
+                {
+                    childRectangle.Y = _rect.Top + fixedWidget.ChildBox.Top.Value;
+                    if( fixedWidget.ChildBox.Bottom.HasValue )
+                    {
+                        // Horizontally anchored
+                        childRectangle.Height = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Y;
+                    }
+                    else
+                    {
+                        // Top-anchored
+                        childRectangle.Height = fixedWidget.ChildBox.Height;
+                    }
+                }
+                else
+                {
+                    childRectangle.Height = fixedWidget.ChildBox.Height;
+
+                    if( fixedWidget.ChildBox.Bottom.HasValue )
+                    {
+                        // Bottom-anchored
+                        childRectangle.Y = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Height;
+                    }
+                    else
+                    {
+                        // Centered
+                        childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
+                    }
+                }
+
+                fixedWidget.DoLayout( childRectangle );
             }
             
             HitBox = Resolution.InternalMode.Rectangle;
