@@ -33,8 +33,10 @@ namespace NuclearWinter.Input
         // on a different thread than our game
         private static object threadLock = new object();
 
+#if WINDOWS_PHONE
         // we use this to keep the last known value from the accelerometer callback
         private static Vector3 nextValue = new Vector3();
+#endif
 
         // whether or not the accelerometer is active
         private static bool isActive = false;
