@@ -16,6 +16,9 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             public int                      CornerSize;
 
+            public Color                    TextColor;
+            public Color                    TextDownColor;
+
             public Texture2D                ButtonFrameLeft;
             public Texture2D                ButtonFrameMiddle;
             public Texture2D                ButtonFrameRight;
@@ -24,12 +27,15 @@ namespace NuclearWinter.UI
             public Texture2D                ButtonFrameMiddleDown;
             public Texture2D                ButtonFrameRightDown;
 
-            public Texture2D                ButtonFrameFocused;
-            public Texture2D                ButtonFrameDownFocused;
+            public Texture2D                ButtonFrameFocus;
+            public Texture2D                ButtonFrameDownFocus;
 
             //------------------------------------------------------------------
             public RadioButtonSetStyle(
                 int         _iCornerSize,
+
+                Color       _textColor,
+                Color       _textDownColor,
 
                 Texture2D   _buttonFrameLeft,
                 Texture2D   _buttonFrameMiddle,
@@ -39,11 +45,15 @@ namespace NuclearWinter.UI
                 Texture2D   _buttonFrameMiddleDown,
                 Texture2D   _buttonFrameRightDown,
 
-                Texture2D   _buttonFrameFocused,
-                Texture2D   _buttonFrameDownFocused
+                Texture2D   _buttonFrameFocus,
+                Texture2D   _buttonFrameDownFocus
             )
             {
                 CornerSize              = _iCornerSize;
+
+                TextColor               = _textColor;
+                TextDownColor           = _textDownColor;
+
                 ButtonFrameLeft         = _buttonFrameLeft;
                 ButtonFrameMiddle       = _buttonFrameMiddle;
                 ButtonFrameRight        = _buttonFrameRight;
@@ -52,8 +62,8 @@ namespace NuclearWinter.UI
                 ButtonFrameMiddleDown   = _buttonFrameMiddleDown;
                 ButtonFrameRightDown    = _buttonFrameRightDown;
 
-                ButtonFrameFocused      = _buttonFrameFocused;
-                ButtonFrameDownFocused  = _buttonFrameDownFocused;
+                ButtonFrameFocus        = _buttonFrameFocus;
+                ButtonFrameDownFocus    = _buttonFrameDownFocus;
            }
         }
 
@@ -72,13 +82,17 @@ namespace NuclearWinter.UI
             set {
                 mStyle = value;
 
+                int i = 0;
                 foreach( Button button in mlButtons )
                 {
                     button.Parent = this;
+                    button.TextColor = ( SelectedButtonIndex == i ) ? mStyle.TextDownColor : mStyle.TextColor;
                     button.Padding = new Box( 0, 0, 0, 0 );
 
                     button.Style.FrameDown  = Style.ButtonFrameMiddleDown;
                     button.ClickHandler     = ButtonClicked;
+
+                    i++;
                 }
 
                 Button firstButton = mlButtons.First();
@@ -109,7 +123,8 @@ namespace NuclearWinter.UI
 
                     if( iButton == miSelectedButtonIndex )
                     {
-                        button.Style.FrameFocused   = Style.ButtonFrameDownFocused;
+                        button.TextColor            = mStyle.TextDownColor;
+                        button.Style.FrameFocus     = Style.ButtonFrameDownFocus;
                         if( iButton == 0 )
                         {
                             button.Style.Frame          = Style.ButtonFrameLeftDown;
@@ -126,7 +141,8 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        button.Style.FrameFocused   = Style.ButtonFrameFocused;
+                        button.TextColor            = mStyle.TextColor;
+                        button.Style.FrameFocus     = Style.ButtonFrameFocus;
 
                         if( iButton == 0 )
                         {
@@ -190,13 +206,16 @@ namespace NuclearWinter.UI
 
             Style = new RadioButtonSetStyle(
                 Screen.Style.ButtonCornerSize,
+                
+                Color.White * 0.6f,
+                Color.White,
                 Screen.Style.ButtonFrameLeft,
                 Screen.Style.ButtonFrameMiddle,
                 Screen.Style.ButtonFrameRight,
 
-                Screen.Style.ButtonFrameLeft,
-                Screen.Style.ButtonFrameMiddle,
-                Screen.Style.ButtonFrameRight,
+                Screen.Style.ButtonFrameLeftDown,
+                Screen.Style.ButtonFrameMiddleDown,
+                Screen.Style.ButtonFrameRightDown,
 
                 Screen.Style.ButtonFrameFocus,
                 Screen.Style.ButtonFrameDownFocus

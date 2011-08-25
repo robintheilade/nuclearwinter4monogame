@@ -23,7 +23,7 @@ namespace NuclearWinter.UI
             public Texture2D        FrameDown;
             public Texture2D        FrameHover;
             public Texture2D        FramePressed;
-            public Texture2D        FrameFocused;
+            public Texture2D        FrameFocus;
             public int              VerticalPadding;
             public int              HorizontalPadding;
 
@@ -44,7 +44,7 @@ namespace NuclearWinter.UI
                 FrameDown       = _buttonFrameDown;
                 FrameHover      = _buttonFrameHover;
                 FramePressed    = _buttonFramePressed;
-                FrameFocused    = _buttonFrameFocused;
+                FrameFocus    = _buttonFrameFocused;
 
                 VerticalPadding     = _iVerticalPadding;
                 HorizontalPadding   = _iHorizontalPadding;
@@ -342,7 +342,7 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Style.FrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                Screen.DrawBox( Style.FrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
             }
 
             mLabel.Draw();

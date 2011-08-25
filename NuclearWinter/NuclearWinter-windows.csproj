@@ -112,6 +112,7 @@
     <Compile Include="UI\DropDownBox.cs" />
     <Compile Include="UI\EditBox.cs" />
     <Compile Include="UI\FixedGroup.cs" />
+    <Compile Include="UI\FixedWidget.cs" />
     <Compile Include="UI\GridGroup.cs" />
     <Compile Include="UI\Group.cs" />
     <Compile Include="UI\Image.cs" />

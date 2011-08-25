@@ -83,6 +83,16 @@ namespace NuclearWinter.UI
             return new AnchoredRect( null, null, _iRight, _iBottom, _iWidth, _iHeight );
         }
 
+        public static AnchoredRect CreateTopRightAnchored( int _iRight, int _iTop, int _iWidth, int _iHeight )
+        {
+            return new AnchoredRect( null, _iTop, _iRight, null, _iWidth, _iHeight );
+        }
+
+        public static AnchoredRect CreateTopLeftAnchored( int _iLeft, int _iTop, int _iWidth, int _iHeight )
+        {
+            return new AnchoredRect( _iLeft, _iTop, null, null, _iWidth, _iHeight );
+        }
+
         public static AnchoredRect CreateCentered( int _iWidth, int _iHeight )
         {
             return new AnchoredRect( null, null, null, null, _iWidth, _iHeight );

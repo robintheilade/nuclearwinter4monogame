@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
@@ -94,6 +95,8 @@ namespace NuclearWinter.UI
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
 
+            HitBox = _rect;
+
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
             if( mIcon.Texture != null )
@@ -107,6 +110,47 @@ namespace NuclearWinter.UI
                     mLabel.ContentWidth, mLabel.ContentHeight
                 )
             );
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return PageGroup.HitTest( _point );
+        }
+
+        public override void OnMouseDown( Point _hitPoint )
+        {
+            PageGroup.OnMouseDown( _hitPoint );
+        }
+
+        public override void OnMouseUp( Point _hitPoint )
+        {
+            PageGroup.OnMouseUp( _hitPoint );
+        }
+
+        public override void OnMouseEnter( Point _hitPoint )
+        {
+            PageGroup.OnMouseEnter( _hitPoint );
+        }
+
+        public override void OnMouseOut( Point _hitPoint )
+        {
+            PageGroup.OnMouseOut( _hitPoint );
+        }
+
+        public override void OnMouseMove( Point _hitPoint )
+        {
+            PageGroup.OnMouseMove( _hitPoint );
+        }
+
+        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        {
+            return PageGroup.OnPadButton( _button, _bIsDown );
+        }
+
+        public override bool Update( float _fElapsedTime )
+        {
+            return PageGroup.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -221,104 +265,45 @@ namespace NuclearWinter.UI
             activeTab.PageGroup.DoLayout( contentRect );
         }
 
-        /*
         //----------------------------------------------------------------------
-        bool IsInTabs( Point _hitPoint )
+        public override Widget HitTest( Point _point )
         {
-            return _hitPoint.Y < Position.Y + TabHeight && _hitPoint.X >= Position.X + 20 && _hitPoint.X < Position.X  + 20 + mTabs.ContentWidth;
-        }
-        */
-
-        public override void OnMouseEnter( Point _hitPoint )
-        {
-            base.OnMouseEnter( _hitPoint );
-
-            /*
-            if( IsInTabs( _hitPoint ) )
-            {
-                mbIsMouseInTabs = true;
-                mTabs.OnMouseEnter( _hitPoint );
-            }
-            else
-            {
-                mbIsMouseInTabs = false;
-                // ActivePage.OnMouseEnter( _hitPoint );
-            }
-            */
+            return Tabs[ActiveTabIndex].HitTest( _point );
         }
 
-        public override void OnMouseOut( Point _hitPoint )
-        {
-            base.OnMouseOut( _hitPoint );
-            
-            /*
-            if( mbIsMouseInTabs )
-            {
-                mTabs.OnMouseOut( _hitPoint );
-            }
-            else
-            {
-                // ActivePage.OnMouseOut( _hitPoint );
-            }*/
-        }
-
-        public override void OnMouseMove( Point _hitPoint )
-        {
-            base.OnMouseMove( _hitPoint );
-
-            /*if( IsInTabs( _hitPoint ) || mbIsTabPressed )
-            {
-                if( ! mbIsMouseInTabs )
-                {
-                    // ActivePage.OnMouseOut( _hitPoint );
-                    mTabs.OnMouseEnter( _hitPoint );
-                }
-                else
-                {
-                    mTabs.OnMouseMove( _hitPoint );
-                }
-
-                mbIsMouseInTabs = true;
-            }
-            else
-            {
-                if( mbIsMouseInTabs )
-                {
-                    mTabs.OnMouseOut( _hitPoint );
-                    // ActivePage.OnMouseEnter( _hitPoint );
-                }
-                else
-                {
-                    // ActivePage.OnMouseMove( _hitPoint );
-                }
-
-                mbIsMouseInTabs = false;
-            }*/
-        }
-
-        //----------------------------------------------------------------------
         public override void OnMouseDown( Point _hitPoint )
         {
-            base.OnMouseDown( _hitPoint );
-
-            /*if( mbIsMouseInTabs )
-            {
-                mbIsTabPressed = true;
-                mTabs.OnMouseDown( _hitPoint );
-            }*/
+            Tabs[ActiveTabIndex].OnMouseDown( _hitPoint );
         }
 
         public override void OnMouseUp( Point _hitPoint )
         {
-            /*if( mbIsTabPressed )
-            {
-                mbIsTabPressed = false;
-                mTabs.OnMouseUp( _hitPoint );
-            }*/
+            Tabs[ActiveTabIndex].OnMouseUp( _hitPoint );
         }
 
-        public void TabClicked( RadioButtonSet _tabs )
+        public override void OnMouseEnter( Point _hitPoint )
         {
+            Tabs[ActiveTabIndex].OnMouseEnter( _hitPoint );
+        }
+
+        public override void OnMouseOut( Point _hitPoint )
+        {
+            Tabs[ActiveTabIndex].OnMouseOut( _hitPoint );
+        }
+
+        public override void OnMouseMove( Point _hitPoint )
+        {
+            Tabs[ActiveTabIndex].OnMouseMove( _hitPoint );
+        }
+
+        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        {
+            return Tabs[ActiveTabIndex].OnPadButton( _button, _bIsDown );
+        }
+
+        public override bool Update( float _fElapsedTime )
+        {
+            return Tabs[ActiveTabIndex].Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
