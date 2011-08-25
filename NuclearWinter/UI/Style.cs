@@ -49,6 +49,7 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameRightDown;
 
         public Texture2D        EditBoxFrame;
+        public int              EditBoxCornerSize = 30;
 
         public Texture2D        DropDownArrow;
 
