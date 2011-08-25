@@ -27,8 +27,12 @@ namespace NuclearWinter.UI
             public Texture2D                ButtonFrameMiddleDown;
             public Texture2D                ButtonFrameRightDown;
 
-            public Texture2D                ButtonFrameFocus;
-            public Texture2D                ButtonFrameDownFocus;
+            public Texture2D                ButtonFrameLeftFocus;
+            public Texture2D                ButtonFrameLeftDownFocus;
+            public Texture2D                ButtonFrameMiddleFocus;
+            public Texture2D                ButtonFrameMiddleDownFocus;
+            public Texture2D                ButtonFrameRightFocus;
+            public Texture2D                ButtonFrameRightDownFocus;
 
             //------------------------------------------------------------------
             public RadioButtonSetStyle(
@@ -45,8 +49,12 @@ namespace NuclearWinter.UI
                 Texture2D   _buttonFrameMiddleDown,
                 Texture2D   _buttonFrameRightDown,
 
-                Texture2D   _buttonFrameFocus,
-                Texture2D   _buttonFrameDownFocus
+                Texture2D   _buttonFrameLeftFocus,
+                Texture2D   _buttonFrameLeftDownFocus,
+                Texture2D   _buttonFrameMiddleFocus,
+                Texture2D   _buttonFrameMiddleDownFocus,
+                Texture2D   _buttonFrameRightFocus,
+                Texture2D   _buttonFrameRightDownFocus
             )
             {
                 CornerSize              = _iCornerSize;
@@ -62,8 +70,12 @@ namespace NuclearWinter.UI
                 ButtonFrameMiddleDown   = _buttonFrameMiddleDown;
                 ButtonFrameRightDown    = _buttonFrameRightDown;
 
-                ButtonFrameFocus        = _buttonFrameFocus;
-                ButtonFrameDownFocus    = _buttonFrameDownFocus;
+                ButtonFrameLeftFocus        = _buttonFrameLeftFocus;
+                ButtonFrameLeftDownFocus    = _buttonFrameLeftDownFocus;
+                ButtonFrameMiddleFocus      = _buttonFrameMiddleFocus;
+                ButtonFrameMiddleDownFocus  = _buttonFrameMiddleDownFocus;
+                ButtonFrameRightFocus       = _buttonFrameRightFocus;
+                ButtonFrameRightDownFocus   = _buttonFrameRightDownFocus;
            }
         }
 
@@ -124,38 +136,42 @@ namespace NuclearWinter.UI
                     if( iButton == miSelectedButtonIndex )
                     {
                         button.TextColor            = mStyle.TextDownColor;
-                        button.Style.FrameFocus     = Style.ButtonFrameDownFocus;
                         if( iButton == 0 )
                         {
                             button.Style.Frame          = Style.ButtonFrameLeftDown;
+                            button.Style.FrameFocus     = Style.ButtonFrameLeftDownFocus;
                         }
                         else
                         if( iButton == mlButtons.Count - 1 )
                         {
                             button.Style.Frame          = Style.ButtonFrameRightDown;
+                            button.Style.FrameFocus     = Style.ButtonFrameRightDownFocus;
                         }
                         else
                         {
                             button.Style.Frame          = Style.ButtonFrameMiddleDown;
+                            button.Style.FrameFocus     = Style.ButtonFrameMiddleDownFocus;
                         }
                     }
                     else
                     {
                         button.TextColor            = mStyle.TextColor;
-                        button.Style.FrameFocus     = Style.ButtonFrameFocus;
 
                         if( iButton == 0 )
                         {
                             button.Style.Frame          = Style.ButtonFrameLeft;
+                            button.Style.FrameFocus     = Style.ButtonFrameLeftFocus;
                         }
                         else
                         if( iButton == mlButtons.Count - 1 )
                         {
-                            button.Style.Frame      = Style.ButtonFrameRight;
+                            button.Style.Frame          = Style.ButtonFrameRight;
+                            button.Style.FrameFocus     = Style.ButtonFrameRightFocus;
                         }
                         else
                         {
-                            button.Style.Frame      = Style.ButtonFrameMiddle;
+                            button.Style.Frame          = Style.ButtonFrameMiddle;
+                            button.Style.FrameFocus     = Style.ButtonFrameMiddleFocus;
                         }
                     }
                 }
@@ -217,8 +233,12 @@ namespace NuclearWinter.UI
                 Screen.Style.ButtonFrameMiddleDown,
                 Screen.Style.ButtonFrameRightDown,
 
-                Screen.Style.ButtonFrameFocus,
-                Screen.Style.ButtonFrameDownFocus
+                Screen.Style.ButtonFrameLeftFocus,
+                Screen.Style.ButtonFrameLeftDownFocus,
+                Screen.Style.ButtonFrameMiddleFocus,
+                Screen.Style.ButtonFrameMiddleDownFocus,
+                Screen.Style.ButtonFrameRightFocus,
+                Screen.Style.ButtonFrameRightDownFocus
             );
 
             SelectedButtonIndex = _iInitialButtonIndex;

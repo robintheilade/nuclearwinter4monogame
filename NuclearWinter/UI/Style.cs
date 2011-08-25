@@ -31,6 +31,13 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameFocus;
         public Texture2D        ButtonFrameDownFocus;
 
+        public Texture2D        ButtonFrameLeftFocus;
+        public Texture2D        ButtonFrameLeftDownFocus;
+        public Texture2D        ButtonFrameMiddleFocus;
+        public Texture2D        ButtonFrameMiddleDownFocus;
+        public Texture2D        ButtonFrameRightFocus;
+        public Texture2D        ButtonFrameRightDownFocus;
+
         public int              ButtonVerticalPadding = 10;
         public int              ButtonHorizontalPadding = 20;
 
