@@ -143,18 +143,14 @@ namespace NuclearWinter.UI
         {
             if( ! mbIsInPage )
             {
-                mNotebook.SetActiveTab( this );
-
-                /*
-                if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight && IsInTab )
+                if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
                 {
                     OnActivateUp();
                 }
-                else
+                /*else
                 {
                     ResetPressState();
-                }
-                */
+                }*/
             }
             else
             {
@@ -209,6 +205,33 @@ namespace NuclearWinter.UI
         public override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             return PageGroup.OnPadButton( _button, _bIsDown );
+        }
+
+
+        public override void OnPadMove( Direction _direction )
+        {
+            int iTabIndex = mNotebook.Tabs.IndexOf( this );
+
+            if( _direction == Direction.Left && iTabIndex > 0 )
+            {
+                NotebookTab tab = mNotebook.Tabs[iTabIndex - 1];
+                Screen.Focus( tab );
+            }
+            else
+            if( _direction == Direction.Right && iTabIndex < mNotebook.Tabs.Count - 1 )
+            {
+                NotebookTab tab = mNotebook.Tabs[iTabIndex  + 1];
+                Screen.Focus( tab );
+            }
+            else
+            {
+                base.OnPadMove( _direction );
+            }
+        }
+
+        public override void OnActivateUp()
+        {
+            mNotebook.SetActiveTab( this );
         }
 
         public override bool Update( float _fElapsedTime )
