@@ -35,7 +35,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public AnchoredRect     ChildBox;
-        public Rectangle        ChildRectangle;
+        public Rectangle        ChildRectangle      { get; private set; }
 
         Anchor                  mContentAnchor;
 
