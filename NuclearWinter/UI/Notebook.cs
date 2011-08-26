@@ -19,6 +19,14 @@ namespace NuclearWinter.UI
         Label                   mLabel;
         Image                   mIcon;
 
+        public bool             Active { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
+        bool                    mbIsInPage;
+        bool                    mbIsHovered;
+        bool                    mbIsPressed;
+
+        //----------------------------------------------------------------------
+        public bool             Closable;
+
         //----------------------------------------------------------------------
         public string           Text
         {
@@ -65,7 +73,7 @@ namespace NuclearWinter.UI
         {
             mNotebook       = _notebook;
 
-            mLabel          = new Label( Screen );
+            mLabel          = new Label( Screen, "", Screen.Style.ButtonTextColor );
             mIcon           = new Image( Screen, _iconTex );
             mIcon.Padding   = new Box( 10, 0, 10, 20 );
 
@@ -120,27 +128,82 @@ namespace NuclearWinter.UI
 
         public override void OnMouseDown( Point _hitPoint )
         {
-            PageGroup.OnMouseDown( _hitPoint );
+            if( ! mbIsInPage )
+            {
+                Screen.Focus( this );
+                //OnActivateDown();
+            }
+            else
+            {
+                PageGroup.OnMouseDown( _hitPoint );
+            }
         }
 
         public override void OnMouseUp( Point _hitPoint )
         {
-            PageGroup.OnMouseUp( _hitPoint );
+            if( ! mbIsInPage )
+            {
+                mNotebook.SetActiveTab( this );
+
+                /*
+                if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight && IsInTab )
+                {
+                    OnActivateUp();
+                }
+                else
+                {
+                    ResetPressState();
+                }
+                */
+            }
+            else
+            {
+                PageGroup.OnMouseUp( _hitPoint );
+            }
         }
 
         public override void OnMouseEnter( Point _hitPoint )
         {
-            PageGroup.OnMouseEnter( _hitPoint );
+            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight )
+            {
+                mbIsHovered = true;
+            }
+            else
+            {
+                PageGroup.OnMouseEnter( _hitPoint );
+                mbIsInPage = true;
+            }
         }
 
         public override void OnMouseOut( Point _hitPoint )
         {
-            PageGroup.OnMouseOut( _hitPoint );
+            mbIsHovered = false;
+
+            if( mbIsInPage )
+            {
+                PageGroup.OnMouseOut( _hitPoint );
+            }
         }
 
         public override void OnMouseMove( Point _hitPoint )
         {
-            PageGroup.OnMouseMove( _hitPoint );
+            // FIXME: Handle if we're pressed or not
+
+            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight )
+            {
+                if( mbIsInPage )
+                {
+                    PageGroup.OnMouseOut( _hitPoint );
+                    mbIsInPage = false;
+                    mbIsHovered = true;
+                }
+            }
+            else
+            {
+                mbIsHovered = false;
+
+                PageGroup.OnMouseMove( _hitPoint );
+            }
         }
 
         public override bool OnPadButton( Buttons _button, bool _bIsDown )
@@ -156,7 +219,22 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( mNotebook.Style.Tab, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+            bool bIsActive = Active;
+
+            Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTab : mNotebook.Style.Tab, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+
+            if( mbIsHovered && ! bIsActive ) // && ! mbIsPressed && mPressedAnim.IsOver )
+            {
+                if( Screen.IsActive )
+                {
+                    Screen.DrawBox( Screen.Style.ButtonFrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+                }
+            }
+
+            if( Screen.IsActive && HasFocus )
+            {
+                Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTabFocus : mNotebook.Style.TabFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+            }
 
             mLabel.Draw();
             mIcon.Draw();
@@ -178,7 +256,6 @@ namespace NuclearWinter.UI
                 ActiveTabFocus  = _activeTabFocus;
             }
 
-
             public int              TabCornerSize;
 
             public Texture2D        Tab;
@@ -195,7 +272,7 @@ namespace NuclearWinter.UI
         public List<NotebookTab>    Tabs            { get; private set; }
         public int                  ActiveTabIndex  { get; private set; }
 
-        const int                   TabHeight = 50;
+        public int                  TabHeight = 50;
 
         /*bool                mbIsMouseInTabs;
         bool                mbIsTabPressed;*/
@@ -266,34 +343,42 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public void SetActiveTab( NotebookTab _tab )
+        {
+            Debug.Assert( Tabs.Contains( _tab ) );
+
+            ActiveTabIndex = Tabs.IndexOf( _tab );
+        }
+
+        //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            return Tabs[ActiveTabIndex].HitTest( _point );
-        }
+            if( _point.Y < Position.Y + TabHeight )
+            {
+                if( _point.X < Position.X + 20 ) return null;
 
-        public override void OnMouseDown( Point _hitPoint )
-        {
-            Tabs[ActiveTabIndex].OnMouseDown( _hitPoint );
-        }
+                int iTabX = 0;
+                int iTab = 0;
 
-        public override void OnMouseUp( Point _hitPoint )
-        {
-            Tabs[ActiveTabIndex].OnMouseUp( _hitPoint );
-        }
+                foreach( NotebookTab tab in Tabs )
+                {
+                    int iTabWidth = tab.ContentWidth;
 
-        public override void OnMouseEnter( Point _hitPoint )
-        {
-            Tabs[ActiveTabIndex].OnMouseEnter( _hitPoint );
-        }
+                    if( _point.X - Position.X - 20 < iTabX + iTabWidth )
+                    {
+                        return Tabs[ iTab ];
+                    }
 
-        public override void OnMouseOut( Point _hitPoint )
-        {
-            Tabs[ActiveTabIndex].OnMouseOut( _hitPoint );
-        }
+                    iTabX += iTabWidth;
+                    iTab++;
+                }
 
-        public override void OnMouseMove( Point _hitPoint )
-        {
-            Tabs[ActiveTabIndex].OnMouseMove( _hitPoint );
+                return null;
+            }
+            else
+            {
+                return Tabs[ActiveTabIndex].HitTest( _point );
+            }
         }
 
         public override bool OnPadButton( Buttons _button, bool _bIsDown )
