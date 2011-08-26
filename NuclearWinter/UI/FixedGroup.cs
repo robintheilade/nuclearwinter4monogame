@@ -267,7 +267,7 @@ namespace NuclearWinter.UI
                 for( int iChild = mlChildren.Count - 1; iChild >= 0; iChild-- )
                 {
                     FixedWidget fixedChild = mlChildren[iChild];
-                    if( ( hitWidget = fixedChild.Child.HitTest( _point ) ) != null )
+                    if( fixedChild.Child != null && ( hitWidget = fixedChild.Child.HitTest( _point ) ) != null )
                     {
                         return hitWidget;
                     }
