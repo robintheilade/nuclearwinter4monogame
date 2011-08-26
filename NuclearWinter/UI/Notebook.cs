@@ -25,7 +25,12 @@ namespace NuclearWinter.UI
         bool                    mbIsPressed;
 
         //----------------------------------------------------------------------
-        public bool             Closable;
+        bool                    mbClosable;
+        public bool             Closable
+        {
+            get { return mbClosable; }
+            set { mbClosable = value; UpdateContentSize(); }
+        }
 
         //----------------------------------------------------------------------
         public string           Text
@@ -92,6 +97,11 @@ namespace NuclearWinter.UI
             else
             {
                 ContentWidth    = mLabel.ContentWidth + Padding.Left + Padding.Right;
+            }
+
+            if( Closable )
+            {
+                ContentWidth += Screen.Style.NotebookTabClose.Width;
             }
 
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
@@ -261,6 +271,11 @@ namespace NuclearWinter.UI
 
             mLabel.Draw();
             mIcon.Draw();
+
+            if( Closable )
+            {
+                Screen.Game.SpriteBatch.Draw( Screen.Style.NotebookTabClose, new Vector2( Position.X + Size.X - 10 - Screen.Style.NotebookTabClose.Width, Position.Y + Size.Y / 2 - Screen.Style.NotebookTabClose.Height / 2 ), Color.White );
+            }
         }
     }
 
