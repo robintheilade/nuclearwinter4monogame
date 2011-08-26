@@ -26,8 +26,8 @@ namespace NuclearWinter.UI
 
         List<string>    mlstrWrappedText;
         string          mstrText;
+        string          mstrDisplayedText;
         Point           mpTextPosition;
-
         public string           Text
         {
             get
@@ -38,6 +38,7 @@ namespace NuclearWinter.UI
             set
             {
                 mstrText = value;
+                mstrDisplayedText = value;
                 UpdateContentSize();
             }
         }
@@ -66,6 +67,7 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             mstrText    = _strText;
+            mstrDisplayedText = mstrText;
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 10 );
             mAnchor     = _anchor;
@@ -105,6 +107,7 @@ namespace NuclearWinter.UI
 
             if( mbWrapText )
             {
+                ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Left + Padding.Right;
                 mlstrWrappedText = null;
                 DoWrapText();
             }
@@ -112,18 +115,34 @@ namespace NuclearWinter.UI
 
         void DoWrapText()
         {
-            if( ContentWidth > Size.X && Size.X > 0 )
+            if( mbWrapText )
             {
-                // Wrap text
-                mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
-                ContentWidth = Size.X;
-                ContentHeight = (int)( Font.LineSpacing * 0.9f * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                if( ContentWidth > Size.X && Size.X > 0 )
+                {
+                    // Wrap text
+                    mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
+                    ContentWidth = Size.X;
+                    ContentHeight = (int)( Font.LineSpacing * 0.9f * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                }
+                else
+                if( mlstrWrappedText == null )
+                {
+                    mlstrWrappedText = new List<string>();
+                    mlstrWrappedText.Add( mstrText );
+                }
             }
             else
-            if( mlstrWrappedText == null )
             {
-                mlstrWrappedText = new List<string>();
-                mlstrWrappedText.Add( mstrText );
+                // Ellipsize
+                int iWidth = ContentWidth;
+                int iOffset = Text.Length;
+                while( iWidth > Size.X )
+                {
+                    iOffset--;
+                    mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
+
+                    iWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
+                }
             }
         }
 
@@ -173,7 +192,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, Text, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color );
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color );
             }
         }
     }

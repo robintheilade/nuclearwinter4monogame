@@ -15,62 +15,151 @@ namespace NuclearWinter.UI
     public class ListViewColumn
     {
         //----------------------------------------------------------------------
-        public enum ColumnType
-        {
-            Text,
-            Image
-        }
-
-        //----------------------------------------------------------------------
-        public ColumnType   Type;
         public Label        Label { get; private set; }
         public int          Width;
         public Anchor       Anchor;
 
         //----------------------------------------------------------------------
-        public ListViewColumn( ListView _listView, ColumnType _type, string _strText, int _iWidth, Anchor _anchor )
+        public ListViewColumn( ListView _listView, string _strText, int _iWidth, Anchor _anchor )
         {
-            Type    = _type;
             Width   = _iWidth;
             Label   = new UI.Label( _listView.Screen, _strText );
             Anchor  = _anchor;
         }
     }
 
-    public struct ListViewCell
+    //--------------------------------------------------------------------------
+    abstract public class ListViewCell
     {
         //----------------------------------------------------------------------
-        public string       Text;
-        public Texture2D    Image;
+        protected ListView              mListView;
+
+        public string                   Text;
+        public Texture2D                Image;
 
         //----------------------------------------------------------------------
-        public ListViewCell( string _strText )
+        public ListViewCell( ListView _view, string _strText, Texture2D _image )
         {
+            mListView = _view;
             Text    = _strText;
-            Image   = null;
+            Image   = _image;
         }
 
         //----------------------------------------------------------------------
-        public ListViewCell( Texture2D _image )
+        public abstract void DoLayout( ListViewColumn _col );
+        public abstract void Draw( Point _location );
+    }
+
+    //--------------------------------------------------------------------------
+    public class ListViewTextCell: ListViewCell
+    {
+        string          mstrText;
+        float           mfTextWidth;
+        Vector2         mvTextOffset;
+
+        //----------------------------------------------------------------------
+        public ListViewTextCell( ListView _view, string _strText )
+        : base( _view, _strText, null )
         {
-            Text    = null;
-            Image   = _image;
+
+        }
+
+        //----------------------------------------------------------------------
+        public override void DoLayout( ListViewColumn _col )
+        {
+            mstrText = Text;
+            mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
+            if( mfTextWidth > _col.Width )
+            {
+                int iOffset = mstrText.Length;
+
+                while( mfTextWidth > _col.Width )
+                {
+                    iOffset--;
+                    mstrText = Text.Substring( 0, iOffset ) + "...";
+                    mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
+                }
+            }
+
+            mvTextOffset = Vector2.Zero;
+            switch( _col.Anchor )
+            {
+                case Anchor.Start:
+                    mvTextOffset.X += 10;
+                    break;
+                case Anchor.Center:
+                    mvTextOffset.X += _col.Width / 2f - mfTextWidth / 2f;
+                    break;
+                case Anchor.End:
+                    mvTextOffset.X += _col.Width - mfTextWidth - 10;
+                    break;
+            }
+        }
+
+        //----------------------------------------------------------------------
+        public override void Draw( Point _location )
+        {
+            Vector2 vTextPos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - ( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
+            vTextPos += mvTextOffset;
+
+            mListView.Screen.Game.SpriteBatch.DrawString( mListView.Screen.Style.MediumFont, mstrText, vTextPos, mListView.TextColor );
         }
     }
 
+    //--------------------------------------------------------------------------
+    public class ListViewImageCell: ListViewCell
+    {
+        Vector2     mvOffset;
+
+        //----------------------------------------------------------------------
+        public ListViewImageCell( ListView _view, Texture2D _image )
+        : base( _view, null, _image )
+        {
+
+        }
+
+        //----------------------------------------------------------------------
+        public override void DoLayout( ListViewColumn _col )
+        {
+            mvOffset = Vector2.Zero;
+            switch( _col.Anchor )
+            {
+                case Anchor.Start:
+                    mvOffset.X += 10;
+                    break;
+                case Anchor.Center:
+                    mvOffset.X += _col.Width / 2f - Image.Width / 2f;
+                    break;
+                case Anchor.End:
+                    mvOffset.X += _col.Width - Image.Width - 10;
+                    break;
+            }
+        }
+
+        //----------------------------------------------------------------------
+        public override void Draw( Point _location )
+        {
+            Vector2 vImagePos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - Image.Height / 2f );
+            vImagePos += mvOffset;
+
+            mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color.White );
+        }
+    }
+
+    //--------------------------------------------------------------------------
     /*
      * A set of values for a row in a ListView
      */
-    public struct ListViewRow
+    public class ListViewRow
     {
         public ListViewRow( ListViewCell[] _aCells, object _tag )
         {
-            Cells   = _aCells;
-            Tag     = _tag;
+            Cells           = _aCells;
+            Tag             = _tag;
         }
 
-        public ListViewCell[]       Cells;
-        public object               Tag;
+        public ListViewCell[]           Cells           { get; private set; }
+        public object                   Tag;
     }
 
     /*
@@ -91,7 +180,7 @@ namespace NuclearWinter.UI
         public bool                 MergeColumns            = false;
         public bool                 SelectFocusedRow        = true;
 
-        public List<ListViewRow>    Rows                { get; private set; }
+        public List<ListViewRow>    Rows;
         public int                  RowHeight = 60;
         public int                  RowSpacing = 0;
 
@@ -125,14 +214,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void AddColumn( string _strText, ListViewColumn.ColumnType _type, int _iWidth, Anchor _anchor )
-        {
-            Columns.Add( new ListViewColumn( this, _type, _strText, _iWidth, _anchor ) );
-        }
-
         public void AddColumn( string _strText, int _iWidth, Anchor _anchor )
         {
-            Columns.Add( new ListViewColumn( this, ListViewColumn.ColumnType.Text, _strText, _iWidth, _anchor ) );
+            Columns.Add( new ListViewColumn( this, _strText, _iWidth, _anchor ) );
         }
 
         //----------------------------------------------------------------------
@@ -158,10 +242,18 @@ namespace NuclearWinter.UI
             HitBox = _rect;
         
             int iColX = 0;
+            int iColIndex = 0;
             foreach( ListViewColumn col in Columns )
             {
                 col.Label.DoLayout( new Rectangle( Position.X + 10 + iColX, Position.Y + 10, col.Width, RowHeight ) );
                 iColX += col.Width;
+
+                foreach( ListViewRow row in Rows )
+                {
+                    row.Cells[ iColIndex ].DoLayout( col );
+                }
+
+                iColIndex++;
             }
         }
 
@@ -355,50 +447,7 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    switch( col.Type )
-                    {
-                        case ListViewColumn.ColumnType.Text:
-                            {
-                                float fTextWidth = Screen.Style.MediumFont.MeasureString( row.Cells[i].Text ).X;
-                                Vector2 vTextPos = new Vector2( Position.X + iColX + 10, Position.Y + 10 + iRowY + RowHeight / 2 - ( Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
-                                switch( col.Anchor )
-                                {
-                                    case Anchor.Start:
-                                        vTextPos.X += 10;
-                                        break;
-                                    case Anchor.Center:
-                                        vTextPos.X += col.Width / 2f - fTextWidth / 2f;
-                                        break;
-                                    case Anchor.End:
-                                        vTextPos.X += col.Width - fTextWidth - 10;
-                                        break;
-                                }
-
-                                Screen.Game.SpriteBatch.DrawString( Screen.Style.MediumFont, row.Cells[i].Text, vTextPos, TextColor );
-                            }
-                            break;
-                        case ListViewColumn.ColumnType.Image:
-                            {
-                                Texture2D image = row.Cells[i].Image;
-
-                                Vector2 vImagePos = new Vector2( Position.X + iColX + 10 + col.Width / 2f - image.Width / 2f, Position.Y + 10 + iRowY + RowHeight / 2 - image.Height / 2f );
-                                switch( col.Anchor )
-                                {
-                                    case Anchor.Start:
-                                        vImagePos.X += 10;
-                                        break;
-                                    case Anchor.Center:
-                                        vImagePos.X += col.Width / 2f - image.Width / 2f;
-                                        break;
-                                    case Anchor.End:
-                                        vImagePos.X += col.Width - image.Width - 10;
-                                        break;
-                                }
-                                Screen.Game.SpriteBatch.Draw( image, vImagePos, Color.White );
-                            }
-                            break;
-                    }
-
+                    row.Cells[i].Draw( new Point( Position.X + 10 + iColX, Position.Y + iRowY ) );
 
                     iColX += col.Width;
                 }
