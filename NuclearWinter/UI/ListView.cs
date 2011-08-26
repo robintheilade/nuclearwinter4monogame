@@ -68,8 +68,8 @@ namespace NuclearWinter.UI
         public override void DoLayout( ListViewColumn _col )
         {
             mstrText = Text;
-            mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
-            if( mfTextWidth > _col.Width )
+            mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
+            if( mstrText != "" && mfTextWidth > _col.Width )
             {
                 int iOffset = mstrText.Length;
 
@@ -77,7 +77,7 @@ namespace NuclearWinter.UI
                 {
                     iOffset--;
                     mstrText = Text.Substring( 0, iOffset ) + "...";
-                    mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
+                    mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
                 }
             }
 
@@ -181,8 +181,9 @@ namespace NuclearWinter.UI
         public bool                 SelectFocusedRow        = true;
 
         public List<ListViewRow>    Rows;
-        public int                  RowHeight = 60;
-        public int                  RowSpacing = 0;
+        public int                  RowHeight   = 60;
+        public int                  RowSpacing  = 0;
+        public int                  ColSpacing  = 0;
 
         public int                  SelectedRowIndex;
         public Action<ListView>     SelectHandler;
@@ -449,7 +450,7 @@ namespace NuclearWinter.UI
 
                     row.Cells[i].Draw( new Point( Position.X + 10 + iColX, Position.Y + iRowY ) );
 
-                    iColX += col.Width;
+                    iColX += col.Width + ColSpacing;
                 }
 
                 iRow++;

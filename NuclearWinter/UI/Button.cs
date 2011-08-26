@@ -325,11 +325,16 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( (!mbIsPressed) ? Style.Frame : Style.FrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+            Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.FrameDown;
+
+            if( frame != null )
+            {
+                Screen.DrawBox( frame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+            }
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
-                if( Screen.IsActive )
+                if( Screen.IsActive && Style.FrameHover != null )
                 {
                     Screen.DrawBox( Style.FrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
                 }
@@ -337,12 +342,18 @@ namespace NuclearWinter.UI
             else
             if( mPressedAnim.CurrentValue > 0f )
             {
-                Screen.DrawBox( Style.FramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                if( Style.FramePressed != null )
+                {
+                    Screen.DrawBox( Style.FramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                }
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Style.FrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                if( Style.FrameFocus != null )
+                {
+                    Screen.DrawBox( Style.FrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                }
             }
 
             mLabel.Draw();

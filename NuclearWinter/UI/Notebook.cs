@@ -18,9 +18,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Label                   mLabel;
         Image                   mIcon;
+        Button                  mCloseButton;
 
         public bool             Active { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
-        bool                    mbIsInPage;
         bool                    mbIsHovered;
         bool                    mbIsPressed;
 
@@ -82,6 +82,11 @@ namespace NuclearWinter.UI
             mIcon           = new Image( Screen, _iconTex );
             mIcon.Padding   = new Box( 10, 0, 10, 20 );
 
+            mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
+            mCloseButton.ClickHandler = delegate {
+                mNotebook.Tabs.Remove( this );
+            };
+
             Text            = _strText;
 
             PageGroup       = new FixedGroup( Screen );
@@ -128,95 +133,57 @@ namespace NuclearWinter.UI
                     mLabel.ContentWidth, mLabel.ContentHeight
                 )
             );
+
+            if( Closable )
+            {
+                mCloseButton.DoLayout( new Rectangle(
+                    Position.X + Size.X - 10 - Screen.Style.NotebookTabClose.Width,
+                    Position.Y + Size.Y / 2 - Screen.Style.NotebookTabClose.Height / 2,
+                    mCloseButton.ContentWidth, mCloseButton.ContentHeight )
+                );
+            }
         }
 
         //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            return PageGroup.HitTest( _point );
+            return mCloseButton.HitTest( _point ) ?? base.HitTest( _point );
         }
 
         public override void OnMouseDown( Point _hitPoint )
         {
-            if( ! mbIsInPage )
-            {
-                Screen.Focus( this );
-                //OnActivateDown();
-            }
-            else
-            {
-                PageGroup.OnMouseDown( _hitPoint );
-            }
+            Screen.Focus( this );
+            //OnActivateDown();
         }
 
         public override void OnMouseUp( Point _hitPoint )
         {
-            if( ! mbIsInPage )
+            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
             {
-                if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
+                if( _hitPoint.X > Position.X && _hitPoint.X < Position.X + Size.X )
                 {
                     OnActivateUp();
                 }
-                /*else
-                {
-                    ResetPressState();
-                }*/
             }
-            else
+            /*else
             {
-                PageGroup.OnMouseUp( _hitPoint );
-            }
+                ResetPressState();
+            }*/
         }
 
         public override void OnMouseEnter( Point _hitPoint )
         {
-            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight )
-            {
-                mbIsHovered = true;
-            }
-            else
-            {
-                PageGroup.OnMouseEnter( _hitPoint );
-                mbIsInPage = true;
-            }
+            mbIsHovered = true;
         }
 
         public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
-
-            if( mbIsInPage )
-            {
-                PageGroup.OnMouseOut( _hitPoint );
-            }
         }
 
         public override void OnMouseMove( Point _hitPoint )
         {
-            // FIXME: Handle if we're pressed or not
-
-            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight )
-            {
-                if( mbIsInPage )
-                {
-                    PageGroup.OnMouseOut( _hitPoint );
-                    mbIsInPage = false;
-                    mbIsHovered = true;
-                }
-            }
-            else
-            {
-                mbIsHovered = false;
-
-                PageGroup.OnMouseMove( _hitPoint );
-            }
         }
-
-        public override bool OnPadButton( Buttons _button, bool _bIsDown )
-        {
-            return PageGroup.OnPadButton( _button, _bIsDown );
-        }
-
 
         public override void OnPadMove( Direction _direction )
         {
@@ -244,11 +211,6 @@ namespace NuclearWinter.UI
             mNotebook.SetActiveTab( this );
         }
 
-        public override bool Update( float _fElapsedTime )
-        {
-            return PageGroup.Update( _fElapsedTime );
-        }
-
         //----------------------------------------------------------------------
         public override void Draw()
         {
@@ -274,7 +236,7 @@ namespace NuclearWinter.UI
 
             if( Closable )
             {
-                Screen.Game.SpriteBatch.Draw( Screen.Style.NotebookTabClose, new Vector2( Position.X + Size.X - 10 - Screen.Style.NotebookTabClose.Width, Position.Y + Size.Y / 2 - Screen.Style.NotebookTabClose.Height / 2 ), Color.White );
+                mCloseButton.Draw();
             }
         }
     }
@@ -354,6 +316,7 @@ namespace NuclearWinter.UI
                 Size.Y
             );
 
+            ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
             NotebookTab activeTab = Tabs[ActiveTabIndex];
 
             Rectangle contentRect = new Rectangle( Position.X, Position.Y + ( TabHeight - 10 ), Size.X, Size.Y - ( TabHeight - 10 ) );
@@ -404,7 +367,7 @@ namespace NuclearWinter.UI
 
                     if( _point.X - Position.X - 20 < iTabX + iTabWidth )
                     {
-                        return Tabs[ iTab ];
+                        return Tabs[ iTab ].HitTest( _point );
                     }
 
                     iTabX += iTabWidth;
@@ -415,7 +378,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                return Tabs[ActiveTabIndex].HitTest( _point );
+                return Tabs[ActiveTabIndex].PageGroup.HitTest( _point );
             }
         }
 

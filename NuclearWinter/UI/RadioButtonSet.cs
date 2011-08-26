@@ -109,9 +109,11 @@ namespace NuclearWinter.UI
 
                 Button firstButton = mlButtons.First();
                 firstButton.Style.FrameDown = Style.ButtonFrameLeftDown;
+                firstButton.Padding = new Box( 0, 0, 0, 5 );
 
                 Button lastButton = mlButtons.Last();
                 lastButton.Style.FrameDown = Style.ButtonFrameRightDown;
+                lastButton.Padding = new Box( 0, 5, 0, 0 );
             }
         }
 

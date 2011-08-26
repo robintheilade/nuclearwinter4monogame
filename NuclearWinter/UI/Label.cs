@@ -132,6 +132,7 @@ namespace NuclearWinter.UI
                 }
             }
             else
+            if( Text != "" )
             {
                 // Ellipsize
                 int iWidth = ContentWidth;
