@@ -69,7 +69,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
+        public virtual void Update( float _fElapsedTime )
         {
             MenuScreen.IsActive     = Game.IsActive && mActivePopupPane == null;
             PopupScreen.IsActive    = Game.IsActive && mActivePopupPane != null;
