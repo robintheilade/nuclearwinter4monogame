@@ -65,34 +65,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
+        public void HandleInput()
         {
-            if( IsActive )
-            {
-                HandleInput();
-            }
+            if( ! IsActive ) return;
 
-
-            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
-
-            List<Widget> lUpdateRemovedWidgets = new List<Widget>();
-            foreach( Widget widget in mlUpdateList )
-            {
-                if( ! widget.Update( _fElapsedTime ) )
-                {
-                    lUpdateRemovedWidgets.Add( widget );
-                }
-            }
-
-            foreach( Widget widget in lUpdateRemovedWidgets )
-            {
-                mlUpdateList.Remove( widget );
-            }
-        }
-
-        //----------------------------------------------------------------------
-        void HandleInput()
-        {
             foreach( Buttons button in Enum.GetValues(typeof(Buttons)) )
             {
                 PlayerIndex playerIndex;
@@ -248,6 +224,26 @@ namespace NuclearWinter.UI
                 }
             }
 #endif
+        }
+
+        //----------------------------------------------------------------------
+        public void Update( float _fElapsedTime )
+        {
+            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
+
+            List<Widget> lUpdateRemovedWidgets = new List<Widget>();
+            foreach( Widget widget in mlUpdateList )
+            {
+                if( ! widget.Update( _fElapsedTime ) )
+                {
+                    lUpdateRemovedWidgets.Add( widget );
+                }
+            }
+
+            foreach( Widget widget in lUpdateRemovedWidgets )
+            {
+                mlUpdateList.Remove( widget );
+            }
         }
 
         //----------------------------------------------------------------------

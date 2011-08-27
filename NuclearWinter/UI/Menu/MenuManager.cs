@@ -74,6 +74,12 @@ namespace NuclearWinter.UI
             MenuScreen.IsActive     = Game.IsActive && mActivePopupPane == null;
             PopupScreen.IsActive    = Game.IsActive && mActivePopupPane != null;
 
+            MenuScreen.HandleInput();
+            if( mActivePopupPane != null )
+            {
+                PopupScreen.HandleInput();
+            }
+
             MenuScreen.Update( _fElapsedTime );
             if( mActivePopupPane != null )
             {
