@@ -177,14 +177,14 @@ namespace NuclearWinter.UI
         {
             if( mIcon.Texture != null )
             {
-                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Horizontal;
             }
             else
             {
-                ContentWidth    = mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mLabel.ContentWidth + Padding.Horizontal;
             }
 
-            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
+            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical;
         }
 
         //----------------------------------------------------------------------
@@ -193,7 +193,7 @@ namespace NuclearWinter.UI
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
 
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+            HitBox = _rect;
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
             switch( mAnchor )
