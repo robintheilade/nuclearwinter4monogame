@@ -103,12 +103,12 @@ namespace NuclearWinter.UI
             Position = ChildRectangle.Location;
             Size = new Point( ChildRectangle.Width, ChildRectangle.Height );
 
-            Debug.Assert( Child.ContentWidth <= Size.X && Child.ContentHeight <= Size.Y, "Child is too big for its parent" );
-
             if( mChild == null )
             {
                 return;
             }
+
+            Debug.Assert( mChild.ContentWidth <= Size.X && mChild.ContentHeight <= Size.Y, "Child is too big for its parent" );
 
             switch( mContentAnchor )
             {
