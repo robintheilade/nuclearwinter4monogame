@@ -183,22 +183,24 @@ namespace NuclearWinter
         {
             List<string> lText = new List<string>();
 
-            string strLine = string.Empty;
-            string returnString = String.Empty;
-            string[] aWords = _strText.Split(' ');
-
-            foreach( string strWord in aWords )
+            foreach( string strChunk in _strText.Split( '\n' ) )
             {
-                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
+                string strLine = string.Empty;
+                string[] aWords = strChunk.Split( ' ' );
+
+                foreach( string strWord in aWords )
                 {
-                    lText.Add( strLine );
-                    strLine = string.Empty;
+                    if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
+                    {
+                        lText.Add( strLine );
+                        strLine = string.Empty;
+                    }
+
+                    strLine += strWord + ' ';
                 }
 
-                strLine += strWord + ' ';
+                lText.Add( strLine );
             }
-
-            lText.Add( strLine );
 
             return lText;
         }

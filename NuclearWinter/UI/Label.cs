@@ -188,7 +188,7 @@ namespace NuclearWinter.UI
             {
                 for( int i = 0; i < mlstrWrappedText.Count; i++ )
                 {
-                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * 0.9f * i ) ), Color );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) ), Color );
                 }
             }
             else
