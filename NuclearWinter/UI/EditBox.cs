@@ -190,6 +190,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public override void OnPadMove( Direction _direction )
+        {
+            if( _direction == Direction.Left || _direction == Direction.Right )
+            {
+                // Horizontal pad move are eaten since left and right are used to move the caret
+                return;
+            }
+
+            base.OnPadMove( _direction );
+        }
+
+        //----------------------------------------------------------------------
         public override void OnFocus()
         {
             Screen.AddWidgetToUpdateList( this );
