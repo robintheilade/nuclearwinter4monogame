@@ -81,5 +81,11 @@ namespace NuclearWinter.UI
         
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;
+
+        public Texture2D        TreeViewBranchClosed;
+        public Texture2D        TreeViewBranchOpen;
+        public Texture2D        TreeViewBranchOpenEmpty;
+        public Texture2D        TreeViewBranch;
+        public Texture2D        TreeViewBranchLast;
     }
 }
