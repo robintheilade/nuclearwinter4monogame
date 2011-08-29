@@ -12,11 +12,22 @@ namespace NuclearWinter.UI
     public class TreeViewNode: Widget
     {
         //----------------------------------------------------------------------
-        public Texture2D            Icon;
-        public string               Text {
+        public Texture2D            Icon
+        {
+            get { return mImage.Texture; }
+            set {
+                mImage.Texture = value;
+                mLabel.Padding = mImage.Texture != null ? new Box( 10, 10, 10, 0 ) : new Box( 10 );
+            }
+        }
+
+        public string               Text
+        {
             get { return mLabel.Text; }
             set { mLabel.Text = value; }
         }
+
+        public object               Tag;
 
         public ObservableList<TreeViewNode>     Children        { get; private set; }
 
@@ -39,7 +50,7 @@ namespace NuclearWinter.UI
         bool                        mbIsLast;
 
         //----------------------------------------------------------------------
-        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon )
+        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon, object _tag )
         : base( _treeView.Screen )
         {
             mTreeView   = _treeView;
@@ -48,13 +59,28 @@ namespace NuclearWinter.UI
             Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args ) { _args.Item.Parent = this; UpdateContentSize(); };
 
             mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.ButtonTextColor );
-            mImage      = new Image( Screen, _icon );
+            mImage      = new Image( Screen );
+            mImage.Padding = new Box( 0, 5, 0, 10 );
+
+            Icon = _icon;
 
             UpdateContentSize();
         }
 
+        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon )
+        : this( _treeView, _strText, _icon, null )
+        {
+
+        }
+
+        public TreeViewNode( TreeView _treeView, string _strText, object _tag )
+        : this( _treeView, _strText, null, _tag )
+        {
+
+        }
+
         public TreeViewNode( TreeView _treeView, string _strText )
-        : this( _treeView, _strText, null )
+        : this( _treeView, _strText, null, null )
         {
         }
 
@@ -90,14 +116,15 @@ namespace NuclearWinter.UI
             Size = new Point( _rect.Width, _rect.Height );
             HitBox = _rect;
             
-            if( Children.Count > 0 || DisplayAsContainer )
+            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
+
+            if( mImage.Texture != null )
             {
-                mLabel.DoLayout( new Rectangle( Position.X + mTreeView.NodeBranchWidth, Position.Y, Size.X - mTreeView.NodeBranchWidth, mTreeView.NodeHeight ) );
+                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
+                iLabelX += mImage.ContentWidth;
             }
-            else
-            {
-                mLabel.DoLayout( new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight ) );
-            }
+
+            mLabel.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
 
             int iX = Position.X;
             int iY = Position.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
@@ -138,7 +165,11 @@ namespace NuclearWinter.UI
                 Screen.Game.SpriteBatch.Draw( tex, new Vector2( Position.X, Position.Y ), Color.White );
             }
 
-            mImage.Draw();
+            if( mImage.Texture != null )
+            {
+                mImage.Draw();
+            }
+
             mLabel.Draw();
 
             if( ! mbCollapsed )

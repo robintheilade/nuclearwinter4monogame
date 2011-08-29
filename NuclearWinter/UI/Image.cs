@@ -94,7 +94,7 @@ namespace NuclearWinter.UI
 
             if( ! mbStretch )
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Padding.Left, Position.Y + Padding.Top ), Color );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Size.X / 2 - ContentWidth / 2 + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ), Color );
             }
             else
             {

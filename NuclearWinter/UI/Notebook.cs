@@ -122,7 +122,7 @@ namespace NuclearWinter.UI
 
             if( mIcon.Texture != null )
             {
-                mIcon.Position = new Point( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
+                mIcon.DoLayout ( new Rectangle( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
             }
 
             mLabel.DoLayout(

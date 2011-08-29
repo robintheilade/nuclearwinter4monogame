@@ -199,7 +199,7 @@ namespace NuclearWinter.UI
                 case UI.Anchor.Start:
                     if( mIcon.Texture != null )
                     {
-                        mIcon.Position = new Point( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
+                        mIcon.DoLayout( new Rectangle( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
 
                     mLabel.DoLayout(
@@ -212,7 +212,7 @@ namespace NuclearWinter.UI
                 case UI.Anchor.Center:
                     if( mIcon.Texture != null )
                     {
-                        mIcon.Position = new Point( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
+                        mIcon.DoLayout( new Rectangle( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
 
                     mLabel.DoLayout(
