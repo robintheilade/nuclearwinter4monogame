@@ -92,6 +92,7 @@
     <Compile Include="Animation\SmoothValue.cs" />
     <Compile Include="Animation\Timeline.cs" />
     <Compile Include="Collections\KeyedList.cs" />
+    <Compile Include="Collections\ObservableList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateFadeTransition.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
