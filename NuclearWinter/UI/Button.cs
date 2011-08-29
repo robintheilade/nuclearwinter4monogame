@@ -108,8 +108,6 @@ namespace NuclearWinter.UI
             set { mLabel.Color = value; }
         }
 
-        public override bool CanFocus { get { return true; } }
-
         public ButtonStyle Style;
 
         public Action<Button>   ClickHandler;

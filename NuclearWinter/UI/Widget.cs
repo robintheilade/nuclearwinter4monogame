@@ -156,7 +156,6 @@ namespace NuclearWinter.UI
             }
         }
 
-        public abstract bool CanFocus { get; }
         public virtual Widget GetSibling( UI.Direction _direction, Widget _child )
         {
             if( Parent != null )
@@ -169,14 +168,7 @@ namespace NuclearWinter.UI
 
         public virtual Widget GetFirstFocusableDescendant( UI.Direction _direction )
         {
-            if( CanFocus )
-            {
-                return this;
-            }
-            else
-            {
-                return null;
-            }
+            return this;
         }
 
         public bool HasFocus

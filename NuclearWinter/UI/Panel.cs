@@ -23,7 +23,11 @@ namespace NuclearWinter.UI
             CornerSize  = _iCornerSize;
         }
 
-        public override bool  CanFocus { get { return false; } }
+        //----------------------------------------------------------------------
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
+        }
 
         //----------------------------------------------------------------------
         protected override void UpdateContentSize()

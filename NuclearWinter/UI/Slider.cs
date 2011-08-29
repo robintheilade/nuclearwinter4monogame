@@ -34,8 +34,6 @@ namespace NuclearWinter.UI
 
         public Action           ChangeHandler;
 
-        public override bool CanFocus { get { return true; } }
-
         //----------------------------------------------------------------------
         public Slider( Screen _screen, int _iMin, int _iMax, int _iInitialValue, int _iStep )
         : base( _screen )

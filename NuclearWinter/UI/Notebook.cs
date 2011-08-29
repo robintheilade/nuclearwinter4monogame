@@ -67,8 +67,6 @@ namespace NuclearWinter.UI
             set { mLabel.Color = value; }
         }
 
-        public override bool CanFocus { get { return true; } }
-
         //----------------------------------------------------------------------
         public FixedGroup       PageGroup        { get; private set; }
 
@@ -273,12 +271,6 @@ namespace NuclearWinter.UI
         public int                  ActiveTabIndex  { get; private set; }
 
         public int                  TabHeight = 50;
-
-        /*bool                mbIsMouseInTabs;
-        bool                mbIsTabPressed;*/
-
-        //----------------------------------------------------------------------
-        public override bool CanFocus { get { return true; } }
 
         //----------------------------------------------------------------------
         public Notebook( Screen _screen )

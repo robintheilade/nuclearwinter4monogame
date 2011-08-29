@@ -168,8 +168,6 @@ namespace NuclearWinter.UI
             return focusableSibling;
         }
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         public FixedGroup( Screen _screen )
         : base( _screen )

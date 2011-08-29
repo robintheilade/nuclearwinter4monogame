@@ -57,8 +57,6 @@ namespace NuclearWinter.UI
             set { mbWrapText = value; UpdateContentSize(); }
         }
 
-        public override bool CanFocus { get { return false; } }
-
 
         public Color            Color;
 
@@ -97,6 +95,12 @@ namespace NuclearWinter.UI
         public Label( Screen _screen )
         : this( _screen, "", Anchor.Center, Color.White )
         {
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
         }
 
         //----------------------------------------------------------------------

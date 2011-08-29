@@ -16,9 +16,6 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override bool CanFocus { get { return true; } }
-
-        //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {
             ContentWidth    = Padding.Left + Padding.Right;

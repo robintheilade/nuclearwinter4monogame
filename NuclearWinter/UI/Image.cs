@@ -12,8 +12,6 @@ namespace NuclearWinter.UI
      */
     public class Image: Widget
     {
-        public override bool CanFocus { get { return false; } }
-
         protected bool mbStretch;
         public bool Stretch {
             get { return mbStretch; }
@@ -30,6 +28,12 @@ namespace NuclearWinter.UI
                 mTexture = value;
                 UpdateContentSize();
             }
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
         }
 
         //----------------------------------------------------------------------

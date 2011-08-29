@@ -78,8 +78,6 @@ namespace NuclearWinter.UI
             return ( Child != null ) ? Child.GetFirstFocusableDescendant( _direction ) : null;
         }
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {

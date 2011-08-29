@@ -32,8 +32,6 @@ namespace NuclearWinter.UI
         int                         miSpacing; // FIXME: Not taken into account
         GridGroupTile[,]            maTiles;
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         public GridGroup( Screen _screen, int _iCols, int _iRows, bool _bExpand, int _iSpacing )
         : base( _screen )

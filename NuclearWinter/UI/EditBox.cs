@@ -67,8 +67,6 @@ namespace NuclearWinter.UI
 
         string                  mstrDisplayedText;
 
-        public override bool CanFocus { get { return true; } }
-
         public Action<EditBox>  ValidateHandler;
 
         //----------------------------------------------------------------------

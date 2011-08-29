@@ -18,8 +18,6 @@ namespace NuclearWinter.UI
         bool            mbExpand;
         int             miSpacing; // FIXME: Not taken into account
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         public BoxGroup( Screen _screen, Direction _direction, bool _bExpand, int _iSpacing )
         : base( _screen )
@@ -29,6 +27,7 @@ namespace NuclearWinter.UI
             miSpacing   = _iSpacing;
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
             if( mDirection == Direction.Left || mDirection == Direction.Right )
@@ -57,6 +56,7 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
             int iIndex = mlChildren.IndexOf( _child );
@@ -95,6 +95,7 @@ namespace NuclearWinter.UI
             return base.GetSibling( _direction, this );
         }
 
+        //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {
             bool bHorizontal = mDirection == Direction.Left || mDirection == Direction.Right;

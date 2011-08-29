@@ -250,7 +250,6 @@ namespace NuclearWinter.UI
         public void Focus( Widget _widget )
         {
             Debug.Assert( _widget.Screen == this );
-            Debug.Assert( _widget.CanFocus );
 
             mbHasActivatedFocusedWidget = false;
             if( FocusedWidget != null && FocusedWidget != _widget )

@@ -9,9 +9,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
-    /*
-     * A ListViewColumn defines a column in a ListView
-     */
+    //--------------------------------------------------------------------------
+    // A ListViewColumn defines a column in a ListView
     public class ListViewColumn
     {
         //----------------------------------------------------------------------
@@ -152,14 +151,16 @@ namespace NuclearWinter.UI
      */
     public class ListViewRow
     {
+        //----------------------------------------------------------------------
+        public ListViewCell[]           Cells           { get; private set; }
+        public object                   Tag;
+
+        //----------------------------------------------------------------------
         public ListViewRow( ListViewCell[] _aCells, object _tag )
         {
             Cells           = _aCells;
             Tag             = _tag;
         }
-
-        public ListViewCell[]           Cells           { get; private set; }
-        public object                   Tag;
     }
 
     /*
@@ -168,6 +169,7 @@ namespace NuclearWinter.UI
      */
     public class ListView: Widget
     {
+        //----------------------------------------------------------------------
         public struct ListViewStyle
         {
             public Texture2D        FrameSelected;
@@ -175,6 +177,7 @@ namespace NuclearWinter.UI
             public Texture2D        FrameSelectedFocus;
         }
 
+        //----------------------------------------------------------------------
         public List<ListViewColumn> Columns             { get; private set; }
         public bool                 DisplayColumnHeaders    = true;
         public bool                 MergeColumns            = false;
@@ -195,8 +198,6 @@ namespace NuclearWinter.UI
 
         public ListViewStyle        Style;
         public Color                TextColor           = Color.White;
-
-        public override bool CanFocus { get { return true; } }
 
         //----------------------------------------------------------------------
         public ListView( Screen _screen )

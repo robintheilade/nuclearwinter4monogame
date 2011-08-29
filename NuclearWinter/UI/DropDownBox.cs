@@ -25,8 +25,6 @@ namespace NuclearWinter.UI
 
         public Action<DropDownBox>      ChangeHandler;
 
-        public override bool            CanFocus                { get { return true; } }
-
         Rectangle                       mDropDownHitBox;
         const int                       siLineHeight = 50;
         const int                       siMaxLineDisplayed = 3;

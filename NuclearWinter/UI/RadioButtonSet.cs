@@ -117,7 +117,6 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool            CanFocus { get { return false; } }
         public Action<RadioButtonSet>   ClickHandler;
         int                             miSelectedButtonIndex = 0;
         public int                      SelectedButtonIndex
