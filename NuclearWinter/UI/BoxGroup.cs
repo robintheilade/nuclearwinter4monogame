@@ -137,7 +137,7 @@ namespace NuclearWinter.UI
             int iSize = 0;
             foreach( Widget widget in mlChildren )
             {
-                iSize += bHorizontal ? widget.Size.X : widget.Size.Y;
+                iSize += bHorizontal ? widget.ContentWidth : widget.ContentHeight;
             }
 
             if( mlChildren.Count > 1 )
