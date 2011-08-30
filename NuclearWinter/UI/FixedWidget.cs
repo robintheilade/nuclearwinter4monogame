@@ -117,7 +117,7 @@ namespace NuclearWinter.UI
                     Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X, Size.Y ) );
                     break;
                 case Anchor.End:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X - Child.ContentWidth, Size.Y ) );
+                    Child.DoLayout( new Rectangle( Position.X + Size.X - Child.ContentWidth, Position.Y, Child.ContentWidth, Size.Y ) );
                     break;
             }
         }

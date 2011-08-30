@@ -43,14 +43,12 @@ namespace NuclearWinter.UI
         bool    mbIsHovered;
         float   mfTimer;
 
-        bool    mbHideContent;
+        public const char DefaultPasswordChar = '●';
 
-        public bool HideContent {
-            get { return mbHideContent; }
-            set {
-                mbHideContent = value;
-                UpdateContentSize();
-            }
+        char mPasswordCharacter = '\0';
+        public char PasswordChar {
+            get { return mPasswordCharacter; }
+            set { mPasswordCharacter = value; UpdateContentSize(); }
         }
 
         public string Text
@@ -67,6 +65,7 @@ namespace NuclearWinter.UI
 
         string                  mstrDisplayedText;
 
+        public Func<char,bool>  TextEnteredHandler;
         public Action<EditBox>  ValidateHandler;
 
         //----------------------------------------------------------------------
@@ -89,9 +88,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {
-            mstrDisplayedText = (!mbHideContent) ? Text : "".PadLeft( Text.Length, '●' );
+            mstrDisplayedText = ( mPasswordCharacter == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordCharacter );
 
-            ContentWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
+            ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
         }
 
@@ -147,13 +146,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnTextEntered( char _char )
         {
-            if( ! char.IsControl( _char ) )
+            if( ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
                 Text = Text.Insert( CaretOffset, _char.ToString() );
                 CaretOffset++;
             }
         }
-
+        
         public override void OnKeyPress( Keys _key )
         {
             switch( _key )
