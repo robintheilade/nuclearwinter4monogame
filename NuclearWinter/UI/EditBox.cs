@@ -68,6 +68,8 @@ namespace NuclearWinter.UI
         public Func<char,bool>  TextEnteredHandler;
         public Action<EditBox>  ValidateHandler;
 
+        public bool             IsReadOnly;
+
         //----------------------------------------------------------------------
         public EditBox( Screen _screen, string _strText )
         : base( _screen )
@@ -146,7 +148,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnTextEntered( char _char )
         {
-            if( ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
+            if( ! IsReadOnly && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
                 Text = Text.Insert( CaretOffset, _char.ToString() );
                 CaretOffset++;
@@ -158,17 +160,17 @@ namespace NuclearWinter.UI
             switch( _key )
             {
                 case Keys.Enter:
-                    if( ValidateHandler != null ) ValidateHandler( this );
+                    if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
                     break;
                 case Keys.Back:
-                    if( Text.Length > 0 && CaretOffset > 0 )
+                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset > 0 )
                     {
                         CaretOffset--;
                         Text = Text.Remove( CaretOffset, 1 );
                     }
                     break;
                 case Keys.Delete:
-                    if( Text.Length > 0 && CaretOffset < Text.Length )
+                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset < Text.Length )
                     {
                         Text = Text.Remove( CaretOffset, 1 );
                     }
