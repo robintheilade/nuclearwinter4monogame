@@ -100,6 +100,7 @@ namespace NuclearWinter.UI
         {
             Vector2 vTextPos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - ( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
             vTextPos += mvTextOffset;
+            vTextPos.Y += mListView.Screen.Style.MediumFont.YOffset;
 
             mListView.Screen.Game.SpriteBatch.DrawString( mListView.Screen.Style.MediumFont, mstrText, vTextPos, mListView.TextColor );
         }

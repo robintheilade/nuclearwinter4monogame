@@ -54,16 +54,16 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected override void UpdateContentSize()
         {
-            SpriteFont font = Screen.Style.MediumFont;
+            UIFont uiFont = Screen.Style.MediumFont;
 
             int iMaxWidth = 0;
             foreach( string _strValue in mlValues )
             {
-                iMaxWidth = Math.Max( iMaxWidth, (int)font.MeasureString( _strValue ).X );
+                iMaxWidth = Math.Max( iMaxWidth, (int)uiFont.MeasureString( _strValue ).X );
             }
 
             ContentWidth    = iMaxWidth + Padding.Left + Padding.Right + Screen.Style.DropDownArrow.Width;
-            ContentHeight   = (int)( font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+            ContentHeight   = (int)( uiFont.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
         }
 
         //----------------------------------------------------------------------
@@ -345,7 +345,7 @@ namespace NuclearWinter.UI
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top, Size.X - Padding.Horizontal, siLineHeight ), 10, Color.White );
                     }
 
-                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top ) );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top + Screen.Style.MediumFont.YOffset ) );
                 }
             }
         }

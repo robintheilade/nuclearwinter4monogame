@@ -12,8 +12,8 @@ namespace NuclearWinter.UI
      */
     public class Label: Widget
     {
-        SpriteFont mFont;
-        public SpriteFont       Font
+        UIFont mFont;
+        public UIFont       Font
         {
             get { return mFont; }
             
@@ -178,7 +178,7 @@ namespace NuclearWinter.UI
                     break;
                 case UI.Anchor.End:
                     mpTextPosition = new Point(
-                        Position.X + Size.X - Padding.Right - ContentWidth,
+                        Position.X + Size.X - Padding.Right     - ContentWidth,
                         iTop
                     );
                     break;
@@ -192,12 +192,12 @@ namespace NuclearWinter.UI
             {
                 for( int i = 0; i < mlstrWrappedText.Count; i++ )
                 {
-                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) ), Color );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color );
                 }
             }
             else
             {
-                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color );
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + Font.YOffset ), Color );
             }
         }
     }

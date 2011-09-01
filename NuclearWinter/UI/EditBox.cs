@@ -13,8 +13,8 @@ namespace NuclearWinter.UI
      */
     public class EditBox: Widget
     {
-        SpriteFont mFont;
-        public SpriteFont       Font
+        UIFont mFont;
+        public UIFont       Font
         {
             get { return mFont; }
             
@@ -231,7 +231,7 @@ namespace NuclearWinter.UI
                 Screen.DrawBox( Screen.Style.ButtonFramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color.White );
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + mFont.YOffset ), Color.White );
 
             const float fBlinkInterval = 0.3f;
 

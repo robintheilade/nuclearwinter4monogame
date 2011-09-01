@@ -14,9 +14,9 @@ namespace NuclearWinter.UI
     {
         public int              BlurRadius = 4;
 
-        public SpriteFont       SmallFont;
-        public SpriteFont       MediumFont;
-        public SpriteFont       BigFont;
+        public UIFont           SmallFont;
+        public UIFont           MediumFont;
+        public UIFont           BigFont;
 
         public int              ButtonCornerSize = 30;
         public int              DefaultButtonHeight = 80;
