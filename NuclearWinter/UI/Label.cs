@@ -82,18 +82,18 @@ namespace NuclearWinter.UI
         }
 
         public Label( Screen _screen, string _strText, Anchor _anchor )
-        : this( _screen, _strText, _anchor, Color.White )
+        : this( _screen, _strText, _anchor, _screen.Style.DefaultTextColor )
         {
 
         }
 
         public Label( Screen _screen, string _strText )
-        : this( _screen, _strText, Anchor.Center, Color.White )
+        : this( _screen, _strText, Anchor.Center, _screen.Style.DefaultTextColor )
         {
         }
 
         public Label( Screen _screen )
-        : this( _screen, "", Anchor.Center, Color.White )
+        : this( _screen, "", Anchor.Center, _screen.Style.DefaultTextColor )
         {
         }
 

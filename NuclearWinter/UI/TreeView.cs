@@ -58,7 +58,7 @@ namespace NuclearWinter.UI
 
             Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args ) { _args.Item.Parent = this; UpdateContentSize(); };
 
-            mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.ButtonTextColor );
+            mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.DefaultTextColor );
             mImage      = new Image( Screen );
             mImage.Padding = new Box( 0, 5, 0, 10 );
 

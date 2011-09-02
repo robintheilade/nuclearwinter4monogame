@@ -22,7 +22,7 @@ namespace NuclearWinter.UI
         {
             mLabel = new Label( _screen );
             mLabel.Anchor = Anchor.Start;
-            mLabel.Color = Screen.Style.ButtonTextColor;
+            mLabel.Color = Screen.Style.DefaultTextColor;
             mLabel.WrapText = true;
         }
 

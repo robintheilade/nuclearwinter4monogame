@@ -76,7 +76,7 @@ namespace NuclearWinter.UI
         {
             mNotebook       = _notebook;
 
-            mLabel          = new Label( Screen, "", Screen.Style.ButtonTextColor );
+            mLabel          = new Label( Screen, "", Screen.Style.DefaultTextColor );
             mIcon           = new Image( Screen, _iconTex );
             mIcon.Padding   = new Box( 10, 0, 10, 20 );
 

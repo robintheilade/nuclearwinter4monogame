@@ -131,7 +131,7 @@ namespace NuclearWinter.UI
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
-            TextColor           = Screen.Style.ButtonTextColor;
+            TextColor           = Screen.Style.DefaultTextColor;
 
             UpdateContentSize();
         }
