@@ -113,20 +113,20 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             base.OnMouseDown( _hitPoint );
 
@@ -134,7 +134,7 @@ namespace NuclearWinter.UI
             OnActivateDown();
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             if( HitTest( _hitPoint ) == this )
             {
@@ -146,7 +146,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnTextEntered( char _char )
+        internal override void OnTextEntered( char _char )
         {
             if( ! IsReadOnly && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
@@ -155,7 +155,7 @@ namespace NuclearWinter.UI
             }
         }
         
-        public override void OnKeyPress( Keys _key )
+        internal override void OnKeyPress( Keys _key )
         {
             switch( _key )
             {
@@ -191,7 +191,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnPadMove( Direction _direction )
+        internal override void OnPadMove( Direction _direction )
         {
             if( _direction == Direction.Left || _direction == Direction.Right )
             {
@@ -203,12 +203,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnFocus()
+        internal override void OnFocus()
         {
             Screen.AddWidgetToUpdateList( this );
         }
 
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             if( ! HasFocus )
             {

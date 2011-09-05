@@ -90,27 +90,27 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             mPressedAnim.Update( _fElapsedTime );
             return ! mPressedAnim.IsOver;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             base.OnMouseDown( _hitPoint );
             Screen.Focus( this );
@@ -137,7 +137,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             if( mbIsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
@@ -161,7 +161,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseMove(Point _hitPoint)
+        internal override void OnMouseMove(Point _hitPoint)
         {
             if( mbIsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
@@ -173,7 +173,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseWheel( int _iDelta )
+        internal override void OnMouseWheel( int _iDelta )
         {
             int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120, 0, Math.Max( 0, mlValues.Count - siMaxLineDisplayed ) );
             miHoveredValueIndex += iNewScrollOffset - miScrollOffset;
@@ -188,7 +188,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnActivateDown()
+        internal override void OnActivateDown()
         {
             if( mbIsOpen )
             {
@@ -212,7 +212,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnActivateUp()
+        internal override void OnActivateUp()
         {
             if( mbIsOpen )
             {
@@ -229,7 +229,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool OnCancel( bool _bPressed )
+        internal override bool OnCancel( bool _bPressed )
         {
             if( mbIsOpen )
             {
@@ -243,7 +243,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnBlur()
+        internal override void OnBlur()
         {
             mPressedAnim.SetTime( 1f );
             mbIsOpen = false;
@@ -251,7 +251,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnPadMove( Direction _direction )
+        internal override void OnPadMove( Direction _direction )
         {
             if( ! mbIsOpen )
             {

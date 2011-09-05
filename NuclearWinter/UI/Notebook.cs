@@ -148,13 +148,13 @@ namespace NuclearWinter.UI
             return mCloseButton.HitTest( _point ) ?? base.HitTest( _point );
         }
 
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
             //OnActivateDown();
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
             {
@@ -169,21 +169,21 @@ namespace NuclearWinter.UI
             }*/
         }
 
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
         }
 
-        public override void OnMouseMove( Point _hitPoint )
+        internal override void OnMouseMove( Point _hitPoint )
         {
         }
 
-        public override void OnPadMove( Direction _direction )
+        internal override void OnPadMove( Direction _direction )
         {
             int iTabIndex = mNotebook.Tabs.IndexOf( this );
 
@@ -204,7 +204,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnActivateUp()
+        internal override void OnActivateUp()
         {
             mNotebook.SetActiveTab( this );
         }
@@ -374,12 +374,12 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             return Tabs[ActiveTabIndex].OnPadButton( _button, _bIsDown );
         }
 
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             return Tabs[ActiveTabIndex].Update( _fElapsedTime );
         }

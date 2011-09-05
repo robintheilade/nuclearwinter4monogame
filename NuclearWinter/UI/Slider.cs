@@ -62,18 +62,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
             mbIsPressed = true;
@@ -83,7 +83,7 @@ namespace NuclearWinter.UI
             if( ChangeHandler != null ) ChangeHandler();
         }
 
-        public override void OnMouseMove( Point _hitPoint )
+        internal override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsPressed )
             {
@@ -99,13 +99,13 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             mbIsPressed = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnPadMove(Direction _direction)
+        internal override void OnPadMove(Direction _direction)
         {
             if( _direction == Direction.Left )
             {

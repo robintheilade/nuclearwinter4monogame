@@ -104,7 +104,7 @@ namespace NuclearWinter.UI
             return null;
         }
 
-        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             foreach( Widget child in mlChildren )
             {

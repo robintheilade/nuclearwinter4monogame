@@ -203,33 +203,33 @@ namespace NuclearWinter.UI
             }
         }
 
-        public virtual bool     OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
-
-        public virtual bool     Update( float _fElapsedTime ) { return false; }
-        internal abstract void  UpdateContentSize();
+        internal virtual bool     Update( float _fElapsedTime ) { return false; }
+        internal abstract void      UpdateContentSize();
 
         //----------------------------------------------------------------------
         // Events
-        public virtual void     OnMouseDown ( Point _hitPoint ) {}
-        public virtual void     OnMouseUp   ( Point _hitPoint ) {}
+        internal virtual void     OnMouseDown ( Point _hitPoint ) {}
+        internal virtual void     OnMouseUp   ( Point _hitPoint ) {}
 
-        public virtual void     OnMouseEnter( Point _hitPoint ) {}
-        public virtual void     OnMouseOut  ( Point _hitPoint ) {}
-        public virtual void     OnMouseMove ( Point _hitPoint ) {}
+        internal virtual void     OnMouseEnter( Point _hitPoint ) {}
+        internal virtual void     OnMouseOut  ( Point _hitPoint ) {}
+        internal virtual void     OnMouseMove ( Point _hitPoint ) {}
 
-        public virtual void     OnMouseWheel( int _iDelta ) {}
+        internal virtual void     OnMouseWheel( int _iDelta ) {}
 
-        public virtual void     OnKeyPress  ( Keys _key ) {}
-        public virtual void     OnTextEntered( char _char ) {}
+        internal virtual void     OnKeyPress  ( Keys _key ) {}
+        internal virtual void     OnTextEntered( char _char ) {}
 
-        public virtual void     OnActivateDown() {}
-        public virtual void     OnActivateUp() {}
-        public virtual bool     OnCancel( bool _bPressed ) { return false; } // return true to consume the event
+        internal virtual void     OnActivateDown() {}
+        internal virtual void     OnActivateUp() {}
+        internal virtual bool     OnCancel( bool _bPressed ) { return false; } // return true to consume the event
 
-        public virtual void     OnFocus() {}
-        public virtual void     OnBlur() {}
+        internal virtual void     OnFocus() {}
+        internal virtual void     OnBlur() {}
 
-        public virtual void     OnPadMove( Direction _direction ) {
+        internal virtual bool     OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
+
+        internal virtual void     OnPadMove( Direction _direction ) {
             Widget widget = GetSibling( _direction, this );
 
             if( widget != null )

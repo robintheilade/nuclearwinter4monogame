@@ -19,7 +19,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             mfAngle += _fElapsedTime * 3f;
 

@@ -140,7 +140,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             if( Child != null )
             {
@@ -152,7 +152,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             if( Child != null )
             {
@@ -164,7 +164,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             if( Child != null )
             {
@@ -176,7 +176,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             if( Child != null )
             {
@@ -188,7 +188,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseMove( Point _hitPoint )
+        internal override void OnMouseMove( Point _hitPoint )
         {
             if( Child != null )
             {
@@ -200,7 +200,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             if( Child != null )
             {
@@ -212,7 +212,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             if( Child != null )
             {

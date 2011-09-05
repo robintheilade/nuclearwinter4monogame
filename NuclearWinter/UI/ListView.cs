@@ -261,24 +261,24 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
             mHoverPoint = _hitPoint;
         }
 
-        public override void OnMouseMove(Point _hitPoint)
+        internal override void OnMouseMove(Point _hitPoint)
         {
             mHoverPoint = _hitPoint;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
             miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) ) / ( RowHeight + RowSpacing ) );
@@ -288,7 +288,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) ) / ( RowHeight + RowSpacing ) );
 
@@ -299,7 +299,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnActivateUp()
+        internal override void OnActivateUp()
         {
             if( miFocusedRowIndex != SelectedRowIndex && miFocusedRowIndex != -1 )
             {
@@ -313,7 +313,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnPadMove( Direction _direction )
+        internal override void OnPadMove( Direction _direction )
         {
             if( _direction == Direction.Up )
             {
@@ -341,7 +341,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnKeyPress( Keys _key )
+        internal override void OnKeyPress( Keys _key )
         {
             switch( _key )
             {
@@ -352,7 +352,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnBlur()
+        internal override void OnBlur()
         {
             miFocusedRowIndex = -1;
         }

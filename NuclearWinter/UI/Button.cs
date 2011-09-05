@@ -226,27 +226,27 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override bool Update( float _fElapsedTime )
+        internal override bool Update( float _fElapsedTime )
         {
             mPressedAnim.Update( _fElapsedTime );
             return ! mPressedAnim.IsOver;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint )
         {
             base.OnMouseDown( _hitPoint );
 
@@ -254,7 +254,7 @@ namespace NuclearWinter.UI
             OnActivateDown();
         }
 
-        public override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint )
         {
             if( HitTest( _hitPoint ) == this )
             {
@@ -273,7 +273,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override bool OnPadButton( Buttons _button, bool _bIsDown )
+        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             if( _button == mBoundPadButton )
             {
@@ -294,13 +294,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnActivateDown()
+        internal override void OnActivateDown()
         {
             mbIsPressed = true;
             mPressedAnim.SetTime( 0f );
         }
 
-        public override void OnActivateUp()
+        internal override void OnActivateUp()
         {
             mPressedAnim.SetTime( 0f );
             mbIsPressed = false;
@@ -308,7 +308,7 @@ namespace NuclearWinter.UI
             if( ClickHandler != null ) ClickHandler( this );
         }
 
-        public override void OnBlur()
+        internal override void OnBlur()
         {
             ResetPressState();
         }
