@@ -385,18 +385,20 @@ namespace NuclearWinter.UI
                 int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing );
                 if( MergeColumns )
                 {
-                    Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Rectangle rowRect = new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight );
+
+                    Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
                     if( HasFocus && miFocusedRowIndex == iRow )
                     {
                         if( SelectedRowIndex != iRow )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameFocus, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
                         else
                         if( Style.FrameSelectedFocus != null )
                         {
-                            Screen.DrawBox( Style.FrameSelectedFocus, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.FrameSelectedFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
                     }
 
@@ -404,12 +406,12 @@ namespace NuclearWinter.UI
                     {
                         if( SelectedRowIndex != iRow )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
                         else
                         if( Style.FrameSelectedHover != null )
                         {
-                            Screen.DrawBox( Style.FrameSelectedHover, new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.FrameSelectedHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
                     }
                 }
@@ -419,20 +421,22 @@ namespace NuclearWinter.UI
                 {
                     ListViewColumn col = Columns[i];
 
+                    Rectangle rowRect = new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight );
+
                     if( ! MergeColumns )
                     {
-                        Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
                         if( HasFocus && miFocusedRowIndex == iRow )
                         {
                             if( SelectedRowIndex != iRow )
                             {
-                                Screen.DrawBox( Screen.Style.GridBoxFrameFocus, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
                             else
                             if( Style.FrameSelectedFocus != null )
                             {
-                                Screen.DrawBox( Style.FrameSelectedFocus, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.FrameSelectedFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
                         }
 
@@ -440,12 +444,12 @@ namespace NuclearWinter.UI
                         {
                             if( SelectedRowIndex != iRow )
                             {
-                                Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
                             else
                             if( Style.FrameSelectedHover != null )
                             {
-                                Screen.DrawBox( Style.FrameSelectedHover, new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.FrameSelectedHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
                         }
                     }

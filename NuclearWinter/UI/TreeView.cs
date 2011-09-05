@@ -21,15 +21,25 @@ namespace NuclearWinter.UI
             }
         }
 
+        string mstrText = "";
         public string               Text
         {
-            get { return mLabel.Text; }
-            set { mLabel.Text = value; }
+            get { return mstrText; }
+            set {
+                mstrText = value;
+                UpdateLabel();
+            }
+        }
+
+        void UpdateLabel()
+        {
+            mLabel.Text = Collapsed ? string.Format( "{0} ({1})", mstrText, ContainedNodeCount ) : mstrText;
         }
 
         public object               Tag;
 
-        public ObservableList<TreeViewNode>     Children        { get; private set; }
+        public ObservableList<TreeViewNode>     Children            { get; private set; }
+        public int                              ContainedNodeCount  { get; private set; }
 
         public bool                 DisplayAsContainer;
         public bool                 Collapsed {
@@ -56,8 +66,23 @@ namespace NuclearWinter.UI
             mTreeView   = _treeView;
             Children    = new ObservableList<TreeViewNode>();
 
-            Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args ) { _args.Item.Parent = this; UpdateContentSize(); };
+            Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
+            {
+                _args.Item.Parent = _args.Added ? this : null;
 
+                if( _args.Added )
+                {
+                    OnNodeAdded();
+                }
+                else
+                {
+                    OnNodeRemoved();
+                }
+
+                UpdateContentSize();
+            };
+
+            mstrText = _strText;
             mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.DefaultTextColor );
             mImage      = new Image( Screen );
             mImage.Padding = new Box( 0, 5, 0, 10 );
@@ -87,10 +112,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            ContentHeight = mTreeView.NodeHeight;
+            UpdateLabel();
+
+            ContentHeight = mTreeView.NodeHeight + mTreeView.NodeSpacing;
             if( Children.Count > 0 && ! mbCollapsed )
             {
-                ContentHeight += mTreeView.NodeSpacing * (Children.Count + 1);
                 foreach( TreeViewNode child in Children )
                 {
                     ContentHeight += child.ContentHeight;
@@ -108,6 +134,27 @@ namespace NuclearWinter.UI
         {
             UpdateContentSize();
         }
+
+        void OnNodeAdded()
+        {
+            ContainedNodeCount++;
+
+            if( Parent is TreeViewNode )
+            {
+                ((TreeViewNode)Parent).OnNodeAdded();
+            }
+        }
+
+        void OnNodeRemoved()
+        {
+            ContainedNodeCount--;
+
+            if( Parent is TreeViewNode )
+            {
+                ((TreeViewNode)Parent).OnNodeRemoved();
+            }
+        }
+
 
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
@@ -131,7 +178,7 @@ namespace NuclearWinter.UI
             foreach( TreeViewNode child in Children )
             {
                 child.DoLayout( new Rectangle( iX + mTreeView.NodeBranchWidth, iY, Size.X - mTreeView.NodeBranchWidth, child.ContentHeight ) );
-                iY += child.ContentHeight + mTreeView.NodeSpacing;
+                iY += child.ContentHeight;
             }
 
             if( Parent != null )
@@ -149,9 +196,11 @@ namespace NuclearWinter.UI
                 Screen.Game.SpriteBatch.Draw( mbIsLast ? Screen.Style.TreeViewBranchLast : Screen.Style.TreeViewBranch, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
             }
 
+            Rectangle nodeRect = new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight );
+
             if( Children.Count == 0 && ! DisplayAsContainer )
             {
-                Screen.DrawBox( Screen.Style.GridBoxFrame, new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.GridBoxFrame, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
             }
             else
             {
@@ -172,6 +221,11 @@ namespace NuclearWinter.UI
 
             mLabel.Draw();
 
+            if( mTreeView.HoveredNode == this )
+            {
+                Screen.DrawBox( Screen.Style.GridBoxFrameHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+            }
+
             if( ! mbCollapsed )
             {
                 foreach( TreeViewNode child in Children )
@@ -191,6 +245,13 @@ namespace NuclearWinter.UI
         public int                          NodeHeight      = 40;
         public int                          NodeSpacing     = 0;
         public int                          NodeBranchWidth = 25;
+
+        //----------------------------------------------------------------------
+        internal TreeViewNode               HoveredNode     = null;
+
+        //----------------------------------------------------------------------
+        bool                                mbIsHovered;
+        Point                               mHoverPoint;
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -219,6 +280,78 @@ namespace NuclearWinter.UI
             {
                 node.DoLayout( new Rectangle( iX, iY, Size.X - 20, node.ContentHeight ) );
                 iY += node.ContentHeight;
+            }
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseEnter( Point _hitPoint )
+        {
+            mbIsHovered = true;
+            mHoverPoint = _hitPoint;
+            UpdateHoveredNode();
+        }
+
+        internal override void OnMouseMove(Point _hitPoint)
+        {
+            mHoverPoint = _hitPoint;
+            UpdateHoveredNode();
+        }
+
+        internal override void OnMouseOut( Point _hitPoint )
+        {
+            mbIsHovered = false;
+            UpdateHoveredNode();
+        }
+
+        void UpdateHoveredNode()
+        {
+            HoveredNode = null;
+            if( mbIsHovered )
+            {
+                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) ) / ( NodeHeight + NodeSpacing );
+
+                HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
+            }
+        }
+
+        TreeViewNode FindHoveredNode( IList<TreeViewNode> _children, int _iNodeIndex, int _iNodeOffset )
+        {
+            foreach( TreeViewNode node in _children )
+            {
+                if( _iNodeOffset == _iNodeIndex )
+                {
+                    return node;
+                }
+                else
+                if( node.Collapsed )
+                {
+                    _iNodeOffset += 1;
+                }
+                else
+                if( _iNodeOffset + node.ContainedNodeCount >= _iNodeIndex )
+                {
+                    return FindHoveredNode( node.Children, _iNodeIndex, _iNodeOffset + 1 );
+                }
+                else
+                {
+                    _iNodeOffset += 1 + node.ContainedNodeCount;
+                }
+            }
+
+            return null;
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseDown( Point _hitPoint )
+        {
+            Screen.Focus( this );
+        }
+
+        internal override void OnMouseUp( Point _hitPoint )
+        {
+            if( HoveredNode != null && HoveredNode.DisplayAsContainer )
+            {
+                HoveredNode.Collapsed = ! HoveredNode.Collapsed;
             }
         }
 

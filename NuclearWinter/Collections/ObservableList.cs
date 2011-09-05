@@ -19,11 +19,13 @@ namespace NuclearWinter.Collections
         {
             public int      Index;
             public T        Item;
+            public bool     Added;
 
-            public ListChangedEventArgs( int _index, T _item )
+            public ListChangedEventArgs( int _index, T _item, bool _bAdded )
             {
-                Index  = _index;
-                Item   = _item;
+                Index   = _index;
+                Item    = _item;
+                Added   = _bAdded;
             }
         }
 
@@ -76,14 +78,14 @@ namespace NuclearWinter.Collections
         public void Insert( int index, T item )
         {
             internalList.Insert( index, item );
-            OnListChanged( new ListChangedEventArgs( index, item ) );
+            OnListChanged( new ListChangedEventArgs( index, item, true ) );
         }
 
         public void RemoveAt( int index )
         {
             T item = internalList[index];
             internalList.Remove( item );
-            OnListChanged( new ListChangedEventArgs( index, item ) );
+            OnListChanged( new ListChangedEventArgs( index, item, false ) );
         }
 
         public T this[int index]
@@ -91,14 +93,14 @@ namespace NuclearWinter.Collections
             get { return internalList[index]; }
             set {
                 internalList[index] = value;
-                OnListChanged( new ListChangedEventArgs( index, value ) );
+                OnListChanged( new ListChangedEventArgs( index, value, true ) );
             }
         }
 
         public void Add( T item )
         {
             internalList.Add(item);
-            OnListChanged( new ListChangedEventArgs( internalList.IndexOf( item ), item ) );
+            OnListChanged( new ListChangedEventArgs( internalList.IndexOf( item ), item, true ) );
         }
 
         public void Clear() {
@@ -127,7 +129,7 @@ namespace NuclearWinter.Collections
                 int index = internalList.IndexOf(item);
                 if( internalList.Remove(item) )
                 {
-                    OnListChanged(new ListChangedEventArgs(index, item));
+                    OnListChanged( new ListChangedEventArgs( index, item, false ) );
                     return true;
                 }
                 else
