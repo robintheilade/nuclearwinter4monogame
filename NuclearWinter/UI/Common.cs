@@ -66,5 +66,11 @@ namespace NuclearWinter.UI
             mSpriteFont.LineSpacing = _iLineSpacing;
             YOffset     = _iYOffset;
         }
+
+        //----------------------------------------------------------------------
+        public UIFont( SpriteFont _font )
+        : this( _font, _font.LineSpacing, 0 )
+        {
+        }
     }
 }
