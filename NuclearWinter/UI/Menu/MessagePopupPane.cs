@@ -41,16 +41,11 @@ namespace NuclearWinter.UI
 
             int iPadding = FixedGroup.Screen.Style.PopupFrameCornerSize;
 
-            Rectangle paneRect = new Rectangle(
-                Manager.PopupScreen.Width / 2 - Width / 2 - iPadding,
-                Manager.PopupScreen.Height / 2 - Height / 2 - iPadding, 
-                Width + iPadding * 2, Height + iPadding * 2 );
-
             NuclearWinter.UI.Panel panel = new NuclearWinter.UI.Panel( FixedGroup.Screen, FixedGroup.Screen.Style.PopupFrame, FixedGroup.Screen.Style.PopupFrameCornerSize );
-            FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( panel, AnchoredRect.CreateCentered( paneRect.Width, paneRect.Height ) ) );
+            FixedGroup.AddChild( new NuclearWinter.UI.FixedWidget( panel, AnchoredRect.CreateCentered( Width, Height ) ) );
 
             FixedGroup page = new FixedGroup( FixedGroup.Screen );
-            FixedGroup.AddChild( new FixedWidget( page, AnchoredRect.CreateCentered( paneRect.Width, paneRect.Height ) ) );
+            FixedGroup.AddChild( new FixedWidget( page, AnchoredRect.CreateCentered( Width, Height ) ) );
 
             TitleLabel = new NuclearWinter.UI.Label( Manager.MenuScreen, "", NuclearWinter.UI.Anchor.Start );
             TitleLabel.Font = Manager.MenuScreen.Style.BigFont;
@@ -68,7 +63,7 @@ namespace NuclearWinter.UI
 
                 // Actions
                 NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Direction.Left, 0 );
-                page.AddChild( new FixedWidget( actionsGroup, AnchoredRect.CreateBottomAnchored( iPadding, iPadding, iPadding, 60 ), Anchor.End ) );
+                page.AddChild( new FixedWidget( actionsGroup, AnchoredRect.CreateBottomAnchored( iPadding, iPadding, iPadding, FixedGroup.Screen.Style.DefaultButtonHeight ), Anchor.End ) );
 
                 // Close
                 // FIXME: i18n

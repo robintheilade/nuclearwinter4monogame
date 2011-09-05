@@ -190,7 +190,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position        = _rect.Location;
             Size            = new Point( _rect.Width, _rect.Height );

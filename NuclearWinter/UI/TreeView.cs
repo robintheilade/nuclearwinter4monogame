@@ -85,7 +85,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             ContentHeight = mTreeView.NodeHeight;
             if( Children.Count > 0 && ! mbCollapsed )
@@ -110,7 +110,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -142,7 +142,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             if( Parent != null )
             {
@@ -200,14 +200,14 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -223,7 +223,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 

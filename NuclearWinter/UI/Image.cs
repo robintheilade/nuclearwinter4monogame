@@ -37,7 +37,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             int iWidth = mTexture != null ? mTexture.Width : 0;
             int iHeight = mTexture != null ? mTexture.Height : 0;
@@ -72,7 +72,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -88,7 +88,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             if( mTexture == null ) return;
 

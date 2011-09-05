@@ -176,12 +176,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             foreach( FixedWidget fixedWidget in mlChildren )
             {
@@ -290,11 +290,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             foreach( FixedWidget child in mlChildren )
             {
-                child.Child.Draw();
+                child.Draw();
             }
         }
     }

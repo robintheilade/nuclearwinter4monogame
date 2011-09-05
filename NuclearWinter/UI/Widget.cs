@@ -188,7 +188,7 @@ namespace NuclearWinter.UI
             Screen = _screen;
         }
 
-        public abstract void    DoLayout( Rectangle _rect );
+        internal abstract void  DoLayout( Rectangle _rect );
 
         //----------------------------------------------------------------------
         public virtual Widget   HitTest( Point _point )
@@ -206,7 +206,7 @@ namespace NuclearWinter.UI
         public virtual bool     OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
 
         public virtual bool     Update( float _fElapsedTime ) { return false; }
-        protected abstract void UpdateContentSize();
+        internal abstract void  UpdateContentSize();
 
         //----------------------------------------------------------------------
         // Events
@@ -244,7 +244,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public abstract void    Draw();
-        public virtual void     DrawFocused() {}
+        internal abstract void  Draw();
+        internal virtual void   DrawFocused() {}
     }
 }

@@ -30,6 +30,11 @@ namespace NuclearWinter.UI
                 }
 
                 UpdateContentSize();
+
+                if( Parent != null )
+                {
+                    Parent.UpdateContentSize();
+                }
             }
         }
 
@@ -79,7 +84,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             if( mChild != null )
             {
@@ -94,7 +99,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             ChildRectangle = _rect;
 
@@ -220,7 +225,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             if( Child != null )
             {

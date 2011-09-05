@@ -88,7 +88,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             mstrDisplayedText = ( mPasswordCharacter == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordCharacter );
 
@@ -97,7 +97,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -222,7 +222,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.EditBoxFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
 

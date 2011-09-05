@@ -271,7 +271,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Horizontal;
             ContentHeight   = 0;
@@ -285,7 +285,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -392,7 +392,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             foreach( Button button in mlButtons )
             {

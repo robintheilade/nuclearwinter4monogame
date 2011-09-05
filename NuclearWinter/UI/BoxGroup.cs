@@ -94,7 +94,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             bool bHorizontal = mDirection == Direction.Left || mDirection == Direction.Right;
 
@@ -109,6 +109,11 @@ namespace NuclearWinter.UI
                 }
 
                 ContentHeight += Padding.Vertical;
+
+                if( mlChildren.Count > 1 )
+                {
+                    ContentWidth += miSpacing * ( mlChildren.Count - 1 );
+                }
             }
             else
             {
@@ -121,11 +126,15 @@ namespace NuclearWinter.UI
                 }
 
                 ContentWidth += Padding.Horizontal;
+                if( mlChildren.Count > 1 )
+                {
+                    ContentHeight += miSpacing * ( mlChildren.Count - 1 );
+                }
             }
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position        = _rect.Location;
             Size            = new Point( _rect.Width, _rect.Height );

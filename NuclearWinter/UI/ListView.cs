@@ -45,8 +45,8 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public abstract void DoLayout( ListViewColumn _col );
-        public abstract void Draw( Point _location );
+        internal abstract void DoLayout( ListViewColumn _col );
+        internal abstract void Draw( Point _location );
     }
 
     //--------------------------------------------------------------------------
@@ -64,7 +64,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( ListViewColumn _col )
+        internal override void DoLayout( ListViewColumn _col )
         {
             mstrText = Text;
             mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
@@ -96,7 +96,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw( Point _location )
+        internal override void Draw( Point _location )
         {
             Vector2 vTextPos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - ( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
             vTextPos += mvTextOffset;
@@ -119,7 +119,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( ListViewColumn _col )
+        internal override void DoLayout( ListViewColumn _col )
         {
             mvOffset = Vector2.Zero;
             switch( _col.Anchor )
@@ -137,7 +137,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw( Point _location )
+        internal override void Draw( Point _location )
         {
             Vector2 vImagePos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - Image.Height / 2f );
             vImagePos += mvOffset;
@@ -231,14 +231,14 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
@@ -358,7 +358,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
