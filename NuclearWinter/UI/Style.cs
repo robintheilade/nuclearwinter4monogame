@@ -20,7 +20,7 @@ namespace NuclearWinter.UI
 
         public int              ButtonCornerSize = 30;
         public int              DefaultButtonHeight = 80;
-        public Color            DefaultTextColor;
+        public Color            DefaultTextColor = Color.White;
         public Texture2D        ButtonFrame;
 
         public Texture2D        ButtonFrameHover;
