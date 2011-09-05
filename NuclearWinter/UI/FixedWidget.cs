@@ -30,11 +30,6 @@ namespace NuclearWinter.UI
                 }
 
                 UpdateContentSize();
-
-                if( Parent != null )
-                {
-                    Parent.UpdateContentSize();
-                }
             }
         }
 
@@ -96,6 +91,8 @@ namespace NuclearWinter.UI
                 ContentWidth = 0;
                 ContentHeight = 0;
             }
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

@@ -204,7 +204,16 @@ namespace NuclearWinter.UI
         }
 
         internal virtual bool     Update( float _fElapsedTime ) { return false; }
-        internal abstract void      UpdateContentSize();
+
+        internal virtual void UpdateContentSize()
+        {
+            // Compute content size then call this!
+
+            if( Parent != null )
+            {
+                Parent.UpdateContentSize();
+            }
+        }
 
         //----------------------------------------------------------------------
         // Events

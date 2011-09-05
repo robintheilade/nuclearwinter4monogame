@@ -183,6 +183,8 @@ namespace NuclearWinter.UI
             }
 
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

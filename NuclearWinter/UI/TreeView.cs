@@ -46,6 +46,7 @@ namespace NuclearWinter.UI
             get { return mbCollapsed; }
             set {
                 mbCollapsed = value;
+                UpdateLabel();
                 UpdateContentSize();
             }
         }
@@ -79,6 +80,7 @@ namespace NuclearWinter.UI
                     OnNodeRemoved();
                 }
 
+                UpdateLabel();
                 UpdateContentSize();
             };
 
@@ -112,8 +114,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            UpdateLabel();
-
             ContentHeight = mTreeView.NodeHeight + mTreeView.NodeSpacing;
             if( Children.Count > 0 && ! mbCollapsed )
             {
@@ -127,6 +127,8 @@ namespace NuclearWinter.UI
             {
                 ((TreeViewNode)Parent).ChildSizeChanged();
             }
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -265,6 +267,8 @@ namespace NuclearWinter.UI
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

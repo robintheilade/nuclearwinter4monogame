@@ -115,6 +115,8 @@ namespace NuclearWinter.UI
                 mlstrWrappedText = null;
                 DoWrapText();
             }
+
+            base.UpdateContentSize();
         }
 
         void DoWrapText()

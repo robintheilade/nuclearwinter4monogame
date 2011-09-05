@@ -94,6 +94,8 @@ namespace NuclearWinter.UI
 
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

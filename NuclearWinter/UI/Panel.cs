@@ -32,8 +32,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            ContentWidth = 0;
-            ContentHeight = 0;
         }
 
         //----------------------------------------------------------------------

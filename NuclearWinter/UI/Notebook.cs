@@ -108,6 +108,8 @@ namespace NuclearWinter.UI
             }
 
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -291,8 +293,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            ContentWidth    = 0;
-            ContentHeight   = 0;
         }
 
         //----------------------------------------------------------------------

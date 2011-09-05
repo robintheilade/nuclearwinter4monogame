@@ -64,6 +64,8 @@ namespace NuclearWinter.UI
 
             ContentWidth    = iMaxWidth + Padding.Left + Padding.Right + Screen.Style.DropDownArrow.Width;
             ContentHeight   = (int)( uiFont.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

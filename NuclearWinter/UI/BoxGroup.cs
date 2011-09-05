@@ -131,6 +131,8 @@ namespace NuclearWinter.UI
                     ContentHeight += miSpacing * ( mlChildren.Count - 1 );
                 }
             }
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

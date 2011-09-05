@@ -282,6 +282,8 @@ namespace NuclearWinter.UI
             }
 
             ContentHeight += Padding.Vertical;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------

@@ -31,6 +31,8 @@ namespace NuclearWinter.UI
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
