@@ -12,8 +12,6 @@ namespace NuclearWinter.UI
      */
     public class Image: Widget
     {
-        public override bool CanFocus { get { return false; } }
-
         protected bool mbStretch;
         public bool Stretch {
             get { return mbStretch; }
@@ -33,7 +31,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
+        }
+
+        //----------------------------------------------------------------------
+        internal override void UpdateContentSize()
         {
             int iWidth = mTexture != null ? mTexture.Width : 0;
             int iHeight = mTexture != null ? mTexture.Height : 0;
@@ -68,13 +72,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
@@ -87,13 +88,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             if( mTexture == null ) return;
 
             if( ! mbStretch )
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Padding.Left, Position.Y + Padding.Top ), Color );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Size.X / 2 - ContentWidth / 2 + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ), Color );
             }
             else
             {

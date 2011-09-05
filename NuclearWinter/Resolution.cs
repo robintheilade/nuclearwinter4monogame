@@ -67,6 +67,7 @@ namespace NuclearWinter
     {
         static Resolution()
         {
+            ScaleFactor = 1f;
             InternalMode = new ScreenMode( 1920, 1080 );
 
             SortedScreenModes = new List<ScreenMode>();

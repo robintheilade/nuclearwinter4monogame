@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace NuclearWinter.GameFlow
 {
@@ -13,15 +14,23 @@ namespace NuclearWinter.GameFlow
         public GameState( T _game )
         {
             Game = _game;
+            Content = new ContentManager( _game.Services );
+            Content.RootDirectory = "Content";
         }
 
         //----------------------------------------------------------------------
         // Start the GameState, called when it becomes the current one
-        public abstract void Start();
+        public virtual void Start()
+        {
+            Game.ResetElapsedTime();
+        }
 
         //----------------------------------------------------------------------
         // Stop the GameState, called when switching to another one
-        public abstract void Stop();
+        public virtual void Stop()
+        {
+            Content.Unload();
+        }
 
         //----------------------------------------------------------------------
         public virtual void OnActivated() {}
@@ -66,5 +75,6 @@ namespace NuclearWinter.GameFlow
 
         //----------------------------------------------------------------------
         public readonly T           Game;
+        public ContentManager       Content;
     }
 }

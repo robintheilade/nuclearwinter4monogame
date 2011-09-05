@@ -13,7 +13,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
-    <XnaProfile>HiDef</XnaProfile>
+    <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>81a398ec-87fd-441b-929a-094d399987b1</XnaCrossPlatformGroupID>
     <XnaOutputType>Library</XnaOutputType>
     <PublishUrl>publish\</PublishUrl>
@@ -92,14 +92,16 @@
     <Compile Include="Animation\SmoothValue.cs" />
     <Compile Include="Animation\Timeline.cs" />
     <Compile Include="Collections\KeyedList.cs" />
+    <Compile Include="Collections\ObservableList.cs" />
     <Compile Include="GameFlow\GameState.cs" />
     <Compile Include="GameFlow\GameStateFadeTransition.cs" />
     <Compile Include="GameFlow\GameStateMgr.cs" />
     <Compile Include="GameFlow\IGameState.cs" />
     <Compile Include="Input\Accelerometer.cs" />
+    <Compile Include="Input\TextInput.cs" />
     <Compile Include="SaveHandler.cs" />
-    <Compile Include="Input\GamePadManager.cs" />
-    <Compile Include="Input\TouchManager.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Input\TouchInputManager.cs" />
     <Compile Include="LocalizedKeyboardState.cs" />
     <Compile Include="NuclearGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -111,11 +113,19 @@
     <Compile Include="UI\DropDownBox.cs" />
     <Compile Include="UI\EditBox.cs" />
     <Compile Include="UI\FixedGroup.cs" />
+    <Compile Include="UI\FixedWidget.cs" />
     <Compile Include="UI\GridGroup.cs" />
     <Compile Include="UI\Group.cs" />
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListView.cs" />
+    <Compile Include="UI\Menu\IMenuManager.cs" />
+    <Compile Include="UI\Menu\ManagerPane.cs" />
+    <Compile Include="UI\Menu\MenuManager.cs" />
+    <Compile Include="UI\Menu\MessagePopupPane.cs" />
+    <Compile Include="UI\Menu\Pane.cs" />
+    <Compile Include="UI\Menu\PopupPane.cs" />
+    <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
     <Compile Include="UI\RootGroup.cs" />
@@ -123,8 +133,9 @@
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpinningWheel.cs" />
     <Compile Include="UI\Style.cs" />
+    <Compile Include="UI\TextArea.cs" />
+    <Compile Include="UI\TreeView.cs" />
     <Compile Include="UI\Widget.cs" />
-    <Compile Include="UI\WidgetProxy.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +173,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Private>False</Private>
     </Reference>

@@ -12,8 +12,8 @@ namespace NuclearWinter.UI
      */
     public class Label: Widget
     {
-        SpriteFont mFont;
-        public SpriteFont       Font
+        UIFont mFont;
+        public UIFont       Font
         {
             get { return mFont; }
             
@@ -26,8 +26,8 @@ namespace NuclearWinter.UI
 
         List<string>    mlstrWrappedText;
         string          mstrText;
+        string          mstrDisplayedText;
         Point           mpTextPosition;
-
         public string           Text
         {
             get
@@ -38,6 +38,7 @@ namespace NuclearWinter.UI
             set
             {
                 mstrText = value;
+                mstrDisplayedText = value;
                 UpdateContentSize();
             }
         }
@@ -46,17 +47,15 @@ namespace NuclearWinter.UI
         public Anchor   Anchor
         {
             get { return mAnchor; }
-            set { mAnchor = value; DoLayout( null ); }
+            set { mAnchor = value; UpdateContentSize(); }
         }
 
         bool    mbWrapText;
         public bool WrapText
         {
             get { return mbWrapText; }
-            set { mbWrapText = value; UpdateContentSize(); DoLayout( null ); }
+            set { mbWrapText = value; UpdateContentSize(); }
         }
-
-        public override bool CanFocus { get { return false; } }
 
 
         public Color            Color;
@@ -66,6 +65,7 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             mstrText    = _strText;
+            mstrDisplayedText = mstrText;
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 10 );
             mAnchor     = _anchor;
@@ -82,29 +82,36 @@ namespace NuclearWinter.UI
         }
 
         public Label( Screen _screen, string _strText, Anchor _anchor )
-        : this( _screen, _strText, _anchor, Color.White )
+        : this( _screen, _strText, _anchor, _screen.Style.DefaultTextColor )
         {
 
         }
 
         public Label( Screen _screen, string _strText )
-        : this( _screen, _strText, Anchor.Center, Color.White )
+        : this( _screen, _strText, Anchor.Center, _screen.Style.DefaultTextColor )
         {
         }
 
         public Label( Screen _screen )
-        : this( _screen, "", Anchor.Center, Color.White )
+        : this( _screen, "", Anchor.Center, _screen.Style.DefaultTextColor )
         {
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
+        }
+
+        //----------------------------------------------------------------------
+        internal override void UpdateContentSize()
         {
             ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
             if( mbWrapText )
             {
+                ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Left + Padding.Right;
                 mlstrWrappedText = null;
                 DoWrapText();
             }
@@ -112,31 +119,44 @@ namespace NuclearWinter.UI
 
         void DoWrapText()
         {
-            if( ContentWidth > Size.X && Size.X > 0 )
+            if( mbWrapText )
             {
-                // Wrap text
-                mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
-                ContentWidth = Size.X;
-                ContentHeight = (int)( Font.LineSpacing * 0.9f * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                if( ContentWidth > Size.X && Size.X > 0 )
+                {
+                    // Wrap text
+                    mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
+                    ContentWidth = Size.X;
+                    ContentHeight = (int)( Font.LineSpacing * 0.9f * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                }
+                else
+                if( mlstrWrappedText == null )
+                {
+                    mlstrWrappedText = new List<string>();
+                    mlstrWrappedText.Add( mstrText );
+                }
             }
             else
-            if( mlstrWrappedText == null )
+            if( Text != "" )
             {
-                mlstrWrappedText = new List<string>();
-                mlstrWrappedText.Add( mstrText );
+                // Ellipsize
+                int iWidth = ContentWidth;
+                int iOffset = Text.Length;
+                while( iWidth > Size.X )
+                {
+                    iOffset--;
+                    mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
+
+                    iWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
+                }
             }
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-
-                DoWrapText();
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
+            DoWrapText();
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
@@ -158,7 +178,7 @@ namespace NuclearWinter.UI
                     break;
                 case UI.Anchor.End:
                     mpTextPosition = new Point(
-                        Position.X + Size.X - Padding.Right - ContentWidth,
+                        Position.X + Size.X - Padding.Right     - ContentWidth,
                         iTop
                     );
                     break;
@@ -166,18 +186,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             if( WrapText )
             {
                 for( int i = 0; i < mlstrWrappedText.Count; i++ )
                 {
-                    Screen.Game.DrawBlurredText( mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * 0.9f * i ) ), Color );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color );
                 }
             }
             else
             {
-                Screen.Game.DrawBlurredText( mFont, Text, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color );
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + Font.YOffset ), Color );
             }
         }
     }

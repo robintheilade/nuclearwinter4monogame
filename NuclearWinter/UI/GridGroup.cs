@@ -7,11 +7,11 @@ using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    public class GridGroupTile: WidgetProxy
+    public class GridGroupTile: FixedWidget
     {
         //----------------------------------------------------------------------
-        public GridGroupTile( Screen _screen, Widget _child, int _iColumn, int _iRow )
-        : base( _screen, _child )
+        public GridGroupTile( Screen _screen, int _iColumn, int _iRow )
+        : base( _screen, AnchoredRect.CreateFull(0) )
         {
             Column  = _iColumn;
             Row     = _iRow;
@@ -32,8 +32,6 @@ namespace NuclearWinter.UI
         int                         miSpacing; // FIXME: Not taken into account
         GridGroupTile[,]            maTiles;
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         public GridGroup( Screen _screen, int _iCols, int _iRows, bool _bExpand, int _iSpacing )
         : base( _screen )
@@ -47,7 +45,7 @@ namespace NuclearWinter.UI
             {
                 for( int iColumn = 0; iColumn < _iCols; iColumn++ )
                 {
-                    GridGroupTile tile = new GridGroupTile( Screen, null, iColumn, iRow );
+                    GridGroupTile tile = new GridGroupTile( Screen, iColumn, iRow );
                     tile.Parent = this;
                     maTiles[ iColumn, iRow ] = tile;
                 }
@@ -192,13 +190,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position        = _rect.Value.Location;
-                Size            = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position        = _rect.Location;
+            Size            = new Point( _rect.Width, _rect.Height );
 
             Debug.Assert( Size.X != 0 && Size.Y != 0 );
 

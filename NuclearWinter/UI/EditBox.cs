@@ -13,8 +13,8 @@ namespace NuclearWinter.UI
      */
     public class EditBox: Widget
     {
-        SpriteFont mFont;
-        public SpriteFont       Font
+        UIFont mFont;
+        public UIFont       Font
         {
             get { return mFont; }
             
@@ -35,6 +35,7 @@ namespace NuclearWinter.UI
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+                mfTimer = 0f;
             }
         }
         int     miCaretX;
@@ -42,14 +43,12 @@ namespace NuclearWinter.UI
         bool    mbIsHovered;
         float   mfTimer;
 
-        bool    mbHideContent;
+        public const char DefaultPasswordChar = '●';
 
-        public bool HideContent {
-            get { return mbHideContent; }
-            set {
-                mbHideContent = value;
-                UpdateContentSize();
-            }
+        char mPasswordCharacter = '\0';
+        public char PasswordChar {
+            get { return mPasswordCharacter; }
+            set { mPasswordCharacter = value; UpdateContentSize(); }
         }
 
         public string Text
@@ -66,9 +65,10 @@ namespace NuclearWinter.UI
 
         string                  mstrDisplayedText;
 
-        public override bool CanFocus { get { return true; } }
-
+        public Func<char,bool>  TextEnteredHandler;
         public Action<EditBox>  ValidateHandler;
+
+        public bool             IsReadOnly;
 
         //----------------------------------------------------------------------
         public EditBox( Screen _screen, string _strText )
@@ -76,7 +76,7 @@ namespace NuclearWinter.UI
         {
             mstrText    = _strText;
             mFont       = _screen.Style.MediumFont;
-            mPadding    = new Box( 10 );
+            mPadding    = new Box( 15 );
 
             UpdateContentSize();
         }
@@ -88,22 +88,19 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
-            mstrDisplayedText = (!mbHideContent) ? Text : "".PadLeft( Text.Length, '●' );
+            mstrDisplayedText = ( mPasswordCharacter == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordCharacter );
 
-            ContentWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
+            ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
 
@@ -149,12 +146,34 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public override void OnTextEntered( char _char )
+        {
+            if( ! IsReadOnly && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
+            {
+                Text = Text.Insert( CaretOffset, _char.ToString() );
+                CaretOffset++;
+            }
+        }
+        
         public override void OnKeyPress( Keys _key )
         {
             switch( _key )
             {
                 case Keys.Enter:
-                    if( ValidateHandler != null ) ValidateHandler( this );
+                    if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
+                    break;
+                case Keys.Back:
+                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset > 0 )
+                    {
+                        CaretOffset--;
+                        Text = Text.Remove( CaretOffset, 1 );
+                    }
+                    break;
+                case Keys.Delete:
+                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset < Text.Length )
+                    {
+                        Text = Text.Remove( CaretOffset, 1 );
+                    }
                     break;
                 case Keys.Left:
                     CaretOffset--;
@@ -162,28 +181,25 @@ namespace NuclearWinter.UI
                 case Keys.Right:
                     CaretOffset++;
                     break;
-                case Keys.Back:
-                    if( Text.Length > 0 && CaretOffset > 0 )
-                    {
-                        Text = Text.Substring( 0, CaretOffset - 1 ) + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                        //CaretOffset--;
-                    }
+                case Keys.End:
+                    CaretOffset = Text.Length;
                     break;
-                case Keys.Space:
-                    Text += " ";
-                    CaretOffset++;
-                    break;
-                default:
-                    if( _key >= Keys.A && _key <= Keys.Z )
-                    {
-                        string key = _key.ToString();
-                        bool bShift = Screen.Game.GamePadMgr.KeyboardState.Native.IsKeyDown( Keys.LeftShift ) || Screen.Game.GamePadMgr.KeyboardState.Native.IsKeyDown( Keys.RightShift );
-
-                        Text = Text.Substring( 0, CaretOffset ) + ( bShift ? key : key.ToLower() ) + Text.Substring( CaretOffset, Text.Length - CaretOffset );
-                        CaretOffset++;
-                    }
+                case Keys.Home:
+                    CaretOffset = 0;
                     break;
             }
+        }
+
+        //----------------------------------------------------------------------
+        public override void OnPadMove( Direction _direction )
+        {
+            if( _direction == Direction.Left || _direction == Direction.Right )
+            {
+                // Horizontal pad move are eaten since left and right are used to move the caret
+                return;
+            }
+
+            base.OnPadMove( _direction );
         }
 
         //----------------------------------------------------------------------
@@ -206,20 +222,20 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.EditBoxFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
 
-            if( mbIsHovered )
+            if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonFramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.Game.DrawBlurredText( mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y ), Color.White );
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + mFont.YOffset ), Color.White );
 
             const float fBlinkInterval = 0.3f;
 
-            if( HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
+            if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX, Position.Y + Padding.Top, 3, Size.Y - Padding.Vertical ), Color.White );
             }

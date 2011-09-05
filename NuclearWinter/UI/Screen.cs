@@ -18,12 +18,15 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public NuclearGame  Game                { get; private set; }
+        public bool         IsActive;
+
         public Style        Style               { get; private set; }
 
         public int          Width               { get; private set; }
         public int          Height              { get; private set; }
+        public Rectangle    Bounds              { get { return new Rectangle( 0, 0, Width, Height ); } }
 
-        public Group        Root                { get; private set; }
+        public FixedGroup   Root                { get; private set; }
 
         List<Widget>        mlUpdateList;
 
@@ -40,10 +43,18 @@ namespace NuclearWinter.UI
             Width   = _iWidth;
             Height  = _iHeight;
 
-            Root    = new RootGroup( this );
+
+            Root    = new FixedGroup( this );
             mlUpdateList = new List<Widget>();
         }
-        
+
+        //----------------------------------------------------------------------
+        public void Resize( int _iWidth, int _iHeight )
+        {
+            Width = _iWidth;
+            Height = _iHeight;
+        }
+
         //----------------------------------------------------------------------
         public void AddWidgetToUpdateList( Widget _widget )
         {
@@ -54,40 +65,22 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
-        {
-            Root.DoLayout( null );
-
-            List<Widget> lUpdateRemovedWidgets = new List<Widget>();
-            foreach( Widget widget in mlUpdateList )
-            {
-                if( ! widget.Update( _fElapsedTime ) )
-                {
-                    lUpdateRemovedWidgets.Add( widget );
-                }
-            }
-
-            foreach( Widget widget in lUpdateRemovedWidgets )
-            {
-                mlUpdateList.Remove( widget );
-            }
-        }
-
-        //----------------------------------------------------------------------
         public void HandleInput()
         {
+            if( ! IsActive ) return;
+
             foreach( Buttons button in Enum.GetValues(typeof(Buttons)) )
             {
                 PlayerIndex playerIndex;
 
                 bool bPressed;
 
-                if( Game.GamePadMgr.WasButtonJustPressed( button, Game.PlayerInCharge, out playerIndex, true ) )
+                if( Game.InputMgr.WasButtonJustPressed( button, Game.PlayerInCharge, out playerIndex, true ) )
                 {
                     bPressed = true;
                 }
                 else
-                if( Game.GamePadMgr.WasButtonJustReleased( button, Game.PlayerInCharge, out playerIndex ) )
+                if( Game.InputMgr.WasButtonJustReleased( button, Game.PlayerInCharge, out playerIndex ) )
                 {
                     bPressed = false;
                 }
@@ -146,11 +139,11 @@ namespace NuclearWinter.UI
 #if WINDOWS
             // Mouse buttons
             Point mouseHitPoint = new Point(
-                (int)( Game.GamePadMgr.MouseState.X / Resolution.ScaleFactor ),
-                (int)( ( Game.GamePadMgr.MouseState.Y - Resolution.Viewport.Y ) / Resolution.ScaleFactor )
+                (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
+                (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
             );
 
-            if( Game.GamePadMgr.WasMouseButtonJustPressed( 0 ) )
+            if( Game.InputMgr.WasMouseButtonJustPressed( 0 ) )
             {
                 mClickedWidget = null;
                 if( FocusedWidget != null )
@@ -169,7 +162,7 @@ namespace NuclearWinter.UI
                 }
             }
             else
-            if( Game.GamePadMgr.WasMouseButtonJustReleased( 0 ) )
+            if( Game.InputMgr.WasMouseButtonJustReleased( 0 ) )
             {
                 if( mClickedWidget != null )
                 {
@@ -179,7 +172,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                Widget hoveredWidget = FocusedWidget == null ? null : ( FocusedWidget.HitTest( mouseHitPoint ) ?? Root.HitTest( mouseHitPoint ) );
+                Widget hoveredWidget = ( FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint ) ) ?? Root.HitTest( mouseHitPoint );
 
                 if( mClickedWidget == null )
                 {
@@ -208,7 +201,7 @@ namespace NuclearWinter.UI
             }
 
             // Mouse wheel
-            int iWheelDelta = Game.GamePadMgr.GetMouseWheelDelta();
+            int iWheelDelta = Game.InputMgr.GetMouseWheelDelta();
             if( iWheelDelta != 0 )
             {
                 if( FocusedWidget != null )
@@ -220,19 +213,43 @@ namespace NuclearWinter.UI
             // Keyboard
             if( FocusedWidget != null )
             {
-                foreach( Keys key in Game.GamePadMgr.GetJustPressedKeys() )
+                foreach( Keys key in Game.InputMgr.JustPressedKeys )
                 {
                     FocusedWidget.OnKeyPress( key );
+                }
+
+                foreach( char character in Game.InputMgr.EnteredText )
+                {
+                    FocusedWidget.OnTextEntered( character );
                 }
             }
 #endif
         }
 
         //----------------------------------------------------------------------
+        public void Update( float _fElapsedTime )
+        {
+            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
+
+            List<Widget> lUpdateRemovedWidgets = new List<Widget>();
+            foreach( Widget widget in mlUpdateList )
+            {
+                if( ! widget.Update( _fElapsedTime ) )
+                {
+                    lUpdateRemovedWidgets.Add( widget );
+                }
+            }
+
+            foreach( Widget widget in lUpdateRemovedWidgets )
+            {
+                mlUpdateList.Remove( widget );
+            }
+        }
+
+        //----------------------------------------------------------------------
         public void Focus( Widget _widget )
         {
             Debug.Assert( _widget.Screen == this );
-            Debug.Assert( _widget.CanFocus );
 
             mbHasActivatedFocusedWidget = false;
             if( FocusedWidget != null && FocusedWidget != _widget )
@@ -270,7 +287,7 @@ namespace NuclearWinter.UI
         {
             Root.Draw();
 
-            if( FocusedWidget != null )
+            if( FocusedWidget != null && IsActive )
             {
                 FocusedWidget.DrawFocused();
             }

@@ -14,6 +14,44 @@ namespace NuclearWinter.UI
      */
     public class Button: Widget
     {
+        //----------------------------------------------------------------------
+        public struct ButtonStyle
+        {
+            //------------------------------------------------------------------
+            public int              CornerSize;
+            public Texture2D        Frame;
+            public Texture2D        FrameDown;
+            public Texture2D        FrameHover;
+            public Texture2D        FramePressed;
+            public Texture2D        FrameFocus;
+            public int              VerticalPadding;
+            public int              HorizontalPadding;
+
+            //------------------------------------------------------------------
+            public ButtonStyle(
+                int         _iCornerSize,
+                Texture2D   _buttonFrame,
+                Texture2D   _buttonFrameDown,
+                Texture2D   _buttonFrameHover,
+                Texture2D   _buttonFramePressed,
+                Texture2D   _buttonFrameFocused,
+                int         _iVerticalPadding,
+                int         _iHorizontalPadding
+            )
+            {
+                CornerSize      = _iCornerSize;
+                Frame           = _buttonFrame;
+                FrameDown       = _buttonFrameDown;
+                FrameHover      = _buttonFrameHover;
+                FramePressed    = _buttonFramePressed;
+                FrameFocus    = _buttonFrameFocused;
+
+                VerticalPadding     = _iVerticalPadding;
+                HorizontalPadding   = _iHorizontalPadding;
+            }
+        }
+
+        //----------------------------------------------------------------------
         Label                   mLabel;
         Image                   mIcon;
         Buttons                 mBoundPadButton;
@@ -33,7 +71,7 @@ namespace NuclearWinter.UI
             set
             {
                 mLabel.Text = value;
-                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 20, 10, 20 ) : new Box( 10, 20, 10, 0 );
+                mLabel.Padding = mLabel.Text != "" ? new Box( Style.VerticalPadding, Style.HorizontalPadding ) : new Box( Style.VerticalPadding, Style.HorizontalPadding, Style.VerticalPadding, 0 );
                 UpdateContentSize();
             }
         }
@@ -51,92 +89,140 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override bool CanFocus { get { return true; } }
+        Anchor mAnchor;
+        public Anchor Anchor
+        {
+            get {
+                return mAnchor;
+            }
 
-        public Texture2D        ButtonFrame             { get; set; }
-        public Texture2D        ButtonFrameDown         { get; set; }
-        public Texture2D        ButtonFrameHover        { get; set; }
-        public Texture2D        ButtonFramePressed      { get; set; }
-        public Texture2D        ButtonFrameFocused      { get; set; }
+            set
+            {
+                mAnchor = value;
+            }
+        }
+
+        public Color TextColor
+        {
+            get { return mLabel.Color; }
+            set { mLabel.Color = value; }
+        }
+
+        public ButtonStyle Style;
 
         public Action<Button>   ClickHandler;
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, string _strText, Texture2D _iconTex )
+        public Button( Screen _screen, ButtonStyle _style, string _strText, Texture2D _iconTex, Anchor _anchor )
         : base( _screen )
         {
+            Style = _style;
+
             mLabel          = new Label( _screen );
 
             mIcon           = new Image( _screen );
             mIcon.Texture   = _iconTex;
-            mIcon.Padding   = new Box( 10, 0, 10, 20 );
+            mIcon.Padding   = new Box( Style.VerticalPadding, 0, Style.VerticalPadding, Style.HorizontalPadding );
 
-            Text = _strText;
+            Text            = _strText;
+
+            Anchor          = _anchor;
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
-            ButtonFrame         = Screen.Style.ButtonFrame;
-            ButtonFrameDown     = Screen.Style.ButtonFrameDown;
-            ButtonFrameHover    = Screen.Style.ButtonFrameHover;
-            ButtonFramePressed  = Screen.Style.ButtonFramePressed;
-            ButtonFrameFocused  = Screen.Style.ButtonFrameFocused;
+            TextColor           = Screen.Style.DefaultTextColor;
 
             UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
+        public Button( Screen _screen, string _strText, Texture2D _iconTex, Anchor _anchor )
+        : this( _screen, new ButtonStyle(
+                _screen.Style.ButtonCornerSize,
+                _screen.Style.ButtonFrame,
+                _screen.Style.ButtonFrameDown,
+                _screen.Style.ButtonFrameHover,
+                _screen.Style.ButtonFramePressed,
+                _screen.Style.ButtonFrameFocus,
+                _screen.Style.ButtonVerticalPadding,
+                _screen.Style.ButtonHorizontalPadding
+            ), _strText, _iconTex, _anchor )
+        {
+        }
+
+        //----------------------------------------------------------------------
+        public Button( Screen _screen, string _strText, Texture2D _iconTex )
+        : this( _screen, _strText, _iconTex, Anchor.Center )
+        {
+
+        }
+
+        //----------------------------------------------------------------------
         public Button( Screen _screen, string _strText )
-        : this( _screen, _strText, null )
+        : this( _screen, _strText, null, Anchor.Center )
         {
         }
 
         //----------------------------------------------------------------------
         public Button( Screen _screen )
-        : this( _screen, "", null )
+        : this( _screen, "", null, Anchor.Center )
         {
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             if( mIcon.Texture != null )
             {
-                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Horizontal;
             }
             else
             {
-                ContentWidth    = mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mLabel.ContentWidth + Padding.Horizontal;
             }
 
-            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
+            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical;
         }
 
-
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
+            HitBox = _rect;
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
-
-            if( mIcon.Texture != null )
+            switch( mAnchor )
             {
-                mIcon.Position = new Point( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2 );
-            }
+                case UI.Anchor.Start:
+                    if( mIcon.Texture != null )
+                    {
+                        mIcon.DoLayout( new Rectangle( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                    }
 
-            mLabel.DoLayout(
-                new Rectangle(
-                    pCenter.X - ContentWidth / 2 + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
-                    mLabel.ContentWidth, mLabel.ContentHeight
-                )
-            );
+                    mLabel.DoLayout(
+                        new Rectangle(
+                            Position.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            mLabel.ContentWidth, mLabel.ContentHeight
+                        )
+                    );
+                    break;
+                case UI.Anchor.Center:
+                    if( mIcon.Texture != null )
+                    {
+                        mIcon.DoLayout( new Rectangle( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                    }
+
+                    mLabel.DoLayout(
+                        new Rectangle(
+                            pCenter.X - ContentWidth / 2 + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            mLabel.ContentWidth, mLabel.ContentHeight
+                        )
+                    );
+                    break;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -235,25 +321,41 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
-            Screen.DrawBox( (!mbIsPressed) ? ButtonFrame  : ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.FrameDown;
+
+            if( frame != null )
+            {
+                Screen.DrawBox( frame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+            }
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
-                Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                if( Screen.IsActive && Style.FrameHover != null )
+                {
+                    Screen.DrawBox( Style.FrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                }
             }
             else
+            if( mPressedAnim.CurrentValue > 0f )
             {
-                Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
+                if( Style.FramePressed != null )
+                {
+                    Screen.DrawBox( Style.FramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                }
             }
 
-            if( HasFocus && ! mbIsPressed )
+            if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( ButtonFrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                if( Style.FrameFocus != null )
+                {
+                    Screen.DrawBox( Style.FrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                }
             }
 
             mLabel.Draw();
+
             mIcon.Draw();
         }
     }

@@ -9,10 +9,10 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace NuclearWinter.Input
 {
-    public class TouchManager: GameComponent
+    public class TouchInputManager: GameComponent
     {
         //----------------------------------------------------------------------
-        public TouchManager( Game _game )
+        public TouchInputManager( Game _game )
         : base ( _game )
         {
 

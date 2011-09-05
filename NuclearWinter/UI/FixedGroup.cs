@@ -10,98 +10,18 @@ using System.Diagnostics;
 namespace NuclearWinter.UI
 {
     //--------------------------------------------------------------------------
-    public class FixedWidget: Widget
-    {
-        Widget mChild;
-
-        public Widget       Child {
-            get { return mChild; }
-            set {
-                if( mChild != null )
-                {
-                    Debug.Assert( mChild.Parent == this );
-                    mChild.Parent = null;
-                }
-
-                Debug.Assert( value.Parent == null );
-                mChild = value;
-                mChild.Parent = this;
-            }
-        }
-
-        public Rectangle    ChildRectangle;
-
-        Anchor              mAnchor;
-
-        public override Widget GetFirstFocusableDescendant(Direction _direction)
-        {
-            return Child.GetFirstFocusableDescendant( _direction );
-        }
-
-        public override bool CanFocus
-        {
-            get { return false; }
-        }
-        //public override bool CanFocus { get { return Child != null && Child.CanFocus; } }
-
-        public FixedWidget( Widget _child, Rectangle _rect, Anchor _anchor )
-        : base( _child.Screen )
-        {
-            Child           = _child;
-            ChildRectangle  = _rect;
-            mAnchor         = _anchor;
-        }
-
-        public FixedWidget( Widget _child, Rectangle _rect )
-        : this( _child, _rect, Anchor.Center )
-        {
-        }
-
-
-        protected override void UpdateContentSize()
-        {
-        }
-
-        public override void DoLayout( Rectangle? _rect )
-        {
-            if( _rect.HasValue )
-            {
-                ChildRectangle = _rect.Value;
-            }
-
-            Position = ChildRectangle.Location;
-            Size = new Point( ChildRectangle.Width, ChildRectangle.Height );
-
-            switch( mAnchor )
-            {
-                case Anchor.Start:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Child.ContentWidth, ChildRectangle.Height ) );
-                    break;
-                case Anchor.Center:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X, Size.Y ) );
-                    break;
-                case Anchor.End:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X - Child.ContentWidth, Size.Y ) );
-                    break;
-            }
-        }
-
-        public override void Draw()
-        {
-            Child.Draw();
-        }
-    }
-
-    //--------------------------------------------------------------------------
     public class FixedGroup: Widget
     {
+        //----------------------------------------------------------------------
         List<FixedWidget>           mlChildren;
 
+        //----------------------------------------------------------------------
         public void Clear()
         {
             mlChildren.RemoveAll( delegate(FixedWidget _widget) { _widget.Parent = null; return true; } );
         }
 
+        //----------------------------------------------------------------------
         public void AddChild( FixedWidget _fixedWidget )
         {
             Debug.Assert( _fixedWidget.Parent == null );
@@ -110,6 +30,7 @@ namespace NuclearWinter.UI
             mlChildren.Add( _fixedWidget );
         }
 
+        //----------------------------------------------------------------------
         public void RemoveChild( FixedWidget _fixedWidget )
         {
             Debug.Assert( _fixedWidget.Parent == this );
@@ -118,6 +39,7 @@ namespace NuclearWinter.UI
             mlChildren.Remove( _fixedWidget );
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
             FixedWidget firstChild = null;
@@ -177,6 +99,7 @@ namespace NuclearWinter.UI
             return focusableDescendant;
         }
 
+        //----------------------------------------------------------------------
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
             FixedWidget nearestSibling = null;
@@ -245,8 +168,6 @@ namespace NuclearWinter.UI
             return focusableSibling;
         }
 
-        public override bool CanFocus { get { return false; } }
-
         //----------------------------------------------------------------------
         public FixedGroup( Screen _screen )
         : base( _screen )
@@ -255,16 +176,80 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
             foreach( FixedWidget fixedWidget in mlChildren )
             {
-                fixedWidget.DoLayout( fixedWidget.ChildRectangle );
+                Rectangle childRectangle;
+
+                // Horizontal
+                if( fixedWidget.ChildBox.Left.HasValue )
+                {
+                    childRectangle.X = _rect.Left + fixedWidget.ChildBox.Left.Value;
+                    if( fixedWidget.ChildBox.Right.HasValue )
+                    {
+                        // Horizontally anchored
+                        childRectangle.Width = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.X;
+                    }
+                    else
+                    {
+                        // Left-anchored
+                        childRectangle.Width = fixedWidget.ChildBox.Width;
+                    }
+                }
+                else
+                {
+                    childRectangle.Width = fixedWidget.ChildBox.Width;
+
+                    if( fixedWidget.ChildBox.Right.HasValue )
+                    {
+                        // Right-anchored
+                        childRectangle.X = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.Width;
+                    }
+                    else
+                    {
+                        // Centered
+                        childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
+                    }
+                }
+
+                // Vertical
+                if( fixedWidget.ChildBox.Top.HasValue )
+                {
+                    childRectangle.Y = _rect.Top + fixedWidget.ChildBox.Top.Value;
+                    if( fixedWidget.ChildBox.Bottom.HasValue )
+                    {
+                        // Horizontally anchored
+                        childRectangle.Height = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Y;
+                    }
+                    else
+                    {
+                        // Top-anchored
+                        childRectangle.Height = fixedWidget.ChildBox.Height;
+                    }
+                }
+                else
+                {
+                    childRectangle.Height = fixedWidget.ChildBox.Height;
+
+                    if( fixedWidget.ChildBox.Bottom.HasValue )
+                    {
+                        // Bottom-anchored
+                        childRectangle.Y = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Height;
+                    }
+                    else
+                    {
+                        // Centered
+                        childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
+                    }
+                }
+
+                fixedWidget.DoLayout( childRectangle );
             }
             
             HitBox = Resolution.InternalMode.Rectangle;
@@ -280,7 +265,7 @@ namespace NuclearWinter.UI
                 for( int iChild = mlChildren.Count - 1; iChild >= 0; iChild-- )
                 {
                     FixedWidget fixedChild = mlChildren[iChild];
-                    if( ( hitWidget = fixedChild.Child.HitTest( _point ) ) != null )
+                    if( fixedChild.Child != null && ( hitWidget = fixedChild.Child.HitTest( _point ) ) != null )
                     {
                         return hitWidget;
                     }
@@ -305,11 +290,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             foreach( FixedWidget child in mlChildren )
             {
-                child.Child.Draw();
+                child.Draw();
             }
         }
     }

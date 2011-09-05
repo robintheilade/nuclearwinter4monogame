@@ -23,29 +23,30 @@ namespace NuclearWinter.UI
             CornerSize  = _iCornerSize;
         }
 
-        public override bool  CanFocus { get { return false; } }
+        //----------------------------------------------------------------------
+        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        {
+            return null;
+        }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
             ContentWidth = 0;
             ContentHeight = 0;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( Texture, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), CornerSize, Color.White );
         }

@@ -34,8 +34,6 @@ namespace NuclearWinter.UI
 
         public Action           ChangeHandler;
 
-        public override bool CanFocus { get { return true; } }
-
         //----------------------------------------------------------------------
         public Slider( Screen _screen, int _iMin, int _iMax, int _iInitialValue, int _iStep )
         : base( _screen )
@@ -51,19 +49,16 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout(Rectangle? _rect)
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-                HitBox = _rect.Value;
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
+            HitBox = _rect;
         }
 
         //----------------------------------------------------------------------
@@ -130,7 +125,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
@@ -138,14 +133,14 @@ namespace NuclearWinter.UI
             int handleX = Position.X + (int)( ( Size.X - handleSize ) * (float)( Value - MinValue ) / MaxValue );
 
             Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
-            if( mbIsHovered && ! mbIsPressed )
+            if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
                 Screen.DrawBox( Screen.Style.ButtonFrameHover, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             }
 
-            if( HasFocus && ! mbIsPressed )
+            if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameFocused, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             }
         }
     }

@@ -15,20 +15,13 @@ using Microsoft.Phone.Shell;
 
 namespace NuclearWinter
 {
-    public enum TargetPlatform
-    {
-        Windows,
-        Xbox360,
-        WindowsPhone
-    }
-
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
         public Texture2D        WhitePixelTex { get; protected set; }
 
         //----------------------------------------------------------------------
-        public NuclearGame( TargetPlatform _platform )
+        public NuclearGame()
         {
 #if WINDOWS_PHONE
             PhoneApplicationService.Current.Deactivated += new EventHandler<DeactivatedEventArgs>( OnDeactivated );
@@ -41,17 +34,6 @@ namespace NuclearWinter
 
 
             Graphics = new GraphicsDeviceManager(this);
-
-            switch( _platform )
-            {
-                case TargetPlatform.WindowsPhone:
-                    BlurRadius = 2;
-                    break;
-                case TargetPlatform.Xbox360:
-                case TargetPlatform.Windows:
-                    BlurRadius = 4;
-                    break;
-            }
         }
 
         //----------------------------------------------------------------------
@@ -63,8 +45,8 @@ namespace NuclearWinter
             Components.Add( GameStateMgr );
 
 #if WINDOWS || XBOX
-            GamePadMgr                = new Input.GamePadManager( this );
-            Components.Add( GamePadMgr );
+            InputMgr                = new Input.InputManager( this );
+            Components.Add( InputMgr );
 #endif
 
 #if WINDOWS_PHONE
@@ -201,99 +183,105 @@ namespace NuclearWinter
         {
             List<string> lText = new List<string>();
 
-            string strLine = string.Empty;
-            string returnString = String.Empty;
-            string[] aWords = _strText.Split(' ');
-
-            foreach( string strWord in aWords )
+            foreach( string strChunk in _strText.Split( '\n' ) )
             {
-                if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
+                string strLine = string.Empty;
+                string[] aWords = strChunk.Split( ' ' );
+
+                foreach( string strWord in aWords )
                 {
-                    lText.Add( strLine );
-                    strLine = string.Empty;
+                    if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
+                    {
+                        lText.Add( strLine );
+                        strLine = string.Empty;
+                    }
+
+                    strLine += strWord + ' ';
                 }
 
-                strLine += strWord + ' ';
+                lText.Add( strLine );
             }
-
-            lText.Add( strLine );
 
             return lText;
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition )
         {
-            DrawBlurredText( _font, _strLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
+            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color )
         {
-            DrawBlurredText( _font, _strLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
+            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
         {
-            DrawBlurredText( _font, _strLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
+            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor )
         {
-            DrawBlurredText( _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
+            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
         }
 
-        protected int BlurRadius = 4;
-
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
         {
-            Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
+            if( _fBlurRadius > 0f )
+            {
+                Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
 
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            }
 
             SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition )
         {
-            DrawBlurredText( _font, _strbLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
+            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color )
         {
-            DrawBlurredText( _font, _strbLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
+            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
         {
-            DrawBlurredText( _font, _strbLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
+            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor )
         {
-            DrawBlurredText( _font, _strbLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
+            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
         }
 
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
         {
-            Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
+            if( _fBlurRadius > 0f )
+            {
+                Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
 
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y - BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - BlurRadius, _vPosition.Y + BlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            }
 
             SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
         }
@@ -343,7 +331,7 @@ namespace NuclearWinter
         public GameFlow.GameStateMgr<NuclearGame>           GameStateMgr        { get; private set; }
 
 #if WINDOWS || XBOX
-        public Input.GamePadManager                         GamePadMgr          { get; private set; }
+        public Input.InputManager                         InputMgr          { get; private set; }
 #endif
 
 #if WINDOWS_PHONE

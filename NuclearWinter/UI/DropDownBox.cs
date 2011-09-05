@@ -25,8 +25,6 @@ namespace NuclearWinter.UI
 
         public Action<DropDownBox>      ChangeHandler;
 
-        public override bool            CanFocus                { get { return true; } }
-
         Rectangle                       mDropDownHitBox;
         const int                       siLineHeight = 50;
         const int                       siMaxLineDisplayed = 3;
@@ -54,28 +52,25 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected override void UpdateContentSize()
+        internal override void UpdateContentSize()
         {
-            SpriteFont font = Screen.Style.MediumFont;
+            UIFont uiFont = Screen.Style.MediumFont;
 
             int iMaxWidth = 0;
             foreach( string _strValue in mlValues )
             {
-                iMaxWidth = Math.Max( iMaxWidth, (int)font.MeasureString( _strValue ).X );
+                iMaxWidth = Math.Max( iMaxWidth, (int)uiFont.MeasureString( _strValue ).X );
             }
 
             ContentWidth    = iMaxWidth + Padding.Left + Padding.Right + Screen.Style.DropDownArrow.Width;
-            ContentHeight   = (int)( font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+            ContentHeight   = (int)( uiFont.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle? _rect )
+        internal override void DoLayout( Rectangle _rect )
         {
-            if( _rect.HasValue )
-            {
-                Position = _rect.Value.Location;
-                Size = new Point( _rect.Value.Width, _rect.Value.Height );
-            }
+            Position = _rect.Location;
+            Size = new Point( _rect.Width, _rect.Height );
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
@@ -286,22 +281,25 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Draw()
+        internal override void Draw()
         {
             Screen.DrawBox( (!mbIsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
             if( mbIsHovered && ! mbIsOpen && mPressedAnim.IsOver )
             {
-                Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                if( Screen.IsActive )
+                {
+                    Screen.DrawBox( ButtonFrameHover,      new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                }
             }
             else
             {
                 Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
             }
 
-            if( HasFocus && ! mbIsOpen )
+            if( Screen.IsActive && HasFocus && ! mbIsOpen )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameFocused, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
 
             Screen.Game.SpriteBatch.Draw( Screen.Style.DropDownArrow,
@@ -309,7 +307,7 @@ namespace NuclearWinter.UI
                 Color.White
             );
 
-            Screen.Game.DrawBlurredText( Screen.Style.MediumFont, mlValues[SelectedValueIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) );
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[SelectedValueIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) );
         }
 
         //----------------------------------------------------------------------
@@ -331,7 +329,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DrawFocused()
+        internal override void DrawFocused()
         {
             if( mbIsOpen )
             {
@@ -342,12 +340,12 @@ namespace NuclearWinter.UI
                 int iMaxIndex = Math.Min( mlValues.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
-                    if( miHoveredValueIndex == iIndex )
+                    if( Screen.IsActive && miHoveredValueIndex == iIndex )
                     {
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top, Size.X - Padding.Horizontal, siLineHeight ), 10, Color.White );
                     }
 
-                    Screen.Game.DrawBlurredText( Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top ) );
+                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[iIndex], new Vector2( Position.X + Padding.Left, Position.Y + Size.Y + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top + Screen.Style.MediumFont.YOffset ) );
                 }
             }
         }
