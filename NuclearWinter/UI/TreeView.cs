@@ -202,7 +202,7 @@ namespace NuclearWinter.UI
 
             if( Children.Count == 0 && ! DisplayAsContainer )
             {
-                Screen.DrawBox( Screen.Style.GridBoxFrame, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( mTreeView.SelectedNode == this ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
             }
             else
             {
@@ -223,9 +223,30 @@ namespace NuclearWinter.UI
 
             mLabel.Draw();
 
+            if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
+            {
+                if( mTreeView.SelectedNode != this )
+                {
+                    Screen.DrawBox( Screen.Style.GridBoxFrameFocus, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                }
+                else
+                if( Screen.Style.GridBoxFrameSelectedFocus != null )
+                {
+                    Screen.DrawBox( Screen.Style.GridBoxFrameSelectedFocus, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                }
+            }
+
             if( mTreeView.HoveredNode == this )
             {
-                Screen.DrawBox( Screen.Style.GridBoxFrameHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                if( mTreeView.SelectedNode != this )
+                {
+                    Screen.DrawBox( Screen.Style.GridBoxFrameHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                }
+                else
+                if( Screen.Style.GridBoxFrameSelectedHover != null )
+                {
+                    Screen.DrawBox( Screen.Style.GridBoxFrameSelectedHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                }
             }
 
             if( ! mbCollapsed )
@@ -249,11 +270,17 @@ namespace NuclearWinter.UI
         public int                          NodeBranchWidth = 25;
 
         //----------------------------------------------------------------------
+        public Action<TreeView>             ValidateHandler;
+        public TreeViewNode                 SelectedNode    = null;
+
+        //----------------------------------------------------------------------
         internal TreeViewNode               HoveredNode     = null;
+        internal TreeViewNode               FocusedNode     = null;
 
         //----------------------------------------------------------------------
         bool                                mbIsHovered;
         Point                               mHoverPoint;
+
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -349,14 +376,29 @@ namespace NuclearWinter.UI
         internal override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
+            FocusedNode = HoveredNode;
         }
 
         internal override void OnMouseUp( Point _hitPoint )
         {
-            if( HoveredNode != null && HoveredNode.DisplayAsContainer )
+            if( HoveredNode != null && FocusedNode == HoveredNode )
             {
-                HoveredNode.Collapsed = ! HoveredNode.Collapsed;
+                if( HoveredNode.DisplayAsContainer )
+                {
+                    SelectedNode = null;
+                    HoveredNode.Collapsed = ! HoveredNode.Collapsed;
+                }
+                else
+                {
+                    SelectedNode = HoveredNode;
+                }
             }
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseDoubleClick( Point _hitPoint )
+        {
+            if( SelectedNode != null && ValidateHandler != null ) ValidateHandler( this );
         }
 
         //----------------------------------------------------------------------

@@ -301,6 +301,12 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
+        internal override void OnMouseDoubleClick( Point _hitPoint )
+        {
+            if( ValidateHandler != null ) ValidateHandler( this );
+        }
+
         internal override void OnActivateUp()
         {
             if( miFocusedRowIndex != SelectedRowIndex && miFocusedRowIndex != -1 )

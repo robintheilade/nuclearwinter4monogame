@@ -10,12 +10,13 @@ namespace NuclearWinter.Input
     //-------------------------------------------------------------------------
     // Inspired by Nuclex.Input and
     // http://stackoverflow.com/questions/375316/xna-keyboard-text-input
-    internal class TextInput: IMessageFilter, IDisposable
+    internal class WindowMessageFilter: IMessageFilter, IDisposable
     {
         //---------------------------------------------------------------------
         public Action<Keys>     KeyUpHandler;
         public Action<Keys>     KeyDownHandler;
         public Action<char>     CharacterHandler;
+        public Action           DoubleClickHandler;
 
         //---------------------------------------------------------------------
         bool                    mbIsDisposed;
@@ -23,15 +24,16 @@ namespace NuclearWinter.Input
         const int               WM_CHAR             = 0x0102;
         const int               WM_KEYDOWN          = 0x0100;
         const int               WM_KEYUP            = 0x0101;
+        const int               WM_LBUTTONDBLCLK    = 0x0203;
 
         //---------------------------------------------------------------------
-        public TextInput( IntPtr _hWnd )
+        public WindowMessageFilter( IntPtr _hWnd )
         {
             Application.AddMessageFilter( this );
         }
 
         //---------------------------------------------------------------------
-        ~TextInput()
+        ~WindowMessageFilter()
         {
             Dispose();
         }
@@ -78,6 +80,13 @@ namespace NuclearWinter.Input
                         CharacterHandler( character );
                     }
 
+                    return true;
+                }
+                case WM_LBUTTONDBLCLK: {
+                    if( DoubleClickHandler != null )
+                    {
+                        DoubleClickHandler();
+                    }
                     return true;
                 }
             }

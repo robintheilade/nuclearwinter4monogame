@@ -143,8 +143,12 @@ namespace NuclearWinter.UI
                 (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
             );
 
+            bool bHasMouseEvent = false;
+
             if( Game.InputMgr.WasMouseButtonJustPressed( 0 ) )
             {
+                bHasMouseEvent = true;
+
                 mClickedWidget = null;
                 if( FocusedWidget != null )
                 {
@@ -161,16 +165,30 @@ namespace NuclearWinter.UI
                     mClickedWidget.OnMouseDown( mouseHitPoint );
                 }
             }
-            else
+
+            if( Game.InputMgr.WasMouseJustDoubleClicked() )
+            {
+                bHasMouseEvent = true;
+
+                Widget widget  = FocusedWidget.HitTest( mouseHitPoint );
+                if( widget != null )
+                {
+                    widget.OnMouseDoubleClick( mouseHitPoint );
+                }
+            }
+
             if( Game.InputMgr.WasMouseButtonJustReleased( 0 ) )
             {
+                bHasMouseEvent = true;
+
                 if( mClickedWidget != null )
                 {
                     mClickedWidget.OnMouseUp( mouseHitPoint );
                     mClickedWidget = null;
                 }
             }
-            else
+            
+            if( ! bHasMouseEvent )
             {
                 Widget hoveredWidget = ( FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint ) ) ?? Root.HitTest( mouseHitPoint );
 

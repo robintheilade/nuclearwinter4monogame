@@ -98,7 +98,7 @@
     <Compile Include="GameFlow\GameStateMgr.cs" />
     <Compile Include="GameFlow\IGameState.cs" />
     <Compile Include="Input\Accelerometer.cs" />
-    <Compile Include="Input\TextInput.cs" />
+    <Compile Include="Input\WindowMessageFilter.cs" />
     <Compile Include="SaveHandler.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\TouchInputManager.cs" />

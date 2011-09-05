@@ -32,7 +32,9 @@ namespace NuclearWinter.Input
 
         public List<char>                           EnteredText             { get; private set; }
         public List<Keys>                           JustPressedKeys         { get; private set; }
-        TextInput                                   mTextInput;
+
+        WindowMessageFilter                         mMessageFilter;
+        bool                                        mbDoubleClicked;
 #endif
 
         Buttons[]                                   maLastPressedButtons;
@@ -60,10 +62,10 @@ namespace NuclearWinter.Input
             EnteredText             = new List<char>();
             JustPressedKeys         = new List<Keys>();
 
-            mTextInput              = new TextInput( Game.Window.Handle );
-            mTextInput.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
-            mTextInput.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
-
+            mMessageFilter              = new WindowMessageFilter( Game.Window.Handle );
+            mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
+            mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
+            mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #endif
         }
 
@@ -138,6 +140,8 @@ namespace NuclearWinter.Input
 
             EnteredText.Clear();
             JustPressedKeys.Clear();
+
+            mbDoubleClicked = false;
 #endif
 
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
@@ -280,6 +284,12 @@ namespace NuclearWinter.Input
                 default:
                     return false;
             }
+        }
+
+        //----------------------------------------------------------------------
+        public bool WasMouseJustDoubleClicked()
+        {
+            return mbDoubleClicked;
         }
 
         //----------------------------------------------------------------------

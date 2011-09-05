@@ -217,26 +217,27 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         // Events
-        internal virtual void     OnMouseDown ( Point _hitPoint ) {}
-        internal virtual void     OnMouseUp   ( Point _hitPoint ) {}
+        internal virtual void       OnMouseDown ( Point _hitPoint ) {}
+        internal virtual void       OnMouseUp   ( Point _hitPoint ) {}
+        internal virtual void       OnMouseDoubleClick( Point _hitPoint ) {}
 
-        internal virtual void     OnMouseEnter( Point _hitPoint ) {}
-        internal virtual void     OnMouseOut  ( Point _hitPoint ) {}
-        internal virtual void     OnMouseMove ( Point _hitPoint ) {}
+        internal virtual void       OnMouseEnter( Point _hitPoint ) {}
+        internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
+        internal virtual void       OnMouseMove ( Point _hitPoint ) {}
 
-        internal virtual void     OnMouseWheel( int _iDelta ) {}
+        internal virtual void       OnMouseWheel( int _iDelta ) {}
 
-        internal virtual void     OnKeyPress  ( Keys _key ) {}
-        internal virtual void     OnTextEntered( char _char ) {}
+        internal virtual void       OnKeyPress  ( Keys _key ) {}
+        internal virtual void       OnTextEntered( char _char ) {}
 
-        internal virtual void     OnActivateDown() {}
-        internal virtual void     OnActivateUp() {}
-        internal virtual bool     OnCancel( bool _bPressed ) { return false; } // return true to consume the event
+        internal virtual void       OnActivateDown() {}
+        internal virtual void       OnActivateUp() {}
+        internal virtual bool       OnCancel( bool _bPressed ) { return false; } // return true to consume the event
 
-        internal virtual void     OnFocus() {}
-        internal virtual void     OnBlur() {}
+        internal virtual void       OnFocus() {}
+        internal virtual void       OnBlur() {}
 
-        internal virtual bool     OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
+        internal virtual bool       OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
 
         internal virtual void     OnPadMove( Direction _direction ) {
             Widget widget = GetSibling( _direction, this );
