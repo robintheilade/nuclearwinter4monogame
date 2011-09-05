@@ -43,7 +43,8 @@ namespace NuclearWinter.UI
             set
             {
                 mLabel.Text = value;
-                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 20, 10, 20 ) : new Box( 10, 20, 10, 0 );
+
+                UpdatePaddings();
                 UpdateContentSize();
             }
         }
@@ -57,7 +58,21 @@ namespace NuclearWinter.UI
             set
             {
                 mIcon.Texture = value;
+                UpdatePaddings();
                 UpdateContentSize();
+            }
+        }
+
+        void UpdatePaddings()
+        {
+            if( mIcon.Texture != null )
+            {
+                mIcon.Padding = mLabel.Text != "" ? new Box( 10, 0, 10, 10 ) : new Box( 10, 0, 10, 20 );
+                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 20, 10, 10 ) : new Box( 10, 20, 10, 0 );
+            }
+            else
+            {
+                mLabel.Padding = new Box( 10, 20 );
             }
         }
 
@@ -78,7 +93,6 @@ namespace NuclearWinter.UI
 
             mLabel          = new Label( Screen, "", Screen.Style.DefaultTextColor );
             mIcon           = new Image( Screen, _iconTex );
-            mIcon.Padding   = new Box( 10, 0, 10, 20 );
 
             mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
             mCloseButton.ClickHandler = delegate {

@@ -116,6 +116,7 @@ namespace NuclearWinter.UI
                     Child.DoLayout( new Rectangle( Position.X, Position.Y, Child.ContentWidth, ChildRectangle.Height ) );
                     break;
                 case Anchor.Center:
+                case Anchor.Fill: // FIXME: Implement Fill anchor behavior
                     Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X, Size.Y ) );
                     break;
                 case Anchor.End:

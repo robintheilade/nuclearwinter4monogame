@@ -26,7 +26,8 @@ namespace NuclearWinter.UI
     {
         Center,
         Start,
-        End
+        End,
+        Fill
     }
 
     //--------------------------------------------------------------------------
