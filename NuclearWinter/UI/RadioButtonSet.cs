@@ -82,8 +82,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         List<Button>                    mlButtons;
 
-        public bool                     Expand;
-
         int                             miHoveredButton;
         bool                            mbIsPressed;
 
@@ -294,7 +292,7 @@ namespace NuclearWinter.UI
 
             Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
 
-            int iHeight = Expand ? Size.Y : ContentHeight;
+            int iHeight = Size.Y;
 
             HitBox = new Rectangle(
                 pCenter.X - ContentWidth / 2,

@@ -108,8 +108,6 @@ namespace NuclearWinter.UI
                 return;
             }
 
-            Debug.Assert( mChild.ContentWidth <= Size.X && mChild.ContentHeight <= Size.Y, "Child is too big for its parent" );
-
             switch( mContentAnchor )
             {
                 case Anchor.Start:
@@ -123,6 +121,8 @@ namespace NuclearWinter.UI
                     Child.DoLayout( new Rectangle( Position.X + Size.X - Child.ContentWidth, Position.Y, Child.ContentWidth, Size.Y ) );
                     break;
             }
+
+            Debug.Assert( mChild.ContentWidth <= Size.X && mChild.ContentHeight <= Size.Y, "Child is too big for its parent" );
         }
 
         //----------------------------------------------------------------------

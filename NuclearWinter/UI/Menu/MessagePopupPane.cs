@@ -49,7 +49,7 @@ namespace NuclearWinter.UI
 
             TitleLabel = new NuclearWinter.UI.Label( Manager.MenuScreen, "", NuclearWinter.UI.Anchor.Start );
             TitleLabel.Font = Manager.MenuScreen.Style.BigFont;
-            page.AddChild( new FixedWidget( TitleLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding, iPadding, 50 ) ) );
+            page.AddChild( new FixedWidget( TitleLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding, iPadding, FixedGroup.Screen.Style.DefaultButtonHeight ) ) );
 
             {
                 mSpinningWheel = new NuclearWinter.UI.SpinningWheel( FixedGroup.Screen, Manager.Content.Load<Texture2D>( "Sprites/Menu/SpinningWheel" ) );
@@ -59,7 +59,7 @@ namespace NuclearWinter.UI
                 // Message label
                 MessageLabel = new NuclearWinter.UI.Label( FixedGroup.Screen, "", NuclearWinter.UI.Anchor.Start );
                 MessageLabel.WrapText = true;
-                page.AddChild( new NuclearWinter.UI.FixedWidget( MessageLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding + 80, iPadding, 100 ) ) );
+                page.AddChild( new NuclearWinter.UI.FixedWidget( MessageLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding + 80, iPadding, 200 ) ) );
 
                 // Actions
                 NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Direction.Left, 0 );
