@@ -61,6 +61,17 @@ namespace NuclearWinter.UI
         AnimatedValue           mPressedAnim;
         bool                    mbIsPressed;
 
+        protected Box           mMargin;
+        public Box              Margin
+        {
+            get { return mMargin; }
+
+            set {
+                mMargin = value;
+                UpdateContentSize();
+            }
+        }
+
         public string           Text
         {
             get
@@ -118,6 +129,8 @@ namespace NuclearWinter.UI
         {
             Style = _style;
 
+            mMargin = new Box(0);
+
             mLabel          = new Label( _screen );
 
             mIcon           = new Image( _screen );
@@ -173,16 +186,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            if( mIcon.Texture != null )
-            {
-                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Horizontal;
-            }
-            else
-            {
-                ContentWidth    = mLabel.ContentWidth + Padding.Horizontal;
-            }
-
-            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical;
+            ContentWidth    = ( (mIcon.Texture != null ) ? mIcon.ContentWidth : 0 ) + mLabel.ContentWidth + Padding.Horizontal + mMargin.Horizontal;
+            ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical + mMargin.Vertical;
 
             base.UpdateContentSize();
         }
@@ -201,12 +206,12 @@ namespace NuclearWinter.UI
                 case UI.Anchor.Start:
                     if( mIcon.Texture != null )
                     {
-                        mIcon.DoLayout( new Rectangle( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                        mIcon.DoLayout( new Rectangle( Position.X + Padding.Left + Margin.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
 
                     mLabel.DoLayout(
                         new Rectangle(
-                            Position.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            Position.X + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
                             mLabel.ContentWidth, mLabel.ContentHeight
                         )
                     );
@@ -214,12 +219,12 @@ namespace NuclearWinter.UI
                 case UI.Anchor.Center:
                     if( mIcon.Texture != null )
                     {
-                        mIcon.DoLayout( new Rectangle( pCenter.X - ContentWidth / 2 + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                        mIcon.DoLayout( new Rectangle( pCenter.X - ContentWidth / 2 + Padding.Left + Margin.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
 
                     mLabel.DoLayout(
                         new Rectangle(
-                            pCenter.X - ContentWidth / 2 + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            pCenter.X - ContentWidth / 2 + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
                             mLabel.ContentWidth, mLabel.ContentHeight
                         )
                     );
@@ -332,11 +337,13 @@ namespace NuclearWinter.UI
                 Screen.DrawBox( frame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
             }
 
+            Rectangle marginRect = new Rectangle( Position.X + Margin.Left, Position.Y + Margin.Top, Size.X - Margin.Left - Margin.Right, Size.Y - Margin.Top - Margin.Bottom );
+
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
                 if( Screen.IsActive && Style.FrameHover != null )
                 {
-                    Screen.DrawBox( Style.FrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                    Screen.DrawBox( Style.FrameHover, marginRect, Style.CornerSize, Color.White );
                 }
             }
             else
@@ -344,7 +351,7 @@ namespace NuclearWinter.UI
             {
                 if( Style.FramePressed != null )
                 {
-                    Screen.DrawBox( Style.FramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                    Screen.DrawBox( Style.FramePressed, marginRect, Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
                 }
             }
 
@@ -352,7 +359,7 @@ namespace NuclearWinter.UI
             {
                 if( Style.FrameFocus != null )
                 {
-                    Screen.DrawBox( Style.FrameFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                    Screen.DrawBox( Style.FrameFocus, marginRect, Style.CornerSize, Color.White );
                 }
             }
 

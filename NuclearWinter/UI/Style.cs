@@ -31,16 +31,11 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFocus;
         public Texture2D        ButtonDownFocus;
 
-        public Texture2D        ButtonFrameLeftFocus;
-        public Texture2D        ButtonFrameLeftDownFocus;
-        public Texture2D        ButtonFrameMiddleFocus;
-        public Texture2D        ButtonFrameMiddleDownFocus;
-        public Texture2D        ButtonFrameRightFocus;
-        public Texture2D        ButtonFrameRightDownFocus;
-
         public int              ButtonVerticalPadding = 10;
         public int              ButtonHorizontalPadding = 20;
 
+        public int              RadioButtonCornerSize = 30;
+        public int              RadioButtonFrameOffset = 10;
         public Texture2D        ButtonFrameLeft;
         public Texture2D        ButtonFrameLeftDown;
         public Texture2D        ButtonFrameMiddle;
