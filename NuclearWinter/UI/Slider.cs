@@ -135,12 +135,12 @@ namespace NuclearWinter.UI
             Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameHover, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFrameFocus, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
             }
         }
     }

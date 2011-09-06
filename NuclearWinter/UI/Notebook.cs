@@ -238,7 +238,7 @@ namespace NuclearWinter.UI
             {
                 if( Screen.IsActive )
                 {
-                    Screen.DrawBox( Screen.Style.ButtonFrameHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+                    Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
                 }
             }
 

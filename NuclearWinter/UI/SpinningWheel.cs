@@ -35,7 +35,7 @@ namespace NuclearWinter.UI
 
             if( ! mbStretch )
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Padding.Left, Position.Y + Padding.Top ) + vOrigin, null, Color, mfAngle, vOrigin, 1f, SpriteEffects.None, 0f );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Size.X / 2 - ContentWidth / 2 + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) + vOrigin, null, Color, mfAngle, vOrigin, 1f, SpriteEffects.None, 0f );
             }
             else
             {

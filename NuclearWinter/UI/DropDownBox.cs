@@ -45,8 +45,8 @@ namespace NuclearWinter.UI
 
             ButtonFrame         = Screen.Style.ButtonFrame;
             ButtonFrameDown     = Screen.Style.ButtonFrameDown;
-            ButtonFrameHover    = Screen.Style.ButtonFrameHover;
-            ButtonFramePressed  = Screen.Style.ButtonFramePressed;
+            ButtonFrameHover    = Screen.Style.ButtonHover;
+            ButtonFramePressed  = Screen.Style.ButtonPress;
 
             UpdateContentSize();
         }

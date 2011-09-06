@@ -142,9 +142,9 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonCornerSize,
                 _screen.Style.ButtonFrame,
                 _screen.Style.ButtonFrameDown,
-                _screen.Style.ButtonFrameHover,
-                _screen.Style.ButtonFramePressed,
-                _screen.Style.ButtonFrameFocus,
+                _screen.Style.ButtonHover,
+                _screen.Style.ButtonPress,
+                _screen.Style.ButtonFocus,
                 _screen.Style.ButtonVerticalPadding,
                 _screen.Style.ButtonHorizontalPadding
             ), _strText, _iconTex, _anchor )

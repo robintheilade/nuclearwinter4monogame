@@ -230,7 +230,7 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonFramePressed, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonPress, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
             }
 
             Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + mFont.YOffset ), Color.White );

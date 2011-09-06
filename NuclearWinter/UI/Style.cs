@@ -23,13 +23,13 @@ namespace NuclearWinter.UI
         public Color            DefaultTextColor = Color.White;
         public Texture2D        ButtonFrame;
 
-        public Texture2D        ButtonFrameHover;
+        public Texture2D        ButtonHover;
 
         public Texture2D        ButtonFrameDown;
-        public Texture2D        ButtonFramePressed;
+        public Texture2D        ButtonPress;
 
-        public Texture2D        ButtonFrameFocus;
-        public Texture2D        ButtonFrameDownFocus;
+        public Texture2D        ButtonFocus;
+        public Texture2D        ButtonDownFocus;
 
         public Texture2D        ButtonFrameLeftFocus;
         public Texture2D        ButtonFrameLeftDownFocus;
