@@ -10,6 +10,12 @@ namespace NuclearWinter.UI
     {
         Label           mLabel;
 
+        public UIFont Font
+        {
+            get { return mLabel.Font; }
+            set { mLabel.Font = value; }
+        }
+
         public string Text {
             get { return mLabel.Text; }
 
