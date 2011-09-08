@@ -19,6 +19,13 @@ namespace NuclearWinter.UI
         Down,
         Left,
         Up
+    
+    }
+
+    public enum Orientation
+    {
+        Horizontal,
+        Vertical
     }
 
     //--------------------------------------------------------------------------
