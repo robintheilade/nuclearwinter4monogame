@@ -84,6 +84,13 @@ namespace NuclearWinter.UI
                 UpdateContentSize();
             };
 
+            Children.ListCleared += delegate( object _source, EventArgs _args )
+            {
+                ContainedNodeCount = 0;
+                UpdateLabel();
+                UpdateContentSize();
+            };
+
             mstrText = _strText;
             mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.DefaultTextColor );
             mImage      = new Image( Screen );
