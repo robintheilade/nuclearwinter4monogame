@@ -8,22 +8,25 @@ namespace NuclearWinter.UI
 {
     public class DropDownBox: Widget
     {
-        List<string>                    mlValues;
-        public int                      SelectedValueIndex      { get; private set; }
+        //----------------------------------------------------------------------
+        public int                      SelectedValueIndex;
+        public bool                     IsOpen                  { get; private set; }
+        public Action<DropDownBox>      ChangeHandler;
 
-        bool                            mbIsHovered;
-        int                             miHoveredValueIndex;
-
-        AnimatedValue                   mPressedAnim;
-        bool                            mbIsOpen;
-        bool                            mbIsPressed;
-
+        //----------------------------------------------------------------------
         public Texture2D                ButtonFrame             { get; set; }
         public Texture2D                ButtonFrameDown         { get; set; }
         public Texture2D                ButtonFrameHover        { get; set; }
         public Texture2D                ButtonFramePressed      { get; set; }
 
-        public Action<DropDownBox>      ChangeHandler;
+        //----------------------------------------------------------------------
+        List<string>                    mlValues;
+
+        bool                            mbIsHovered;
+        int                             miHoveredValueIndex;
+
+        AnimatedValue                   mPressedAnim;
+        bool                            mbIsPressed;
 
         Rectangle                       mDropDownHitBox;
         const int                       siLineHeight = 50;
@@ -117,7 +120,7 @@ namespace NuclearWinter.UI
             base.OnMouseDown( _hitPoint );
             Screen.Focus( this );
             
-            if( mbIsOpen && mDropDownHitBox.Contains( _hitPoint ) )
+            if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
             }
             else
@@ -134,18 +137,18 @@ namespace NuclearWinter.UI
                     miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, mlValues.Count - siMaxLineDisplayed );
                 }
 
-                mbIsOpen = ! mbIsOpen;
+                IsOpen = ! IsOpen;
                 mPressedAnim.SetTime( 0f );
             }
         }
 
         internal override void OnMouseUp( Point _hitPoint )
         {
-            if( mbIsOpen && mDropDownHitBox.Contains( _hitPoint ) )
+            if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
                 SelectedValueIndex = (int)( ( _hitPoint.Y - ( Position.Y + Size.Y + Padding.Top ) ) / siLineHeight ) + miScrollOffset;
                 mPressedAnim.SetTime( 1f );
-                mbIsOpen = false;
+                IsOpen = false;
                 mbIsPressed = false;
 
                 if( ChangeHandler != null ) ChangeHandler( this );
@@ -158,14 +161,14 @@ namespace NuclearWinter.UI
             else
             {
                 mPressedAnim.SetTime( 1f );
-                mbIsOpen = false;
+                IsOpen = false;
                 mbIsPressed = false;
             }
         }
 
         internal override void OnMouseMove(Point _hitPoint)
         {
-            if( mbIsOpen && mDropDownHitBox.Contains( _hitPoint ) )
+            if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
                 miHoveredValueIndex = (int)( ( _hitPoint.Y - ( Position.Y + Size.Y + Padding.Top ) ) / siLineHeight ) + miScrollOffset;
             }
@@ -192,7 +195,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnActivateDown()
         {
-            if( mbIsOpen )
+            if( IsOpen )
             {
             }
             else
@@ -216,24 +219,24 @@ namespace NuclearWinter.UI
 
         internal override void OnActivateUp()
         {
-            if( mbIsOpen )
+            if( IsOpen )
             {
                 SelectedValueIndex = miHoveredValueIndex;
                 if( ChangeHandler != null ) ChangeHandler( this );
 
                 mPressedAnim.SetTime( 1f );
-                mbIsOpen = false;
+                IsOpen = false;
                 mbIsPressed = false;
             }
             else
             {
-                mbIsOpen = true;
+                IsOpen = true;
             }
         }
 
         internal override bool OnCancel( bool _bPressed )
         {
-            if( mbIsOpen )
+            if( IsOpen )
             {
                 if( ! _bPressed ) OnBlur();
                 return true;
@@ -248,14 +251,14 @@ namespace NuclearWinter.UI
         internal override void OnBlur()
         {
             mPressedAnim.SetTime( 1f );
-            mbIsOpen = false;
+            IsOpen = false;
             mbIsPressed = false;
         }
 
         //----------------------------------------------------------------------
         internal override void OnPadMove( Direction _direction )
         {
-            if( ! mbIsOpen )
+            if( ! IsOpen )
             {
                 base.OnPadMove( _direction );
                 return;
@@ -285,9 +288,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( (!mbIsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
-            if( mbIsHovered && ! mbIsOpen && mPressedAnim.IsOver )
+            if( mbIsHovered && ! IsOpen && mPressedAnim.IsOver )
             {
                 if( Screen.IsActive )
                 {
@@ -299,7 +302,7 @@ namespace NuclearWinter.UI
                 Screen.DrawBox( ButtonFramePressed,    new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White * mPressedAnim.CurrentValue );
             }
 
-            if( Screen.IsActive && HasFocus && ! mbIsOpen )
+            if( Screen.IsActive && HasFocus && ! IsOpen )
             {
                 Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
             }
@@ -315,7 +318,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            if( HasFocus && mbIsOpen )
+            if( HasFocus && IsOpen )
             {
                 return this;
             }
@@ -333,7 +336,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DrawFocused()
         {
-            if( mbIsOpen )
+            if( IsOpen )
             {
                 int iLinesDisplayed = Math.Min( siMaxLineDisplayed, mlValues.Count );
 
