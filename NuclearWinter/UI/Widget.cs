@@ -225,7 +225,7 @@ namespace NuclearWinter.UI
         internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
         internal virtual void       OnMouseMove ( Point _hitPoint ) {}
 
-        internal virtual void       OnMouseWheel( int _iDelta ) {}
+        internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) {}
 
         internal virtual void       OnKeyPress  ( Keys _key ) {}
         internal virtual void       OnTextEntered( char _char ) {}

@@ -41,6 +41,9 @@ namespace NuclearWinter
         {
             SpriteBatch = new SpriteBatch( GraphicsDevice );
 
+            ScissorRasterizerState = new RasterizerState();
+            ScissorRasterizerState.ScissorTestEnable = true;
+
             GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
             Components.Add( GameStateMgr );
 
@@ -307,8 +310,10 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
-        public GraphicsDeviceManager                        Graphics;
-        public SpriteBatch                                  SpriteBatch;
+        public GraphicsDeviceManager                        Graphics                { get; private set; }
+        public SpriteBatch                                  SpriteBatch             { get; private set; }
+        public RasterizerState                              ScissorRasterizerState  { get; private set; }
+
         
 #if WINDOWS || XBOX
         // Index of the player responsible for menu navigation (or null if none yet)

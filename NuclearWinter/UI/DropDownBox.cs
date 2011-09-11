@@ -166,7 +166,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseMove(Point _hitPoint)
+        internal override void OnMouseMove( Point _hitPoint )
         {
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
@@ -178,9 +178,9 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseWheel( int _iDelta )
+        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120, 0, Math.Max( 0, mlValues.Count - siMaxLineDisplayed ) );
+            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120 * 3, 0, Math.Max( 0, mlValues.Count - siMaxLineDisplayed ) );
             miHoveredValueIndex += iNewScrollOffset - miScrollOffset;
             miScrollOffset = iNewScrollOffset;
         }

@@ -288,6 +288,8 @@ namespace NuclearWinter.UI
         bool                                mbIsHovered;
         Point                               mHoverPoint;
 
+        int                                 miScrollOffset;
+        int                                 miScrollMax;
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -314,11 +316,14 @@ namespace NuclearWinter.UI
 
             int iX = Position.X + 10;
             int iY = Position.Y + 10;
+            int iHeight = 0;
             foreach( TreeViewNode node in Nodes )
             {
-                node.DoLayout( new Rectangle( iX, iY, Size.X - 20, node.ContentHeight ) );
-                iY += node.ContentHeight;
+                node.DoLayout( new Rectangle( iX, iY + iHeight - miScrollOffset, Size.X - 20, node.ContentHeight ) );
+                iHeight += node.ContentHeight;
             }
+
+            miScrollMax = Math.Max( 0, ( iHeight ) - ( Size.Y - 20 ) );
         }
 
         //----------------------------------------------------------------------
@@ -346,7 +351,7 @@ namespace NuclearWinter.UI
             HoveredNode = null;
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) ) / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + miScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
             }
@@ -409,14 +414,24 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        {
+            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - ( _iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) ), 0, Math.Max( 0, miScrollMax ) );
+            miScrollOffset = iNewScrollOffset;
+            UpdateHoveredNode();
+        }
+
+        //----------------------------------------------------------------------
         internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
+            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 ) );
             foreach( TreeViewNode node in Nodes )
             {
                 node.Draw();
             }
+            Screen.PopScissorRectangle();
         }
 
     }

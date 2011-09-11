@@ -204,7 +204,7 @@ namespace NuclearWinter.UI
                         {
                             mHoveredWidget.OnMouseOut( mouseHitPoint );
                         }
-                    
+                        
                         mHoveredWidget = hoveredWidget;
                         if( mHoveredWidget != null )
                         {
@@ -222,9 +222,11 @@ namespace NuclearWinter.UI
             int iWheelDelta = Game.InputMgr.GetMouseWheelDelta();
             if( iWheelDelta != 0 )
             {
-                if( FocusedWidget != null )
+                Widget hoveredWidget = ( FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint ) ) ?? Root.HitTest( mouseHitPoint );
+
+                if( hoveredWidget != null )
                 {
-                    FocusedWidget.OnMouseWheel( iWheelDelta );
+                    hoveredWidget.OnMouseWheel( mouseHitPoint, iWheelDelta );
                 }
             }
 
@@ -301,14 +303,74 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        Stack<Rectangle> mlScissorRects = new Stack<Rectangle>();
+
+        Rectangle Intersection( Rectangle _rect1, Rectangle _rect2 )
+        {
+            Rectangle rect = new Rectangle(
+                Math.Max( _rect1.X, _rect2.X ),
+                Math.Max( _rect1.Y, _rect2.Y ),
+                0, 0 );
+
+            rect.Width = Math.Min( _rect1.Right, _rect2.Right ) - rect.X;
+            rect.Height = Math.Min( _rect1.Bottom, _rect2.Bottom ) - rect.Y;
+
+            if( rect.Width < 0 )
+            {
+                rect.X += rect.Width;
+                rect.Width = 0;
+            }
+
+            if( rect.Height < 0 )
+            {
+                rect.X += rect.Height;
+                rect.Height = 0;
+            }
+
+            return rect;
+        }
+
+        public void PushScissorRectangle( Rectangle _scissorRect )
+        {
+            Rectangle parentRect = mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds;
+
+            mlScissorRects.Push( Intersection( Intersection( parentRect, _scissorRect ), Game.GraphicsDevice.Viewport.Bounds ) );
+
+            Game.SpriteBatch.End();
+            Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState );
+        }
+
+        public void PopScissorRectangle()
+        {
+            mlScissorRects.Pop();
+
+            Game.SpriteBatch.End();
+
+            if( mlScissorRects.Count > 0 )
+            {
+                Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState );
+            }
+            else
+            {
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null );
+            }
+        }
+
+        //----------------------------------------------------------------------
         public void Draw()
         {
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null );
+
             Root.Draw();
 
             if( FocusedWidget != null && IsActive )
             {
                 FocusedWidget.DrawFocused();
             }
+
+            Game.SpriteBatch.End();
         }
     }
 }
