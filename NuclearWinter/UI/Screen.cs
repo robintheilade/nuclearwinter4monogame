@@ -338,7 +338,7 @@ namespace NuclearWinter.UI
 
             Game.SpriteBatch.End();
             Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
-            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState );
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
         }
 
         public void PopScissorRectangle()
@@ -350,7 +350,7 @@ namespace NuclearWinter.UI
             if( mlScissorRects.Count > 0 )
             {
                 Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
-                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState );
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
             }
             else
             {
@@ -361,7 +361,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Draw()
         {
-            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null );
+            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, null, null, Game.SpriteMatrix );
 
             Root.Draw();
 

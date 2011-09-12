@@ -18,7 +18,44 @@ namespace NuclearWinter
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
-        public Texture2D        WhitePixelTex { get; protected set; }
+        public Texture2D        WhitePixelTex                               { get; protected set; }
+        public Matrix           SpriteMatrix                                { get; protected set; }
+
+        //----------------------------------------------------------------------
+        public GraphicsDeviceManager                Graphics                { get; private set; }
+        public SpriteBatch                          SpriteBatch             { get; private set; }
+        public RasterizerState                      ScissorRasterizerState  { get; private set; }
+
+        
+#if WINDOWS || XBOX
+        // Index of the player responsible for menu navigation (or null if none yet)
+        public PlayerIndex?                         PlayerInCharge;
+#endif
+
+        public Storage.SaveHandler                  NuclearSaveHandler;
+#if WINDOWS || XBOX
+        public StorageDevice                        SaveGameStorageDevice;
+        bool                                        mbShouldDisplayStorageSelector;
+        Action                                      DeviceSelectedCallback;
+#endif
+
+        //----------------------------------------------------------------------
+        // Sound & Music
+        public Song                                 Song;
+
+        //----------------------------------------------------------------------
+        // Game States
+        public GameFlow.GameStateMgr<NuclearGame>   GameStateMgr            { get; private set; }
+
+        //----------------------------------------------------------------------
+        // Input
+#if WINDOWS || XBOX
+        public Input.InputManager                   InputMgr                { get; private set; }
+#endif
+
+#if WINDOWS_PHONE
+        public Input.TouchManager                   TouchMgr                { get; private set; }
+#endif
 
         //----------------------------------------------------------------------
         public NuclearGame()
@@ -308,39 +345,5 @@ namespace NuclearWinter
                 Song = _song;
             }
         }
-
-        //----------------------------------------------------------------------
-        public GraphicsDeviceManager                        Graphics                { get; private set; }
-        public SpriteBatch                                  SpriteBatch             { get; private set; }
-        public RasterizerState                              ScissorRasterizerState  { get; private set; }
-
-        
-#if WINDOWS || XBOX
-        // Index of the player responsible for menu navigation (or null if none yet)
-        public PlayerIndex?                                 PlayerInCharge;
-#endif
-
-        public Storage.SaveHandler                          NuclearSaveHandler;
-#if WINDOWS || XBOX
-        public StorageDevice                                SaveGameStorageDevice;
-        bool                                                mbShouldDisplayStorageSelector;
-        Action                                              DeviceSelectedCallback;
-#endif
-
-        //----------------------------------------------------------------------
-        // Sound & Music
-        public Song                                         Song;
-
-        //----------------------------------------------------------------------
-        // Game States
-        public GameFlow.GameStateMgr<NuclearGame>           GameStateMgr        { get; private set; }
-
-#if WINDOWS || XBOX
-        public Input.InputManager                         InputMgr          { get; private set; }
-#endif
-
-#if WINDOWS_PHONE
-        public Input.TouchManager                           TouchMgr            { get; private set; }
-#endif
     }
 }
