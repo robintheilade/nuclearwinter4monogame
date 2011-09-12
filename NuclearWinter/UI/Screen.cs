@@ -170,7 +170,7 @@ namespace NuclearWinter.UI
             {
                 bHasMouseEvent = true;
 
-                Widget widget  = FocusedWidget.HitTest( mouseHitPoint );
+                Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
                 if( widget != null )
                 {
                     widget.OnMouseDoubleClick( mouseHitPoint );

@@ -52,7 +52,7 @@ namespace NuclearWinter.UI
             page.AddChild( new FixedWidget( TitleLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding, iPadding, FixedGroup.Screen.Style.DefaultButtonHeight ) ) );
 
             {
-                mSpinningWheel = new NuclearWinter.UI.SpinningWheel( FixedGroup.Screen, Manager.Content.Load<Texture2D>( "Sprites/Menu/SpinningWheel" ) );
+                mSpinningWheel = new NuclearWinter.UI.SpinningWheel( FixedGroup.Screen, FixedGroup.Screen.Style.SpinningWheel );
                 mSpinningWheelAnchor = new NuclearWinter.UI.FixedWidget( FixedGroup.Screen, AnchoredRect.CreateCentered( mSpinningWheel.ContentWidth , mSpinningWheel.ContentHeight ) );
                 page.AddChild( mSpinningWheelAnchor );
 

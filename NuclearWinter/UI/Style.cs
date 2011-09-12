@@ -18,6 +18,8 @@ namespace NuclearWinter.UI
         public UIFont           MediumFont;
         public UIFont           BigFont;
 
+        public Texture2D        SpinningWheel;
+
         public int              ButtonCornerSize = 30;
         public int              DefaultButtonHeight = 80;
         public Color            DefaultTextColor = Color.White;
