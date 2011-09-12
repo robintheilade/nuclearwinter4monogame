@@ -280,7 +280,7 @@ namespace NuclearWinter.UI
         {
             foreach( FixedWidget child in mlChildren )
             {
-                if( child.Child.OnPadButton( _button, _bIsDown ) )
+                if( child.OnPadButton( _button, _bIsDown ) )
                 {
                     return true;
                 }
