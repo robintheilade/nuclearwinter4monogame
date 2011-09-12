@@ -189,6 +189,9 @@ namespace NuclearWinter.UI
                 case Keys.Home:
                     CaretOffset = 0;
                     break;
+                default:
+                    base.OnKeyPress( _key );
+                    break;
             }
         }
 

@@ -227,7 +227,40 @@ namespace NuclearWinter.UI
 
         internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) {}
 
-        internal virtual void       OnKeyPress  ( Keys _key ) {}
+        internal virtual void       OnKeyPress  ( Keys _key )
+        {
+            if( _key == Keys.Tab )
+            {
+                List<Direction> directions = new List<Direction>();
+
+                if( Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown( Keys.LeftShift ) || Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown( Keys.RightShift ) )
+                {
+                    directions.Add( Direction.Left );
+                    directions.Add( Direction.Up );
+                }
+                else
+                {
+                    directions.Add( Direction.Right );
+                    directions.Add( Direction.Down );
+                }
+
+                foreach( Direction direction in directions )
+                {
+                    Widget widget = GetSibling( direction, this );
+
+                    if( widget != null )
+                    {
+                        Widget focusableWidget = widget.GetFirstFocusableDescendant( direction );
+
+                        if( focusableWidget != null )
+                        {
+                            Screen.Focus( focusableWidget );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         internal virtual void       OnTextEntered( char _char ) {}
 
         internal virtual void       OnActivateDown() {}
@@ -239,7 +272,7 @@ namespace NuclearWinter.UI
 
         internal virtual bool       OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
 
-        internal virtual void     OnPadMove( Direction _direction ) {
+        internal virtual void       OnPadMove( Direction _direction ) {
             Widget widget = GetSibling( _direction, this );
 
             if( widget != null )
