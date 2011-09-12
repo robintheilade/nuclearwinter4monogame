@@ -71,6 +71,7 @@ namespace NuclearWinter
 
 
             Graphics = new GraphicsDeviceManager(this);
+            SpriteMatrix = Matrix.Identity;
         }
 
         //----------------------------------------------------------------------
