@@ -40,7 +40,7 @@ namespace NuclearWinter.UI
             mPopupScreen = new NuclearWinter.UI.Screen( _game, _style, _game.GraphicsDevice.Viewport.Width, _game.GraphicsDevice.Viewport.Height );
 
             NuclearWinter.UI.Image fade = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
-            fade.Color = Color.Black * 0.3f;
+            fade.Color = mPopupScreen.Style.PopupBackgroundFadeColor;
             PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, AnchoredRect.CreateFull(0) ) );
 
             PopupScreenPaneAnchor   = new NuclearWinter.UI.FixedWidget( PopupScreen, AnchoredRect.CreateFull(0) );
