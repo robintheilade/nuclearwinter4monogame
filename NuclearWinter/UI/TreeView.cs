@@ -98,6 +98,8 @@ namespace NuclearWinter.UI
 
             Icon = _icon;
 
+            Tag = _tag;
+
             UpdateContentSize();
         }
 
