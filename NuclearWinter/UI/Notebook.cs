@@ -14,6 +14,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         Notebook                mNotebook;
+        public object           Tag;
 
         //----------------------------------------------------------------------
         Label                   mLabel;
@@ -99,6 +100,11 @@ namespace NuclearWinter.UI
                 mNotebook.Tabs.Remove( this );
                 
                 Screen.Focus( mNotebook );
+
+                if( mNotebook.TabClosedHandler != null )
+                {
+                    mNotebook.TabClosedHandler( this );
+                }
             };
 
             Text            = _strText;
@@ -282,6 +288,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public NotebookStyle        Style;
+        public Action<NotebookTab>  TabClosedHandler;
 
         Panel                       mPanel;
 
