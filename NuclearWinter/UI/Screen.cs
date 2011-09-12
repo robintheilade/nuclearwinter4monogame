@@ -349,6 +349,7 @@ namespace NuclearWinter.UI
         public void PushScissorRectangle( Rectangle _scissorRect )
         {
             Rectangle rect = TransformRect( _scissorRect, Game.SpriteMatrix );
+            rect.Offset( 0, NuclearWinter.Resolution.Viewport.Y );
             Rectangle parentRect = mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds;
 
             mlScissorRects.Push( Intersection( Intersection( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds ) );
