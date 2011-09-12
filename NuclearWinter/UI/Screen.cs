@@ -330,11 +330,28 @@ namespace NuclearWinter.UI
             return rect;
         }
 
+        Rectangle TransformRect( Rectangle _rect, Matrix _matrix )
+        {
+            Vector2 vMin = new Vector2( _rect.X, _rect.Y );
+            Vector2 vMax = new Vector2( _rect.Right, _rect.Bottom );
+            vMin = Vector2.Transform( vMin, _matrix );
+            vMax = Vector2.Transform( vMax, _matrix );
+            Rectangle bounds = new Rectangle(
+                (int)vMin.X,
+                (int)vMin.Y,
+                (int)( vMax.X - vMin.X  ),
+                (int)( vMax.Y - vMin.Y )
+                );
+
+            return bounds;
+        }
+
         public void PushScissorRectangle( Rectangle _scissorRect )
         {
+            Rectangle rect = TransformRect( _scissorRect, Game.SpriteMatrix );
             Rectangle parentRect = mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds;
 
-            mlScissorRects.Push( Intersection( Intersection( parentRect, _scissorRect ), Game.GraphicsDevice.Viewport.Bounds ) );
+            mlScissorRects.Push( Intersection( Intersection( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds ) );
 
             Game.SpriteBatch.End();
             Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
@@ -354,7 +371,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null );
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, null, null, Game.SpriteMatrix );
             }
         }
 
