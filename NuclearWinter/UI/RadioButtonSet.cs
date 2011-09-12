@@ -353,7 +353,7 @@ namespace NuclearWinter.UI
             mlButtons[miHoveredButton].OnMouseUp( _hitPoint );
         }
 
-        public void ButtonClicked( Button _button )
+        internal void ButtonClicked( Button _button )
         {
             SelectedButtonIndex = mlButtons.IndexOf( _button );
             if( ClickHandler != null )
