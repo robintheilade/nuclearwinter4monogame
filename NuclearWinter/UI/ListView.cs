@@ -381,6 +381,8 @@ namespace NuclearWinter.UI
                 }
             }
 
+            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ), Size.X - 20, Size.Y - 20 - ( DisplayColumnHeaders ? RowHeight : 0 ) ) );
+
             int iHoverRow = -1;
             if( mbIsHovered )
             {
@@ -469,6 +471,8 @@ namespace NuclearWinter.UI
 
                 iRow++;
             }
+
+            Screen.PopScissorRectangle();
         }
     }
 }

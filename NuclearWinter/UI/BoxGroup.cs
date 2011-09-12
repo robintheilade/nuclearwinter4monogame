@@ -14,43 +14,27 @@ namespace NuclearWinter.UI
     public class BoxGroup: Group
     {
         //----------------------------------------------------------------------
-        Direction       mDirection;
+        Orientation     mOrientation;
         int             miSpacing; // FIXME: Not taken into account
 
         //----------------------------------------------------------------------
-        public BoxGroup( Screen _screen, Direction _direction, int _iSpacing )
+        public BoxGroup( Screen _screen, Orientation _orientation, int _iSpacing )
         : base( _screen )
         {
-            mDirection  = _direction;
+            mOrientation  = _orientation;
             miSpacing   = _iSpacing;
         }
 
         //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
-            if( mDirection == Direction.Left || mDirection == Direction.Right )
+            if( mOrientation == Orientation.Vertical )
             {
-                switch( _direction )
-                {
-                    case Direction.Left:
-                        return mlChildren[ mlChildren.Count - 1 ].GetFirstFocusableDescendant( _direction );
-                    case Direction.Right:
-                        return mlChildren[0].GetFirstFocusableDescendant( _direction );
-                    default:
-                        return mlChildren[0].GetFirstFocusableDescendant( _direction );
-                }
+                return mlChildren[0].GetFirstFocusableDescendant( _direction );
             }
             else
             {
-                switch( _direction )
-                {
-                    case Direction.Up:
-                        return mlChildren[ mlChildren.Count - 1 ].GetFirstFocusableDescendant( _direction );
-                    case Direction.Down:
-                        return mlChildren[0].GetFirstFocusableDescendant( _direction );
-                    default:
-                        return mlChildren[0].GetFirstFocusableDescendant( _direction );
-                }
+                return mlChildren[0].GetFirstFocusableDescendant( _direction );
             }
         }
 
@@ -59,33 +43,39 @@ namespace NuclearWinter.UI
         {
             int iIndex = mlChildren.IndexOf( _child );
 
-            if( mDirection == _direction )
+            if( mOrientation == Orientation.Horizontal )
             {
-                if( iIndex < mlChildren.Count - 1 )
+                if( _direction == Direction.Right )
                 {
-                    return mlChildren[iIndex + 1];
+                    if( iIndex < mlChildren.Count - 1 )
+                    {
+                        return mlChildren[iIndex + 1];
+                    }
+                }
+                else
+                if( _direction == Direction.Left )
+                {
+                    if( iIndex > 0 )
+                    {
+                        return mlChildren[iIndex - 1];
+                    }
                 }
             }
             else
             {
-                if( mDirection == Direction.Left || mDirection == Direction.Right )
+                if( _direction == Direction.Down )
                 {
-                    if( _direction == Direction.Left || _direction == Direction.Right )
+                    if( iIndex < mlChildren.Count - 1 )
                     {
-                        if( iIndex > 0 )
-                        {
-                            return mlChildren[iIndex - 1];
-                        }
+                        return mlChildren[iIndex + 1];
                     }
                 }
                 else
+                if( _direction == Direction.Up )
                 {
-                    if( _direction == Direction.Up || _direction == Direction.Down )
+                    if( iIndex > 0 )
                     {
-                        if( iIndex > 0 )
-                        {
-                            return mlChildren[iIndex - 1];
-                        }
+                        return mlChildren[iIndex - 1];
                     }
                 }
             }
@@ -96,9 +86,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            bool bHorizontal = mDirection == Direction.Left || mDirection == Direction.Right;
-
-            if( bHorizontal )
+            if( mOrientation == Orientation.Horizontal )
             {
                 ContentWidth    = Padding.Horizontal;
                 ContentHeight   = 0;
@@ -143,12 +131,10 @@ namespace NuclearWinter.UI
 
             Debug.Assert( Size.X != 0 && Size.Y != 0 );
 
-            bool bHorizontal = mDirection == Direction.Left || mDirection == Direction.Right;
-
             int iSize = 0;
             foreach( Widget widget in mlChildren )
             {
-                iSize += bHorizontal ? widget.ContentWidth : widget.ContentHeight;
+                iSize += mOrientation == Orientation.Horizontal ? widget.ContentWidth : widget.ContentHeight;
             }
 
             if( mlChildren.Count > 1 )
@@ -158,18 +144,12 @@ namespace NuclearWinter.UI
 
             Point pWidgetPosition;
                 
-            switch( mDirection )
+            switch( mOrientation )
             {
-                case Direction.Left:
-                    pWidgetPosition = new Point( Position.X + Size.X / 2 + iSize / 2, Position.Y );
-                    break;
-                case Direction.Up:
-                    pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 + iSize / 2 );
-                    break;
-                case Direction.Right:
+                case Orientation.Horizontal:
                     pWidgetPosition = new Point( Position.X + Size.X / 2 - iSize / 2, Position.Y );
                     break;
-                case Direction.Down:
+                case Orientation.Vertical:
                     pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iSize / 2 );
                     break;
                 default:
@@ -178,31 +158,15 @@ namespace NuclearWinter.UI
 
             foreach( Widget widget in mlChildren )
             {
-                if( mDirection == Direction.Left )
-                {
-                    pWidgetPosition.X -= widget.ContentWidth;
-                }
-                else
-                if( mDirection == Direction.Up )
-                {
-                    pWidgetPosition.Y -= widget.ContentHeight;
-                }
-
-                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, bHorizontal ? widget.ContentWidth : Size.X, bHorizontal ? Size.Y : widget.ContentHeight ) );
+                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? widget.ContentWidth : Size.X, mOrientation == Orientation.Horizontal ? Size.Y : widget.ContentHeight ) );
                 
-                switch( mDirection )
+                switch( mOrientation )
                 {
-                    case Direction.Right:
+                    case Orientation.Horizontal:
                         pWidgetPosition.X += widget.ContentWidth + miSpacing;
                         break;
-                    case Direction.Left:
-                        pWidgetPosition.X -= miSpacing;
-                        break;
-                    case Direction.Down:
+                    case Orientation.Vertical:
                         pWidgetPosition.Y += widget.ContentHeight + miSpacing;
-                        break;
-                    case Direction.Up:
-                        pWidgetPosition.Y -= miSpacing;
                         break;
                 }
             }

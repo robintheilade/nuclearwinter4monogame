@@ -123,12 +123,12 @@ namespace NuclearWinter.UI
         {
             if( mbWrapText )
             {
-                if( ContentWidth > Size.X && Size.X > 0 )
+                if( Size.X > 0 )
                 {
                     // Wrap text
                     mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
                     ContentWidth = Size.X;
-                    ContentHeight = (int)( Font.LineSpacing * 0.9f * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                    ContentHeight = (int)( Font.LineSpacing * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
                 }
                 else
                 if( mlstrWrappedText == null )

@@ -62,7 +62,7 @@ namespace NuclearWinter.UI
                 page.AddChild( new NuclearWinter.UI.FixedWidget( MessageLabel, AnchoredRect.CreateTopAnchored( iPadding, iPadding + 80, iPadding, 200 ) ) );
 
                 // Actions
-                NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Direction.Left, 0 );
+                NuclearWinter.UI.BoxGroup actionsGroup = new NuclearWinter.UI.BoxGroup( FixedGroup.Screen, NuclearWinter.UI.Orientation.Horizontal, 0 );
                 page.AddChild( new FixedWidget( actionsGroup, AnchoredRect.CreateBottomAnchored( iPadding, iPadding, iPadding, FixedGroup.Screen.Style.DefaultButtonHeight ), Anchor.End ) );
 
                 // Close

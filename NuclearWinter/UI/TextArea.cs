@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
@@ -19,8 +20,20 @@ namespace NuclearWinter.UI
         public string Text {
             get { return mLabel.Text; }
 
-            set { mLabel.Text = value; }
+            set {
+                mLabel.Text = value;
+                ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( Size.Y - 20 ) );
+            }
         }
+
+        int             miScrollOffset;
+        public int      ScrollOffset
+        {
+            get { return miScrollOffset; }
+            set { miScrollOffset = (int)MathHelper.Clamp( value, 0f, ScrollMax ); }
+        }
+
+        public int      ScrollMax { get; private set; }
 
         //----------------------------------------------------------------------
         public TextArea( Screen _screen )
@@ -48,7 +61,16 @@ namespace NuclearWinter.UI
             Size = new Point( _rect.Width, _rect.Height );
             HitBox = _rect;
 
-            mLabel.DoLayout( new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 ) );
+            mLabel.DoLayout( new Rectangle( Position.X + 10, Position.Y + 10 - miScrollOffset, Size.X - 20, Size.Y - 20 ) );
+
+            ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( Size.Y - 20 ) );
+            miScrollOffset = (int)MathHelper.Min( miScrollOffset, ScrollMax );
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        {
+            ScrollOffset = (int)( miScrollOffset - ( _iDelta / 120 * 3 * ( mLabel.Font.LineSpacing ) ) );
         }
 
         //----------------------------------------------------------------------
@@ -56,7 +78,9 @@ namespace NuclearWinter.UI
         {
             Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
+            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 ) );
             mLabel.Draw();
+            Screen.PopScissorRectangle();
         }
 
     }
