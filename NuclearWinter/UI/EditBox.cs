@@ -35,10 +35,23 @@ namespace NuclearWinter.UI
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+
+                int iScrollStep = Size.X / 3;
+
+                if( Size.X != 0 && miCaretX > miScrollOffset + ( Size.X - Padding.Horizontal ) - miCaretWidth )
+                {
+                    miScrollOffset = Math.Min( miMaxScrollOffset, ( miCaretX - ( Size.X - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
+                }
+                else
+                if( miCaretX < miScrollOffset )
+                {
+                    miScrollOffset = Math.Max( 0, miCaretX - iScrollStep );
+                }
                 mfTimer = 0f;
             }
         }
         int     miCaretX;
+        int     miCaretWidth = 3;
 
         bool    mbIsHovered;
         float   mfTimer;
@@ -64,6 +77,8 @@ namespace NuclearWinter.UI
         }
 
         string                  mstrDisplayedText;
+        int                     miScrollOffset;
+        int                     miMaxScrollOffset;
 
         public Func<char,bool>  TextEnteredHandler;
         public Action<EditBox>  ValidateHandler;
@@ -92,6 +107,7 @@ namespace NuclearWinter.UI
         {
             mstrDisplayedText = ( mPasswordCharacter == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordCharacter );
 
+            miMaxScrollOffset = (int)Math.Max( 0, Font.MeasureString( mstrDisplayedText ).X - ( Size.X - Padding.Horizontal ) + miCaretWidth );
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
@@ -229,21 +245,27 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.EditBoxFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
+            Rectangle rect = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+
+            Screen.DrawBox( Screen.Style.EditBoxFrame, rect, Screen.Style.EditBoxCornerSize, Color.White );
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonPress, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonPress, rect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + mFont.YOffset ), Color.White );
+            Screen.PushScissorRectangle( new Rectangle( Position.X + Padding.Left, Position.Y + Padding.Top, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ) );
+
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), Color.White );
 
             const float fBlinkInterval = 0.3f;
 
             if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX, Position.Y + Padding.Top, 3, Size.Y - Padding.Vertical ), Color.White );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, Position.Y + Padding.Top, miCaretWidth, Size.Y - Padding.Vertical ), Color.White );
             }
+
+            Screen.PopScissorRectangle();
         }
     }
 }
