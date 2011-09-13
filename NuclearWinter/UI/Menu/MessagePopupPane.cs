@@ -74,6 +74,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Close()
         {
+            TitleLabel.Text = "";
+            MessageLabel.Text = "";
+            CloseButton.ClickHandler = null;
+            CloseButton.Text = "Close";
+
             ShowSpinningWheel = false;
             Manager.ClosePopup();
         }
