@@ -16,6 +16,13 @@ namespace NuclearWinter.UI
         List<FixedWidget>           mlChildren;
 
         //----------------------------------------------------------------------
+        public FixedGroup( Screen _screen )
+        : base( _screen )
+        {
+            mlChildren = new List<FixedWidget>();
+        }
+
+        //----------------------------------------------------------------------
         public void Clear()
         {
             mlChildren.RemoveAll( delegate(FixedWidget _widget) { _widget.Parent = null; return true; } );
@@ -166,13 +173,6 @@ namespace NuclearWinter.UI
             }
 
             return focusableSibling;
-        }
-
-        //----------------------------------------------------------------------
-        public FixedGroup( Screen _screen )
-        : base( _screen )
-        {
-            mlChildren = new List<FixedWidget>();
         }
 
         //----------------------------------------------------------------------

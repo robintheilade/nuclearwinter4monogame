@@ -9,8 +9,9 @@ namespace NuclearWinter.UI
 {
     /*
      * A widget that draws a box with the specified texture & corner size
+     * Can also contain stuff
      */
-    public class Panel: Widget
+    public class Panel: FixedGroup
     {
         public Texture2D        Texture;
         public int              CornerSize;
@@ -24,29 +25,20 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override Widget GetFirstFocusableDescendant( Direction _direction )
-        {
-            return null;
-        }
-
-        //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
-        {
-        }
-
-        //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
 
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+            base.DoLayout( _rect );
         }
 
         //----------------------------------------------------------------------
         internal override void Draw()
         {
             Screen.DrawBox( Texture, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), CornerSize, Color.White );
+
+            base.Draw();
         }
     }
 }
