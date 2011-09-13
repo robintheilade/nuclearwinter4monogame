@@ -305,7 +305,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Stack<Rectangle> mlScissorRects = new Stack<Rectangle>();
 
-        Rectangle Intersection( Rectangle _rect1, Rectangle _rect2 )
+        Rectangle IntersectRects( Rectangle _rect1, Rectangle _rect2 )
         {
             Rectangle rect = new Rectangle(
                 Math.Max( _rect1.X, _rect2.X ),
@@ -323,7 +323,7 @@ namespace NuclearWinter.UI
 
             if( rect.Height < 0 )
             {
-                rect.X += rect.Height;
+                rect.Y += rect.Height;
                 rect.Height = 0;
             }
 
@@ -352,7 +352,7 @@ namespace NuclearWinter.UI
             rect.Offset( 0, NuclearWinter.Resolution.Viewport.Y );
             Rectangle parentRect = mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds;
 
-            mlScissorRects.Push( Intersection( Intersection( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds ) );
+            mlScissorRects.Push( IntersectRects( IntersectRects( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds ) );
 
             Game.SpriteBatch.End();
             Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
