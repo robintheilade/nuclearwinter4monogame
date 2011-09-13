@@ -389,6 +389,8 @@ namespace NuclearWinter.UI
             }
 
             Game.SpriteBatch.End();
+
+            Debug.Assert( mlScissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles" );
         }
     }
 }
