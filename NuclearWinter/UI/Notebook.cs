@@ -96,6 +96,7 @@ namespace NuclearWinter.UI
             mIcon           = new Image( Screen, _iconTex );
 
             mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
+            mCloseButton.Padding = new Box(0);
             mCloseButton.ClickHandler = delegate {
                 mNotebook.Tabs.Remove( this );
                 
