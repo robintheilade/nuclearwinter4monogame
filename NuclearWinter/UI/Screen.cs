@@ -53,6 +53,8 @@ namespace NuclearWinter.UI
         {
             Width = _iWidth;
             Height = _iHeight;
+
+            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
         }
 
         //----------------------------------------------------------------------
@@ -354,26 +356,16 @@ namespace NuclearWinter.UI
 
             mlScissorRects.Push( IntersectRects( IntersectRects( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds ) );
 
-            Game.SpriteBatch.End();
+            SuspendBatch();
             Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
-            Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
+            ResumeBatch();
         }
 
         public void PopScissorRectangle()
         {
+            SuspendBatch();
             mlScissorRects.Pop();
-
-            Game.SpriteBatch.End();
-
-            if( mlScissorRects.Count > 0 )
-            {
-                Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
-                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
-            }
-            else
-            {
-                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, null, null, Game.SpriteMatrix );
-            }
+            ResumeBatch();
         }
 
         //----------------------------------------------------------------------
@@ -391,6 +383,27 @@ namespace NuclearWinter.UI
             Game.SpriteBatch.End();
 
             Debug.Assert( mlScissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles" );
+        }
+
+        internal void SuspendBatch()
+        {
+            Game.SpriteBatch.End();
+            Game.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+        }
+
+        internal void ResumeBatch()
+        {
+            Game.GraphicsDevice.RasterizerState = Game.ScissorRasterizerState;
+
+            if( mlScissorRects.Count > 0 )
+            {
+                Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
+            }
+            else
+            {
+                Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, null, null, Game.SpriteMatrix );
+            }
         }
     }
 }

@@ -15,14 +15,51 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         Orientation     mOrientation;
-        int             miSpacing; // FIXME: Not taken into account
+        int             miSpacing;
+
+        List<bool>      mlExpandedChildren;
 
         //----------------------------------------------------------------------
         public BoxGroup( Screen _screen, Orientation _orientation, int _iSpacing )
         : base( _screen )
         {
-            mOrientation  = _orientation;
-            miSpacing   = _iSpacing;
+            mlExpandedChildren = new List<bool>();
+
+            mOrientation    = _orientation;
+            miSpacing       = _iSpacing;
+        }
+
+        //----------------------------------------------------------------------
+        public void AddChild( Widget _widget, int _iIndex, bool _bExpand )
+        {
+            Debug.Assert( _widget.Parent == null );
+
+            _widget.Parent = this;
+            mlExpandedChildren.Insert( _iIndex, _bExpand );
+            mlChildren.Insert( _iIndex, _widget );
+            UpdateContentSize();
+        }
+
+        public override void AddChild( Widget _widget, int _iIndex )
+        {
+            AddChild( _widget, _iIndex, false );
+        }
+
+        public void AddChild( Widget _widget, bool _bExpand )
+        {
+            AddChild( _widget, mlChildren.Count, _bExpand );
+        }
+
+        public override void RemoveChild( Widget _widget )
+        {
+            Debug.Assert( _widget.Parent == this );
+
+            _widget.Parent = null;
+
+            mlExpandedChildren.RemoveAt( mlChildren.IndexOf( _widget ) );
+
+            mlChildren.Remove( _widget );
+            UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -131,42 +168,65 @@ namespace NuclearWinter.UI
 
             Debug.Assert( Size.X != 0 && Size.Y != 0 );
 
-            int iSize = 0;
-            foreach( Widget widget in mlChildren )
+            int iUnexpandedSize = 0;
+            int iExpandedChildrenCount = 0;
+            for( int iIndex = 0; iIndex < mlChildren.Count; iIndex++ )
             {
-                iSize += mOrientation == Orientation.Horizontal ? widget.ContentWidth : widget.ContentHeight;
+                if( ! mlExpandedChildren[iIndex] )
+                {
+                    iUnexpandedSize += ( mOrientation == Orientation.Horizontal ) ? mlChildren[iIndex].ContentWidth : mlChildren[iIndex].ContentHeight;
+                }
+                else
+                {
+                    iExpandedChildrenCount++;
+                }
+            }
+
+            int iExpandedWidgetSize = 0;
+            if( iExpandedChildrenCount > 0 )
+            {
+                iExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? Size.X : Size.Y ) - iUnexpandedSize ) / iExpandedChildrenCount;
             }
 
             if( mlChildren.Count > 1 )
             {
-                iSize += ( mlChildren.Count - 1 ) * miSpacing;
+                iUnexpandedSize += ( mlChildren.Count - 1 ) * miSpacing;
             }
 
+            int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? Size.X : Size.Y ) : iUnexpandedSize;
+
             Point pWidgetPosition;
-                
+            
             switch( mOrientation )
             {
                 case Orientation.Horizontal:
-                    pWidgetPosition = new Point( Position.X + Size.X / 2 - iSize / 2, Position.Y );
+                    pWidgetPosition = new Point( Position.X + Size.X / 2 - iActualSize / 2, Position.Y );
                     break;
                 case Orientation.Vertical:
-                    pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iSize / 2 );
+                    pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iActualSize / 2 );
                     break;
                 default:
                     throw new NotSupportedException();
             }
 
-            foreach( Widget widget in mlChildren )
+            for( int iIndex = 0; iIndex < mlChildren.Count; iIndex++ )
             {
-                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? widget.ContentWidth : Size.X, mOrientation == Orientation.Horizontal ? Size.Y : widget.ContentHeight ) );
+                Widget widget = mlChildren[iIndex];
+
+                int iWidgetSize = ( mOrientation == Orientation.Horizontal ) ? widget.ContentWidth : widget.ContentHeight;
+                if( mlExpandedChildren[iIndex] )
+                {
+                    iWidgetSize = iExpandedWidgetSize;
+                }
+                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : Size.X, mOrientation == Orientation.Horizontal ? Size.Y : iWidgetSize ) );
                 
                 switch( mOrientation )
                 {
                     case Orientation.Horizontal:
-                        pWidgetPosition.X += widget.ContentWidth + miSpacing;
+                        pWidgetPosition.X += iWidgetSize + miSpacing;
                         break;
                     case Orientation.Vertical:
-                        pWidgetPosition.Y += widget.ContentHeight + miSpacing;
+                        pWidgetPosition.Y += iWidgetSize + miSpacing;
                         break;
                 }
             }

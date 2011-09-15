@@ -48,26 +48,14 @@ namespace NuclearWinter.UI
             mContentAnchor  = _contentAnchor;
         }
 
-        public FixedWidget( Screen _screen, AnchoredRect _box, Anchor _contentAnchor )
+        public FixedWidget( Screen _screen, AnchoredRect _box, Anchor _contentAnchor = Anchor.Center )
         : this( _screen, null, _box, _contentAnchor )
         {
 
         }
 
-        public FixedWidget( Screen _screen, AnchoredRect _box )
-        : this( _screen, null, _box, Anchor.Center )
-        {
-
-        }
-
-        public FixedWidget( Widget _widget, AnchoredRect _box, Anchor _contentAnchor )
+        public FixedWidget( Widget _widget, AnchoredRect _box, Anchor _contentAnchor = Anchor.Center )
         : this( _widget.Screen, _widget, _box, _contentAnchor )
-        {
-
-        }
-
-        public FixedWidget( Widget _widget, AnchoredRect _box )
-        : this( _widget.Screen, _widget, _box, Anchor.Center )
         {
 
         }

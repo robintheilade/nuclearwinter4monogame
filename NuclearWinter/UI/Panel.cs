@@ -22,6 +22,7 @@ namespace NuclearWinter.UI
         {
             Texture     = _texture;
             CornerSize  = _iCornerSize;
+            Padding     = new Box( CornerSize );
         }
 
         //----------------------------------------------------------------------
@@ -30,7 +31,7 @@ namespace NuclearWinter.UI
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
 
-            base.DoLayout( _rect );
+            base.DoLayout( new Rectangle( _rect.X + Padding.Left, _rect.Y + Padding.Right, _rect.Width - Padding.Horizontal, _rect.Height - Padding.Vertical ) );
         }
 
         //----------------------------------------------------------------------

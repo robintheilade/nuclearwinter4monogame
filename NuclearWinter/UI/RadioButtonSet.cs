@@ -98,6 +98,8 @@ namespace NuclearWinter.UI
             }
         }
 
+        public bool Expand;
+
         public Action<RadioButtonSet>   ClickHandler;
         int                             miSelectedButtonIndex = 0;
         public int                      SelectedButtonIndex
@@ -191,7 +193,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public RadioButtonSet( Screen _screen, List<Button> _lButtons, int _iInitialButtonIndex )
+        public RadioButtonSet( Screen _screen, List<Button> _lButtons, int _iInitialButtonIndex, bool _bExpand = false )
         : base( _screen )
         {
             mlButtons = _lButtons;
@@ -212,12 +214,13 @@ namespace NuclearWinter.UI
             );
 
             SelectedButtonIndex = _iInitialButtonIndex;
+            Expand = _bExpand;
 
             UpdateContentSize();
         }
 
-        public RadioButtonSet( Screen _screen, List<Button> _lButtons )
-        : this( _screen, _lButtons, 0 )
+        public RadioButtonSet( Screen _screen, List<Button> _lButtons, bool _bExpand = false )
+        : this( _screen, _lButtons, 0, _bExpand )
         {
         }
 
@@ -266,11 +269,13 @@ namespace NuclearWinter.UI
             int iHeight = Size.Y;
 
             HitBox = new Rectangle(
-                pCenter.X - ContentWidth / 2,
+                pCenter.X - ( Expand ? Size.X : ContentWidth ) / 2,
                 pCenter.Y - iHeight / 2,
                 ContentWidth,
                 iHeight
             );
+
+            int iExpandedButtonWidth = Size.X / mlButtons.Count;
 
             int iButton = 0;
             int iButtonX = 0;
@@ -278,10 +283,10 @@ namespace NuclearWinter.UI
             {
                 button.DoLayout( new Rectangle(
                     HitBox.X + iButtonX, pCenter.Y - iHeight / 2,
-                    button.ContentWidth, iHeight
+                    Expand ? iExpandedButtonWidth : button.ContentWidth, iHeight
                 ) );
 
-                iButtonX += button.ContentWidth;
+                iButtonX += Expand ? iExpandedButtonWidth : button.ContentWidth;
                 iButton++;
             }
         }

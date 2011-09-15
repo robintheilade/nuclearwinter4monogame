@@ -81,25 +81,24 @@ namespace NuclearWinter.UI
         int                     miMaxScrollOffset;
 
         public Func<char,bool>  TextEnteredHandler;
+
+        public static bool IntegerValidator( char _char )   { return ( _char >= '0' && _char <= '9' ) || _char == '-'; }
+        public static bool FloatValidator( char _char )     { return ( _char >= '0' && _char <= '9' ) || _char == '.' || _char == '-'; }
+
         public Action<EditBox>  ValidateHandler;
 
         public bool             IsReadOnly;
 
         //----------------------------------------------------------------------
-        public EditBox( Screen _screen, string _strText )
+        public EditBox( Screen _screen, string _strText = "", Func<char,bool> _textEnteredHandler = null )
         : base( _screen )
         {
             mstrText    = _strText;
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 15 );
+            TextEnteredHandler = _textEnteredHandler;
 
             UpdateContentSize();
-        }
-
-        //----------------------------------------------------------------------
-        public EditBox( Screen _screen )
-        : this( _screen, "" )
-        {
         }
 
         //----------------------------------------------------------------------

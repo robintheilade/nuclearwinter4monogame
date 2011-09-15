@@ -61,7 +61,7 @@ namespace NuclearWinter.UI
         bool                        mbIsLast;
 
         //----------------------------------------------------------------------
-        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon, object _tag )
+        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon = null, object _tag = null )
         : base( _treeView.Screen )
         {
             mTreeView   = _treeView;
@@ -103,21 +103,10 @@ namespace NuclearWinter.UI
             UpdateContentSize();
         }
 
-        public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon )
-        : this( _treeView, _strText, _icon, null )
-        {
-
-        }
-
         public TreeViewNode( TreeView _treeView, string _strText, object _tag )
         : this( _treeView, _strText, null, _tag )
         {
 
-        }
-
-        public TreeViewNode( TreeView _treeView, string _strText )
-        : this( _treeView, _strText, null, null )
-        {
         }
 
         //----------------------------------------------------------------------

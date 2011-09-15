@@ -49,22 +49,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public Image( Screen _screen, Texture2D _texture, bool _bStretch )
+        public Image( Screen _screen, Texture2D _texture = null, bool _bStretch = false )
         : base( _screen )
         {
             mTexture = _texture;
             mbStretch = _bStretch;
             UpdateContentSize();
-        }
-
-        public Image( Screen _screen, Texture2D _texture )
-        : this( _screen, _texture, false )
-        {
-        }
-
-        public Image( Screen _screen )
-        : this( _screen, null, false )
-        {
         }
 
         //----------------------------------------------------------------------
