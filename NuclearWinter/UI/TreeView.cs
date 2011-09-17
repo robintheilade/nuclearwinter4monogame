@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NuclearWinter.Collections;
+using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
@@ -162,16 +163,6 @@ namespace NuclearWinter.UI
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
             HitBox = _rect;
-            
-            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
-
-            if( mImage.Texture != null )
-            {
-                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
-                iLabelX += mImage.ContentWidth;
-            }
-
-            mLabel.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
 
             int iX = Position.X;
             int iY = Position.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
@@ -196,7 +187,21 @@ namespace NuclearWinter.UI
                 Screen.Game.SpriteBatch.Draw( mbIsLast ? Screen.Style.TreeViewBranchLast : Screen.Style.TreeViewBranch, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
             }
 
-            Rectangle nodeRect = new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight );
+            DrawNode( Position );
+
+            if( ! mbCollapsed )
+            {
+                foreach( TreeViewNode child in Children )
+                {
+                    child.Draw();
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------
+        internal void DrawNode( Point _position )
+        {
+            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, Size.X, mTreeView.NodeHeight );
 
             if( Children.Count == 0 && ! DisplayAsContainer )
             {
@@ -211,14 +216,18 @@ namespace NuclearWinter.UI
                     tex = Screen.Style.TreeViewBranchClosed;
                 }
 
-                Screen.Game.SpriteBatch.Draw( tex, new Vector2( Position.X, Position.Y ), Color.White );
+                Screen.Game.SpriteBatch.Draw( tex, new Vector2( _position.X, _position.Y ), Color.White );
             }
 
+            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
             if( mImage.Texture != null )
             {
+                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
                 mImage.Draw();
+                iLabelX += mImage.ContentWidth;
             }
 
+            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
             mLabel.Draw();
 
             if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
@@ -244,14 +253,6 @@ namespace NuclearWinter.UI
                 if( Screen.Style.GridBoxFrameSelectedHover != null )
                 {
                     Screen.DrawBox( Screen.Style.GridBoxFrameSelectedHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
-                }
-            }
-
-            if( ! mbCollapsed )
-            {
-                foreach( TreeViewNode child in Children )
-                {
-                    child.Draw();
                 }
             }
         }
@@ -281,6 +282,15 @@ namespace NuclearWinter.UI
 
         int                                 miScrollOffset;
         int                                 miScrollMax;
+
+        //----------------------------------------------------------------------
+        // Drag & drop
+        public Func<TreeViewNode,TreeViewNode,bool>     DragNDropHandler;
+        bool                                mbIsMouseDown;
+        bool                                mbIsDragging;
+        Point                               mMouseDownPoint;
+        Point                               mMouseDragPoint;
+        const int                           siDragTriggerDistance   = 10;
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -325,8 +335,16 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
-        internal override void OnMouseMove(Point _hitPoint)
+        internal override void OnMouseMove( Point _hitPoint )
         {
+            if( mbIsMouseDown && FocusedNode != null )
+            {
+                mbIsDragging = DragNDropHandler != null && (
+                        Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
+                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
+                mMouseDragPoint = _hitPoint;
+            }
+
             mHoverPoint = _hitPoint;
             UpdateHoveredNode();
         }
@@ -378,12 +396,66 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseDown( Point _hitPoint )
         {
+            mbIsMouseDown = true;
+            mMouseDownPoint = _hitPoint;
+
             Screen.Focus( this );
             FocusedNode = HoveredNode;
         }
 
         internal override void OnMouseUp( Point _hitPoint )
         {
+            mbIsMouseDown = false;
+
+            if( mbIsDragging )
+            {
+                Debug.Assert( FocusedNode != null );
+
+                if( HitBox.Contains( _hitPoint ) && HoveredNode != FocusedNode && DragNDropHandler != null )
+                {
+                    TreeViewNode ancestorNode = HoveredNode;
+
+                    bool bIsCycle = false;
+                    while( ancestorNode != null )
+                    {
+                        if( ancestorNode == FocusedNode )
+                        {
+                            bIsCycle = true;
+                            break;
+                        }
+
+                        ancestorNode = (TreeViewNode)ancestorNode.Parent;
+                    }
+
+                    if( ! bIsCycle && DragNDropHandler(FocusedNode, HoveredNode ) )
+                    {
+                        if( FocusedNode.Parent != null )
+                        {
+                            ( (TreeViewNode)(FocusedNode.Parent) ).Children.Remove( FocusedNode );
+                        }
+                        else
+                        {
+                            Nodes.Remove( FocusedNode );
+                        }
+
+                        if( HoveredNode != null )
+                        {
+                            HoveredNode.Children.Add( FocusedNode );
+                        }
+                        else
+                        {
+                            Nodes.Add( FocusedNode );
+                        }
+                    }
+                }
+                else
+                {
+                    // Drag'n'Drop cancelled
+                }
+
+                mbIsDragging = false;
+            }
+            else
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
                 if( HoveredNode.DisplayAsContainer )
@@ -425,5 +497,17 @@ namespace NuclearWinter.UI
             Screen.PopScissorRectangle();
         }
 
+        //----------------------------------------------------------------------
+        internal override void DrawFocused()
+        {
+            if( mbIsDragging )
+            {
+                Debug.Assert( FocusedNode != null );
+
+                FocusedNode.DrawNode( new Point(
+                    FocusedNode.Position.X + mMouseDragPoint.X - mMouseDownPoint.X,
+                    FocusedNode.Position.Y + mMouseDragPoint.Y - mMouseDownPoint.Y  ) );
+            }
+        }
     }
 }
