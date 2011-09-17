@@ -278,12 +278,17 @@ namespace NuclearWinter.UI
         public int                          NodeSpacing     = 0;
         public int                          NodeBranchWidth = 25;
 
+
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
         public TreeViewNode                 SelectedNode    = null;
 
         //----------------------------------------------------------------------
-        internal TreeViewNode               HoveredNode     = null;
+        public List<Button>                 ActionButtons       { get; private set; }
+        Button                              mHoveredActionButton;
+
+        //----------------------------------------------------------------------
+        public TreeViewNode                 HoveredNode     = null;
         internal TreeViewNode               FocusedNode     = null;
 
         //----------------------------------------------------------------------
@@ -307,6 +312,7 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             Nodes = new List<TreeViewNode>();
+            ActionButtons = new List<Button>();
         }
 
         //----------------------------------------------------------------------
@@ -332,6 +338,21 @@ namespace NuclearWinter.UI
             {
                 node.DoLayout( new Rectangle( iX, iY + iHeight - miScrollOffset, Size.X - 20, node.ContentHeight ) );
                 iHeight += node.ContentHeight;
+            }
+
+            if( HoveredNode != null )
+            {
+                int iButtonX = 0;
+                foreach( Button button in ActionButtons.Reverse<Button>() )
+                {
+                    button.DoLayout( new Rectangle(
+                        Position.X + Size.X - 20 - iButtonX - button.ContentWidth,
+                        HoveredNode.Position.Y + NodeHeight / 2 - button.ContentHeight / 2,
+                        button.ContentWidth, button.ContentHeight )
+                    );
+
+                    iButtonX += button.ContentWidth;
+                }
             }
 
             miScrollMax = Math.Max( 0, ( iHeight ) - ( Size.Y - 20 ) );
@@ -373,6 +394,39 @@ namespace NuclearWinter.UI
                 int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + miScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
+
+                if( HoveredNode != null )
+                {
+                    if( mHoveredActionButton != null )
+                    {
+                        if( mHoveredActionButton.HitTest( mHoverPoint ) != null )
+                        {
+                            mHoveredActionButton.OnMouseMove( mHoverPoint );
+                        }
+                        else
+                        {
+                            mHoveredActionButton.OnMouseOut( mHoverPoint );
+                            mHoveredActionButton = null;
+                        }
+                    }
+
+                    if( mHoveredActionButton == null )
+                    {
+                        foreach( Button button in ActionButtons )
+                        {
+                            if( button.HitTest( mHoverPoint ) != null )
+                            {
+                                mHoveredActionButton = button;
+                                mHoveredActionButton.OnMouseEnter( mHoverPoint );
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    mHoveredActionButton = null;
+                }
             }
         }
 
@@ -406,17 +460,30 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseDown( Point _hitPoint )
         {
-            mbIsMouseDown = true;
-            mMouseDownPoint = _hitPoint;
+            if( mHoveredActionButton != null )
+            {
+                mHoveredActionButton.OnMouseDown( _hitPoint );
+                Screen.Focus( this );
+            }
+            else
+            {
+                mbIsMouseDown = true;
+                mMouseDownPoint = _hitPoint;
 
-            Screen.Focus( this );
-            FocusedNode = HoveredNode;
+                Screen.Focus( this );
+                FocusedNode = HoveredNode;
+            }
         }
 
         internal override void OnMouseUp( Point _hitPoint )
         {
             mbIsMouseDown = false;
 
+            if( mHoveredActionButton != null )
+            {
+                mHoveredActionButton.OnMouseUp( _hitPoint );
+            }
+            else
             if( mbIsDragging )
             {
                 Debug.Assert( FocusedNode != null );
@@ -483,7 +550,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseDoubleClick( Point _hitPoint )
         {
-            if( SelectedNode != null && ValidateHandler != null ) ValidateHandler( this );
+            if( mHoveredActionButton == null && SelectedNode != null && ValidateHandler != null ) ValidateHandler( this );
         }
 
         //----------------------------------------------------------------------
@@ -504,6 +571,15 @@ namespace NuclearWinter.UI
             {
                 node.Draw();
             }
+
+            if( HoveredNode != null && ! mbIsDragging )
+            {
+                foreach( Button button in ActionButtons )
+                {
+                    button.Draw();
+                }
+            }
+
             Screen.PopScissorRectangle();
         }
 
