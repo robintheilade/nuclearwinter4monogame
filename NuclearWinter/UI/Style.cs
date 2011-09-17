@@ -85,5 +85,6 @@ namespace NuclearWinter.UI
         public Texture2D        TreeViewBranchOpenEmpty;
         public Texture2D        TreeViewBranch;
         public Texture2D        TreeViewBranchLast;
+        public Texture2D        TreeViewLine;
     }
 }

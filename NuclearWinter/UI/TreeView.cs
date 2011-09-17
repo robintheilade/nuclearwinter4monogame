@@ -74,11 +74,11 @@ namespace NuclearWinter.UI
 
                 if( _args.Added )
                 {
-                    OnNodeAdded();
+                    OnNodeAdded( 1 + _args.Item.ContainedNodeCount );
                 }
                 else
                 {
-                    OnNodeRemoved();
+                    OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
                 }
 
                 UpdateLabel();
@@ -136,23 +136,23 @@ namespace NuclearWinter.UI
             UpdateContentSize();
         }
 
-        void OnNodeAdded()
+        void OnNodeAdded( int _iAddedNodeCount )
         {
-            ContainedNodeCount++;
+            ContainedNodeCount += _iAddedNodeCount;
 
             if( Parent is TreeViewNode )
             {
-                ((TreeViewNode)Parent).OnNodeAdded();
+                ((TreeViewNode)Parent).OnNodeAdded( _iAddedNodeCount);
             }
         }
 
-        void OnNodeRemoved()
+        void OnNodeRemoved( int _iRemovedNodeCount )
         {
-            ContainedNodeCount--;
+            ContainedNodeCount -= _iRemovedNodeCount;
 
             if( Parent is TreeViewNode )
             {
-                ((TreeViewNode)Parent).OnNodeRemoved();
+                ((TreeViewNode)Parent).OnNodeRemoved( _iRemovedNodeCount );
             }
         }
 
@@ -184,24 +184,18 @@ namespace NuclearWinter.UI
         {
             if( Parent != null )
             {
-                Screen.Game.SpriteBatch.Draw( mbIsLast ? Screen.Style.TreeViewBranchLast : Screen.Style.TreeViewBranch, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
-            }
-
-            DrawNode( Position );
-
-            if( ! mbCollapsed )
-            {
-                foreach( TreeViewNode child in Children )
+                if( ! mbIsLast )
                 {
-                    child.Draw();
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranch, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewLine, new Rectangle( Position.X - mTreeView.NodeBranchWidth, Position.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing, Screen.Style.TreeViewBranch.Width, ContentHeight - (mTreeView.NodeHeight + mTreeView.NodeSpacing) ), Color.White );
+                }
+                else
+                {
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranchLast, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
                 }
             }
-        }
 
-        //----------------------------------------------------------------------
-        internal void DrawNode( Point _position )
-        {
-            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, Size.X, mTreeView.NodeHeight );
+            Rectangle nodeRect = new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight );
 
             if( Children.Count == 0 && ! DisplayAsContainer )
             {
@@ -216,19 +210,10 @@ namespace NuclearWinter.UI
                     tex = Screen.Style.TreeViewBranchClosed;
                 }
 
-                Screen.Game.SpriteBatch.Draw( tex, new Vector2( _position.X, _position.Y ), Color.White );
+                Screen.Game.SpriteBatch.Draw( tex, new Vector2( Position.X, Position.Y ), Color.White );
             }
 
-            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
-            if( mImage.Texture != null )
-            {
-                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
-                mImage.Draw();
-                iLabelX += mImage.ContentWidth;
-            }
-
-            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
-            mLabel.Draw();
+            DrawNode( Position );
 
             if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
             {
@@ -255,6 +240,31 @@ namespace NuclearWinter.UI
                     Screen.DrawBox( Screen.Style.GridBoxFrameSelectedHover, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                 }
             }
+
+            if( ! mbCollapsed )
+            {
+                foreach( TreeViewNode child in Children )
+                {
+                    child.Draw();
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------
+        internal void DrawNode( Point _position )
+        {
+            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, Size.X, mTreeView.NodeHeight );
+
+            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
+            if( mImage.Texture != null )
+            {
+                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
+                mImage.Draw();
+                iLabelX += mImage.ContentWidth;
+            }
+
+            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
+            mLabel.Draw();
         }
     }
 
