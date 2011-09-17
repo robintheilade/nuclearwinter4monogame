@@ -262,6 +262,16 @@ namespace NuclearWinter.UI
                 mCloseButton.Draw();
             }
         }
+
+        public void Close()
+        {
+            mNotebook.Tabs.Remove( this );
+
+            if( HasFocus )
+            {
+                Screen.Focus( mNotebook );
+            }
+        }
     }
 
     //--------------------------------------------------------------------------
