@@ -201,7 +201,7 @@ namespace NuclearWinter.UI
         public Color                TextColor           = Color.White;
 
         //----------------------------------------------------------------------
-        int                         miScrollOffset;
+        public int                  ScrollOffset    { get; private set; }
         int                         miScrollMax;
 
         //----------------------------------------------------------------------
@@ -287,15 +287,15 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - ( _iDelta / 120 * 3 * ( RowHeight + RowSpacing ) ), 0, Math.Max( 0, miScrollMax ) );
-            miScrollOffset = iNewScrollOffset;
+            int iNewScrollOffset = (int)MathHelper.Clamp( ScrollOffset - ( _iDelta / 120 * 3 * ( RowHeight + RowSpacing ) ), 0, Math.Max( 0, miScrollMax ) );
+            ScrollOffset = iNewScrollOffset;
         }
 
         //----------------------------------------------------------------------
         internal override void OnMouseDown( Point _hitPoint )
         {
             Screen.Focus( this );
-            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + miScrollOffset ) / ( RowHeight + RowSpacing ) );
+            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + ScrollOffset ) / ( RowHeight + RowSpacing ) );
             if( miFocusedRowIndex > Rows.Count - 1 )
             {
                 miFocusedRowIndex = -1;
@@ -304,7 +304,7 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseUp( Point _hitPoint )
         {
-            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + miScrollOffset ) / ( RowHeight + RowSpacing ) );
+            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + ScrollOffset ) / ( RowHeight + RowSpacing ) );
 
             if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
             {
@@ -398,13 +398,13 @@ namespace NuclearWinter.UI
             int iHoverRow = -1;
             if( mbIsHovered )
             {
-                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - miScrollOffset ) ) / ( RowHeight + RowSpacing );
+                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - ScrollOffset ) ) / ( RowHeight + RowSpacing );
             }
 
             int iRow = 0;
             foreach( ListViewRow row in Rows )
             {
-                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - miScrollOffset;
+                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - ScrollOffset;
                 if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > Size.Y - 20 ) )
                 {
                     iRow++;
