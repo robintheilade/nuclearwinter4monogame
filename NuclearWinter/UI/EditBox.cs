@@ -88,6 +88,7 @@ namespace NuclearWinter.UI
         public Action<EditBox>  ValidateHandler;
 
         public bool             IsReadOnly;
+        public int              MaxLength;
 
         //----------------------------------------------------------------------
         public EditBox( Screen _screen, string _strText = "", Func<char,bool> _textEnteredHandler = null )
@@ -165,7 +166,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnTextEntered( char _char )
         {
-            if( ! IsReadOnly && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
+            if( ! IsReadOnly && ( MaxLength == 0 || Text.Length < MaxLength ) && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
                 Text = Text.Insert( CaretOffset, _char.ToString() );
                 CaretOffset++;
