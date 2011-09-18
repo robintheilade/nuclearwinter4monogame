@@ -266,6 +266,7 @@ namespace NuclearWinter.UI
             }
 
             miScrollMax = Math.Max( 0, Rows.Count * ( RowHeight + RowSpacing ) - ( Size.Y - 20 ) );
+            ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
         }
 
         //----------------------------------------------------------------------
