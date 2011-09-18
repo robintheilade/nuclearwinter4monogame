@@ -302,7 +302,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        void ResetPressState()
+        internal void ResetPressState()
         {
             mPressedAnim.SetTime( 1f );
             mbIsPressed = false;

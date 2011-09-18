@@ -286,6 +286,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public List<Button>                 ActionButtons       { get; private set; }
         Button                              mHoveredActionButton;
+        bool                                mbIsHoveredActionButtonDown;
 
         //----------------------------------------------------------------------
         public TreeViewNode                 HoveredNode     = null;
@@ -395,7 +396,7 @@ namespace NuclearWinter.UI
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
-                if( HoveredNode != null )
+                if( ! mbIsDragging && HoveredNode != null )
                 {
                     if( mHoveredActionButton != null )
                     {
@@ -406,12 +407,21 @@ namespace NuclearWinter.UI
                         else
                         {
                             mHoveredActionButton.OnMouseOut( mHoverPoint );
+
+                            if( mbIsHoveredActionButtonDown )
+                            {
+                                mHoveredActionButton.ResetPressState();
+                                mbIsHoveredActionButtonDown = false;
+                            }
+
                             mHoveredActionButton = null;
                         }
                     }
 
                     if( mHoveredActionButton == null )
                     {
+                        mbIsHoveredActionButtonDown = false;
+
                         foreach( Button button in ActionButtons )
                         {
                             if( button.HitTest( mHoverPoint ) != null )
@@ -425,6 +435,11 @@ namespace NuclearWinter.UI
                 }
                 else
                 {
+                    if( mbIsHoveredActionButtonDown )
+                    {
+                        mHoveredActionButton.ResetPressState();
+                        mbIsHoveredActionButtonDown = false;
+                    }
                     mHoveredActionButton = null;
                 }
             }
@@ -462,8 +477,8 @@ namespace NuclearWinter.UI
         {
             if( mHoveredActionButton != null )
             {
-                mHoveredActionButton.OnMouseDown( _hitPoint );
-                Screen.Focus( this );
+                mHoveredActionButton.OnActivateDown();
+                mbIsHoveredActionButtonDown = true;
             }
             else
             {
@@ -481,7 +496,11 @@ namespace NuclearWinter.UI
 
             if( mHoveredActionButton != null )
             {
-                mHoveredActionButton.OnMouseUp( _hitPoint );
+                if( mbIsHoveredActionButtonDown )
+                {
+                    mHoveredActionButton.OnMouseUp( _hitPoint );
+                    mbIsHoveredActionButtonDown = false;
+                }
             }
             else
             if( mbIsDragging )
