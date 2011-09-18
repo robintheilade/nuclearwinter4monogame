@@ -7,12 +7,23 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
-    public class CustomRenderer: Widget
+    public interface CustomViewportEventHandler
     {
-        public Action           DrawHandler;
+        void OnMouseEnter( Point _hitPoint );
+        void OnMouseMove( Point _hitPoint );
+        void OnMouseOut( Point _hitPoint );
+
+        void OnMouseDown( Point _hitPoint );
+        void OnMouseUp( Point _hitPoint );
+    }
+
+    public class CustomViewport: Widget
+    {
+        public Action                       DrawHandler;
+        public CustomViewportEventHandler   EventHandler;
 
         //----------------------------------------------------------------------
-        public CustomRenderer( Screen _screen )
+        public CustomViewport( Screen _screen )
         : base( _screen )
         {
         }
@@ -22,7 +33,16 @@ namespace NuclearWinter.UI
         {
             Position = _rect.Location;
             Size = new Point( _rect.Width, _rect.Height );
+
+            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
         }
+
+        internal override void OnMouseEnter(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseEnter( _hitPoint );  }
+        internal override void OnMouseMove(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseMove( _hitPoint );  }
+        internal override void OnMouseOut(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseOut( _hitPoint );  }
+
+        internal override void OnMouseDown(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseDown( _hitPoint );  }
+        internal override void OnMouseUp(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseUp( _hitPoint );  }
 
         //----------------------------------------------------------------------
         internal override void Draw()
