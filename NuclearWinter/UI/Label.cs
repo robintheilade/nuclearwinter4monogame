@@ -137,6 +137,7 @@ namespace NuclearWinter.UI
                 {
                     iOffset--;
                     mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
+                    if( iOffset == 0 ) break;
 
                     iWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
                 }
