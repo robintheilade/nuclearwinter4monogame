@@ -213,6 +213,11 @@ namespace NuclearWinter
                 NuclearSaveHandler.SaveGameData();
             }
 
+            if( GameStateMgr != null && GameStateMgr.CurrentState != null )
+            {
+                GameStateMgr.CurrentState.OnExiting();
+            }
+
             base.OnExiting(sender, args);
         }
 

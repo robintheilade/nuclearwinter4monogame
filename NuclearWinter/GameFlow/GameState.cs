@@ -34,6 +34,7 @@ namespace NuclearWinter.GameFlow
 
         //----------------------------------------------------------------------
         public virtual void OnActivated() {}
+        public virtual void OnExiting() {}
 
         //----------------------------------------------------------------------
         // Called repeatedly when starting the GameState, until it returns true

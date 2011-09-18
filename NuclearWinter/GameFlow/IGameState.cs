@@ -10,11 +10,13 @@ namespace NuclearWinter.GameFlow
         void Start();
         void Stop();
         void OnActivated();
+        void OnExiting();
         bool UpdateFadeIn( float _fElapsedTime );
         void DrawFadeIn();
         bool UpdateFadeOut( float _fElapsedTime );
         void DrawFadeOut();
         void Update( float _fElapsedTime );
         void Draw();
+
     }
 }
