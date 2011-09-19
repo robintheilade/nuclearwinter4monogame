@@ -76,6 +76,8 @@ namespace NuclearWinter.UI
                 {
                     iOffset--;
                     mstrText = Text.Substring( 0, iOffset ) + "...";
+                    if( iOffset == 0 ) break;
+
                     mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
                 }
             }
@@ -198,7 +200,7 @@ namespace NuclearWinter.UI
         Point                       mHoverPoint;
 
         public ListViewStyle        Style;
-        public Color                TextColor           = Color.White;
+        public Color                TextColor;
 
         //----------------------------------------------------------------------
         public int                  ScrollOffset    { get; private set; }
@@ -212,6 +214,7 @@ namespace NuclearWinter.UI
             Rows    = new List<ListViewRow>();
             SelectedRowIndex    = -1;
             miFocusedRowIndex   = -1;
+            TextColor = Screen.Style.DefaultTextColor;
 
             Style.FrameSelected         = Screen.Style.GridBoxFrameSelected;
             Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
@@ -221,7 +224,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void AddColumn( string _strText, int _iWidth, Anchor _anchor )
+        public void AddColumn( string _strText, int _iWidth, Anchor _anchor = Anchor.Center )
         {
             Columns.Add( new ListViewColumn( this, _strText, _iWidth, _anchor ) );
         }
