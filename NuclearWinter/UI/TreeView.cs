@@ -41,6 +41,7 @@ namespace NuclearWinter.UI
 
         public ObservableList<TreeViewNode>     Children            { get; private set; }
         public int                              ContainedNodeCount  { get; private set; }
+        public int                              UncollapsedContainedNodeCount { get; private set; }
 
         public bool                 DisplayAsContainer;
         public bool                 Collapsed {
@@ -88,6 +89,7 @@ namespace NuclearWinter.UI
             Children.ListCleared += delegate( object _source, EventArgs _args )
             {
                 ContainedNodeCount = 0;
+                UncollapsedContainedNodeCount = 0;
                 UpdateLabel();
                 UpdateContentSize();
             };
@@ -122,6 +124,15 @@ namespace NuclearWinter.UI
                 }
             }
 
+            UncollapsedContainedNodeCount = 0;
+            if( ! Collapsed )
+            {
+                foreach( TreeViewNode childNode in Children )
+                {
+                    UncollapsedContainedNodeCount += 1 + childNode.UncollapsedContainedNodeCount;
+                }
+            }
+
             if( Parent is TreeViewNode )
             {
                 ((TreeViewNode)Parent).ChildSizeChanged();
@@ -142,7 +153,7 @@ namespace NuclearWinter.UI
 
             if( Parent is TreeViewNode )
             {
-                ((TreeViewNode)Parent).OnNodeAdded( _iAddedNodeCount);
+                ((TreeViewNode)Parent).OnNodeAdded( _iAddedNodeCount );
             }
         }
 
@@ -461,13 +472,13 @@ namespace NuclearWinter.UI
                     _iNodeOffset += 1;
                 }
                 else
-                if( _iNodeOffset + node.ContainedNodeCount >= _iNodeIndex )
+                if( _iNodeOffset + node.UncollapsedContainedNodeCount >= _iNodeIndex )
                 {
                     return FindHoveredNode( node.Children, _iNodeIndex, _iNodeOffset + 1 );
                 }
                 else
                 {
-                    _iNodeOffset += 1 + node.ContainedNodeCount;
+                    _iNodeOffset += 1 + node.UncollapsedContainedNodeCount;
                 }
             }
 
