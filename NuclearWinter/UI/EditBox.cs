@@ -35,18 +35,6 @@ namespace NuclearWinter.UI
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 ComputeCaretAndSelectionX();
-
-                int iScrollStep = Size.X / 3;
-
-                if( Size.X != 0 && miCaretX > miScrollOffset + ( Size.X - Padding.Horizontal ) - miCaretWidth )
-                {
-                    miScrollOffset = Math.Min( miMaxScrollOffset, ( miCaretX - ( Size.X - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
-                }
-                else
-                if( miCaretX < miScrollOffset )
-                {
-                    miScrollOffset = Math.Max( 0, miCaretX - iScrollStep );
-                }
                 mfTimer = 0f;
             }
         }
@@ -66,9 +54,24 @@ namespace NuclearWinter.UI
         void ComputeCaretAndSelectionX()
         {
             miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+            int iTarget = miCaretX;
+
             if( miSelectionOffset != 0 )
             {
                 miSelectionX = ( miCaretOffset + miSelectionOffset ) > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset + miSelectionOffset ) ).X : 0;
+                iTarget = miSelectionX;
+            }
+
+            int iScrollStep = Size.X / 3;
+
+            if( Size.X != 0 && iTarget > miScrollOffset + ( Size.X - Padding.Horizontal ) - miCaretWidth )
+            {
+                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( Size.X - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
+            }
+            else
+            if( iTarget < miScrollOffset )
+            {
+                miScrollOffset = Math.Max( 0, iTarget - iScrollStep );
             }
         }
 
@@ -254,29 +257,32 @@ namespace NuclearWinter.UI
 
         internal override void OnKeyPress( Keys _key )
         {
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
+
             switch( _key )
             {
                 case Keys.A:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    if( bCtrl )
                     {
                         SelectAll();
                     }
                     break;
                 case Keys.X:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    if( bCtrl )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
                 case Keys.C:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    if( bCtrl )
                     {
                         CopySelectionToClipboard();
                     }
                     break;
                 case Keys.V:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    if( bCtrl )
                     {
                         PasteFromClipboard();
                     }
@@ -314,13 +320,38 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.Left:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    if( bShift )
                     {
-                        SelectionOffset--;
+                        if( bCtrl )
+                        {
+                            int iNewSelectionTarget = CaretOffset + SelectionOffset;
+
+                            if( iNewSelectionTarget > 0 )
+                            {
+                                iNewSelectionTarget = Text.LastIndexOf( ' ', iNewSelectionTarget - 2, iNewSelectionTarget - 2 ) + 1;
+                            }
+
+                            SelectionOffset = iNewSelectionTarget - CaretOffset;
+                        }
+                        else
+                        {
+                            SelectionOffset--;
+                        }
                     }
                     else
                     {
                         int iNewCaretOffset = CaretOffset - 1;
+
+                        if( bCtrl )
+                        {
+                            SelectionOffset = 0;
+
+                            if( iNewCaretOffset > 0 )
+                            {
+                                iNewCaretOffset = Text.LastIndexOf( ' ', iNewCaretOffset - 1, iNewCaretOffset - 1 ) + 1;
+                            }
+                        }
+                        else
                         if( SelectionOffset != 0 )
                         {
                             iNewCaretOffset = ( SelectionOffset > 0 ) ? CaretOffset : CaretOffset + SelectionOffset;
@@ -330,13 +361,48 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.Right:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    if( bShift )
                     {
-                        SelectionOffset++;
+                        if( bCtrl )
+                        {
+                            int iNewSelectionTarget = CaretOffset + SelectionOffset;
+
+                            if( iNewSelectionTarget < Text.Length )
+                            {
+                                iNewSelectionTarget = Text.IndexOf( ' ', iNewSelectionTarget, Text.Length - iNewSelectionTarget ) + 1;
+
+                                if( iNewSelectionTarget == 0 )
+                                {
+                                    iNewSelectionTarget = Text.Length;
+                                }
+
+                                SelectionOffset = iNewSelectionTarget - CaretOffset;
+                            }
+                        }
+                        else
+                        {
+                            SelectionOffset++;
+                        }
                     }
                     else
                     {
                         int iNewCaretOffset = CaretOffset + 1;
+
+                        if( bCtrl )
+                        {
+                            SelectionOffset = 0;
+
+                            if( iNewCaretOffset < Text.Length )
+                            {
+                                iNewCaretOffset = Text.IndexOf( ' ', iNewCaretOffset, Text.Length - iNewCaretOffset ) + 1;
+
+                                if( iNewCaretOffset == 0 )
+                                {
+                                    iNewCaretOffset = Text.Length;
+                                }
+                            }
+                        }
+                        else
                         if( SelectionOffset != 0 )
                         {
                             iNewCaretOffset = ( SelectionOffset < 0 ) ? CaretOffset : CaretOffset + SelectionOffset;
@@ -346,8 +412,9 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.End:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    if( bShift )
                     {
+                        SelectionOffset = Text.Length - CaretOffset;
                     }
                     else
                     {
@@ -356,8 +423,9 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.Home:
-                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    if( bShift )
                     {
+                        SelectionOffset = -CaretOffset;
                     }
                     else
                     {
