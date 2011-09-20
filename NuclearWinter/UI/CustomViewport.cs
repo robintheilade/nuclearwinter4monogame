@@ -15,10 +15,13 @@ namespace NuclearWinter.UI
 
         void OnMouseDown( Point _hitPoint );
         void OnMouseUp( Point _hitPoint );
+
+        void OnMouseWheel( Point _hitPoint, int _iDelta );
     }
 
     public class CustomViewport: Widget
     {
+        public Action<float>                UpdateHandler;
         public Action                       DrawHandler;
         public CustomViewportEventHandler   EventHandler;
 
@@ -26,6 +29,8 @@ namespace NuclearWinter.UI
         public CustomViewport( Screen _screen )
         : base( _screen )
         {
+            // FIXME: This should only be done when connected to the Screen's root and be removed when disconnected
+            Screen.AddWidgetToUpdateList( this );
         }
 
         //----------------------------------------------------------------------
@@ -43,6 +48,18 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseDown(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseDown( _hitPoint );  }
         internal override void OnMouseUp(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseUp( _hitPoint );  }
+
+        internal override void OnMouseWheel(Point _hitPoint, int _iDelta) { if( EventHandler != null ) EventHandler.OnMouseWheel( _hitPoint, _iDelta ); }
+
+        internal override bool Update( float _fElapsedTime )
+        {
+            if( UpdateHandler != null )
+            {
+                UpdateHandler( _fElapsedTime );
+            }
+
+            return true;
+        }
 
         //----------------------------------------------------------------------
         internal override void Draw()
