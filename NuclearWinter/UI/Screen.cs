@@ -251,8 +251,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
-
             List<Widget> lUpdateRemovedWidgets = new List<Widget>();
             foreach( Widget widget in mlUpdateList )
             {
@@ -261,6 +259,8 @@ namespace NuclearWinter.UI
                     lUpdateRemovedWidgets.Add( widget );
                 }
             }
+
+            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
 
             foreach( Widget widget in lUpdateRemovedWidgets )
             {

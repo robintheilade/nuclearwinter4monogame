@@ -388,6 +388,12 @@ namespace NuclearWinter.UI
                         Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
                     ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
+
+                if( mMouseDragPoint.Y > Position.Y + Size.Y - 20
+                ||  mMouseDragPoint.Y < Position.Y + 20 )
+                {
+                    Screen.AddWidgetToUpdateList( this );
+                }
             }
 
             mHoverPoint = _hitPoint;
@@ -588,9 +594,55 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - ( _iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) ), 0, Math.Max( 0, miScrollMax ) );
-            miScrollOffset = iNewScrollOffset;
+            DoScroll( -_iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) );
+        }
+
+        void DoScroll( int _iDelta )
+        {
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -miScrollOffset, Math.Max( 0, miScrollMax - miScrollOffset ) );
+            miScrollOffset += iScrollChange;
+
+            if( mbIsDragging )
+            {
+                mMouseDownPoint.Y -= iScrollChange;
+            }
+
             UpdateHoveredNode();
+        }
+
+        const float sfScrollRepeatDelay = 0.3f;
+        float mfScrollRepeatTimer = sfScrollRepeatDelay;
+        internal override bool Update( float _fElapsedTime )
+        {
+            if( mbIsDragging )
+            {
+                if( mfScrollRepeatTimer >= sfScrollRepeatDelay )
+                {
+                    mfScrollRepeatTimer = 0f;
+
+                    if( mMouseDragPoint.Y > Position.Y + Size.Y - 20 )
+                    {
+                        DoScroll( NodeHeight + NodeSpacing );
+                    }
+                    else
+                    if( mMouseDragPoint.Y < Position.Y + 20 )
+                    {
+                        DoScroll( -( NodeHeight + NodeSpacing ) );
+                    }
+                    else
+                    {
+                        mfScrollRepeatTimer = sfScrollRepeatDelay;
+                        return false;
+                    }
+                }
+                
+                mfScrollRepeatTimer += _fElapsedTime;
+
+                return true;
+            }
+
+            mfScrollRepeatTimer = sfScrollRepeatDelay;
+            return false;
         }
 
         //----------------------------------------------------------------------
