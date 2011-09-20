@@ -34,7 +34,7 @@ namespace NuclearWinter.UI
 
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
-                miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+                ComputeCaretAndSelectionX();
 
                 int iScrollStep = Size.X / 3;
 
@@ -52,6 +52,25 @@ namespace NuclearWinter.UI
         }
         int     miCaretX;
         int     miCaretWidth = 3;
+
+        int     miSelectionOffset;
+        int     SelectionOffset {
+            get { return miSelectionOffset; }
+            set {
+                miSelectionOffset = (int)MathHelper.Clamp( value, -miCaretOffset, mstrText.Length - miCaretOffset );
+                ComputeCaretAndSelectionX();
+            }
+        }
+        int     miSelectionX;
+
+        void ComputeCaretAndSelectionX()
+        {
+            miCaretX = miCaretOffset > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset ) ).X : 0;
+            if( miSelectionOffset != 0 )
+            {
+                miSelectionX = ( miCaretOffset + miSelectionOffset ) > 0 ? (int)mFont.MeasureString( mstrDisplayedText.Substring( 0, miCaretOffset + miSelectionOffset ) ).X : 0;
+            }
+        }
 
         bool    mbIsHovered;
         float   mfTimer;
@@ -100,6 +119,61 @@ namespace NuclearWinter.UI
             TextEnteredHandler = _textEnteredHandler;
 
             UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        public void SelectAll()
+        {
+            CaretOffset = 0;
+            SelectionOffset = Text.Length;
+        }
+
+        //----------------------------------------------------------------------
+        public void DeleteSelectedText()
+        {
+            if( SelectionOffset > 0 )
+            {
+                Text = Text.Remove( CaretOffset, SelectionOffset );
+                SelectionOffset = 0;
+            }
+            else
+            {
+                int iNewCaretOffset = CaretOffset + SelectionOffset;
+                Text = Text.Remove( CaretOffset + SelectionOffset, -SelectionOffset );
+                SelectionOffset = 0;
+                CaretOffset = iNewCaretOffset;
+            }
+        }
+
+        public void CopySelectionToClipboard()
+        {
+            if( SelectionOffset != 0 )
+            {
+                string strText;
+                if( SelectionOffset > 0 )
+                {
+                    strText = Text.Substring( CaretOffset, SelectionOffset );
+                }
+                else
+                {
+                    strText = Text.Substring( CaretOffset + SelectionOffset, -SelectionOffset );
+                }
+
+                // NOTE: For this to work, you must put [STAThread] before your Main()
+                System.Windows.Forms.Clipboard.SetText( strText );
+            }
+        }
+
+        public void PasteFromClipboard()
+        {
+            // NOTE: For this to work, you must put [STAThread] before your Main()
+            string strText = (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName );
+            if( strText != null )
+            {
+                DeleteSelectedText();
+                Text = Text.Insert( CaretOffset, strText );
+                CaretOffset += strText.Length;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -168,42 +242,128 @@ namespace NuclearWinter.UI
         {
             if( ! IsReadOnly && ( MaxLength == 0 || Text.Length < MaxLength ) && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
+                if( SelectionOffset != 0 )
+                {
+                    DeleteSelectedText();
+                }
+
                 Text = Text.Insert( CaretOffset, _char.ToString() );
                 CaretOffset++;
             }
         }
-        
+
         internal override void OnKeyPress( Keys _key )
         {
             switch( _key )
             {
+                case Keys.A:
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    {
+                        SelectAll();
+                    }
+                    break;
+                case Keys.X:
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    {
+                        CopySelectionToClipboard();
+                        DeleteSelectedText();
+                    }
+                    break;
+                case Keys.C:
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    {
+                        CopySelectionToClipboard();
+                    }
+                    break;
+                case Keys.V:
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true ) )
+                    {
+                        PasteFromClipboard();
+                    }
+                    break;
                 case Keys.Enter:
                     if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
                     break;
                 case Keys.Back:
-                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset > 0 )
+                    if( ! IsReadOnly && Text.Length > 0 )
                     {
-                        CaretOffset--;
-                        Text = Text.Remove( CaretOffset, 1 );
+                        if( SelectionOffset != 0 )
+                        {
+                            DeleteSelectedText();
+                        }
+                        else
+                        if( CaretOffset > 0 )
+                        {
+                            CaretOffset--;
+                            Text = Text.Remove( CaretOffset, 1 );
+                        }
                     }
                     break;
                 case Keys.Delete:
-                    if( ! IsReadOnly && Text.Length > 0 && CaretOffset < Text.Length )
+                    if( ! IsReadOnly && Text.Length > 0 )
                     {
-                        Text = Text.Remove( CaretOffset, 1 );
+                        if( SelectionOffset != 0 )
+                        {
+                            DeleteSelectedText();
+                        }
+                        else
+                        if( CaretOffset < Text.Length )
+                        {
+                            Text = Text.Remove( CaretOffset, 1 );
+                        }
                     }
                     break;
                 case Keys.Left:
-                    CaretOffset--;
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    {
+                        SelectionOffset--;
+                    }
+                    else
+                    {
+                        int iNewCaretOffset = CaretOffset - 1;
+                        if( SelectionOffset != 0 )
+                        {
+                            iNewCaretOffset = ( SelectionOffset > 0 ) ? CaretOffset : CaretOffset + SelectionOffset;
+                            SelectionOffset = 0;
+                        }
+                        CaretOffset = iNewCaretOffset;
+                    }
                     break;
                 case Keys.Right:
-                    CaretOffset++;
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    {
+                        SelectionOffset++;
+                    }
+                    else
+                    {
+                        int iNewCaretOffset = CaretOffset + 1;
+                        if( SelectionOffset != 0 )
+                        {
+                            iNewCaretOffset = ( SelectionOffset < 0 ) ? CaretOffset : CaretOffset + SelectionOffset;
+                            SelectionOffset = 0;
+                        }
+                        CaretOffset = iNewCaretOffset;
+                    }
                     break;
                 case Keys.End:
-                    CaretOffset = Text.Length;
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    {
+                    }
+                    else
+                    {
+                        SelectionOffset = 0;
+                        CaretOffset = Text.Length;
+                    }
                     break;
                 case Keys.Home:
-                    CaretOffset = 0;
+                    if( Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true ) )
+                    {
+                    }
+                    else
+                    {
+                        SelectionOffset = 0;
+                        CaretOffset = 0;
+                    }
                     break;
                 default:
                     base.OnKeyPress( _key );
@@ -260,6 +420,21 @@ namespace NuclearWinter.UI
 
             const float fBlinkInterval = 0.3f;
 
+            if( SelectionOffset != 0 )
+            {
+                Rectangle selectionRectangle;
+                if( SelectionOffset > 0 )
+                {
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, Position.Y + Padding.Top, miSelectionX - miCaretX, Size.Y - Padding.Vertical );
+                }
+                else
+                {
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, Position.Y + Padding.Top, miCaretX - miSelectionX, Size.Y - Padding.Vertical );
+                }
+
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );
+            }
+            else
             if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, Position.Y + Padding.Top, miCaretWidth, Size.Y - Padding.Vertical ), Color.White );
