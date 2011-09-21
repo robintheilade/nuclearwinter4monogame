@@ -34,6 +34,7 @@ namespace NuclearWinter.UI
 
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
+                miSelectionOffset = 0;
                 ComputeCaretAndSelectionX();
                 mfTimer = 0f;
             }
@@ -143,7 +144,6 @@ namespace NuclearWinter.UI
             {
                 int iNewCaretOffset = CaretOffset + SelectionOffset;
                 Text = Text.Remove( CaretOffset + SelectionOffset, -SelectionOffset );
-                SelectionOffset = 0;
                 CaretOffset = iNewCaretOffset;
             }
         }
@@ -170,12 +170,18 @@ namespace NuclearWinter.UI
         public void PasteFromClipboard()
         {
             // NOTE: For this to work, you must put [STAThread] before your Main()
-            string strText = (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName );
-            if( strText != null )
+            string strPastedText = (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName );
+            if( strPastedText != null )
             {
                 DeleteSelectedText();
-                Text = Text.Insert( CaretOffset, strText );
-                CaretOffset += strText.Length;
+
+                if( MaxLength != 0 && strPastedText.Length > MaxLength - Text.Length )
+                {
+                    strPastedText = strPastedText.Substring( 0, MaxLength - Text.Length );
+                }
+
+                Text = Text.Insert( CaretOffset, strPastedText );
+                CaretOffset += strPastedText.Length;
             }
         }
 
@@ -243,7 +249,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnTextEntered( char _char )
         {
-            if( ! IsReadOnly && ( MaxLength == 0 || Text.Length < MaxLength ) && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
+            if( ! IsReadOnly && ( MaxLength == 0 || Text.Length < MaxLength || SelectionOffset != 0 ) && ! char.IsControl( _char ) && ( TextEnteredHandler == null || TextEnteredHandler( _char ) ) )
             {
                 if( SelectionOffset != 0 )
                 {
@@ -390,8 +396,6 @@ namespace NuclearWinter.UI
 
                         if( bCtrl )
                         {
-                            SelectionOffset = 0;
-
                             if( iNewCaretOffset < Text.Length )
                             {
                                 iNewCaretOffset = Text.IndexOf( ' ', iNewCaretOffset, Text.Length - iNewCaretOffset ) + 1;
@@ -406,7 +410,6 @@ namespace NuclearWinter.UI
                         if( SelectionOffset != 0 )
                         {
                             iNewCaretOffset = ( SelectionOffset < 0 ) ? CaretOffset : CaretOffset + SelectionOffset;
-                            SelectionOffset = 0;
                         }
                         CaretOffset = iNewCaretOffset;
                     }
@@ -418,7 +421,6 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        SelectionOffset = 0;
                         CaretOffset = Text.Length;
                     }
                     break;
@@ -429,7 +431,6 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        SelectionOffset = 0;
                         CaretOffset = 0;
                     }
                     break;
