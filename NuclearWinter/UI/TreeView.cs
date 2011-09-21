@@ -79,6 +79,11 @@ namespace NuclearWinter.UI
                 }
                 else
                 {
+                    if( _args.Item == mTreeView.SelectedNode )
+                    {
+                        mTreeView.SelectedNode = null;
+                    }
+
                     OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
                 }
 
@@ -296,12 +301,11 @@ namespace NuclearWinter.UI
     public class TreeView: Widget
     {
         //----------------------------------------------------------------------
-        public List<TreeViewNode>           Nodes               { get; private set; }
+        public ObservableList<TreeViewNode> Nodes               { get; private set; }
 
         public int                          NodeHeight      = 40;
         public int                          NodeSpacing     = 0;
         public int                          NodeBranchWidth = 25;
-
 
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
@@ -336,7 +340,21 @@ namespace NuclearWinter.UI
         public TreeView( Screen _screen )
         : base( _screen )
         {
-            Nodes = new List<TreeViewNode>();
+            Nodes = new ObservableList<TreeViewNode>();
+
+            Nodes.ListCleared += delegate {
+                SelectedNode = null;
+            };
+
+            Nodes.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
+            {
+                if( ! _args.Added && _args.Item == SelectedNode )
+                {
+                    SelectedNode = null;
+                }
+            };
+
+
             ActionButtons = new List<Button>();
         }
 
@@ -593,6 +611,10 @@ namespace NuclearWinter.UI
                 {
                     SelectedNode = HoveredNode;
                 }
+            }
+            else
+            {
+                SelectedNode = null;
             }
         }
 
