@@ -80,6 +80,9 @@ namespace NuclearWinter.UI
         public Texture2D        PopupFrame;
         public Color            PopupBackgroundFadeColor = Color.Black * 0.2f;
 
+        public Texture2D        TreeViewContainerFrame;
+        public Texture2D        TreeViewContainerFrameSelected;
+
         public Texture2D        TreeViewBranchClosed;
         public Texture2D        TreeViewBranchOpen;
         public Texture2D        TreeViewBranchOpenEmpty;

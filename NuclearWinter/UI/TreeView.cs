@@ -208,9 +208,20 @@ namespace NuclearWinter.UI
 
             Rectangle nodeRect = new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight );
 
+            Texture2D frameTex;
+
             if( ! DisplayAsContainer )
             {
-                Screen.DrawBox( mTreeView.SelectedNode == this ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                frameTex = mTreeView.SelectedNode == this ? Screen.Style.GridBoxFrameSelected : Screen.Style.GridBoxFrame;
+            }
+            else
+            {
+                frameTex = mTreeView.SelectedNode == this ? Screen.Style.TreeViewContainerFrameSelected : Screen.Style.TreeViewContainerFrame;
+            }
+
+            if( frameTex != null )
+            {
+                Screen.DrawBox( frameTex, nodeRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
             }
 
             if( Children.Count != 0 || DisplayAsContainer )
@@ -573,7 +584,7 @@ namespace NuclearWinter.UI
             else
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
-                if( HoveredNode.DisplayAsContainer || ( HoveredNode.Children.Count > 0 && _hitPoint.X < HoveredNode.Position.X + NodeBranchWidth ) )
+                if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.Position.X + NodeBranchWidth )
                 {
                     SelectedNode = null;
                     HoveredNode.Collapsed = ! HoveredNode.Collapsed;
