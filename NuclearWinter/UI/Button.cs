@@ -100,6 +100,19 @@ namespace NuclearWinter.UI
             }
         }
 
+        public Color            IconColor
+        {
+            get {
+                return mIcon.Color;
+            }
+
+            set
+            {
+                mIcon.Color = value;
+            }
+        }
+
+
         Anchor mAnchor;
         public Anchor Anchor
         {
