@@ -34,6 +34,7 @@ namespace NuclearWinter.UI
         bool                mbHasActivatedFocusedWidget;
         Widget              mClickedWidget;
         Widget              mHoveredWidget;
+        Point               mPreviousMouseHitPoint;
 
         //----------------------------------------------------------------------
         public Screen( NuclearWinter.NuclearGame _game, Style _style, int _iWidth, int _iHeight )
@@ -139,6 +140,7 @@ namespace NuclearWinter.UI
             }
 
 #if WINDOWS
+            //------------------------------------------------------------------
             // Mouse buttons
             Point mouseHitPoint = new Point(
                 (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
@@ -200,29 +202,33 @@ namespace NuclearWinter.UI
             {
                 Widget hoveredWidget = ( FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint ) ) ?? Root.HitTest( mouseHitPoint );
 
-                if( mClickedWidget == null )
+                if( mouseHitPoint != mPreviousMouseHitPoint )
                 {
-                    if( hoveredWidget != null && hoveredWidget == mHoveredWidget )
+
+                    if( mClickedWidget == null )
                     {
-                        mHoveredWidget.OnMouseMove( mouseHitPoint );
+                        if( hoveredWidget != null && hoveredWidget == mHoveredWidget )
+                        {
+                            mHoveredWidget.OnMouseMove( mouseHitPoint );
+                        }
+                        else
+                        {
+                            if( mHoveredWidget != null )
+                            {
+                                mHoveredWidget.OnMouseOut( mouseHitPoint );
+                            }
+                        
+                            mHoveredWidget = hoveredWidget;
+                            if( mHoveredWidget != null )
+                            {
+                                mHoveredWidget.OnMouseEnter( mouseHitPoint );
+                            }
+                        }
                     }
                     else
                     {
-                        if( mHoveredWidget != null )
-                        {
-                            mHoveredWidget.OnMouseOut( mouseHitPoint );
-                        }
-                        
-                        mHoveredWidget = hoveredWidget;
-                        if( mHoveredWidget != null )
-                        {
-                            mHoveredWidget.OnMouseEnter( mouseHitPoint );
-                        }
+                        mClickedWidget.OnMouseMove( mouseHitPoint );
                     }
-                }
-                else
-                {
-                    mClickedWidget.OnMouseMove( mouseHitPoint );
                 }
             }
 
@@ -238,6 +244,9 @@ namespace NuclearWinter.UI
                 }
             }
 
+            mPreviousMouseHitPoint = mouseHitPoint;
+
+            //------------------------------------------------------------------
             // Keyboard
             if( FocusedWidget != null )
             {
