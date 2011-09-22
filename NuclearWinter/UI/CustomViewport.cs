@@ -42,14 +42,19 @@ namespace NuclearWinter.UI
             HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
         }
 
-        internal override void OnMouseEnter(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseEnter( _hitPoint );  }
-        internal override void OnMouseMove(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseMove( _hitPoint );  }
-        internal override void OnMouseOut(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseOut( _hitPoint );  }
+        Point TransformPoint( Point _point )
+        {
+            return new Point( _point.X - Position.X, _point.Y - Position.Y );
+        }
 
-        internal override void OnMouseDown(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseDown( _hitPoint );  }
-        internal override void OnMouseUp(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseUp( _hitPoint );  }
+        internal override void OnMouseEnter(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseEnter( TransformPoint( _hitPoint ) );  }
+        internal override void OnMouseMove(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseMove( TransformPoint( _hitPoint ) );  }
+        internal override void OnMouseOut(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseOut( TransformPoint( _hitPoint ) );  }
 
-        internal override void OnMouseWheel(Point _hitPoint, int _iDelta) { if( EventHandler != null ) EventHandler.OnMouseWheel( _hitPoint, _iDelta ); }
+        internal override void OnMouseDown(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseDown( TransformPoint( _hitPoint ) );  }
+        internal override void OnMouseUp(Point _hitPoint) { if( EventHandler != null ) EventHandler.OnMouseUp( TransformPoint( _hitPoint ) );  }
+
+        internal override void OnMouseWheel(Point _hitPoint, int _iDelta) { if( EventHandler != null ) EventHandler.OnMouseWheel( TransformPoint( _hitPoint ), _iDelta ); }
 
         internal override bool Update( float _fElapsedTime )
         {
