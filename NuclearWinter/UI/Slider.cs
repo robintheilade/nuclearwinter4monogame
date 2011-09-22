@@ -73,8 +73,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             Screen.Focus( this );
             mbIsPressed = true;
 
@@ -99,8 +101,10 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             mbIsPressed = false;
         }
 

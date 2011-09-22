@@ -104,20 +104,19 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseEnter( Point _hitPoint )
         {
-            base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
         internal override void OnMouseOut( Point _hitPoint )
         {
-            base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            base.OnMouseDown( _hitPoint );
+            if( _iButton != 0 ) return;
+
             Screen.Focus( this );
             
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
@@ -142,8 +141,10 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
                 SelectedValueIndex = (int)( ( _hitPoint.Y - ( Position.Y + Size.Y + Padding.Top ) ) / siLineHeight ) + miScrollOffset;

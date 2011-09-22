@@ -147,24 +147,27 @@ namespace NuclearWinter.UI
 
             bool bHasMouseEvent = false;
 
-            if( Game.InputMgr.WasMouseButtonJustPressed( 0 ) )
+            for( int iButton = 0; iButton < 3; iButton++ )
             {
-                bHasMouseEvent = true;
-
-                mClickedWidget = null;
-                if( FocusedWidget != null )
+                if( Game.InputMgr.WasMouseButtonJustPressed( iButton ) )
                 {
-                    mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
-                }
+                    bHasMouseEvent = true;
 
-                if( mClickedWidget == null )
-                {
-                    mClickedWidget = Root.HitTest( mouseHitPoint );
-                }
+                    mClickedWidget = null;
+                    if( FocusedWidget != null )
+                    {
+                        mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
+                    }
 
-                if( mClickedWidget != null )
-                {
-                    mClickedWidget.OnMouseDown( mouseHitPoint );
+                    if( mClickedWidget == null )
+                    {
+                        mClickedWidget = Root.HitTest( mouseHitPoint );
+                    }
+
+                    if( mClickedWidget != null )
+                    {
+                        mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                    }
                 }
             }
 
@@ -179,14 +182,17 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( Game.InputMgr.WasMouseButtonJustReleased( 0 ) )
+            for( int iButton = 0; iButton < 3; iButton++ )
             {
-                bHasMouseEvent = true;
-
-                if( mClickedWidget != null )
+                if( Game.InputMgr.WasMouseButtonJustReleased( iButton ) )
                 {
-                    mClickedWidget.OnMouseUp( mouseHitPoint );
-                    mClickedWidget = null;
+                    bHasMouseEvent = true;
+
+                    if( mClickedWidget != null )
+                    {
+                        mClickedWidget.OnMouseUp( mouseHitPoint, iButton );
+                        mClickedWidget = null;
+                    }
                 }
             }
             

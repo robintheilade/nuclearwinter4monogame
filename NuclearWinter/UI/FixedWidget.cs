@@ -126,27 +126,27 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( Child != null )
             {
-                Child.OnMouseDown( _hitPoint );
+                Child.OnMouseDown( _hitPoint, _iButton );
             }
             else
             {
-                base.OnMouseDown( _hitPoint );
+                base.OnMouseDown( _hitPoint, _iButton );
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( Child != null )
             {
-                Child.OnMouseUp( _hitPoint );
+                Child.OnMouseUp( _hitPoint, _iButton );
             }
             else
             {
-                base.OnMouseUp( _hitPoint );
+                base.OnMouseUp( _hitPoint, _iButton );
             }
         }
 

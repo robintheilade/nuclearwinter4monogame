@@ -227,16 +227,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            base.OnMouseDown( _hitPoint );
+            if( _iButton != 0 ) return;
 
             Screen.Focus( this );
             OnActivateDown();
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             if( HitTest( _hitPoint ) == this )
             {
                 OnActivateUp();

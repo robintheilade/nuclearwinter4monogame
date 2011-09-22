@@ -173,14 +173,18 @@ namespace NuclearWinter.UI
             return mCloseButton.HitTest( _point ) ?? base.HitTest( _point );
         }
 
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             Screen.Focus( this );
             //OnActivateDown();
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
             {
                 if( _hitPoint.X > Position.X && _hitPoint.X < Position.X + Size.X )

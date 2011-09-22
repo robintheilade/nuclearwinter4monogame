@@ -521,8 +521,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint )
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             if( mHoveredActionButton != null )
             {
                 mHoveredActionButton.OnActivateDown();
@@ -538,15 +540,17 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint )
+        internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( _iButton != 0 ) return;
+
             mbIsMouseDown = false;
 
             if( mHoveredActionButton != null )
             {
                 if( mbIsHoveredActionButtonDown )
                 {
-                    mHoveredActionButton.OnMouseUp( _hitPoint );
+                    mHoveredActionButton.OnMouseUp( _hitPoint, _iButton );
                     mbIsHoveredActionButtonDown = false;
                 }
             }
