@@ -153,7 +153,8 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void LoadContent()
         {
-            WhitePixelTex           = Content.Load<Texture2D>( "Sprites/WhitePixel" );
+            WhitePixelTex = new Texture2D( GraphicsDevice, 1, 1, false, SurfaceFormat.Color );
+            WhitePixelTex.SetData( new[] { Color.White } );
         }
 
 #if WINDOWS || XBOX
