@@ -231,6 +231,14 @@ namespace NuclearWinter
            SpriteBatch.Draw( WhitePixelTex, _vFrom, null, _color, fAngle, Vector2.Zero, new Vector2( fLength, _fWidth ), SpriteEffects.None, 0 );
         }
 
+        public void DrawRect( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1 )
+        {
+            DrawLine( _vFrom, new Vector2( _vFrom.X, _vTo.Y ), _color, _fWidth );
+            DrawLine( _vFrom, new Vector2( _vTo.X, _vFrom.Y ), _color, _fWidth );
+            DrawLine( new Vector2( _vFrom.X, _vTo.Y ), _vTo, _color, _fWidth );
+            DrawLine( new Vector2( _vTo.X, _vFrom.Y ), _vTo, _color, _fWidth );
+        }
+
         //----------------------------------------------------------------------
         public virtual string GetUIString( string _strId ) { return _strId; }
 
