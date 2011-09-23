@@ -309,6 +309,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
+        public Action<TreeView>             SelectHandler;
         public TreeViewNode                 SelectedNode    = null;
 
         //----------------------------------------------------------------------
@@ -615,10 +616,13 @@ namespace NuclearWinter.UI
                 {
                     SelectedNode = HoveredNode;
                 }
+
+                if( SelectHandler != null ) SelectHandler( this );
             }
             else
             {
                 SelectedNode = null;
+                if( SelectHandler != null ) SelectHandler( this );
             }
         }
 
