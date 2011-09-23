@@ -84,6 +84,16 @@ namespace NuclearWinter.UI
                         mTreeView.SelectedNode = null;
                     }
 
+                    if( _args.Item == mTreeView.HoveredNode )
+                    {
+                        mTreeView.UpdateHoveredNode();
+                    }
+
+                    if( _args.Item == mTreeView.FocusedNode )
+                    {
+                        mTreeView.FocusedNode = null;
+                    }
+
                     OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
                 }
 
@@ -345,13 +355,30 @@ namespace NuclearWinter.UI
 
             Nodes.ListCleared += delegate {
                 SelectedNode = null;
+                HoveredNode = null;
+                FocusedNode = null;
+                mHoveredActionButton = null;
+                mbIsHoveredActionButtonDown = false;
             };
 
             Nodes.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
             {
-                if( ! _args.Added && _args.Item == SelectedNode )
+                if( ! _args.Added )
                 {
-                    SelectedNode = null;
+                    if( _args.Item == SelectedNode )
+                    {
+                        SelectedNode = null;
+                    }
+
+                    if( _args.Item == HoveredNode )
+                    {
+                        UpdateHoveredNode();
+                    }
+
+                    if( _args.Item == FocusedNode )
+                    {
+                        FocusedNode = null;
+                    }
                 }
             };
 
@@ -436,14 +463,22 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
-        void UpdateHoveredNode()
+        internal void UpdateHoveredNode()
         {
+            TreeViewNode oldHoveredNode = HoveredNode;
             HoveredNode = null;
+
             if( mbIsHovered )
             {
                 int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + miScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
+
+                if( oldHoveredNode != HoveredNode )
+                {
+                    mHoveredActionButton = null;
+                    mbIsHoveredActionButtonDown = false;
+                }
 
                 if( ! mbIsDragging && HoveredNode != null )
                 {
