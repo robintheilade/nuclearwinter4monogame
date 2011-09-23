@@ -223,6 +223,15 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
+        public void DrawLine( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1f )
+        {
+           float fAngle     = (float)Math.Atan2( _vTo.Y - _vFrom.Y, _vTo.X - _vFrom.X );
+           float fLength    = Vector2.Distance( _vFrom, _vTo );
+ 
+           SpriteBatch.Draw( WhitePixelTex, _vFrom, null, _color, fAngle, Vector2.Zero, new Vector2( fLength, _fWidth ), SpriteEffects.None, 0 );
+        }
+
+        //----------------------------------------------------------------------
         public virtual string GetUIString( string _strId ) { return _strId; }
 
         //----------------------------------------------------------------------
