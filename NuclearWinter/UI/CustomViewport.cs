@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
-    public interface CustomViewportEventHandler
+    public interface CustomViewportHandler
     {
         void OnMouseEnter( Point _hitPoint );
         void OnMouseMove( Point _hitPoint );
@@ -23,7 +23,7 @@ namespace NuclearWinter.UI
     {
         public Action<float>                UpdateHandler;
         public Action                       DrawHandler;
-        public CustomViewportEventHandler   EventHandler;
+        public CustomViewportHandler   EventHandler;
 
         //----------------------------------------------------------------------
         public CustomViewport( Screen _screen )
