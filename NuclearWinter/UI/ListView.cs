@@ -268,7 +268,7 @@ namespace NuclearWinter.UI
                 iColIndex++;
             }
 
-            miScrollMax = Math.Max( 0, Rows.Count * ( RowHeight + RowSpacing ) - ( Size.Y - 20 ) );
+            miScrollMax = Math.Max( 0, Rows.Count * ( RowHeight + RowSpacing ) - ( Size.Y - 20 ) + 5 );
             ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
         }
 
@@ -312,6 +312,18 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
+            SelectRowAt( _hitPoint );
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseDoubleClick( Point _hitPoint )
+        {
+            SelectRowAt( _hitPoint );
+            if( ValidateHandler != null ) ValidateHandler( this );
+        }
+
+        void SelectRowAt( Point _hitPoint )
+        {
             int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + ScrollOffset ) / ( RowHeight + RowSpacing ) );
 
             if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
@@ -319,12 +331,6 @@ namespace NuclearWinter.UI
                 SelectedRowIndex = miFocusedRowIndex;
                 if( SelectHandler != null ) SelectHandler( this );
             }
-        }
-
-        //----------------------------------------------------------------------
-        internal override void OnMouseDoubleClick( Point _hitPoint )
-        {
-            if( ValidateHandler != null ) ValidateHandler( this );
         }
 
         internal override void OnActivateUp()

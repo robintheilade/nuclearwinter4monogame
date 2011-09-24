@@ -426,7 +426,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            miScrollMax = Math.Max( 0, ( iHeight ) - ( Size.Y - 20 ) );
+            miScrollMax = Math.Max( 0, ( iHeight ) - ( Size.Y - 20 ) + 5 );
         }
 
         //----------------------------------------------------------------------
@@ -640,12 +640,32 @@ namespace NuclearWinter.UI
                 mbIsDragging = false;
             }
             else
+            {
+                SelectNodeAt( _hitPoint );
+            }
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseDoubleClick( Point _hitPoint )
+        {
+            if( mHoveredActionButton == null && ValidateHandler != null )
+            {
+                SelectNodeAt( _hitPoint );
+
+                if( SelectedNode != null )
+                {
+                    ValidateHandler( this );
+                }
+            }
+        }
+
+        void SelectNodeAt( Point _hitPoint )
+        {
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
                 if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.Position.X + NodeBranchWidth )
                 {
                     SelectedNode = null;
-                    HoveredNode.Collapsed = ! HoveredNode.Collapsed;
                 }
                 else
                 {
@@ -659,12 +679,6 @@ namespace NuclearWinter.UI
                 SelectedNode = null;
                 if( SelectHandler != null ) SelectHandler( this );
             }
-        }
-
-        //----------------------------------------------------------------------
-        internal override void OnMouseDoubleClick( Point _hitPoint )
-        {
-            if( mHoveredActionButton == null && SelectedNode != null && ValidateHandler != null ) ValidateHandler( this );
         }
 
         //----------------------------------------------------------------------
