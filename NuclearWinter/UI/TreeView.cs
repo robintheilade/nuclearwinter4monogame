@@ -641,7 +641,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                SelectNodeAt( _hitPoint );
+                SelectNodeAt( _hitPoint, true );
             }
         }
 
@@ -650,7 +650,7 @@ namespace NuclearWinter.UI
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
-                SelectNodeAt( _hitPoint );
+                SelectNodeAt( _hitPoint, false );
 
                 if( SelectedNode != null )
                 {
@@ -659,12 +659,17 @@ namespace NuclearWinter.UI
             }
         }
 
-        void SelectNodeAt( Point _hitPoint )
+        void SelectNodeAt( Point _hitPoint, bool _bDoCollapse )
         {
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
                 if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.Position.X + NodeBranchWidth )
                 {
+                    if( _bDoCollapse )
+                    {
+                        HoveredNode.Collapsed = ! HoveredNode.Collapsed;
+                    }
+
                     SelectedNode = null;
                 }
                 else
