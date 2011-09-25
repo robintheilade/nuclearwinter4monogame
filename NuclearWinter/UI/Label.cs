@@ -59,6 +59,8 @@ namespace NuclearWinter.UI
 
 
         public Color            Color;
+        public Color            OutlineColor;
+        public float            OutlineRadius;
 
         //----------------------------------------------------------------------
         public Label( Screen _screen, string _strText, Anchor _anchor, Color _color )
@@ -70,7 +72,9 @@ namespace NuclearWinter.UI
             mPadding    = new Box( 10 );
             mAnchor     = _anchor;
 
-            Color       = _color;
+            Color           = _color;
+            OutlineRadius   = Screen.Style.BlurRadius;
+            OutlineColor    = _color * 0.5f;
 
             UpdateContentSize();
         }
@@ -185,12 +189,12 @@ namespace NuclearWinter.UI
             {
                 for( int i = 0; i < mlstrWrappedText.Count; i++ )
                 {
-                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color );
+                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlstrWrappedText[i], new Vector2( mpTextPosition.X, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color, OutlineColor );
                 }
             }
             else
             {
-                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + Font.YOffset ), Color );
+                Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + Font.YOffset ), Color, OutlineColor );
             }
         }
     }
