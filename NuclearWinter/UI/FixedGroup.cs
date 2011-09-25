@@ -15,6 +15,16 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         List<FixedWidget>           mlChildren;
 
+        public int Width {
+            get { return ContentWidth; }
+            set { ContentWidth = value; }
+        }
+
+        public int Height {
+            get { return ContentHeight; }
+            set { ContentHeight = value; }
+        }
+
         //----------------------------------------------------------------------
         public FixedGroup( Screen _screen )
         : base( _screen )
