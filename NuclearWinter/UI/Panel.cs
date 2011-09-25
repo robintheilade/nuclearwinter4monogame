@@ -15,6 +15,7 @@ namespace NuclearWinter.UI
     {
         public Texture2D        Texture;
         public int              CornerSize;
+        public bool             DoClipping;
 
         //----------------------------------------------------------------------
         public Panel( Screen _screen, Texture2D _texture, int _iCornerSize )
@@ -39,7 +40,17 @@ namespace NuclearWinter.UI
         {
             Screen.DrawBox( Texture, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), CornerSize, Color.White );
 
+            if( DoClipping )
+            {
+                Screen.PushScissorRectangle( new Rectangle( Position.X + Padding.Left, Position.Y + Padding.Top, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ) );
+            }
+
             base.Draw();
+
+            if( DoClipping )
+            {
+                Screen.PopScissorRectangle();
+            }
         }
     }
 }
