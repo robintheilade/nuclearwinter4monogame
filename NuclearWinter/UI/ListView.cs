@@ -175,6 +175,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public struct ListViewStyle
         {
+            public Texture2D        ListFrame;
             public Texture2D        FrameSelected;
             public Texture2D        FrameSelectedHover;
             public Texture2D        FrameSelectedFocus;
@@ -216,6 +217,7 @@ namespace NuclearWinter.UI
             miFocusedRowIndex   = -1;
             TextColor = Screen.Style.DefaultTextColor;
 
+            Style.ListFrame             = Screen.Style.ListFrame;
             Style.FrameSelected         = Screen.Style.GridBoxFrameSelected;
             Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
             Style.FrameSelectedFocus    = Screen.Style.GridBoxFrameSelectedFocus;
@@ -394,7 +396,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
             if( DisplayColumnHeaders )
             {

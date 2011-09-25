@@ -341,7 +341,7 @@ namespace NuclearWinter.UI
             {
                 int iLinesDisplayed = Math.Min( siMaxLineDisplayed, mlValues.Count );
 
-                Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y + Size.Y, Size.X, Padding.Vertical + iLinesDisplayed * siLineHeight ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( Position.X, Position.Y + Size.Y, Size.X, Padding.Vertical + iLinesDisplayed * siLineHeight ), 30, Color.White );
 
                 int iMaxIndex = Math.Min( mlValues.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )

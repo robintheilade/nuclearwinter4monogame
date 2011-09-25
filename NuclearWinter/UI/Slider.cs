@@ -131,7 +131,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.GridFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
 
             int handleSize = Size.Y;
             int handleX = Position.X + (int)( ( Size.X - handleSize ) * (float)( Value - MinValue ) / MaxValue );

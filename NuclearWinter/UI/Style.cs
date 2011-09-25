@@ -50,7 +50,7 @@ namespace NuclearWinter.UI
 
         public Texture2D        DropDownArrow;
 
-        public Texture2D        GridFrame;
+        public Texture2D        ListFrame;
         public Texture2D        GridHeaderFrame;
 
         public int              GridBoxFrameCornerSize = 30;
