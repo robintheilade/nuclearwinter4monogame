@@ -35,7 +35,7 @@ namespace NuclearWinter.UI
             int iPadding = FixedGroup.Screen.Style.PopupFrameCornerSize;
 
             TitleLabel = new Label( Manager.MenuScreen, "", Anchor.Start );
-            TitleLabel.Font = Manager.MenuScreen.Style.BigFont;
+            TitleLabel.Font = Manager.MenuScreen.Style.LargeFont;
 
             FixedGroup page = new FixedGroup( FixedGroup.Screen );
             mPageContainer.Child = page;

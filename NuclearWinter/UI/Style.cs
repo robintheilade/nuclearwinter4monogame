@@ -16,7 +16,8 @@ namespace NuclearWinter.UI
 
         public UIFont           SmallFont;
         public UIFont           MediumFont;
-        public UIFont           BigFont;
+        public UIFont           LargeFont;
+        public UIFont           ExtraLargeFont;
 
         public Texture2D        SpinningWheel;
 

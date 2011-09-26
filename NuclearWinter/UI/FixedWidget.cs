@@ -99,7 +99,7 @@ namespace NuclearWinter.UI
             switch( mContentAnchor )
             {
                 case Anchor.Start:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Child.ContentWidth, ChildRectangle.Height ) );
+                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Math.Min( ChildRectangle.Width, Child.ContentWidth ), Math.Min( ChildRectangle.Height, ChildRectangle.Height ) ) );
                     break;
                 case Anchor.Center:
                 case Anchor.Fill: // FIXME: Implement Fill anchor behavior
