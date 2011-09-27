@@ -76,6 +76,7 @@ namespace NuclearWinter.UI
             }
         }
 
+        bool    mbIsDragging;
         bool    mbIsHovered;
         float   mfTimer;
 
@@ -220,6 +221,15 @@ namespace NuclearWinter.UI
             mbIsHovered = true;
         }
 
+        internal override void OnMouseMove( Point _hitPoint )
+        {
+            if( mbIsDragging )
+            {
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                SelectionOffset = iOffset - miCaretOffset;
+            }
+        }
+
         internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
@@ -231,6 +241,10 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
+            mbIsDragging = true;
+
+            CaretOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+
             Screen.Focus( this );
             OnActivateDown();
         }
@@ -239,6 +253,13 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
+            if( mbIsDragging )
+            {
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                SelectionOffset = iOffset - miCaretOffset;
+                mbIsDragging = false;
+            }
+            else
             if( HitTest( _hitPoint ) == this )
             {
                 OnActivateUp();
@@ -246,6 +267,34 @@ namespace NuclearWinter.UI
             else
             {
             }
+        }
+
+        int GetCaretOffsetAtX( int _x )
+        {
+            // FIXME: This does many calls to Font.MeasureString
+            // We should do a binary search instead!
+
+            _x += miScrollOffset;
+
+            int iIndex = 0;
+
+            float fPreviousX = 0f;
+
+            while( iIndex < Text.Length )
+            {
+                iIndex++;
+
+                float fX = Font.MeasureString( Text.Substring( 0, iIndex ) ).X;
+                if( fX > _x )
+                {
+                    bool bAfter = ( fX - _x ) < ( ( fX - fPreviousX ) / 2f );
+                    return bAfter ? iIndex : ( iIndex - 1 );
+                }
+
+                fPreviousX = fX;
+            }
+
+            return iIndex;
         }
 
         //----------------------------------------------------------------------
