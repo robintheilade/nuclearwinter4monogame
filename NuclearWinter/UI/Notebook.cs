@@ -25,6 +25,8 @@ namespace NuclearWinter.UI
         bool                    mbIsHovered;
         bool                    mbIsPressed;
 
+        public bool             IsUnread;
+
         //----------------------------------------------------------------------
         bool                    mbClosable;
         public bool             Closable
@@ -253,6 +255,11 @@ namespace NuclearWinter.UI
                 }
             }
 
+            if( IsUnread )
+            {
+                    Screen.DrawBox( mNotebook.Style.UnreadTabMarker, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+            }
+
             if( Screen.IsActive && HasFocus )
             {
                 Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTabFocus : mNotebook.Style.TabFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
@@ -284,13 +291,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public struct NotebookStyle
         {
-            public NotebookStyle( int _iTabCornerSize, Texture2D _tab, Texture2D _tabFocus, Texture2D _activeTab, Texture2D _activeTabFocus )
+            public NotebookStyle( int _iTabCornerSize, Texture2D _tab, Texture2D _tabFocus, Texture2D _activeTab, Texture2D _activeTabFocus, Texture2D _unreadTabMarker )
             {
                 TabCornerSize   = _iTabCornerSize;
                 Tab             = _tab;
                 TabFocus        = _tabFocus;
                 ActiveTab       = _activeTab;
                 ActiveTabFocus  = _activeTabFocus;
+                UnreadTabMarker = _unreadTabMarker;
             }
 
             public int              TabCornerSize;
@@ -299,6 +307,7 @@ namespace NuclearWinter.UI
             public Texture2D        TabFocus;
             public Texture2D        ActiveTab;
             public Texture2D        ActiveTabFocus;
+            public Texture2D        UnreadTabMarker;
         }
 
         //----------------------------------------------------------------------
@@ -321,7 +330,8 @@ namespace NuclearWinter.UI
                 Screen.Style.NotebookTab,
                 Screen.Style.NotebookTabFocus,
                 Screen.Style.NotebookActiveTab,
-                Screen.Style.NotebookActiveTabFocus
+                Screen.Style.NotebookActiveTabFocus,
+                Screen.Style.NotebookUnreadTabMarker
             );
 
             mPanel = new Panel( Screen, Screen.Style.Panel, Screen.Style.PanelCornerSize );
@@ -379,6 +389,7 @@ namespace NuclearWinter.UI
             Debug.Assert( Tabs.Contains( _tab ) );
 
             ActiveTabIndex = Tabs.IndexOf( _tab );
+            Tabs[ActiveTabIndex].IsUnread = false;
         }
 
         //----------------------------------------------------------------------

@@ -76,6 +76,7 @@ namespace NuclearWinter.UI
         public Texture2D        NotebookTabClose;
         public Texture2D        NotebookTabCloseHover;
         public Texture2D        NotebookTabCloseDown;
+        public Texture2D        NotebookUnreadTabMarker;
         
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;
