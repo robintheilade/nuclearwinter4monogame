@@ -429,6 +429,7 @@ namespace NuclearWinter.UI
             }
 
             miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
+            ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
             if( miScrollMax > 0 )
             {
                 miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
