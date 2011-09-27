@@ -20,6 +20,8 @@ namespace NuclearWinter.UI
 
         public Color Color = Color.White;
 
+        public Action<Image> ClickHandler;
+
         //----------------------------------------------------------------------
         protected Texture2D mTexture;
         public Texture2D    Texture {
@@ -60,7 +62,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            return null;
+            return ClickHandler != null ? base.HitTest( _point ) : null;
+        }
+
+        internal override void OnMouseUp(Point _hitPoint, int _iButton)
+        {
+            if( _iButton != 0 ) return;
+
+            if( ClickHandler != null )
+            {
+                ClickHandler( this );
+            }
         }
 
         //----------------------------------------------------------------------
