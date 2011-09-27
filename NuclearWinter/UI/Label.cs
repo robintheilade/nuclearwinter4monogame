@@ -192,7 +192,7 @@ namespace NuclearWinter.UI
                     float fX = mpTextPosition.X;
                     if( Anchor == UI.Anchor.Center )
                     {
-                        fX += ContentWidth / 2 + Padding.Left - mFont.MeasureString( mlstrWrappedText[i] ).X / 2f;
+                        fX += ContentWidth / 2 - Padding.Left - mFont.MeasureString( mlstrWrappedText[i] ).X / 2f;
                     }
 
                     Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlstrWrappedText[i], new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color, OutlineColor );
