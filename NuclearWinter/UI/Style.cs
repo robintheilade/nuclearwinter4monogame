@@ -91,5 +91,8 @@ namespace NuclearWinter.UI
         public Texture2D        TreeViewBranch;
         public Texture2D        TreeViewBranchLast;
         public Texture2D        TreeViewLine;
+
+        public Texture2D        VerticalScrollbar;
+        public int              VerticalScrollbarCornerSize = 10;
     }
 }

@@ -335,8 +335,10 @@ namespace NuclearWinter.UI
         bool                                mbIsHovered;
         Point                               mHoverPoint;
 
-        int                                 miScrollOffset;
+        public int                          ScrollOffset        { get; private set; }
         int                                 miScrollMax;
+        int                                 miScrollbarHeight;
+        int                                 miScrollbarOffset;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -407,7 +409,7 @@ namespace NuclearWinter.UI
             int iHeight = 0;
             foreach( TreeViewNode node in Nodes )
             {
-                node.DoLayout( new Rectangle( iX, iY + iHeight - miScrollOffset, Size.X - 20, node.ContentHeight ) );
+                node.DoLayout( new Rectangle( iX, iY + iHeight - ScrollOffset, Size.X - 20, node.ContentHeight ) );
                 iHeight += node.ContentHeight;
             }
 
@@ -426,7 +428,12 @@ namespace NuclearWinter.UI
                 }
             }
 
-            miScrollMax = Math.Max( 0, ( iHeight ) - ( Size.Y - 20 ) + 5 );
+            miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
+            if( miScrollMax > 0 )
+            {
+                miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
+                miScrollbarOffset = (int)( (float)ScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -470,7 +477,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + miScrollOffset ) / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + ScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
@@ -694,8 +701,8 @@ namespace NuclearWinter.UI
 
         void DoScroll( int _iDelta )
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -miScrollOffset, Math.Max( 0, miScrollMax - miScrollOffset ) );
-            miScrollOffset += iScrollChange;
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -ScrollOffset, Math.Max( 0, miScrollMax - ScrollOffset ) );
+            ScrollOffset += iScrollChange;
 
             if( mbIsDragging )
             {
@@ -760,6 +767,11 @@ namespace NuclearWinter.UI
             }
 
             Screen.PopScissorRectangle();
+
+            if( miScrollMax > 0 )
+            {
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+            }
         }
 
         //----------------------------------------------------------------------

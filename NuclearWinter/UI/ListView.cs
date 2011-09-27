@@ -206,6 +206,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public int                  ScrollOffset    { get; private set; }
         int                         miScrollMax;
+        int                         miScrollbarHeight;
+        int                         miScrollbarOffset;
 
         //----------------------------------------------------------------------
         public ListView( Screen _screen )
@@ -270,8 +272,16 @@ namespace NuclearWinter.UI
                 iColIndex++;
             }
 
-            miScrollMax = Math.Max( 0, Rows.Count * ( RowHeight + RowSpacing ) - ( Size.Y - 20 ) + 5 );
+            int iHeight = Rows.Count * ( RowHeight + RowSpacing );
+
+            miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
             ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
+
+            if( miScrollMax > 0 )
+            {
+                miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
+                miScrollbarOffset = (int)( (float)ScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -507,6 +517,11 @@ namespace NuclearWinter.UI
             }
 
             Screen.PopScissorRectangle();
+
+            if( miScrollMax > 0 )
+            {
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+            }
         }
     }
 }
