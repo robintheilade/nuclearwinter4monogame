@@ -243,7 +243,16 @@ namespace NuclearWinter.UI
 
             mbIsDragging = true;
 
-            CaretOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
+            if( HasFocus && bShift )
+            {
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                SelectionOffset = iOffset - miCaretOffset;
+            }
+            else
+            {
+                CaretOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+            }
 
             Screen.Focus( this );
             OnActivateDown();
