@@ -9,6 +9,10 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.GamerServices;
 
+#if WINDOWS
+using System.Windows.Forms;
+#endif
+
 #if WINDOWS_PHONE
 using Microsoft.Phone.Shell;
 #endif
@@ -18,8 +22,13 @@ namespace NuclearWinter
     public class NuclearGame: Game
     {
         //----------------------------------------------------------------------
-        public Texture2D        WhitePixelTex                               { get; protected set; }
-        public Matrix           SpriteMatrix                                { get; protected set; }
+#if WINDOWS
+        public Form                                 Form                    { get; private set; }
+#endif
+
+        //----------------------------------------------------------------------
+        public Texture2D                            WhitePixelTex           { get; protected set; }
+        public Matrix                               SpriteMatrix            { get; protected set; }
 
         //----------------------------------------------------------------------
         public GraphicsDeviceManager                Graphics                { get; private set; }
@@ -69,6 +78,9 @@ namespace NuclearWinter
             StorageDevice.DeviceChanged                 += new EventHandler<EventArgs>( OnStorageDeviceChange );
 #endif
 
+#if WINDOWS
+            Form = (Form)Form.FromHandle( Window.Handle );
+#endif
 
             Graphics = new GraphicsDeviceManager(this);
             SpriteMatrix = Matrix.Identity;

@@ -135,6 +135,7 @@
     <Compile Include="UI\Screen.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpinningWheel.cs" />
+    <Compile Include="UI\Splitter.cs" />
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\TextArea.cs" />
     <Compile Include="UI\TreeView.cs" />
