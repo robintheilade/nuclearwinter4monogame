@@ -271,7 +271,7 @@ namespace NuclearWinter.UI
             HitBox = new Rectangle(
                 pCenter.X - ( Expand ? Size.X : ContentWidth ) / 2,
                 pCenter.Y - iHeight / 2,
-                ContentWidth,
+                Expand ? Size.X : ContentWidth,
                 iHeight
             );
 
