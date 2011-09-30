@@ -57,7 +57,6 @@ namespace NuclearWinter.UI
             set { mbWrapText = value; UpdateContentSize(); }
         }
 
-
         public Color            Color;
         public Color            OutlineColor;
         public float            OutlineRadius;
@@ -135,6 +134,8 @@ namespace NuclearWinter.UI
             if( Text != "" )
             {
                 // Ellipsize
+                mstrDisplayedText = Text;
+
                 int iWidth = ContentWidth;
                 int iOffset = Text.Length;
                 while( iWidth > Size.X )
