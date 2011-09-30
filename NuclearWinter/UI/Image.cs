@@ -65,6 +65,23 @@ namespace NuclearWinter.UI
             return ClickHandler != null ? base.HitTest( _point ) : null;
         }
 
+        internal override void OnMouseEnter( Point _hitPoint )
+        {
+            if( ClickHandler != null )
+            {
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
+                
+            }
+        }
+
+        internal override void OnMouseOut( Point _hitPoint )
+        {
+            if( ClickHandler != null )
+            {
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+            }
+        }
+
         internal override void OnMouseUp(Point _hitPoint, int _iButton)
         {
             if( _iButton != 0 ) return;
