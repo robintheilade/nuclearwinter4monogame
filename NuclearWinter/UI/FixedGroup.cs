@@ -15,6 +15,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         List<FixedWidget>           mlChildren;
 
+        public bool                 AutoSize = false;
+
         public int Width {
             get { return ContentWidth; }
             set { ContentWidth = value; }
@@ -188,6 +190,34 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
+            if( AutoSize )
+            {
+                //ContentWidth = 0;
+                ContentHeight = 0;
+
+                foreach( FixedWidget fixedWidget in mlChildren )
+                {
+                    //ContentWidth    = Math.Max( ContentWidth, fixedWidget.ChildRectangle.Right );
+                    int iHeight = 0;
+                    if( fixedWidget.ChildBox.Top.HasValue )
+                    {
+                        if( fixedWidget.ChildBox.Bottom.HasValue )
+                        {
+                            iHeight = fixedWidget.ChildBox.Top.Value + fixedWidget.Child.ContentHeight + fixedWidget.ChildBox.Bottom.Value;
+                        }
+                        else
+                        {
+                            iHeight = fixedWidget.ChildBox.Top.Value + fixedWidget.ChildBox.Height;
+                        }
+                    }
+
+                    ContentHeight = Math.Max( ContentHeight, iHeight );
+                }
+
+                Console.WriteLine( ContentHeight );
+            }
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -262,6 +292,8 @@ namespace NuclearWinter.UI
                 fixedWidget.DoLayout( childRectangle );
             }
             
+            UpdateContentSize();
+
             HitBox = Resolution.InternalMode.Rectangle;
         }
 

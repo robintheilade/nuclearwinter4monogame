@@ -19,14 +19,17 @@ namespace NuclearWinter.UI
 
         List<bool>      mlExpandedChildren;
 
+        Anchor          mContentAnchor;
+
         //----------------------------------------------------------------------
-        public BoxGroup( Screen _screen, Orientation _orientation, int _iSpacing )
+        public BoxGroup( Screen _screen, Orientation _orientation, int _iSpacing, Anchor _contentAnchor = Anchor.Center )
         : base( _screen )
         {
             mlExpandedChildren = new List<bool>();
 
             mOrientation    = _orientation;
             miSpacing       = _iSpacing;
+            mContentAnchor = _contentAnchor;
         }
 
         //----------------------------------------------------------------------
@@ -200,10 +203,36 @@ namespace NuclearWinter.UI
             switch( mOrientation )
             {
                 case Orientation.Horizontal:
-                    pWidgetPosition = new Point( Position.X + Size.X / 2 - iActualSize / 2, Position.Y );
+                    switch( mContentAnchor )
+                    {
+                        case Anchor.Start:
+                            pWidgetPosition = new Point( Position.X, Position.Y );
+                            break;
+                        case Anchor.Center:
+                            pWidgetPosition = new Point( Position.X + Size.X / 2 - iActualSize / 2, Position.Y );
+                            break;
+                        case Anchor.End:
+                            pWidgetPosition = new Point( Position.X + Size.X - iActualSize, Position.Y );
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
                     break;
                 case Orientation.Vertical:
-                    pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iActualSize / 2 );
+                    switch( mContentAnchor )
+                    {
+                        case Anchor.Start:
+                            pWidgetPosition = new Point( Position.X, Position.Y );
+                            break;
+                        case Anchor.Center:
+                            pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iActualSize / 2 );
+                            break;
+                        case Anchor.End:
+                            pWidgetPosition = new Point( Position.X, Position.Y + Size.Y - iActualSize );
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
                     break;
                 default:
                     throw new NotSupportedException();
