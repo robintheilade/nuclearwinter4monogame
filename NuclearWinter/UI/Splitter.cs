@@ -84,8 +84,7 @@ namespace NuclearWinter.UI
 
             switch( mDirection )
             {
-                case Direction.Left:
-                case Direction.Right: {
+                case Direction.Left: {
                     if( Size.X > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Width - SecondPaneMinSize );
@@ -108,9 +107,31 @@ namespace NuclearWinter.UI
                     }
                     break;
                 }
-                case Direction.Up:
-                case Direction.Down: {
+                case Direction.Right: {
                     if( Size.X > FirstPaneMinSize + SecondPaneMinSize )
+                    {
+                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Width - FirstPaneMinSize );
+                    }
+
+                    HitBox = new Rectangle(
+                        _rect.Right - SplitterOffset - SplitterSize / 2,
+                        _rect.Top,
+                        SplitterSize,
+                        _rect.Height );
+
+                    if( mFirstPane != null )
+                    {
+                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, _rect.Width - SplitterOffset, _rect.Height ) );
+                    }
+
+                    if( mSecondPane != null )
+                    {
+                        mSecondPane.DoLayout( new Rectangle( _rect.Right - SplitterOffset, _rect.Top, SplitterOffset, _rect.Height ) );
+                    }
+                    break;
+                }
+                case Direction.Up: {
+                    if( Size.Y > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Height - SecondPaneMinSize );
                     }
@@ -129,6 +150,29 @@ namespace NuclearWinter.UI
                     if( mSecondPane != null )
                     {
                         mSecondPane.DoLayout( new Rectangle( _rect.Left, _rect.Top + SplitterOffset, _rect.Width, _rect.Height - SplitterOffset ) );
+                    }
+                    break;
+                }
+                case Direction.Down: {
+                    if( Size.Y > FirstPaneMinSize + SecondPaneMinSize )
+                    {
+                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Height - FirstPaneMinSize );
+                    }
+
+                    HitBox = new Rectangle(
+                        _rect.Left,
+                        _rect.Bottom - SplitterOffset - SplitterSize / 2,
+                        _rect.Width,
+                        SplitterSize );
+
+                    if( mFirstPane != null )
+                    {
+                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, _rect.Width, _rect.Height - SplitterOffset ) );
+                    }
+
+                    if( mSecondPane != null )
+                    {
+                        mSecondPane.DoLayout( new Rectangle( _rect.Left, _rect.Bottom - SplitterOffset, _rect.Width, SplitterOffset ) );
                     }
                     break;
                 }
@@ -192,12 +236,16 @@ namespace NuclearWinter.UI
                 switch( mDirection )
                 {
                     case Direction.Left:
+                        SplitterOffset = miDragOffset + _hitPoint.X;
+                        break;
                     case Direction.Right:
-                        SplitterOffset = _hitPoint.X + miDragOffset;
+                        SplitterOffset = miDragOffset - _hitPoint.X;
                         break;
                     case Direction.Up:
+                        SplitterOffset = miDragOffset + _hitPoint.Y;
+                        break;
                     case Direction.Down:
-                        SplitterOffset += _hitPoint.Y + miDragOffset;
+                        SplitterOffset = miDragOffset - _hitPoint.Y;
                         break;
                 }
             }
@@ -210,12 +258,16 @@ namespace NuclearWinter.UI
             switch( mDirection )
             {
                 case Direction.Left:
-                case Direction.Right:
                     miDragOffset = SplitterOffset - _hitPoint.X;
                     break;
+                case Direction.Right:
+                    miDragOffset = SplitterOffset + _hitPoint.X;
+                    break;
                 case Direction.Up:
-                case Direction.Down:
                     miDragOffset = SplitterOffset - _hitPoint.Y;
+                    break;
+                case Direction.Down:
+                    miDragOffset = SplitterOffset + _hitPoint.Y;
                     break;
             }
         }
