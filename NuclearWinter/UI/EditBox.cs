@@ -82,10 +82,10 @@ namespace NuclearWinter.UI
 
         public const char DefaultPasswordChar = '●';
 
-        char mPasswordCharacter = '\0';
+        char mPasswordChar = '\0';
         public char PasswordChar {
-            get { return mPasswordCharacter; }
-            set { mPasswordCharacter = value; UpdateContentSize(); }
+            get { return mPasswordChar; }
+            set { mPasswordChar = value; UpdateContentSize(); }
         }
 
         public string Text
@@ -189,7 +189,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            mstrDisplayedText = ( mPasswordCharacter == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordCharacter );
+            mstrDisplayedText = ( mPasswordChar == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordChar );
 
             miMaxScrollOffset = (int)Math.Max( 0, Font.MeasureString( mstrDisplayedText ).X - ( Size.X - Padding.Horizontal ) + miCaretWidth );
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
@@ -335,14 +335,14 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case Keys.X:
-                    if( bCtrl )
+                    if( bCtrl && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
                 case Keys.C:
-                    if( bCtrl )
+                    if( bCtrl && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                     }
