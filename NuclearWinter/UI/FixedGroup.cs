@@ -213,8 +213,6 @@ namespace NuclearWinter.UI
 
                     ContentHeight = Math.Max( ContentHeight, iHeight );
                 }
-
-                Console.WriteLine( ContentHeight );
             }
 
             base.UpdateContentSize();
