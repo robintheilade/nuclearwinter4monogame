@@ -93,10 +93,13 @@ namespace NuclearWinter.UI
             get { return mstrText; }
             set
             {
-                mstrText = value;
-                CaretOffset = Math.Min( miCaretOffset, mstrText.Length );
+                if( mstrText != value )
+                {
+                    mstrText = value;
+                    CaretOffset = Math.Min( miCaretOffset, mstrText.Length );
 
-                UpdateContentSize();
+                    UpdateContentSize();
+                }
             }
         }
 
@@ -110,6 +113,8 @@ namespace NuclearWinter.UI
         public static bool FloatValidator( char _char )     { return ( _char >= '0' && _char <= '9' ) || _char == '.' || _char == '-'; }
 
         public Action<EditBox>  ValidateHandler;
+        public Action<EditBox>  FocusHandler;
+        public Action<EditBox>  BlurHandler;
 
         public bool             IsReadOnly;
         public int              MaxLength;
@@ -131,6 +136,18 @@ namespace NuclearWinter.UI
         {
             CaretOffset = 0;
             SelectionOffset = Text.Length;
+            mbIsDragging = false;
+        }
+
+        // (can be used as a FocusHandler)
+        public static void SelectAll( EditBox _editBox )
+        {
+            _editBox.SelectAll();
+        }
+
+        public void ClearSelection()
+        {
+            SelectionOffset = 0;
         }
 
         //----------------------------------------------------------------------
@@ -516,6 +533,13 @@ namespace NuclearWinter.UI
         internal override void OnFocus()
         {
             Screen.AddWidgetToUpdateList( this );
+
+            if( FocusHandler != null ) FocusHandler( this );
+        }
+
+        internal override void OnBlur()
+        {
+            if( BlurHandler != null ) BlurHandler( this );
         }
 
         internal override bool Update( float _fElapsedTime )

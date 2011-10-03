@@ -294,8 +294,11 @@ namespace NuclearWinter.UI
                 FocusedWidget.OnBlur();
             }
 
-            FocusedWidget = _widget;
-            FocusedWidget.OnFocus();
+            if( FocusedWidget != _widget )
+            {
+                FocusedWidget = _widget;
+                FocusedWidget.OnFocus();
+            }
         }
 
         //----------------------------------------------------------------------
