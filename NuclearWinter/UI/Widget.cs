@@ -203,7 +203,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal virtual bool     Update( float _fElapsedTime ) { return false; }
+        internal virtual void Update( float _fElapsedTime ) {}
 
         internal virtual void UpdateContentSize()
         {

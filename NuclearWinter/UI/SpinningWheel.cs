@@ -15,16 +15,12 @@ namespace NuclearWinter.UI
         public SpinningWheel( Screen _screen, Texture2D _texture )
         : base( _screen, _texture )
         {
-            // FIXME: This will stay in the screen's update list forever!
-            Screen.AddWidgetToUpdateList( this );
         }
 
         //----------------------------------------------------------------------
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             mfAngle += _fElapsedTime * 3f;
-
-            return true;
         }
 
         //----------------------------------------------------------------------

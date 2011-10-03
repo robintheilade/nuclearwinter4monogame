@@ -76,6 +76,19 @@ namespace NuclearWinter.UI
             mDirection = _direction;
         }
 
+        internal override void Update( float _fElapsedTime )
+        {
+            if( mFirstPane != null )
+            {
+                mFirstPane.Update( _fElapsedTime );
+            }
+
+            if( mSecondPane != null )
+            {
+                mSecondPane.Update( _fElapsedTime );
+            }
+        }
+
         //-----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {

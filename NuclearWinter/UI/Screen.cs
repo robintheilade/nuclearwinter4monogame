@@ -28,8 +28,6 @@ namespace NuclearWinter.UI
 
         public FixedGroup   Root                { get; private set; }
 
-        List<Widget>        mlUpdateList;
-
         public Widget       FocusedWidget       { get; private set; }
         bool                mbHasActivatedFocusedWidget;
         Widget              mClickedWidget;
@@ -46,7 +44,6 @@ namespace NuclearWinter.UI
 
 
             Root    = new FixedGroup( this );
-            mlUpdateList = new List<Widget>();
         }
 
         //----------------------------------------------------------------------
@@ -56,15 +53,6 @@ namespace NuclearWinter.UI
             Height = _iHeight;
 
             Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
-        }
-
-        //----------------------------------------------------------------------
-        public void AddWidgetToUpdateList( Widget _widget )
-        {
-            if( ! mlUpdateList.Contains( _widget ) )
-            {
-                mlUpdateList.Add( _widget );
-            }
         }
 
         //----------------------------------------------------------------------
@@ -266,21 +254,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            List<Widget> lUpdateRemovedWidgets = new List<Widget>();
-            foreach( Widget widget in mlUpdateList )
-            {
-                if( ! widget.Update( _fElapsedTime ) )
-                {
-                    lUpdateRemovedWidgets.Add( widget );
-                }
-            }
-
+            Root.Update( _fElapsedTime );
             Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
-
-            foreach( Widget widget in lUpdateRemovedWidgets )
-            {
-                mlUpdateList.Remove( widget );
-            }
         }
 
         //----------------------------------------------------------------------

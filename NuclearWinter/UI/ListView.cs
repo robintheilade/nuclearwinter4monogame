@@ -208,6 +208,7 @@ namespace NuclearWinter.UI
         int                         miScrollMax;
         int                         miScrollbarHeight;
         int                         miScrollbarOffset;
+        float                       mfLerpScrollOffset;
 
         //----------------------------------------------------------------------
         public ListView( Screen _screen )
@@ -251,6 +252,16 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void Update( float _fElapsedTime )
+        {
+            float fLerpAmount = Math.Min( 1f, _fElapsedTime * 15f );
+            mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
+            mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
+
+            base.Update( _fElapsedTime );
+        }
+
+        //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
             Position = _rect.Location;
@@ -280,7 +291,7 @@ namespace NuclearWinter.UI
             if( miScrollMax > 0 )
             {
                 miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
-                miScrollbarOffset = (int)( (float)ScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
             }
         }
 
@@ -313,7 +324,7 @@ namespace NuclearWinter.UI
             if( _iButton != 0 ) return;
 
             Screen.Focus( this );
-            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + ScrollOffset ) / ( RowHeight + RowSpacing ) );
+            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
             if( miFocusedRowIndex > Rows.Count - 1 )
             {
                 miFocusedRowIndex = -1;
@@ -336,7 +347,7 @@ namespace NuclearWinter.UI
 
         void SelectRowAt( Point _hitPoint )
         {
-            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + ScrollOffset ) / ( RowHeight + RowSpacing ) );
+            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
 
             if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
             {
@@ -424,13 +435,13 @@ namespace NuclearWinter.UI
             int iHoverRow = -1;
             if( mbIsHovered )
             {
-                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - ScrollOffset ) ) / ( RowHeight + RowSpacing );
+                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
             }
 
             int iRow = 0;
             foreach( ListViewRow row in Rows )
             {
-                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - ScrollOffset;
+                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
                 if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > Size.Y - 20 ) )
                 {
                     iRow++;

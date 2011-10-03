@@ -198,15 +198,15 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             if( Child != null )
             {
-                return Child.Update( _fElapsedTime );
+                Child.Update( _fElapsedTime );
             }
             else
             {
-                return base.Update( _fElapsedTime );
+                base.Update( _fElapsedTime );
             }
         }
 

@@ -339,6 +339,7 @@ namespace NuclearWinter.UI
         int                                 miScrollMax;
         int                                 miScrollbarHeight;
         int                                 miScrollbarOffset;
+        float                               mfLerpScrollOffset;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -396,7 +397,7 @@ namespace NuclearWinter.UI
 
             base.UpdateContentSize();
         }
-
+        
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
@@ -409,7 +410,7 @@ namespace NuclearWinter.UI
             int iHeight = 0;
             foreach( TreeViewNode node in Nodes )
             {
-                node.DoLayout( new Rectangle( iX, iY + iHeight - ScrollOffset, Size.X - 20, node.ContentHeight ) );
+                node.DoLayout( new Rectangle( iX, iY + iHeight - (int)mfLerpScrollOffset, Size.X - 20, node.ContentHeight ) );
                 iHeight += node.ContentHeight;
             }
 
@@ -433,7 +434,7 @@ namespace NuclearWinter.UI
             if( miScrollMax > 0 )
             {
                 miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
-                miScrollbarOffset = (int)( (float)ScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
             }
         }
 
@@ -453,12 +454,6 @@ namespace NuclearWinter.UI
                         Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
                     ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
-
-                if( mMouseDragPoint.Y > Position.Y + Size.Y - 20
-                ||  mMouseDragPoint.Y < Position.Y + 20 )
-                {
-                    Screen.AddWidgetToUpdateList( this );
-                }
             }
 
             mHoverPoint = _hitPoint;
@@ -478,7 +473,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + ScrollOffset ) / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + (int)mfLerpScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
@@ -646,6 +641,7 @@ namespace NuclearWinter.UI
                 }
 
                 mbIsDragging = false;
+                mfScrollRepeatTimer = sfScrollRepeatDelay;
             }
             else
             {
@@ -715,7 +711,7 @@ namespace NuclearWinter.UI
 
         const float sfScrollRepeatDelay = 0.3f;
         float mfScrollRepeatTimer = sfScrollRepeatDelay;
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             if( mbIsDragging )
             {
@@ -735,17 +731,21 @@ namespace NuclearWinter.UI
                     else
                     {
                         mfScrollRepeatTimer = sfScrollRepeatDelay;
-                        return false;
                     }
                 }
                 
                 mfScrollRepeatTimer += _fElapsedTime;
-
-                return true;
             }
 
-            mfScrollRepeatTimer = sfScrollRepeatDelay;
-            return false;
+            float fLerpAmount = Math.Min( 1f, _fElapsedTime * 15f );
+            bool bIsScrolling = Math.Abs( mfLerpScrollOffset - ScrollOffset ) > 1f;
+            mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
+            mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
+
+            if( bIsScrolling )
+            {
+                UpdateHoveredNode();
+            }
         }
 
         //----------------------------------------------------------------------

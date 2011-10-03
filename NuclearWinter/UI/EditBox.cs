@@ -532,8 +532,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnFocus()
         {
-            Screen.AddWidgetToUpdateList( this );
-
             if( FocusHandler != null ) FocusHandler( this );
         }
 
@@ -542,17 +540,16 @@ namespace NuclearWinter.UI
             if( BlurHandler != null ) BlurHandler( this );
         }
 
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             if( ! HasFocus )
             {
                 mfTimer = 0f;
-                return false;
             }
-
-            mfTimer += _fElapsedTime;
-
-            return true;
+            else
+            {
+                mfTimer += _fElapsedTime;
+            }
         }
 
         //----------------------------------------------------------------------

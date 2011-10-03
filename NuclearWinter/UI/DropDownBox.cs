@@ -95,10 +95,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
-            mPressedAnim.Update( _fElapsedTime );
-            return ! mPressedAnim.IsOver;
+            if( ! mPressedAnim.IsOver )
+            {
+                mPressedAnim.Update( _fElapsedTime );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -190,7 +192,6 @@ namespace NuclearWinter.UI
         void OnClick()
         {
             mPressedAnim.SetTime( 0f );
-            Screen.AddWidgetToUpdateList( this );
         }
 
         //----------------------------------------------------------------------

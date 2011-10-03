@@ -29,8 +29,6 @@ namespace NuclearWinter.UI
         public CustomViewport( Screen _screen )
         : base( _screen )
         {
-            // FIXME: This should only be done when connected to the Screen's root and be removed when disconnected
-            Screen.AddWidgetToUpdateList( this );
         }
 
         //----------------------------------------------------------------------
@@ -56,14 +54,12 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )     { if( EventHandler != null ) EventHandler.OnMouseWheel( TransformPoint( _hitPoint ), _iDelta ); }
 
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             if( UpdateHandler != null )
             {
                 UpdateHandler( _fElapsedTime );
             }
-
-            return true;
         }
 
         //----------------------------------------------------------------------

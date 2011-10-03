@@ -219,6 +219,17 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void Update( float _fElapsedTime )
+        {
+            foreach( FixedWidget fixedWidget in mlChildren )
+            {
+                fixedWidget.Update( _fElapsedTime );
+            }
+
+            base.Update( _fElapsedTime );
+        }
+
+        //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
             foreach( FixedWidget fixedWidget in mlChildren )

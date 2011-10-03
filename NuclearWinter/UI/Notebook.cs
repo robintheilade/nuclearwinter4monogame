@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
+using NuclearWinter.Collections;
 
 namespace NuclearWinter.UI
 {
@@ -135,6 +136,15 @@ namespace NuclearWinter.UI
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
 
             base.UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        internal override void Update( float _fElapsedTime )
+        {
+            mCloseButton.Update( _fElapsedTime );
+            PageGroup.Update( _fElapsedTime );
+
+            base.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -316,8 +326,8 @@ namespace NuclearWinter.UI
 
         Panel                       mPanel;
 
-        public List<NotebookTab>    Tabs            { get; private set; }
-        public int                  ActiveTabIndex  { get; private set; }
+        public ObservableList<NotebookTab>  Tabs            { get; private set; }
+        public int                          ActiveTabIndex  { get; private set; }
 
         public int                  TabHeight = 50;
 
@@ -335,7 +345,12 @@ namespace NuclearWinter.UI
             );
 
             mPanel = new Panel( Screen, Screen.Style.Panel, Screen.Style.PanelCornerSize );
-            Tabs = new List<NotebookTab>();
+            Tabs = new ObservableList<NotebookTab>();
+
+            Tabs.ListChanged += delegate {
+                ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
+                Tabs[ActiveTabIndex].IsUnread = false;
+            };
         }
 
         //----------------------------------------------------------------------
@@ -356,7 +371,6 @@ namespace NuclearWinter.UI
                 Size.Y
             );
 
-            ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
             NotebookTab activeTab = Tabs[ActiveTabIndex];
 
             Rectangle contentRect = new Rectangle( Position.X, Position.Y + ( TabHeight - 10 ), Size.X, Size.Y - ( TabHeight - 10 ) );
@@ -428,9 +442,9 @@ namespace NuclearWinter.UI
             return Tabs[ActiveTabIndex].OnPadButton( _button, _bIsDown );
         }
 
-        internal override bool Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
-            return Tabs[ActiveTabIndex].Update( _fElapsedTime );
+            Tabs[ActiveTabIndex].Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
