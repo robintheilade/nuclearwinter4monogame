@@ -86,7 +86,7 @@ namespace NuclearWinter.UI
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 - miScrollOffset, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
             mLabel.Draw();
             Screen.PopScissorRectangle();
 
