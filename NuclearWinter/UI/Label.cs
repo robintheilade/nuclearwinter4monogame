@@ -152,8 +152,15 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
+            if( LayoutRect == _rect ) return;
+
+            bool bWrapTextNeeded = ( LayoutRect.Width != _rect.Width || LayoutRect.Height != _rect.Height );
             LayoutRect = _rect;
-            DoWrapText();
+
+            if( bWrapTextNeeded )
+            {
+                DoWrapText();
+            }
 
             Point pCenter = LayoutRect.Center;
 
