@@ -69,7 +69,7 @@ namespace NuclearWinter.UI
                 switch( _direction )
                 {
                     case Direction.Up:
-                        if( ( firstChild == null || child.ChildRectangle.Bottom > firstChild.ChildRectangle.Bottom ) )
+                        if( ( firstChild == null || child.LayoutRect.Bottom > firstChild.LayoutRect.Bottom ) )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -80,7 +80,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Down:
-                        if( firstChild == null || child.ChildRectangle.Top < firstChild.ChildRectangle.Top )
+                        if( firstChild == null || child.LayoutRect.Top < firstChild.LayoutRect.Top )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -91,7 +91,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Left:
-                        if( firstChild == null || child.ChildRectangle.Right > firstChild.ChildRectangle.Right )
+                        if( firstChild == null || child.LayoutRect.Right > firstChild.LayoutRect.Right )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -102,7 +102,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Right:
-                        if( firstChild == null || child.ChildRectangle.Left < firstChild.ChildRectangle.Left )
+                        if( firstChild == null || child.LayoutRect.Left < firstChild.LayoutRect.Left )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -133,7 +133,7 @@ namespace NuclearWinter.UI
                 switch( _direction )
                 {
                     case Direction.Up:
-                        if( child.ChildRectangle.Bottom <= fixedChild.ChildRectangle.Center.Y && ( nearestSibling == null || child.ChildRectangle.Bottom > nearestSibling.ChildRectangle.Bottom ) )
+                        if( child.LayoutRect.Bottom <= fixedChild.LayoutRect.Center.Y && ( nearestSibling == null || child.LayoutRect.Bottom > nearestSibling.LayoutRect.Bottom ) )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -144,7 +144,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Down:
-                        if( child.ChildRectangle.Top >= fixedChild.ChildRectangle.Center.Y && ( nearestSibling == null || child.ChildRectangle.Top < nearestSibling.ChildRectangle.Top ) )
+                        if( child.LayoutRect.Top >= fixedChild.LayoutRect.Center.Y && ( nearestSibling == null || child.LayoutRect.Top < nearestSibling.LayoutRect.Top ) )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -155,7 +155,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Left:
-                        if( child.ChildRectangle.Right <= fixedChild.ChildRectangle.Center.X && ( nearestSibling == null || child.ChildRectangle.Right > nearestSibling.ChildRectangle.Right ) )
+                        if( child.LayoutRect.Right <= fixedChild.LayoutRect.Center.X && ( nearestSibling == null || child.LayoutRect.Right > nearestSibling.LayoutRect.Right ) )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -166,7 +166,7 @@ namespace NuclearWinter.UI
                         }
                         break;
                     case Direction.Right:
-                        if( child.ChildRectangle.Left >= fixedChild.ChildRectangle.Center.X && ( nearestSibling == null || child.ChildRectangle.Left < nearestSibling.ChildRectangle.Left ) )
+                        if( child.LayoutRect.Left >= fixedChild.LayoutRect.Center.X && ( nearestSibling == null || child.LayoutRect.Left < nearestSibling.LayoutRect.Left ) )
                         {
                             Widget childFocusableWidget = child.GetFirstFocusableDescendant( _direction );
                             if( childFocusableWidget != null )
@@ -197,7 +197,7 @@ namespace NuclearWinter.UI
 
                 foreach( FixedWidget fixedWidget in mlChildren )
                 {
-                    //ContentWidth    = Math.Max( ContentWidth, fixedWidget.ChildRectangle.Right );
+                    //ContentWidth    = Math.Max( ContentWidth, fixedWidget.LayoutRect.Right );
                     int iHeight = 0;
                     if( fixedWidget.ChildBox.Top.HasValue )
                     {

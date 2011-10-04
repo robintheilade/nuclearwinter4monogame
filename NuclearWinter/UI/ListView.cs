@@ -264,15 +264,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-            HitBox = _rect;
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
         
             int iColX = 0;
             int iColIndex = 0;
             foreach( ListViewColumn col in Columns )
             {
-                col.Label.DoLayout( new Rectangle( Position.X + 10 + iColX, Position.Y + 10, col.Width, RowHeight ) );
+                col.Label.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
                 iColX += col.Width;
 
                 foreach( ListViewRow row in Rows )
@@ -285,13 +284,13 @@ namespace NuclearWinter.UI
 
             int iHeight = Rows.Count * ( RowHeight + RowSpacing );
 
-            miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
+            miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
             ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
 
             if( miScrollMax > 0 )
             {
-                miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
-                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
+                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
             }
         }
 
@@ -324,7 +323,7 @@ namespace NuclearWinter.UI
             if( _iButton != 0 ) return;
 
             Screen.Focus( this );
-            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
+            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
             if( miFocusedRowIndex > Rows.Count - 1 )
             {
                 miFocusedRowIndex = -1;
@@ -347,7 +346,7 @@ namespace NuclearWinter.UI
 
         void SelectRowAt( Point _hitPoint )
         {
-            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
+            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
 
             if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
             {
@@ -417,32 +416,32 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Style.ListFrame, LayoutRect, 30, Color.White );
 
             if( DisplayColumnHeaders )
             {
                 int iColX = 0;
                 foreach( ListViewColumn col in Columns )
                 {
-                    Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( Position.X + 10 + iColX, Position.Y + 10, col.Width, RowHeight ), 30, Color.White );
+                    Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ), 30, Color.White );
                     col.Label.Draw();
                     iColX += col.Width;
                 }
             }
 
-            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ), Size.X - 20, Size.Y - 20 - ( DisplayColumnHeaders ? RowHeight : 0 ) ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ), LayoutRect.Width - 20, LayoutRect.Height - 20 - ( DisplayColumnHeaders ? RowHeight : 0 ) ) );
 
             int iHoverRow = -1;
             if( mbIsHovered )
             {
-                iHoverRow = ( mHoverPoint.Y - ( Position.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
+                iHoverRow = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
             }
 
             int iRow = 0;
             foreach( ListViewRow row in Rows )
             {
                 int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
-                if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > Size.Y - 20 ) )
+                if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - 20 ) )
                 {
                     iRow++;
                     continue;
@@ -450,7 +449,7 @@ namespace NuclearWinter.UI
 
                 if( MergeColumns )
                 {
-                    Rectangle rowRect = new Rectangle( Position.X + 10, Position.Y + 10 + iRowY, Size.X - 20, RowHeight );
+                    Rectangle rowRect = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + iRowY, LayoutRect.Width - 20, RowHeight );
 
                     Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
@@ -486,7 +485,7 @@ namespace NuclearWinter.UI
                 {
                     ListViewColumn col = Columns[i];
 
-                    Rectangle rowRect = new Rectangle( Position.X + 10 + iColX, Position.Y + 10 + iRowY, col.Width, RowHeight );
+                    Rectangle rowRect = new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10 + iRowY, col.Width, RowHeight );
 
                     if( ! MergeColumns )
                     {
@@ -519,7 +518,7 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    row.Cells[i].Draw( new Point( Position.X + 10 + iColX, Position.Y + iRowY ) );
+                    row.Cells[i].Draw( new Point( LayoutRect.X + 10 + iColX, LayoutRect.Y + iRowY ) );
 
                     iColX += col.Width + ColSpacing;
                 }
@@ -531,7 +530,7 @@ namespace NuclearWinter.UI
 
             if( miScrollMax > 0 )
             {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
             }
         }
     }

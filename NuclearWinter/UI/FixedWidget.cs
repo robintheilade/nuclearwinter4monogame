@@ -35,7 +35,6 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public AnchoredRect     ChildBox;
-        public Rectangle        ChildRectangle      { get; private set; }
 
         Anchor                  mContentAnchor;
 
@@ -86,10 +85,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            ChildRectangle = _rect;
-
-            Position = ChildRectangle.Location;
-            Size = new Point( ChildRectangle.Width, ChildRectangle.Height );
+            LayoutRect = _rect;
 
             if( mChild == null )
             {
@@ -99,18 +95,18 @@ namespace NuclearWinter.UI
             switch( mContentAnchor )
             {
                 case Anchor.Start:
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Math.Min( ChildRectangle.Width, Child.ContentWidth ), Math.Min( ChildRectangle.Height, ChildRectangle.Height ) ) );
+                    Child.DoLayout( new Rectangle( LayoutRect.X, LayoutRect.Y, Math.Min( LayoutRect.Width, Child.ContentWidth ), LayoutRect.Height ) );
                     break;
                 case Anchor.Center:
                 case Anchor.Fill: // FIXME: Implement Fill anchor behavior
-                    Child.DoLayout( new Rectangle( Position.X, Position.Y, Size.X, Size.Y ) );
+                    Child.DoLayout( LayoutRect );
                     break;
                 case Anchor.End:
-                    Child.DoLayout( new Rectangle( Position.X + Size.X - Child.ContentWidth, Position.Y, Child.ContentWidth, Size.Y ) );
+                    Child.DoLayout( new Rectangle( LayoutRect.Right - Child.ContentWidth, LayoutRect.Y, Child.ContentWidth, LayoutRect.Height ) );
                     break;
             }
 
-            Debug.Assert( mChild.ContentWidth <= Size.X && mChild.ContentHeight <= Size.Y, "Child is too big for its parent" );
+            Debug.Assert( mChild.ContentWidth <= LayoutRect.Width && mChild.ContentHeight <= LayoutRect.Height, "Child is too big for its parent" );
         }
 
         //----------------------------------------------------------------------

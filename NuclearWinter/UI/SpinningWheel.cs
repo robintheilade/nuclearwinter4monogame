@@ -32,11 +32,11 @@ namespace NuclearWinter.UI
 
             if( ! mbStretch )
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Size.X / 2 - ContentWidth / 2 + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ) + vOrigin, null, Color, mfAngle, vOrigin, 1f, SpriteEffects.None, 0f );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( LayoutRect.Center.X - ContentWidth / 2 + Padding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top ) + vOrigin, null, Color, mfAngle, vOrigin, 1f, SpriteEffects.None, 0f );
             }
             else
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Rectangle( Position.X + Padding.Left + (int)vOrigin.X, Position.Y + Padding.Top + (int)vOrigin.Y, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ), null, Color, mfAngle, new Vector2( mTexture.Width / 2f, mTexture.Height / 2f ), SpriteEffects.None, 0f );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Rectangle( LayoutRect.X + Padding.Left + (int)vOrigin.X, LayoutRect.Y + Padding.Top + (int)vOrigin.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ), null, Color, mfAngle, new Vector2( mTexture.Width / 2f, mTexture.Height / 2f ), SpriteEffects.None, 0f );
             }
         }
     }

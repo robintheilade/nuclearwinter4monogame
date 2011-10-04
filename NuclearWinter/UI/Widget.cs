@@ -141,9 +141,7 @@ namespace NuclearWinter.UI
         public int              ContentWidth        { get; protected set; }
         public int              ContentHeight       { get; protected set; }
 
-        // FIXME: Replace this with a rectangle?
-        public Point            Position            { get; protected set; }
-        public Point            Size                { get; protected set; }
+        public Rectangle        LayoutRect          { get; protected set; }
 
         protected Box           mPadding;
         public Box              Padding

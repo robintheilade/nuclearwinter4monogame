@@ -63,11 +63,11 @@ namespace NuclearWinter.UI
                 iTarget = miSelectionX;
             }
 
-            int iScrollStep = Size.X / 3;
+            int iScrollStep = LayoutRect.X / 3;
 
-            if( Size.X != 0 && iTarget > miScrollOffset + ( Size.X - Padding.Horizontal ) - miCaretWidth )
+            if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - miCaretWidth )
             {
-                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( Size.X - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
+                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
             }
             else
             if( iTarget < miScrollOffset )
@@ -208,7 +208,7 @@ namespace NuclearWinter.UI
         {
             mstrDisplayedText = ( mPasswordChar == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordChar );
 
-            miMaxScrollOffset = (int)Math.Max( 0, Font.MeasureString( mstrDisplayedText ).X - ( Size.X - Padding.Horizontal ) + miCaretWidth );
+            miMaxScrollOffset = (int)Math.Max( 0, Font.MeasureString( mstrDisplayedText ).X - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth );
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
@@ -218,16 +218,12 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
-
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
             mpTextPosition = new Point(
-                Position.X + Padding.Left,
-                pCenter.Y - ContentHeight / 2 + Padding.Top
+                LayoutRect.X + Padding.Left,
+                LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top
             );
         }
 
@@ -242,7 +238,7 @@ namespace NuclearWinter.UI
         {
             if( mbIsDragging )
             {
-                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ) );
                 SelectionOffset = iOffset - miCaretOffset;
             }
         }
@@ -263,12 +259,12 @@ namespace NuclearWinter.UI
             bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
             if( HasFocus && bShift )
             {
-                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ) );
                 SelectionOffset = iOffset - miCaretOffset;
             }
             else
             {
-                CaretOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                CaretOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ) );
             }
 
             Screen.Focus( this );
@@ -281,7 +277,7 @@ namespace NuclearWinter.UI
 
             if( mbIsDragging )
             {
-                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( Position.X + Padding.Left ) ) );
+                int iOffset = GetCaretOffsetAtX( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ) );
                 SelectionOffset = iOffset - miCaretOffset;
                 mbIsDragging = false;
             }
@@ -555,16 +551,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Rectangle rect = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
-
-            Screen.DrawBox( Screen.Style.EditBoxFrame, rect, Screen.Style.EditBoxCornerSize, Color.White );
+            Screen.DrawBox( Screen.Style.EditBoxFrame, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonPress, rect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonPress, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.PushScissorRectangle( new Rectangle( Position.X + Padding.Left, Position.Y + Padding.Top, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
 
             Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), Color.White );
 
@@ -575,11 +569,11 @@ namespace NuclearWinter.UI
                 Rectangle selectionRectangle;
                 if( SelectionOffset > 0 )
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, Position.Y + Padding.Top, miSelectionX - miCaretX, Size.Y - Padding.Vertical );
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miSelectionX - miCaretX, LayoutRect.Height - Padding.Vertical );
                 }
                 else
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, Position.Y + Padding.Top, miCaretX - miSelectionX, Size.Y - Padding.Vertical );
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretX - miSelectionX, LayoutRect.Height - Padding.Vertical );
                 }
 
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );
@@ -587,7 +581,7 @@ namespace NuclearWinter.UI
             else
             if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, Position.Y + Padding.Top, miCaretWidth, Size.Y - Padding.Vertical ), Color.White );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretWidth, LayoutRect.Height - Padding.Vertical ), Color.White );
             }
 
             Screen.PopScissorRectangle();

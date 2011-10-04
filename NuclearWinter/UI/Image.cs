@@ -95,10 +95,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            Point pCenter = LayoutRect.Center;
 
             HitBox = new Rectangle(
                 pCenter.X - ContentWidth / 2,
@@ -115,11 +114,11 @@ namespace NuclearWinter.UI
 
             if( ! mbStretch )
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( Position.X + Size.X / 2 - ContentWidth / 2 + Padding.Left, Position.Y + Size.Y / 2 - ContentHeight / 2 + Padding.Top ), Color );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( LayoutRect.Center.X - ContentWidth / 2 + Padding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top ), Color );
             }
             else
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Rectangle( Position.X + Padding.Left, Position.Y + Padding.Top, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ), Color );
+                Screen.Game.SpriteBatch.Draw( mTexture, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ), Color );
             }
         }
     }

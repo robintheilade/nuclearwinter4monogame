@@ -150,21 +150,20 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
             HitBox = _rect;
 
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            Point pCenter = LayoutRect.Center;
 
             if( mIcon.Texture != null )
             {
-                mIcon.DoLayout ( new Rectangle( Position.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                mIcon.DoLayout ( new Rectangle( LayoutRect.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
             }
 
             mLabel.DoLayout(
                 new Rectangle(
-                    Position.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                    LayoutRect.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
                     mLabel.ContentWidth, mLabel.ContentHeight
                 )
             );
@@ -172,8 +171,8 @@ namespace NuclearWinter.UI
             if( Closable )
             {
                 mCloseButton.DoLayout( new Rectangle(
-                    Position.X + Size.X - 10 - Screen.Style.NotebookTabClose.Width,
-                    Position.Y + Size.Y / 2 - Screen.Style.NotebookTabClose.Height / 2,
+                    LayoutRect.Right - 10 - Screen.Style.NotebookTabClose.Width,
+                    pCenter.Y - Screen.Style.NotebookTabClose.Height / 2,
                     mCloseButton.ContentWidth, mCloseButton.ContentHeight )
                 );
             }
@@ -197,9 +196,9 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
-            if( _hitPoint.Y < mNotebook.Position.Y + mNotebook.TabHeight /* && IsInTab */ )
+            if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.TabHeight /* && IsInTab */ )
             {
-                if( _hitPoint.X > Position.X && _hitPoint.X < Position.X + Size.X )
+                if( _hitPoint.X > LayoutRect.X && _hitPoint.X < LayoutRect.Right )
                 {
                     OnActivateUp();
                 }
@@ -255,24 +254,24 @@ namespace NuclearWinter.UI
         {
             bool bIsActive = Active;
 
-            Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTab : mNotebook.Style.Tab, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+            Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTab : mNotebook.Style.Tab, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
 
             if( mbIsHovered && ! bIsActive ) // && ! mbIsPressed && mPressedAnim.IsOver )
             {
                 if( Screen.IsActive )
                 {
-                    Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+                    Screen.DrawBox( Screen.Style.ButtonHover, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
                 }
             }
 
             if( IsUnread )
             {
-                    Screen.DrawBox( mNotebook.Style.UnreadTabMarker, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+                    Screen.DrawBox( mNotebook.Style.UnreadTabMarker, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
             }
 
             if( Screen.IsActive && HasFocus )
             {
-                Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTabFocus : mNotebook.Style.TabFocus, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), mNotebook.Style.TabCornerSize, Color.White );
+                Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTabFocus : mNotebook.Style.TabFocus, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
             }
 
             mLabel.Draw();
@@ -361,19 +360,12 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position    = _rect.Location;
-            Size        = new Point( _rect.Width, _rect.Height );
-
-            HitBox = new Rectangle(
-                Position.X,
-                Position.Y,
-                Size.X,
-                Size.Y
-            );
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
             NotebookTab activeTab = Tabs[ActiveTabIndex];
 
-            Rectangle contentRect = new Rectangle( Position.X, Position.Y + ( TabHeight - 10 ), Size.X, Size.Y - ( TabHeight - 10 ) );
+            Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( TabHeight - 10 ), LayoutRect.Width, LayoutRect.Height - ( TabHeight - 10 ) );
 
             mPanel.DoLayout( contentRect );
 
@@ -383,8 +375,8 @@ namespace NuclearWinter.UI
                 int iTabWidth = tab.ContentWidth;
 
                 Rectangle tabRect = new Rectangle(
-                    Position.X + 20 + iTabX,
-                    Position.Y,
+                    LayoutRect.X + 20 + iTabX,
+                    LayoutRect.Y,
                     iTabWidth,
                     TabHeight
                     );
@@ -409,9 +401,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            if( _point.Y < Position.Y + TabHeight )
+            if( _point.Y < LayoutRect.Y + TabHeight )
             {
-                if( _point.X < Position.X + 20 ) return null;
+                if( _point.X < LayoutRect.X + 20 ) return null;
 
                 int iTabX = 0;
                 int iTab = 0;
@@ -420,7 +412,7 @@ namespace NuclearWinter.UI
                 {
                     int iTabWidth = tab.ContentWidth;
 
-                    if( _point.X - Position.X - 20 < iTabX + iTabWidth )
+                    if( _point.X - LayoutRect.X - 20 < iTabX + iTabWidth )
                     {
                         return Tabs[ iTab ].HitTest( _point );
                     }

@@ -92,13 +92,12 @@ namespace NuclearWinter.UI
         //-----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
             switch( mDirection )
             {
                 case Direction.Left: {
-                    if( Size.X > FirstPaneMinSize + SecondPaneMinSize )
+                    if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Width - SecondPaneMinSize );
                     }
@@ -121,7 +120,7 @@ namespace NuclearWinter.UI
                     break;
                 }
                 case Direction.Right: {
-                    if( Size.X > FirstPaneMinSize + SecondPaneMinSize )
+                    if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Width - FirstPaneMinSize );
                     }
@@ -144,7 +143,7 @@ namespace NuclearWinter.UI
                     break;
                 }
                 case Direction.Up: {
-                    if( Size.Y > FirstPaneMinSize + SecondPaneMinSize )
+                    if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Height - SecondPaneMinSize );
                     }
@@ -167,7 +166,7 @@ namespace NuclearWinter.UI
                     break;
                 }
                 case Direction.Down: {
-                    if( Size.Y > FirstPaneMinSize + SecondPaneMinSize )
+                    if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
                     {
                         SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Height - FirstPaneMinSize );
                     }

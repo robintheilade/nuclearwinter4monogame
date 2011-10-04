@@ -22,7 +22,7 @@ namespace NuclearWinter.UI
 
             set {
                 mLabel.Text = value;
-                ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( Size.Y - 20 ) );
+                ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( LayoutRect.Height - 20 ) );
             }
         }
 
@@ -60,19 +60,18 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-            HitBox = _rect;
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
-            mLabel.DoLayout( new Rectangle( Position.X + 10, Position.Y + 10 - miScrollOffset, Size.X - 20, Size.Y - 20 ) );
+            mLabel.DoLayout( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 - miScrollOffset, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
 
-            ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( Size.Y - 20 ) );
+            ScrollMax = Math.Max( 0, mLabel.ContentHeight - mLabel.Padding.Vertical - ( LayoutRect.Height - 20 ) );
             miScrollOffset = (int)MathHelper.Min( miScrollOffset, ScrollMax );
 
             if( ScrollMax > 0 )
             {
-                miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)mLabel.ContentHeight / ( Size.Y - 20 ) ) );
-                miScrollbarOffset = (int)( (float)miScrollOffset / ScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)mLabel.ContentHeight / ( LayoutRect.Height - 20 ) ) );
+                miScrollbarOffset = (int)( (float)miScrollOffset / ScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
             }
         }
 
@@ -85,15 +84,15 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
-            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 - miScrollOffset, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
             mLabel.Draw();
             Screen.PopScissorRectangle();
 
             if( ScrollMax > 0 )
             {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
             }
         }
 

@@ -166,10 +166,10 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position        = _rect.Location;
-            Size            = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
-            Debug.Assert( Size.X != 0 && Size.Y != 0 );
+            Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );
 
             int iUnexpandedSize = 0;
             int iExpandedChildrenCount = 0;
@@ -188,7 +188,7 @@ namespace NuclearWinter.UI
             int iExpandedWidgetSize = 0;
             if( iExpandedChildrenCount > 0 )
             {
-                iExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? Size.X : Size.Y ) - iUnexpandedSize ) / iExpandedChildrenCount;
+                iExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - iUnexpandedSize ) / iExpandedChildrenCount;
             }
 
             if( mlChildren.Count > 1 )
@@ -196,7 +196,7 @@ namespace NuclearWinter.UI
                 iUnexpandedSize += ( mlChildren.Count - 1 ) * miSpacing;
             }
 
-            int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? Size.X : Size.Y ) : iUnexpandedSize;
+            int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) : iUnexpandedSize;
 
             Point pWidgetPosition;
             
@@ -206,13 +206,13 @@ namespace NuclearWinter.UI
                     switch( mContentAnchor )
                     {
                         case Anchor.Start:
-                            pWidgetPosition = new Point( Position.X, Position.Y );
+                            pWidgetPosition = LayoutRect.Location;
                             break;
                         case Anchor.Center:
-                            pWidgetPosition = new Point( Position.X + Size.X / 2 - iActualSize / 2, Position.Y );
+                            pWidgetPosition = new Point( LayoutRect.Center.X - iActualSize / 2, LayoutRect.Y );
                             break;
                         case Anchor.End:
-                            pWidgetPosition = new Point( Position.X + Size.X - iActualSize, Position.Y );
+                            pWidgetPosition = new Point( LayoutRect.Right - iActualSize, LayoutRect.Y );
                             break;
                         default:
                             throw new NotSupportedException();
@@ -222,13 +222,13 @@ namespace NuclearWinter.UI
                     switch( mContentAnchor )
                     {
                         case Anchor.Start:
-                            pWidgetPosition = new Point( Position.X, Position.Y );
+                            pWidgetPosition = LayoutRect.Location;
                             break;
                         case Anchor.Center:
-                            pWidgetPosition = new Point( Position.X, Position.Y + Size.Y / 2 - iActualSize / 2 );
+                            pWidgetPosition = new Point( LayoutRect.X, LayoutRect.Center.Y - iActualSize / 2 );
                             break;
                         case Anchor.End:
-                            pWidgetPosition = new Point( Position.X, Position.Y + Size.Y - iActualSize );
+                            pWidgetPosition = new Point( LayoutRect.X, LayoutRect.Bottom - iActualSize );
                             break;
                         default:
                             throw new NotSupportedException();
@@ -247,7 +247,7 @@ namespace NuclearWinter.UI
                 {
                     iWidgetSize = iExpandedWidgetSize;
                 }
-                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : Size.X, mOrientation == Orientation.Horizontal ? Size.Y : iWidgetSize ) );
+                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : LayoutRect.Width, mOrientation == Orientation.Horizontal ? LayoutRect.Height : iWidgetSize ) );
                 
                 switch( mOrientation )
                 {
@@ -259,8 +259,6 @@ namespace NuclearWinter.UI
                         break;
                 }
             }
-
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
         }
     }
 }

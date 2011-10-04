@@ -53,28 +53,29 @@ namespace NuclearWinter.UI
             }
 
             base.Update( _fElapsedTime );
-        }
+        }
+
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
             if( EnableScrolling )
             {
                 int iHeight = ContentHeight;
-                miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
+                miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
                 ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
 
                 if( miScrollMax > 0 )
                 {
-                    miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
-                    miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                    miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
+                    miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
                 }
             }
 
             base.DoLayout( new Rectangle( _rect.X + Padding.Left, _rect.Y + Padding.Right - (int)mfLerpScrollOffset, _rect.Width - Padding.Horizontal, _rect.Height - Padding.Vertical ) );
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+
+            HitBox = LayoutRect;
         }
 
         public override Widget HitTest( Point _point )
@@ -97,11 +98,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Texture, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), CornerSize, Color.White );
+            Screen.DrawBox( Texture, LayoutRect, CornerSize, Color.White );
 
             if( DoClipping )
             {
-                Screen.PushScissorRectangle( new Rectangle( Position.X + Padding.Left, Position.Y + Padding.Top, Size.X - Padding.Horizontal, Size.Y - Padding.Vertical ) );
+                Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
             }
 
             base.Draw();
@@ -113,7 +114,7 @@ namespace NuclearWinter.UI
 
             if( EnableScrolling && miScrollMax > 0 )
             {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
             }
         }
     }

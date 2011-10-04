@@ -186,15 +186,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-            HitBox = _rect;
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
-            int iX = Position.X;
-            int iY = Position.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
+            int iX = LayoutRect.X;
+            int iY = LayoutRect.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
             foreach( TreeViewNode child in Children )
             {
-                child.DoLayout( new Rectangle( iX + mTreeView.NodeBranchWidth, iY, Size.X - mTreeView.NodeBranchWidth, child.ContentHeight ) );
+                child.DoLayout( new Rectangle( iX + mTreeView.NodeBranchWidth, iY, LayoutRect.Width - mTreeView.NodeBranchWidth, child.ContentHeight ) );
                 iY += child.ContentHeight;
             }
 
@@ -212,16 +211,16 @@ namespace NuclearWinter.UI
             {
                 if( ! mbIsLast )
                 {
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranch, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewLine, new Rectangle( Position.X - mTreeView.NodeBranchWidth, Position.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing, Screen.Style.TreeViewBranch.Width, ContentHeight - (mTreeView.NodeHeight + mTreeView.NodeSpacing) ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranch, new Vector2( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewLine, new Rectangle( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing, Screen.Style.TreeViewBranch.Width, ContentHeight - (mTreeView.NodeHeight + mTreeView.NodeSpacing) ), Color.White );
                 }
                 else
                 {
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranchLast, new Vector2( Position.X - mTreeView.NodeBranchWidth, Position.Y ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranchLast, new Vector2( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y ), Color.White );
                 }
             }
 
-            Rectangle nodeRect = new Rectangle( Position.X, Position.Y, Size.X, mTreeView.NodeHeight );
+            Rectangle nodeRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Width, mTreeView.NodeHeight );
 
             Texture2D frameTex;
 
@@ -248,11 +247,11 @@ namespace NuclearWinter.UI
                     tex = Screen.Style.TreeViewBranchClosed;
                 }
 
-                Screen.Game.SpriteBatch.Draw( tex, new Vector2( Position.X, Position.Y ), Color.White );
+                Screen.Game.SpriteBatch.Draw( tex, new Vector2( LayoutRect.X, LayoutRect.Y ), Color.White );
 
             }
 
-            DrawNode( Position );
+            DrawNode( LayoutRect.Location );
 
             if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
             {
@@ -292,17 +291,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal void DrawNode( Point _position )
         {
-            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, Size.X, mTreeView.NodeHeight );
+            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, LayoutRect.Width, mTreeView.NodeHeight );
 
             int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
             if( mImage.Texture != null )
             {
-                mImage.DoLayout( new Rectangle( Position.X + iLabelX, Position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
+                mImage.DoLayout( new Rectangle( LayoutRect.X + iLabelX, LayoutRect.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
                 mImage.Draw();
                 iLabelX += mImage.ContentWidth;
             }
 
-            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, Size.X - iLabelX, mTreeView.NodeHeight ) );
+            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX, mTreeView.NodeHeight ) );
             mLabel.Draw();
         }
     }
@@ -401,16 +400,15 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-            HitBox = _rect;
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
 
-            int iX = Position.X + 10;
-            int iY = Position.Y + 10;
+            int iX = LayoutRect.X + 10;
+            int iY = LayoutRect.Y + 10;
             int iHeight = 0;
             foreach( TreeViewNode node in Nodes )
             {
-                node.DoLayout( new Rectangle( iX, iY + iHeight - (int)mfLerpScrollOffset, Size.X - 20, node.ContentHeight ) );
+                node.DoLayout( new Rectangle( iX, iY + iHeight - (int)mfLerpScrollOffset, LayoutRect.Width - 20, node.ContentHeight ) );
                 iHeight += node.ContentHeight;
             }
 
@@ -420,8 +418,8 @@ namespace NuclearWinter.UI
                 foreach( Button button in ActionButtons.Reverse<Button>() )
                 {
                     button.DoLayout( new Rectangle(
-                        Position.X + Size.X - 20 - iButtonX - button.ContentWidth,
-                        HoveredNode.Position.Y + NodeHeight / 2 - button.ContentHeight / 2,
+                        LayoutRect.Right - 20 - iButtonX - button.ContentWidth,
+                        HoveredNode.LayoutRect.Y + NodeHeight / 2 - button.ContentHeight / 2,
                         button.ContentWidth, button.ContentHeight )
                     );
 
@@ -429,12 +427,12 @@ namespace NuclearWinter.UI
                 }
             }
 
-            miScrollMax = Math.Max( 0, iHeight - ( Size.Y - 20 ) + 5 );
+            miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
             ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
             if( miScrollMax > 0 )
             {
-                miScrollbarHeight = (int)( ( Size.Y - 20 ) / ( (float)iHeight / ( Size.Y - 20 ) ) );
-                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( Size.Y - 20 - miScrollbarHeight ) );
+                miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
+                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
             }
         }
 
@@ -473,7 +471,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( Position.Y + 10 ) + (int)mfLerpScrollOffset ) / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)mfLerpScrollOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
@@ -667,7 +665,7 @@ namespace NuclearWinter.UI
         {
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
-                if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.Position.X + NodeBranchWidth )
+                if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
                 {
                     if( _bDoCollapse )
                     {
@@ -719,12 +717,12 @@ namespace NuclearWinter.UI
                 {
                     mfScrollRepeatTimer = 0f;
 
-                    if( mMouseDragPoint.Y > Position.Y + Size.Y - 20 )
+                    if( mMouseDragPoint.Y > LayoutRect.Bottom - 20 )
                     {
                         DoScroll( NodeHeight + NodeSpacing );
                     }
                     else
-                    if( mMouseDragPoint.Y < Position.Y + 20 )
+                    if( mMouseDragPoint.Y < LayoutRect.Y + 20 )
                     {
                         DoScroll( -( NodeHeight + NodeSpacing ) );
                     }
@@ -751,9 +749,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
-            Screen.PushScissorRectangle( new Rectangle( Position.X + 10, Position.Y + 10, Size.X - 20, Size.Y - 20 ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
             foreach( TreeViewNode node in Nodes )
             {
                 node.Draw();
@@ -771,7 +769,7 @@ namespace NuclearWinter.UI
 
             if( miScrollMax > 0 )
             {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( Position.X + Size.X - 5 - Screen.Style.VerticalScrollbar.Width / 2, Position.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
             }
         }
 
@@ -783,8 +781,8 @@ namespace NuclearWinter.UI
                 Debug.Assert( FocusedNode != null );
 
                 FocusedNode.DrawNode( new Point(
-                    FocusedNode.Position.X + mMouseDragPoint.X - mMouseDownPoint.X,
-                    FocusedNode.Position.Y + mMouseDragPoint.Y - mMouseDownPoint.Y  ) );
+                    FocusedNode.LayoutRect.X + mMouseDragPoint.X - mMouseDownPoint.X,
+                    FocusedNode.LayoutRect.Y + mMouseDragPoint.Y - mMouseDownPoint.Y  ) );
             }
         }
     }

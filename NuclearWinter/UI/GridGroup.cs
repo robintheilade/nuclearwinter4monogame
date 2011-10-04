@@ -192,10 +192,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position        = _rect.Location;
-            Size            = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
-            Debug.Assert( Size.X != 0 && Size.Y != 0 );
+            Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );
 
             if( ! mbExpand )
             {
@@ -203,22 +202,22 @@ namespace NuclearWinter.UI
                 int iRowCount       = maTiles.GetLength(1);
 
                 Point widgetSize = new Point(
-                    Size.X / iColumnCount,
-                    Size.Y / iRowCount );
+                    LayoutRect.Width / iColumnCount,
+                    LayoutRect.Height / iRowCount );
 
                 for( int iRow = 0; iRow < iRowCount; iRow++ )
                 {
                     for( int iColumn = 0; iColumn < iColumnCount; iColumn++ )
                     {
                         Point widgetPosition = new Point(
-                            Position.X + widgetSize.X * iColumn,
-                            Position.Y + widgetSize.Y * iRow );
+                            LayoutRect.X + widgetSize.X * iColumn,
+                            LayoutRect.Y + widgetSize.Y * iRow );
 
                         maTiles[ iColumn, iRow ].DoLayout( new Rectangle( widgetPosition.X, widgetPosition.Y, widgetSize.X, widgetSize.Y ) );
                     }
                 }
 
-                HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+                HitBox = LayoutRect;
             }
         }
     }

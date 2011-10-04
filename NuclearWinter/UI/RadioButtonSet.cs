@@ -261,21 +261,20 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
 
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            Point pCenter = LayoutRect.Center;
 
-            int iHeight = Size.Y;
+            int iHeight = LayoutRect.Height;
 
             HitBox = new Rectangle(
-                pCenter.X - ( Expand ? Size.X : ContentWidth ) / 2,
+                pCenter.X - ( Expand ? LayoutRect.Width : ContentWidth ) / 2,
                 pCenter.Y - iHeight / 2,
-                Expand ? Size.X : ContentWidth,
+                Expand ? LayoutRect.Width : ContentWidth,
                 iHeight
             );
 
-            int iExpandedButtonWidth = Size.X / mlButtons.Count;
+            int iExpandedButtonWidth = LayoutRect.Width / mlButtons.Count;
 
             int iButton = 0;
             int iButtonX = 0;

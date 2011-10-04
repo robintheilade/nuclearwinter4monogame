@@ -116,11 +116,11 @@ namespace NuclearWinter.UI
         {
             if( mbWrapText )
             {
-                if( Size.X > 0 )
+                if( LayoutRect.Width > 0 )
                 {
                     // Wrap text
-                    mlstrWrappedText = Screen.Game.WrapText( Font, Text, Size.X - Padding.Horizontal );
-                    ContentWidth = Size.X;
+                    mlstrWrappedText = Screen.Game.WrapText( Font, Text, LayoutRect.Width - Padding.Horizontal );
+                    ContentWidth = LayoutRect.Width;
                     ContentHeight = (int)( Font.LineSpacing * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
                 }
                 else
@@ -138,7 +138,7 @@ namespace NuclearWinter.UI
 
                 int iWidth = ContentWidth;
                 int iOffset = Text.Length;
-                while( iWidth > Size.X )
+                while( iWidth > LayoutRect.Width )
                 {
                     iOffset--;
                     mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
@@ -152,19 +152,18 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
+            LayoutRect = _rect;
             DoWrapText();
 
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            Point pCenter = LayoutRect.Center;
 
-            int iTop = WrapText ? ( Position.Y + Padding.Top ) : ( pCenter.Y - ContentHeight / 2 + Padding.Top );
+            int iTop = WrapText ? ( LayoutRect.Y + Padding.Top ) : ( pCenter.Y - ContentHeight / 2 + Padding.Top );
 
             switch( Anchor )
             {
                 case UI.Anchor.Start:
                     mpTextPosition = new Point(
-                        Position.X + Padding.Left,
+                        LayoutRect.X + Padding.Left,
                         iTop
                     );
                     break;
@@ -176,7 +175,7 @@ namespace NuclearWinter.UI
                     break;
                 case UI.Anchor.End:
                     mpTextPosition = new Point(
-                        Position.X + Size.X - Padding.Right     - ContentWidth,
+                        LayoutRect.Right - Padding.Right     - ContentWidth,
                         iTop
                     );
                     break;

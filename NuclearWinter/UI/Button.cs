@@ -189,23 +189,21 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-
-            HitBox = _rect;
-            Point pCenter = new Point( Position.X + Size.X / 2, Position.Y + Size.Y / 2 );
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
+            Point pCenter = LayoutRect.Center;
 
             switch( mAnchor )
             {
                 case UI.Anchor.Start:
                     if( mIcon.Texture != null )
                     {
-                        mIcon.DoLayout( new Rectangle( Position.X + Padding.Left + Margin.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
+                        mIcon.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
 
                     mLabel.DoLayout(
                         new Rectangle(
-                            Position.X + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            LayoutRect.X + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
                             mLabel.ContentWidth, mLabel.ContentHeight
                         )
                     );
@@ -331,10 +329,10 @@ namespace NuclearWinter.UI
 
             if( frame != null )
             {
-                Screen.DrawBox( frame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), Style.CornerSize, Color.White );
+                Screen.DrawBox( frame, LayoutRect, Style.CornerSize, Color.White );
             }
 
-            Rectangle marginRect = new Rectangle( Position.X + Margin.Left, Position.Y + Margin.Top, Size.X - Margin.Left - Margin.Right, Size.Y - Margin.Top - Margin.Bottom );
+            Rectangle marginRect = new Rectangle( LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Left - Margin.Right, LayoutRect.Height - Margin.Top - Margin.Bottom );
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {

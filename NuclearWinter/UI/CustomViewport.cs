@@ -34,15 +34,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-
-            HitBox = new Rectangle( Position.X, Position.Y, Size.X, Size.Y );
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
         }
 
         Point TransformPoint( Point _point )
         {
-            return new Point( _point.X - Position.X, _point.Y - Position.Y );
+            return new Point( _point.X - LayoutRect.X, _point.Y - LayoutRect.Y );
         }
 
         internal override void OnMouseEnter( Point _hitPoint )                  { if( EventHandler != null ) EventHandler.OnMouseEnter( TransformPoint( _hitPoint ) );  }
@@ -70,7 +68,7 @@ namespace NuclearWinter.UI
                 Screen.SuspendBatch();
 
                 Viewport previousViewport = Screen.Game.GraphicsDevice.Viewport;
-                Viewport viewport = new Viewport( Position.X, Position.Y, Size.X, Size.Y );
+                Viewport viewport = new Viewport( LayoutRect );
                 Screen.Game.GraphicsDevice.Viewport = viewport;
                 DrawHandler();
 

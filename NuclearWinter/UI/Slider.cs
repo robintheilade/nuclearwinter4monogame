@@ -56,9 +56,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            Position = _rect.Location;
-            Size = new Point( _rect.Width, _rect.Height );
-            HitBox = _rect;
+            LayoutRect = _rect;
+            HitBox = LayoutRect;
         }
 
         //----------------------------------------------------------------------
@@ -80,8 +79,8 @@ namespace NuclearWinter.UI
             Screen.Focus( this );
             mbIsPressed = true;
 
-            int handleSize = Size.Y;
-            Value = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - Position.X - handleSize / 4 ) / ( Size.X - handleSize ) );
+            int handleSize = LayoutRect.Height;
+            Value = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - LayoutRect.X - handleSize / 4 ) / ( LayoutRect.Width - handleSize ) );
             if( ChangeHandler != null ) ChangeHandler();
         }
 
@@ -89,9 +88,9 @@ namespace NuclearWinter.UI
         {
             if( mbIsPressed )
             {
-                int handleSize = Size.Y;
+                int handleSize = LayoutRect.Height;
 
-                int iValue = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - Position.X - handleSize / 4 ) / ( Size.X - handleSize ) );
+                int iValue = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - LayoutRect.X - handleSize / 4 ) / ( LayoutRect.Width - handleSize ) );
 
                 if( iValue != miValue ) 
                 {
@@ -131,20 +130,20 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( Position.X, Position.Y, Size.X, Size.Y ), 30, Color.White );
+            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
-            int handleSize = Size.Y;
-            int handleX = Position.X + (int)( ( Size.X - handleSize ) * (float)( Value - MinValue ) / MaxValue );
+            int handleSize = LayoutRect.Height;
+            int handleX = LayoutRect.X + (int)( ( LayoutRect.Width - handleSize ) * (float)( Value - MinValue ) / MaxValue );
 
-            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, Position.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
             }
         }
     }
