@@ -57,8 +57,16 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int FirstPaneMinSize = 100;
-        public int SecondPaneMinSize = 100;
+        public int      FirstPaneMinSize = 100;
+        public int      SecondPaneMinSize = 100;
+
+        public bool     InvertDrawOrder;
+
+        public bool     Collapsable;
+        bool            mbCollapsed;
+        Animation.AnimatedValue mCollapseAnim;
+        bool            mbDisplayFirstPane;
+        bool            mbDisplaySecondPane;
 
         Direction       mDirection;
         public int      SplitterOffset;
@@ -74,10 +82,23 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             mDirection = _direction;
+
+            mCollapseAnim = new Animation.SmoothValue( 0f, 1f, 0.2f );
         }
 
         internal override void Update( float _fElapsedTime )
         {
+            if( mbCollapsed )
+            {
+                mCollapseAnim.Direction = Animation.AnimationDirection.Forward;
+                mCollapseAnim.Update( _fElapsedTime );
+            }
+            else
+            {
+                mCollapseAnim.Direction = Animation.AnimationDirection.Backward;
+                mCollapseAnim.Update( _fElapsedTime );
+            }
+
             if( mFirstPane != null )
             {
                 mFirstPane.Update( _fElapsedTime );
@@ -94,99 +115,156 @@ namespace NuclearWinter.UI
         {
             LayoutRect = _rect;
 
-            switch( mDirection )
+            bool bHidePane = mbCollapsed || mCollapseAnim.CurrentValue != 0f;
+
+            mbDisplayFirstPane = ( ! bHidePane || ( mDirection != Direction.Left && mDirection != Direction.Up ) );
+            mbDisplaySecondPane = ( ! bHidePane || ( mDirection != Direction.Right && mDirection != Direction.Down ) );
+
+            if( bHidePane )
             {
-                case Direction.Left: {
-                    if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
-                    {
-                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Width - SecondPaneMinSize );
-                    }
+                int iCollapseOffset = (int)( ( 1f - mCollapseAnim.CurrentValue ) * SplitterOffset );
 
-                    HitBox = new Rectangle(
-                        _rect.Left + SplitterOffset - SplitterSize / 2,
-                        _rect.Top,
-                        SplitterSize,
-                        _rect.Height );
+                switch( mDirection )
+                {
+                    case Direction.Left: {
+                        mSecondPane.DoLayout( new Rectangle( LayoutRect.Left + iCollapseOffset, LayoutRect.Top, LayoutRect.Width - iCollapseOffset, LayoutRect.Height ) );
 
-                    if( mFirstPane != null )
-                    {
-                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, SplitterOffset, _rect.Height ) );
+                        HitBox = new Rectangle(
+                            LayoutRect.Left - SplitterSize / 2,
+                            LayoutRect.Top,
+                            SplitterSize,
+                            LayoutRect.Height );
+                        break;
                     }
+                    case Direction.Up: {
+                        mSecondPane.DoLayout( LayoutRect );
 
-                    if( mSecondPane != null )
-                    {
-                        mSecondPane.DoLayout( new Rectangle( _rect.Left + SplitterOffset, _rect.Top, _rect.Width - SplitterOffset, _rect.Height ) );
+                        HitBox = new Rectangle(
+                            LayoutRect.Top,
+                            LayoutRect.Top - SplitterSize / 2,
+                            LayoutRect.Width,
+                            SplitterSize
+                            );
+                        break;
                     }
-                    break;
+                    case Direction.Right: {
+                        mFirstPane.DoLayout( LayoutRect );
+
+                        HitBox = new Rectangle(
+                            LayoutRect.Right - SplitterSize / 2,
+                            LayoutRect.Top,
+                            SplitterSize,
+                            LayoutRect.Height );
+                        break;
+                    }
+                    case Direction.Down: {
+                        mFirstPane.DoLayout( LayoutRect );
+
+                        HitBox = new Rectangle(
+                            LayoutRect.Left,
+                            LayoutRect.Bottom - SplitterSize / 2,
+                            SplitterSize,
+                            LayoutRect.Height );
+                        break;
+                    }
                 }
-                case Direction.Right: {
-                    if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
-                    {
-                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Width - FirstPaneMinSize );
-                    }
+            }
+            else
+            {
+                switch( mDirection )
+                {
+                    case Direction.Left: {
+                        if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
+                        {
+                            SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, LayoutRect.Width - SecondPaneMinSize );
+                        }
 
-                    HitBox = new Rectangle(
-                        _rect.Right - SplitterOffset - SplitterSize / 2,
-                        _rect.Top,
-                        SplitterSize,
-                        _rect.Height );
+                        HitBox = new Rectangle(
+                            LayoutRect.Left + SplitterOffset - SplitterSize / 2,
+                            LayoutRect.Top,
+                            SplitterSize,
+                            LayoutRect.Height );
 
-                    if( mFirstPane != null )
-                    {
-                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, _rect.Width - SplitterOffset, _rect.Height ) );
-                    }
+                        if( mFirstPane != null )
+                        {
+                            mFirstPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Top, SplitterOffset, LayoutRect.Height ) );
+                        }
 
-                    if( mSecondPane != null )
-                    {
-                        mSecondPane.DoLayout( new Rectangle( _rect.Right - SplitterOffset, _rect.Top, SplitterOffset, _rect.Height ) );
+                        if( mSecondPane != null )
+                        {
+                            mSecondPane.DoLayout( new Rectangle( LayoutRect.Left + SplitterOffset, LayoutRect.Top, LayoutRect.Width - SplitterOffset, LayoutRect.Height ) );
+                        }
+                        break;
                     }
-                    break;
-                }
-                case Direction.Up: {
-                    if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
-                    {
-                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, _rect.Height - SecondPaneMinSize );
-                    }
+                    case Direction.Right: {
+                        if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
+                        {
+                            SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, LayoutRect.Width - FirstPaneMinSize );
+                        }
 
-                    HitBox = new Rectangle(
-                        _rect.Left,
-                        _rect.Top + SplitterOffset - SplitterSize / 2,
-                        _rect.Width,
-                        SplitterSize );
+                        HitBox = new Rectangle(
+                            LayoutRect.Right - SplitterOffset - SplitterSize / 2,
+                            LayoutRect.Top,
+                            SplitterSize,
+                            LayoutRect.Height );
 
-                    if( mFirstPane != null )
-                    {
-                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, _rect.Width, SplitterOffset ) );
-                    }
+                        if( mFirstPane != null )
+                        {
+                            mFirstPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Top, LayoutRect.Width - SplitterOffset, LayoutRect.Height ) );
+                        }
 
-                    if( mSecondPane != null )
-                    {
-                        mSecondPane.DoLayout( new Rectangle( _rect.Left, _rect.Top + SplitterOffset, _rect.Width, _rect.Height - SplitterOffset ) );
+                        if( mSecondPane != null )
+                        {
+                            mSecondPane.DoLayout( new Rectangle( LayoutRect.Right - SplitterOffset, LayoutRect.Top, SplitterOffset, LayoutRect.Height ) );
+                        }
+                        break;
                     }
-                    break;
-                }
-                case Direction.Down: {
-                    if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
-                    {
-                        SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, _rect.Height - FirstPaneMinSize );
-                    }
+                    case Direction.Up: {
+                        if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
+                        {
+                            SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, LayoutRect.Height - SecondPaneMinSize );
+                        }
 
-                    HitBox = new Rectangle(
-                        _rect.Left,
-                        _rect.Bottom - SplitterOffset - SplitterSize / 2,
-                        _rect.Width,
-                        SplitterSize );
+                        HitBox = new Rectangle(
+                            LayoutRect.Left,
+                            LayoutRect.Top + SplitterOffset - SplitterSize / 2,
+                            LayoutRect.Width,
+                            SplitterSize );
 
-                    if( mFirstPane != null )
-                    {
-                        mFirstPane.DoLayout( new Rectangle( _rect.Left, _rect.Top, _rect.Width, _rect.Height - SplitterOffset ) );
-                    }
+                        if( mFirstPane != null )
+                        {
+                            mFirstPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Top, LayoutRect.Width, SplitterOffset ) );
+                        }
 
-                    if( mSecondPane != null )
-                    {
-                        mSecondPane.DoLayout( new Rectangle( _rect.Left, _rect.Bottom - SplitterOffset, _rect.Width, SplitterOffset ) );
+                        if( mSecondPane != null )
+                        {
+                            mSecondPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Top + SplitterOffset, LayoutRect.Width, LayoutRect.Height - SplitterOffset ) );
+                        }
+                        break;
                     }
-                    break;
+                    case Direction.Down: {
+                        if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
+                        {
+                            SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, LayoutRect.Height - FirstPaneMinSize );
+                        }
+
+                        HitBox = new Rectangle(
+                            LayoutRect.Left,
+                            LayoutRect.Bottom - SplitterOffset - SplitterSize / 2,
+                            LayoutRect.Width,
+                            SplitterSize );
+
+                        if( mFirstPane != null )
+                        {
+                            mFirstPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Top, LayoutRect.Width, LayoutRect.Height - SplitterOffset ) );
+                        }
+
+                        if( mSecondPane != null )
+                        {
+                            mSecondPane.DoLayout( new Rectangle( LayoutRect.Left, LayoutRect.Bottom - SplitterOffset, LayoutRect.Width, SplitterOffset ) );
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -200,7 +278,7 @@ namespace NuclearWinter.UI
             }
 
             // The panes
-            if( mFirstPane != null )
+            if( mFirstPane != null && mbDisplayFirstPane )
             {
                 Widget widget = mFirstPane.HitTest( _point );
                 if( widget != null )
@@ -209,7 +287,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( mSecondPane != null )
+            if( mSecondPane != null && mbDisplaySecondPane )
             {
                 Widget widget = mSecondPane.HitTest( _point );
                 if( widget != null )
@@ -227,11 +305,11 @@ namespace NuclearWinter.UI
             {
                 case Direction.Left:
                 case Direction.Right:
-                    Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.SizeWE;
+                    Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeWE;
                     break;
                 case Direction.Up:
                 case Direction.Down:
-                    Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.SizeNS;
+                    Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeNS;
                     break;
             }
         }
@@ -265,22 +343,29 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            mbIsDragging = true;
-
-            switch( mDirection )
+            if( Collapsable )
             {
-                case Direction.Left:
-                    miDragOffset = SplitterOffset - _hitPoint.X;
-                    break;
-                case Direction.Right:
-                    miDragOffset = SplitterOffset + _hitPoint.X;
-                    break;
-                case Direction.Up:
-                    miDragOffset = SplitterOffset - _hitPoint.Y;
-                    break;
-                case Direction.Down:
-                    miDragOffset = SplitterOffset + _hitPoint.Y;
-                    break;
+                mbCollapsed = ! mbCollapsed;
+            }
+            else
+            {
+                mbIsDragging = true;
+
+                switch( mDirection )
+                {
+                    case Direction.Left:
+                        miDragOffset = SplitterOffset - _hitPoint.X;
+                        break;
+                    case Direction.Right:
+                        miDragOffset = SplitterOffset + _hitPoint.X;
+                        break;
+                    case Direction.Up:
+                        miDragOffset = SplitterOffset - _hitPoint.Y;
+                        break;
+                    case Direction.Down:
+                        miDragOffset = SplitterOffset + _hitPoint.Y;
+                        break;
+                }
             }
         }
 
@@ -292,14 +377,29 @@ namespace NuclearWinter.UI
         //-----------------------------------------------------------------------
         internal override void Draw()
         {
-            if( mFirstPane != null )
+            if( ! InvertDrawOrder )
             {
-                mFirstPane.Draw();
-            }
+                if( mFirstPane != null && mbDisplayFirstPane )
+                {
+                    mFirstPane.Draw();
+                }
 
-            if( mSecondPane != null )
+                if( mSecondPane != null && mbDisplaySecondPane )
+                {
+                    mSecondPane.Draw();
+                }
+            }
+            else
             {
-                mSecondPane.Draw();
+                if( mSecondPane != null && mbDisplaySecondPane )
+                {
+                    mSecondPane.Draw();
+                }
+
+                if( mFirstPane != null && mbDisplayFirstPane )
+                {
+                    mFirstPane.Draw();
+                }
             }
         }
     }
