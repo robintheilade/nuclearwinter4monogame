@@ -265,7 +265,7 @@ namespace NuclearWinter.UI
         internal override void DoLayout( Rectangle _rect )
         {
             LayoutRect = _rect;
-            HitBox = LayoutRect;
+            HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
         
             int iColX = 0;
             int iColIndex = 0;
