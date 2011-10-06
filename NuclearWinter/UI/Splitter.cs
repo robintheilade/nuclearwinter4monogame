@@ -348,7 +348,6 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-
             if( Collapsable )
             {
                 mbIsDragging = true;
@@ -373,6 +372,8 @@ namespace NuclearWinter.UI
                         break;
                 }
             }
+
+            Screen.Focus( this );
         }
 
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
