@@ -33,6 +33,17 @@ namespace NuclearWinter.UI
         int                     miScrollbarOffset;
         float                   mfLerpScrollOffset;
 
+        protected Box           mMargin;
+        public Box              Margin
+        {
+            get { return mMargin; }
+
+            set {
+                mMargin = value;
+                UpdateContentSize();
+            }
+        }
+
         //----------------------------------------------------------------------
         public Panel( Screen _screen, Texture2D _texture, int _iCornerSize )
         : base( _screen )
@@ -73,7 +84,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            base.DoLayout( new Rectangle( _rect.X + Padding.Left, _rect.Y + Padding.Right - (int)mfLerpScrollOffset, _rect.Width - Padding.Horizontal, _rect.Height - Padding.Vertical ) );
+            base.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)mfLerpScrollOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical ) );
 
             HitBox = LayoutRect;
         }
@@ -98,11 +109,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Texture, LayoutRect, CornerSize, Color.White );
+            Screen.DrawBox( Texture, new Rectangle( LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical ), CornerSize, Color.White );
 
             if( DoClipping )
             {
-                Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
+                Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical ) );
             }
 
             base.Draw();
