@@ -94,5 +94,11 @@ namespace NuclearWinter.UI
 
         public Texture2D        VerticalScrollbar;
         public int              VerticalScrollbarCornerSize = 10;
+
+        public int              SplitterSize                = 10;
+        public int              SplitterFrameCornerSize     = 5;
+        public Texture2D        SplitterFrame;
+        public Texture2D        SplitterDragHandle;
+        public Texture2D        SplitterCollapseArrow;
     }
 }

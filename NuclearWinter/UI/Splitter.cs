@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
@@ -70,10 +71,11 @@ namespace NuclearWinter.UI
 
         Direction       mDirection;
         public int      SplitterOffset;
-        const int       SplitterSize    = 10;
+        int             SplitterSize { get { return Screen.Style.SplitterSize; } }
 
         bool            mbIsDragging;
         int             miDragOffset;
+        bool            mbIsHovered;
 
         //-----------------------------------------------------------------------
         // NOTE: Splitter is using a Direction instead of an Orientation so
@@ -130,7 +132,7 @@ namespace NuclearWinter.UI
                         mSecondPane.DoLayout( new Rectangle( LayoutRect.Left + iCollapseOffset, LayoutRect.Top, LayoutRect.Width - iCollapseOffset, LayoutRect.Height ) );
 
                         HitBox = new Rectangle(
-                            LayoutRect.Left - SplitterSize / 2,
+                            LayoutRect.Left + iCollapseOffset - SplitterSize / 2,
                             LayoutRect.Top,
                             SplitterSize,
                             LayoutRect.Height );
@@ -141,7 +143,7 @@ namespace NuclearWinter.UI
 
                         HitBox = new Rectangle(
                             LayoutRect.Top,
-                            LayoutRect.Top - SplitterSize / 2,
+                            LayoutRect.Top + iCollapseOffset - SplitterSize / 2,
                             LayoutRect.Width,
                             SplitterSize
                             );
@@ -151,7 +153,7 @@ namespace NuclearWinter.UI
                         mFirstPane.DoLayout( LayoutRect );
 
                         HitBox = new Rectangle(
-                            LayoutRect.Right - SplitterSize / 2,
+                            LayoutRect.Right + iCollapseOffset - SplitterSize / 2,
                             LayoutRect.Top,
                             SplitterSize,
                             LayoutRect.Height );
@@ -162,7 +164,7 @@ namespace NuclearWinter.UI
 
                         HitBox = new Rectangle(
                             LayoutRect.Left,
-                            LayoutRect.Bottom - SplitterSize / 2,
+                            LayoutRect.Bottom + iCollapseOffset - SplitterSize / 2,
                             SplitterSize,
                             LayoutRect.Height );
                         break;
@@ -301,6 +303,8 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseEnter( Point _hitPoint )
         {
+            mbIsHovered = true;
+
             switch( mDirection )
             {
                 case Direction.Left:
@@ -316,12 +320,13 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseOut( Point _hitPoint )
         {
+            mbIsHovered = false;
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
         }
 
         internal override void OnMouseMove( Point _hitPoint )
         {
-            if( mbIsDragging )
+            if( ! Collapsable && mbIsDragging )
             {
                 switch( mDirection )
                 {
@@ -343,9 +348,10 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
+
             if( Collapsable )
             {
-                mbCollapsed = ! mbCollapsed;
+                mbIsDragging = true;
             }
             else
             {
@@ -371,12 +377,46 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
+            if( Collapsable )
+            {
+                mbCollapsed = ! mbCollapsed;
+            }
+
             mbIsDragging = false;
         }
 
         //-----------------------------------------------------------------------
         internal override void Draw()
         {
+            if( mbIsHovered )
+            {
+                Color handleColor = Color.White * ( mbIsDragging ? 1f : 0.8f );
+
+                Screen.DrawBox( Screen.Style.SplitterFrame, HitBox, Screen.Style.SplitterFrameCornerSize, handleColor );
+                Texture2D handleTex = Collapsable ? Screen.Style.SplitterCollapseArrow : Screen.Style.SplitterDragHandle;
+                float fHandleAngle;
+                switch( mDirection )
+                {
+                    case Direction.Left:
+                        fHandleAngle = mbCollapsed ? 0f : MathHelper.Pi;
+                        break;
+                    case Direction.Right:
+                        fHandleAngle = mbCollapsed ? MathHelper.Pi : 0f;
+                        break;
+                    case Direction.Up:
+                        fHandleAngle = mbCollapsed ? MathHelper.PiOver2 : ( 3f * MathHelper.PiOver2 );
+                        break;
+                    case Direction.Down:
+                        fHandleAngle = mbCollapsed ? ( 3f * MathHelper.PiOver2 ) : MathHelper.PiOver2;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                Screen.Game.SpriteBatch.Draw( handleTex, new Vector2( HitBox.Center.X, HitBox.Center.Y ), null, handleColor, fHandleAngle, new Vector2( handleTex.Width / 2f, handleTex.Height / 2f ), 1f, SpriteEffects.None, 0f );
+            }
+
+
             if( ! InvertDrawOrder )
             {
                 if( mFirstPane != null && mbDisplayFirstPane )
