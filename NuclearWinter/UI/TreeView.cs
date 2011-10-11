@@ -735,7 +735,7 @@ namespace NuclearWinter.UI
                 mfScrollRepeatTimer += _fElapsedTime;
             }
 
-            float fLerpAmount = Math.Min( 1f, _fElapsedTime * 15f );
+            float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
             bool bIsScrolling = Math.Abs( mfLerpScrollOffset - ScrollOffset ) > 1f;
             mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
             mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );

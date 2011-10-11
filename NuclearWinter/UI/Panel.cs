@@ -58,7 +58,7 @@ namespace NuclearWinter.UI
         {
             if( EnableScrolling )
             {
-                float fLerpAmount = Math.Min( 1f, _fElapsedTime * 15f );
+                float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
                 mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
                 mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
             }

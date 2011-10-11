@@ -66,6 +66,8 @@ namespace NuclearWinter
         public Input.TouchManager                   TouchMgr                { get; private set; }
 #endif
 
+        public const float                          LerpMultiplier = 15f;
+
         //----------------------------------------------------------------------
         public NuclearGame()
         {
