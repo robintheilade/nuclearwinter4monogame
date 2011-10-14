@@ -23,7 +23,7 @@ namespace NuclearWinter.UI
     {
         public Action<float>                UpdateHandler;
         public Action                       DrawHandler;
-        public CustomViewportHandler   EventHandler;
+        public CustomViewportHandler        EventHandler;
 
         //----------------------------------------------------------------------
         public CustomViewport( Screen _screen )
