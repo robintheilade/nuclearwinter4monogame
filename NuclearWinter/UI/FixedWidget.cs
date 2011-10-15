@@ -85,12 +85,76 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
-
             if( mChild == null )
             {
                 return;
             }
+
+            Rectangle childRectangle;
+
+            // Horizontal
+            if( ChildBox.Left.HasValue )
+            {
+                childRectangle.X = _rect.Left + ChildBox.Left.Value;
+                if( ChildBox.Right.HasValue )
+                {
+                    // Horizontally anchored
+                    childRectangle.Width = ( _rect.Right - ChildBox.Right.Value ) - childRectangle.X;
+                }
+                else
+                {
+                    // Left-anchored
+                    childRectangle.Width = ChildBox.Width;
+                }
+            }
+            else
+            {
+                childRectangle.Width = ChildBox.Width;
+
+                if( ChildBox.Right.HasValue )
+                {
+                    // Right-anchored
+                    childRectangle.X = ( _rect.Right - ChildBox.Right.Value ) - childRectangle.Width;
+                }
+                else
+                {
+                    // Centered
+                    childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
+                }
+            }
+
+            // Vertical
+            if( ChildBox.Top.HasValue )
+            {
+                childRectangle.Y = _rect.Top + ChildBox.Top.Value;
+                if( ChildBox.Bottom.HasValue )
+                {
+                    // Horizontally anchored
+                    childRectangle.Height = ( _rect.Bottom - ChildBox.Bottom.Value ) - childRectangle.Y;
+                }
+                else
+                {
+                    // Top-anchored
+                    childRectangle.Height = ChildBox.Height;
+                }
+            }
+            else
+            {
+                childRectangle.Height = ChildBox.Height;
+
+                if( ChildBox.Bottom.HasValue )
+                {
+                    // Bottom-anchored
+                    childRectangle.Y = ( _rect.Bottom - ChildBox.Bottom.Value ) - childRectangle.Height;
+                }
+                else
+                {
+                    // Centered
+                    childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
+                }
+            }
+
+            LayoutRect = childRectangle;
 
             switch( mContentAnchor )
             {

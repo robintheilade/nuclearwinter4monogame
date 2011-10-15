@@ -234,71 +234,7 @@ namespace NuclearWinter.UI
         {
             foreach( FixedWidget fixedWidget in mlChildren )
             {
-                Rectangle childRectangle;
-
-                // Horizontal
-                if( fixedWidget.ChildBox.Left.HasValue )
-                {
-                    childRectangle.X = _rect.Left + fixedWidget.ChildBox.Left.Value;
-                    if( fixedWidget.ChildBox.Right.HasValue )
-                    {
-                        // Horizontally anchored
-                        childRectangle.Width = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.X;
-                    }
-                    else
-                    {
-                        // Left-anchored
-                        childRectangle.Width = fixedWidget.ChildBox.Width;
-                    }
-                }
-                else
-                {
-                    childRectangle.Width = fixedWidget.ChildBox.Width;
-
-                    if( fixedWidget.ChildBox.Right.HasValue )
-                    {
-                        // Right-anchored
-                        childRectangle.X = ( _rect.Right - fixedWidget.ChildBox.Right.Value ) - childRectangle.Width;
-                    }
-                    else
-                    {
-                        // Centered
-                        childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
-                    }
-                }
-
-                // Vertical
-                if( fixedWidget.ChildBox.Top.HasValue )
-                {
-                    childRectangle.Y = _rect.Top + fixedWidget.ChildBox.Top.Value;
-                    if( fixedWidget.ChildBox.Bottom.HasValue )
-                    {
-                        // Horizontally anchored
-                        childRectangle.Height = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Y;
-                    }
-                    else
-                    {
-                        // Top-anchored
-                        childRectangle.Height = fixedWidget.ChildBox.Height;
-                    }
-                }
-                else
-                {
-                    childRectangle.Height = fixedWidget.ChildBox.Height;
-
-                    if( fixedWidget.ChildBox.Bottom.HasValue )
-                    {
-                        // Bottom-anchored
-                        childRectangle.Y = ( _rect.Bottom - fixedWidget.ChildBox.Bottom.Value ) - childRectangle.Height;
-                    }
-                    else
-                    {
-                        // Centered
-                        childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
-                    }
-                }
-
-                fixedWidget.DoLayout( childRectangle );
+                fixedWidget.DoLayout( _rect );
             }
             
             UpdateContentSize();
