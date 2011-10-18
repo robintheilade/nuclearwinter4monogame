@@ -711,6 +711,11 @@ namespace NuclearWinter.UI
         float mfScrollRepeatTimer = sfScrollRepeatDelay;
         internal override void Update( float _fElapsedTime )
         {
+            foreach( Button actionButton in ActionButtons )
+            {
+                actionButton.Update( _fElapsedTime );
+            }
+
             if( mbIsDragging )
             {
                 if( mfScrollRepeatTimer >= sfScrollRepeatDelay )
