@@ -29,9 +29,10 @@ namespace NuclearWinter.UI
         bool                            mbIsPressed;
 
         Rectangle                       mDropDownHitBox;
-        const int                       siLineHeight = 50;
         const int                       siMaxLineDisplayed = 3;
         int                             miScrollOffset;
+
+        public Box                      TextPadding;
 
         //----------------------------------------------------------------------
         public DropDownBox( Screen _screen, List<string> _lValues, int _iInitialValueIndex )
@@ -41,7 +42,8 @@ namespace NuclearWinter.UI
             SelectedValueIndex = _iInitialValueIndex;
             miScrollOffset = Math.Max( 0, Math.Min( SelectedValueIndex, mlValues.Count - siMaxLineDisplayed ) );
 
-            Padding = new Box( 20 );
+            Padding = new Box( 10 );
+            TextPadding = new Box( 10 );
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
@@ -65,8 +67,8 @@ namespace NuclearWinter.UI
                 iMaxWidth = Math.Max( iMaxWidth, (int)uiFont.MeasureString( _strValue ).X );
             }
 
-            ContentWidth    = iMaxWidth + Padding.Left + Padding.Right + Screen.Style.DropDownArrow.Width;
-            ContentHeight   = (int)( uiFont.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+            ContentWidth    = iMaxWidth + Padding.Horizontal + TextPadding.Horizontal + Screen.Style.DropDownArrow.Width;
+            ContentHeight   = (int)( uiFont.LineSpacing * 0.9f ) + Padding.Vertical + TextPadding.Vertical;
 
             base.UpdateContentSize();
         }
@@ -79,7 +81,7 @@ namespace NuclearWinter.UI
 
             mDropDownHitBox = new Rectangle(
                 HitBox.Left, HitBox.Bottom,
-                HitBox.Width, Padding.Vertical + Math.Min( siMaxLineDisplayed, mlValues.Count ) * siLineHeight );
+                HitBox.Width, Padding.Vertical + Math.Min( siMaxLineDisplayed, mlValues.Count ) * ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) );
         }
 
         //----------------------------------------------------------------------
@@ -137,7 +139,7 @@ namespace NuclearWinter.UI
 
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
-                SelectedValueIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Right + Padding.Top ) ) / siLineHeight ) + miScrollOffset;
+                SelectedValueIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
                 mPressedAnim.SetTime( 1f );
                 IsOpen = false;
                 mbIsPressed = false;
@@ -161,7 +163,7 @@ namespace NuclearWinter.UI
         {
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
-                miHoveredValueIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Right + Padding.Top ) ) / siLineHeight ) + miScrollOffset;
+                miHoveredValueIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
             }
             else
             {
@@ -278,31 +280,36 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, LayoutRect, 30, Color.White );
+            Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
 
             if( mbIsHovered && ! IsOpen && mPressedAnim.IsOver )
             {
                 if( Screen.IsActive )
                 {
-                    Screen.DrawBox( ButtonFrameHover,      LayoutRect, 30, Color.White );
+                    Screen.DrawBox( ButtonFrameHover,      LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
                 }
             }
             else
             {
-                Screen.DrawBox( ButtonFramePressed,    LayoutRect, 30, Color.White * mPressedAnim.CurrentValue );
+                Screen.DrawBox( ButtonFramePressed,    LayoutRect, Screen.Style.ButtonCornerSize, Color.White * mPressedAnim.CurrentValue );
             }
 
             if( Screen.IsActive && HasFocus && ! IsOpen )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, LayoutRect, 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
             }
 
             Screen.Game.SpriteBatch.Draw( Screen.Style.DropDownArrow,
-                new Vector2( LayoutRect.Right - Padding.Right - Screen.Style.DropDownArrow.Width, LayoutRect.Center.Y - Screen.Style.DropDownArrow.Height / 2 ),
+                new Vector2( LayoutRect.Right - Padding.Right - TextPadding.Right - Screen.Style.DropDownArrow.Width, LayoutRect.Center.Y - Screen.Style.DropDownArrow.Height / 2 ),
                 Color.White
             );
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[SelectedValueIndex], new Vector2( LayoutRect.X + Padding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top + Screen.Style.MediumFont.YOffset ) );
+            Screen.Game.DrawBlurredText(
+                Screen.Style.BlurRadius,
+                Screen.Style.MediumFont,
+                mlValues[SelectedValueIndex],
+                new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top + TextPadding.Top + Screen.Style.MediumFont.YOffset ),
+                Screen.Style.DefaultTextColor );
         }
 
         //----------------------------------------------------------------------
@@ -330,17 +337,22 @@ namespace NuclearWinter.UI
             {
                 int iLinesDisplayed = Math.Min( siMaxLineDisplayed, mlValues.Count );
 
-                Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, Padding.Vertical + iLinesDisplayed * siLineHeight ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, iLinesDisplayed * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical ), Screen.Style.ButtonCornerSize, Color.White );
 
                 int iMaxIndex = Math.Min( mlValues.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
                     if( Screen.IsActive && miHoveredValueIndex == iIndex )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Bottom + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top, LayoutRect.X - Padding.Horizontal, siLineHeight ), 10, Color.White );
+                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) * ( iIndex - miScrollOffset ) + Padding.Top, LayoutRect.Width - Padding.Horizontal, ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ), 10, Color.White );
                     }
 
-                    Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, Screen.Style.MediumFont, mlValues[iIndex], new Vector2( LayoutRect.X + Padding.Left, LayoutRect.Bottom + siLineHeight * ( iIndex - miScrollOffset ) + Padding.Top ) );
+                    Screen.Game.DrawBlurredText(
+                        Screen.Style.BlurRadius,
+                        Screen.Style.MediumFont,
+                        mlValues[iIndex],
+                        new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top + Padding.Top + Screen.Style.MediumFont.YOffset ),
+                        Screen.Style.DefaultTextColor );
                 }
             }
         }
