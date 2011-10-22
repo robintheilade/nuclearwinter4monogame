@@ -10,6 +10,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public int                      SelectedValueIndex;
+        public string                   SelectedValue           { get { return Values[ SelectedValueIndex ]; } }
         public bool                     IsOpen                  { get; private set; }
         public Action<DropDownBox>      ChangeHandler;
 
@@ -20,7 +21,8 @@ namespace NuclearWinter.UI
         public Texture2D                ButtonFramePressed      { get; set; }
 
         //----------------------------------------------------------------------
-        List<string>                    mlValues;
+        // FIXME: Use a ObservableList to monitor changes
+        public List<string>             Values                  { get; private set; }
 
         bool                            mbIsHovered;
         int                             miHoveredValueIndex;
@@ -38,12 +40,12 @@ namespace NuclearWinter.UI
         public DropDownBox( Screen _screen, List<string> _lValues, int _iInitialValueIndex )
         : base( _screen )
         {
-            mlValues = _lValues;
+            Values = _lValues;
             SelectedValueIndex = _iInitialValueIndex;
-            miScrollOffset = Math.Max( 0, Math.Min( SelectedValueIndex, mlValues.Count - siMaxLineDisplayed ) );
+            miScrollOffset = Math.Max( 0, Math.Min( SelectedValueIndex, Values.Count - siMaxLineDisplayed ) );
 
             Padding = new Box( 10 );
-            TextPadding = new Box( 10 );
+            TextPadding = new Box( 5 );
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
@@ -62,7 +64,7 @@ namespace NuclearWinter.UI
             UIFont uiFont = Screen.Style.MediumFont;
 
             int iMaxWidth = 0;
-            foreach( string _strValue in mlValues )
+            foreach( string _strValue in Values )
             {
                 iMaxWidth = Math.Max( iMaxWidth, (int)uiFont.MeasureString( _strValue ).X );
             }
@@ -81,7 +83,7 @@ namespace NuclearWinter.UI
 
             mDropDownHitBox = new Rectangle(
                 HitBox.Left, HitBox.Bottom,
-                HitBox.Width, Padding.Vertical + Math.Min( siMaxLineDisplayed, mlValues.Count ) * ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) );
+                HitBox.Width, Padding.Vertical + Math.Min( siMaxLineDisplayed, Values.Count ) * ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) );
         }
 
         //----------------------------------------------------------------------
@@ -125,7 +127,7 @@ namespace NuclearWinter.UI
                 else
                 if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, mlValues.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Values.Count - siMaxLineDisplayed );
                 }
 
                 IsOpen = ! IsOpen;
@@ -173,7 +175,7 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120 * 3, 0, Math.Max( 0, mlValues.Count - siMaxLineDisplayed ) );
+            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Values.Count - siMaxLineDisplayed ) );
             miHoveredValueIndex += iNewScrollOffset - miScrollOffset;
             miScrollOffset = iNewScrollOffset;
         }
@@ -201,7 +203,7 @@ namespace NuclearWinter.UI
                 else
                 if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, mlValues.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Values.Count - siMaxLineDisplayed );
                 }
 
                 mbIsPressed = true;
@@ -268,11 +270,11 @@ namespace NuclearWinter.UI
             else
             if( _direction == Direction.Down )
             {
-                miHoveredValueIndex = Math.Min( mlValues.Count - 1, miHoveredValueIndex + 1 );
+                miHoveredValueIndex = Math.Min( Values.Count - 1, miHoveredValueIndex + 1 );
 
                 if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, mlValues.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Values.Count - siMaxLineDisplayed );
                 }
             }
         }
@@ -307,7 +309,7 @@ namespace NuclearWinter.UI
             Screen.Game.DrawBlurredText(
                 Screen.Style.BlurRadius,
                 Screen.Style.MediumFont,
-                mlValues[SelectedValueIndex],
+                Values[SelectedValueIndex],
                 new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top + TextPadding.Top + Screen.Style.MediumFont.YOffset ),
                 Screen.Style.DefaultTextColor );
         }
@@ -335,22 +337,22 @@ namespace NuclearWinter.UI
         {
             if( IsOpen )
             {
-                int iLinesDisplayed = Math.Min( siMaxLineDisplayed, mlValues.Count );
+                int iLinesDisplayed = Math.Min( siMaxLineDisplayed, Values.Count );
 
                 Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, iLinesDisplayed * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical ), Screen.Style.ButtonCornerSize, Color.White );
 
-                int iMaxIndex = Math.Min( mlValues.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
+                int iMaxIndex = Math.Min( Values.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
                     if( Screen.IsActive && miHoveredValueIndex == iIndex )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) * ( iIndex - miScrollOffset ) + Padding.Top, LayoutRect.Width - Padding.Horizontal, ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ), 10, Color.White );
+                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
                     }
 
                     Screen.Game.DrawBlurredText(
                         Screen.Style.BlurRadius,
                         Screen.Style.MediumFont,
-                        mlValues[iIndex],
+                        Values[iIndex],
                         new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top + Padding.Top + Screen.Style.MediumFont.YOffset ),
                         Screen.Style.DefaultTextColor );
                 }
