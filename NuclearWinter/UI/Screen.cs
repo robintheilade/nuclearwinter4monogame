@@ -31,6 +31,7 @@ namespace NuclearWinter.UI
         public Widget       FocusedWidget       { get; private set; }
         bool                mbHasActivatedFocusedWidget;
         Widget              mClickedWidget;
+        int                 miClickedWidgetMouseButton;
         Widget              mHoveredWidget;
         Point               mPreviousMouseHitPoint;
 
@@ -143,20 +144,24 @@ namespace NuclearWinter.UI
                 {
                     bHasMouseEvent = true;
 
-                    mClickedWidget = null;
-                    if( FocusedWidget != null )
-                    {
-                        mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
-                    }
-
                     if( mClickedWidget == null )
                     {
-                        mClickedWidget = Root.HitTest( mouseHitPoint );
-                    }
+                        miClickedWidgetMouseButton = iButton;
 
-                    if( mClickedWidget != null )
-                    {
-                        mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                        if( FocusedWidget != null )
+                        {
+                            mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
+                        }
+
+                        if( mClickedWidget == null )
+                        {
+                            mClickedWidget = Root.HitTest( mouseHitPoint );
+                        }
+
+                        if( mClickedWidget != null )
+                        {
+                            mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                        }
                     }
                 }
             }
@@ -178,7 +183,7 @@ namespace NuclearWinter.UI
                 {
                     bHasMouseEvent = true;
 
-                    if( mClickedWidget != null )
+                    if( mClickedWidget != null && iButton == miClickedWidgetMouseButton )
                     {
                         mClickedWidget.OnMouseUp( mouseHitPoint, iButton );
                         mClickedWidget = null;
@@ -192,7 +197,6 @@ namespace NuclearWinter.UI
 
                 if( mouseHitPoint != mPreviousMouseHitPoint )
                 {
-
                     if( mClickedWidget == null )
                     {
                         if( hoveredWidget != null && hoveredWidget == mHoveredWidget )
