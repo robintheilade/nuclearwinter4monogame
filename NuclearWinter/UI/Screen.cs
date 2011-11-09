@@ -35,6 +35,8 @@ namespace NuclearWinter.UI
         Widget              mHoveredWidget;
         Point               mPreviousMouseHitPoint;
 
+        int                 miIgnoreClickFrames;
+
         //----------------------------------------------------------------------
         public Screen( NuclearWinter.NuclearGame _game, Style _style, int _iWidth, int _iHeight )
         {
@@ -52,6 +54,9 @@ namespace NuclearWinter.UI
         {
             Width = _iWidth;
             Height = _iHeight;
+
+            // This will prevent accidental clicks when maximizing the window
+            miIgnoreClickFrames = 3;
 
             Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
         }
@@ -138,43 +143,50 @@ namespace NuclearWinter.UI
 
             bool bHasMouseEvent = false;
 
-            for( int iButton = 0; iButton < 3; iButton++ )
+            if( miIgnoreClickFrames == 0 )
             {
-                if( Game.InputMgr.WasMouseButtonJustPressed( iButton ) )
+                for( int iButton = 0; iButton < 3; iButton++ )
                 {
-                    bHasMouseEvent = true;
-
-                    if( mClickedWidget == null )
+                    if( Game.InputMgr.WasMouseButtonJustPressed( iButton ) )
                     {
-                        miClickedWidgetMouseButton = iButton;
-
-                        if( FocusedWidget != null )
-                        {
-                            mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
-                        }
+                        bHasMouseEvent = true;
 
                         if( mClickedWidget == null )
                         {
-                            mClickedWidget = Root.HitTest( mouseHitPoint );
-                        }
+                            miClickedWidgetMouseButton = iButton;
 
-                        if( mClickedWidget != null )
-                        {
-                            mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                            if( FocusedWidget != null )
+                            {
+                                mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
+                            }
+
+                            if( mClickedWidget == null )
+                            {
+                                mClickedWidget = Root.HitTest( mouseHitPoint );
+                            }
+
+                            if( mClickedWidget != null )
+                            {
+                                mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                            }
                         }
                     }
                 }
-            }
 
-            if( Game.InputMgr.WasMouseJustDoubleClicked() )
-            {
-                bHasMouseEvent = true;
-
-                Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
-                if( widget != null )
+                if( Game.InputMgr.WasMouseJustDoubleClicked() )
                 {
-                    widget.OnMouseDoubleClick( mouseHitPoint );
+                    bHasMouseEvent = true;
+
+                    Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
+                    if( widget != null )
+                    {
+                        widget.OnMouseDoubleClick( mouseHitPoint );
+                    }
                 }
+            }
+            else
+            {
+                miIgnoreClickFrames--;
             }
 
             for( int iButton = 0; iButton < 3; iButton++ )
