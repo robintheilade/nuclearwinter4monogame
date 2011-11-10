@@ -14,7 +14,7 @@ namespace NuclearWinter.UI
      * A Screen handles passing on user input, updating and drawing
      * a bunch of widgets
      */
-    public class Screen // FIXME: Inherits from Group!
+    public class Screen
     {
         //----------------------------------------------------------------------
         public NuclearGame  Game                { get; private set; }
@@ -53,11 +53,10 @@ namespace NuclearWinter.UI
         {
             Width = _iWidth;
             Height = _iHeight;
+            Root.DoLayout( Bounds );
 
             // This will prevent accidental clicks when maximizing the window
             miIgnoreClickFrames = 3;
-
-            Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
         }
 
         //----------------------------------------------------------------------
