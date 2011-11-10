@@ -59,7 +59,6 @@ namespace NuclearWinter.UI
                 Panel.AddChild( actionsGroup );
 
                 // Close
-                // FIXME: i18n
                 CloseButton = new Button( Panel.Screen, i18n.Common.Close );
                 CloseButton.BindPadButton( Buttons.A );
                 actionsGroup.AddChild( CloseButton );
