@@ -24,7 +24,7 @@ namespace NuclearWinter.UI
 
         public bool             Active { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
         bool                    mbIsHovered;
-        bool                    mbIsPressed;
+        //bool                    mbIsPressed;
 
         public bool             IsUnread;
 
@@ -87,7 +87,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public FixedGroup       PageGroup        { get; private set; }
+        public Group            PageGroup        { get; private set; }
 
         //----------------------------------------------------------------------
         public NotebookTab( Notebook _notebook, string _strText, Texture2D _iconTex )
@@ -113,7 +113,7 @@ namespace NuclearWinter.UI
 
             Text            = _strText;
 
-            PageGroup       = new FixedGroup( Screen );
+            PageGroup       = new Group( Screen );
         }
 
         //----------------------------------------------------------------------
@@ -150,7 +150,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
 
             HitBox = _rect;
 
@@ -360,7 +360,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
             HitBox = LayoutRect;
 
             NotebookTab activeTab = Tabs[ActiveTabIndex];

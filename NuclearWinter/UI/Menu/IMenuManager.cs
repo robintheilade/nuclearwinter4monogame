@@ -15,6 +15,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Screen              MenuScreen      { get; }
         Screen              PopupScreen     { get; }
-        FixedGroup          PopupGroup      { get; set; }
+        Group               PopupGroup      { get; set; }
     }
 }

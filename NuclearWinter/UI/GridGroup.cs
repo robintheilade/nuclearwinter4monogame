@@ -7,20 +7,6 @@ using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    public class GridGroupTile: FixedWidget
-    {
-        //----------------------------------------------------------------------
-        public GridGroupTile( Screen _screen, int _iColumn, int _iRow )
-        : base( _screen, AnchoredRect.CreateFull(0) )
-        {
-            Column  = _iColumn;
-            Row     = _iRow;
-        }
-
-        public int      Column;
-        public int      Row;
-    }
-
     /*
      * GridGroup allows packing widgets in a grid
      * It takes care of positioning each child widget properly
@@ -30,7 +16,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         bool                        mbExpand;
         int                         miSpacing; // FIXME: Not taken into account
-        GridGroupTile[,]            maTiles;
+        Widget[,]                   maTiles;
+        Dictionary<Widget,Point>    maWidgetLocations;
 
         //----------------------------------------------------------------------
         public GridGroup( Screen _screen, int _iCols, int _iRows, bool _bExpand, int _iSpacing )
@@ -39,17 +26,8 @@ namespace NuclearWinter.UI
             mbExpand    = _bExpand;
             miSpacing   = _iSpacing;
 
-            maTiles = new GridGroupTile[ _iCols, _iRows ];
-
-            for( int iRow = 0; iRow < _iRows; iRow++ )
-            {
-                for( int iColumn = 0; iColumn < _iCols; iColumn++ )
-                {
-                    GridGroupTile tile = new GridGroupTile( Screen, iColumn, iRow );
-                    tile.Parent = this;
-                    maTiles[ iColumn, iRow ] = tile;
-                }
-            }
+            maTiles = new Widget[ _iCols, _iRows ];
+            maWidgetLocations = new Dictionary<Widget,Point>();
         }
 
         public override void AddChild( Widget _widget, int _iIndex )
@@ -57,15 +35,21 @@ namespace NuclearWinter.UI
             throw new NotSupportedException();
         }
 
-        public override void RemoveChild( Widget _widget )
-        {
-            throw new NotSupportedException();
-        }
-
         public void AddChildAt( Widget _child, int _iColumn, int _iRow )
         {
-            maTiles[ _iColumn, _iRow ].Child = _child;
+            Debug.Assert( ! maWidgetLocations.ContainsKey( _child ) );
+
+            maTiles[ _iColumn, _iRow ] = _child;
+            maWidgetLocations[ _child ] = new Point( _iColumn, _iRow );
             mlChildren.Add( _child );
+        }
+
+        public override void RemoveChild( Widget _widget )
+        {
+            Point widgetLocation = maWidgetLocations[ _widget ];
+            maWidgetLocations.Remove( _widget );
+
+            maTiles[ widgetLocation.X, widgetLocation.Y ] = null;
         }
 
         public override Widget GetFirstFocusableDescendant( Direction _direction )
@@ -147,10 +131,8 @@ namespace NuclearWinter.UI
 
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
-            int iIndex = mlChildren.IndexOf( _child );
-
             Widget tileChild = null;
-            GridGroupTile nextTile = (GridGroupTile)_child;
+            Point childLocation = maWidgetLocations[ _child ];
             int iOffset = 0;
 
             do
@@ -160,20 +142,20 @@ namespace NuclearWinter.UI
                 switch( _direction )
                 {
                     case Direction.Left:
-                        if( nextTile.Column - iOffset < 0 ) return base.GetSibling( _direction, this );
-                        tileChild = maTiles[ nextTile.Column - iOffset, nextTile.Row ].Child;
+                        if( childLocation.X - iOffset < 0 ) return base.GetSibling( _direction, this );
+                        tileChild = maTiles[ childLocation.X - iOffset, childLocation.Y ];
                         break;
                     case Direction.Right:
-                        if( nextTile.Column + iOffset >= maTiles.GetLength(0) ) return base.GetSibling( _direction, this );
-                        tileChild = maTiles[ nextTile.Column + iOffset, nextTile.Row ].Child;
+                        if( childLocation.X + iOffset >= maTiles.GetLength(0) ) return base.GetSibling( _direction, this );
+                        tileChild = maTiles[ childLocation.X + iOffset, childLocation.Y ];
                         break;
                     case Direction.Up:
-                        if( nextTile.Row - iOffset < 0 ) return base.GetSibling( _direction, this );
-                        tileChild = maTiles[ nextTile.Column, nextTile.Row - iOffset ].Child;
+                        if( childLocation.Y - iOffset < 0 ) return base.GetSibling( _direction, this );
+                        tileChild = maTiles[ childLocation.X, childLocation.Y - iOffset ];
                         break;
                     case Direction.Down:
-                        if( nextTile.Row + iOffset >= maTiles.GetLength(1) ) return base.GetSibling( _direction, this );
-                        tileChild = maTiles[ nextTile.Column, nextTile.Row + iOffset ].Child;
+                        if( childLocation.Y + iOffset >= maTiles.GetLength(1) ) return base.GetSibling( _direction, this );
+                        tileChild = maTiles[ childLocation.X, childLocation.Y + iOffset ];
                         break;
                 }
             }
@@ -192,7 +174,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
 
             Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );
 
@@ -205,16 +187,13 @@ namespace NuclearWinter.UI
                     LayoutRect.Width / iColumnCount,
                     LayoutRect.Height / iRowCount );
 
-                for( int iRow = 0; iRow < iRowCount; iRow++ )
+                foreach( KeyValuePair<Widget,Point> kvpChild in maWidgetLocations  )
                 {
-                    for( int iColumn = 0; iColumn < iColumnCount; iColumn++ )
-                    {
-                        Point widgetPosition = new Point(
-                            LayoutRect.X + widgetSize.X * iColumn,
-                            LayoutRect.Y + widgetSize.Y * iRow );
+                    Point widgetPosition = new Point(
+                        LayoutRect.X + widgetSize.X * kvpChild.Value.X,
+                        LayoutRect.Y + widgetSize.Y * kvpChild.Value.Y );
 
-                        maTiles[ iColumn, iRow ].DoLayout( new Rectangle( widgetPosition.X, widgetPosition.Y, widgetSize.X, widgetSize.Y ) );
-                    }
+                    kvpChild.Key.DoLayout( new Rectangle( widgetPosition.X, widgetPosition.Y, widgetSize.X, widgetSize.Y ) );
                 }
 
                 HitBox = LayoutRect;

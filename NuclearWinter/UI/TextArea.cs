@@ -60,7 +60,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
             HitBox = LayoutRect;
 
             mLabel.DoLayout( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 - miScrollOffset, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );

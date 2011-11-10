@@ -22,8 +22,8 @@ namespace NuclearWinter.UI
         Screen mPopupScreen;
         public Screen           PopupScreen             { get { return mPopupScreen; } }
 
-        FixedGroup mPopupGroup;
-        public FixedGroup       PopupGroup
+        Group mPopupGroup;
+        public Group            PopupGroup
         {
             get { return mPopupGroup; }
             set {
@@ -41,7 +41,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public MessagePopupPane MessagePopupPane        { get; private set; }
+        public MessagePopup MessagePopupPane        { get; private set; }
 
         //----------------------------------------------------------------------
         public MenuManager( T _game, Style _style, ContentManager _content )
@@ -59,10 +59,10 @@ namespace NuclearWinter.UI
 
             NuclearWinter.UI.Image fade = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
             fade.Color = mPopupScreen.Style.PopupBackgroundFadeColor;
-            PopupScreen.Root.AddChild( new NuclearWinter.UI.FixedWidget( fade, AnchoredRect.CreateFull(0) ) );
+            PopupScreen.Root.AddChild( fade );
 
             //------------------------------------------------------------------
-            MessagePopupPane        = new MessagePopupPane( this );
+            MessagePopupPane        = new MessagePopup( this );
         }
 
         //----------------------------------------------------------------------

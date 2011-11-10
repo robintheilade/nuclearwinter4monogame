@@ -12,9 +12,9 @@ namespace NuclearWinter.UI
     /*
      * Abstract base class for all types of group
      */
-    public abstract class Group: Widget
+    public class Group: Widget
     {
-        protected List<Widget>      mlChildren;
+        public List<Widget>      mlChildren { get; private set; }
 
         public void Clear()
         {
@@ -46,10 +46,54 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public bool                 AutoSize = false;
+
+        public int Width {
+            get { return ContentWidth; }
+            set { ContentWidth = value; }
+        }
+
+        public int Height {
+            get { return ContentHeight; }
+            set { ContentHeight = value; }
+        }
+
+        //----------------------------------------------------------------------
         public Group( Screen _screen )
         : base( _screen )
         {
             mlChildren = new List<Widget>();
+        }
+
+        //----------------------------------------------------------------------
+        internal override void UpdateContentSize()
+        {
+            if( AutoSize )
+            {
+                //ContentWidth = 0;
+                ContentHeight = 0;
+
+                foreach( Widget widget in mlChildren )
+                {
+                    //ContentWidth    = Math.Max( ContentWidth, fixedWidget.LayoutRect.Right );
+                    int iHeight = 0;
+                    if( widget.AnchoredRect.Top.HasValue )
+                    {
+                        if( widget.AnchoredRect.Bottom.HasValue )
+                        {
+                            iHeight = widget.AnchoredRect.Top.Value + widget.ContentHeight + widget.AnchoredRect.Bottom.Value;
+                        }
+                        else
+                        {
+                            iHeight = widget.AnchoredRect.Top.Value + widget.AnchoredRect.Height;
+                        }
+                    }
+
+                    ContentHeight = Math.Max( ContentHeight, iHeight );
+                }
+            }
+
+            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -66,14 +110,21 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            foreach( Widget widget in mlChildren )
-            {
-                widget.DoLayout( _rect );
-            }
+            base.DoLayout( _rect );
 
+            LayoutChildren();
             UpdateContentSize();
 
             HitBox = Resolution.InternalMode.Rectangle;
+        }
+
+        //----------------------------------------------------------------------
+        protected virtual void LayoutChildren()
+        {
+            foreach( Widget widget in mlChildren )
+            {
+                widget.DoLayout( LayoutRect );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -139,12 +190,12 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget GetSibling( Direction _direction, Widget _child )
         {
-            FixedWidget nearestSibling = null;
+            Widget nearestSibling = null;
             Widget focusableSibling = null;
 
-            FixedWidget fixedChild = (FixedWidget)_child;
+            Widget fixedChild = (Widget)_child;
 
-            foreach( FixedWidget child in mlChildren )
+            foreach( Widget child in mlChildren )
             {
                 if( child == _child ) continue;
 

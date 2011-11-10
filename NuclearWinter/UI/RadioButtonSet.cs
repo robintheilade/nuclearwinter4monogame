@@ -261,7 +261,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
 
             Point pCenter = LayoutRect.Center;
 

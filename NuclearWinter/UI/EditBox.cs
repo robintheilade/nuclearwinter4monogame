@@ -218,7 +218,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
             HitBox = LayoutRect;
 
             mpTextPosition = new Point(

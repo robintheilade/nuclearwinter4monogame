@@ -14,7 +14,7 @@ namespace NuclearWinter.UI
      * A Screen handles passing on user input, updating and drawing
      * a bunch of widgets
      */
-    public class Screen
+    public class Screen // FIXME: Inherits from Group!
     {
         //----------------------------------------------------------------------
         public NuclearGame  Game                { get; private set; }
@@ -26,7 +26,7 @@ namespace NuclearWinter.UI
         public int          Height              { get; private set; }
         public Rectangle    Bounds              { get { return new Rectangle( 0, 0, Width, Height ); } }
 
-        public FixedGroup   Root                { get; private set; }
+        public Group        Root                { get; private set; }
 
         public Widget       FocusedWidget       { get; private set; }
         bool                mbHasActivatedFocusedWidget;
@@ -45,8 +45,7 @@ namespace NuclearWinter.UI
             Width   = _iWidth;
             Height  = _iHeight;
 
-
-            Root    = new FixedGroup( this );
+            Root    = new Group( this );
         }
 
         //----------------------------------------------------------------------

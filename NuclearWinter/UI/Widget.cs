@@ -8,97 +8,6 @@ using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    public struct AnchoredRect
-    {
-        public int?     Left;
-        public int?     Top;
-
-        public int?     Right;
-        public int?     Bottom;
-
-        public int      Width;
-        public int      Height;
-
-        //----------------------------------------------------------------------
-        public AnchoredRect( int? _iLeft, int? _iTop, int? _iRight, int? _iBottom, int _iWidth, int _iHeight )
-        {
-            Left    = _iLeft;
-            Top     = _iTop;
-
-            Right   = _iRight;
-            Bottom  = _iBottom;
-
-            Width   = _iWidth;
-            Height  = _iHeight;
-        }
-
-        //----------------------------------------------------------------------
-        public static AnchoredRect CreateFixed( int _iLeft, int _iTop, int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( _iLeft, _iTop, null, null, _iWidth, _iHeight );
-        }
-
-        public static AnchoredRect CreateFixed( Rectangle _rect )
-        {
-            return new AnchoredRect( _rect.Left, _rect.Top, null, null, _rect.Width, _rect.Height );
-        }
-
-        public static AnchoredRect CreateFull( int _iValue )
-        {
-            return new AnchoredRect( _iValue, _iValue, _iValue, _iValue, 0, 0 );
-        }
-
-        public static AnchoredRect CreateFull( int _iLeft, int _iTop, int _iRight, int _iBottom )
-        {
-            return new AnchoredRect( _iLeft, _iTop, _iRight, _iBottom, 0, 0 );
-        }
-
-        public static AnchoredRect CreateLeftAnchored( int _iLeft, int _iTop, int _iBottom, int _iWidth )
-        {
-            return new AnchoredRect( _iLeft, _iTop, null, _iBottom, _iWidth, 0 );
-        }
-
-        public static AnchoredRect CreateRightAnchored( int _iRight, int _iTop, int _iBottom, int _iWidth )
-        {
-            return new AnchoredRect( null, _iTop, _iRight, _iBottom, _iWidth, 0 );
-        }
-
-        public static AnchoredRect CreateTopAnchored( int _iLeft, int _iTop, int _iRight, int _iHeight )
-        {
-            return new AnchoredRect( _iLeft, _iTop, _iRight, null, 0, _iHeight );
-        }
-
-        public static AnchoredRect CreateBottomAnchored( int _iLeft, int _iBottom, int _iRight, int _iHeight )
-        {
-            return new AnchoredRect( _iLeft, null, _iRight, _iBottom, 0, _iHeight );
-        }
-
-        public static AnchoredRect CreateBottomLeftAnchored( int _iLeft, int _iBottom, int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( _iLeft, null, null, _iBottom, _iWidth, _iHeight );
-        }
-
-        public static AnchoredRect CreateBottomRightAnchored( int _iRight, int _iBottom, int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( null, null, _iRight, _iBottom, _iWidth, _iHeight );
-        }
-
-        public static AnchoredRect CreateTopRightAnchored( int _iRight, int _iTop, int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( null, _iTop, _iRight, null, _iWidth, _iHeight );
-        }
-
-        public static AnchoredRect CreateTopLeftAnchored( int _iLeft, int _iTop, int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( _iLeft, _iTop, null, null, _iWidth, _iHeight );
-        }
-
-        public static AnchoredRect CreateCentered( int _iWidth, int _iHeight )
-        {
-            return new AnchoredRect( null, null, null, null, _iWidth, _iHeight );
-        }
-    }
-
     public struct Box
     {
         //----------------------------------------------------------------------
@@ -141,16 +50,15 @@ namespace NuclearWinter.UI
         public int              ContentWidth        { get; protected set; }
         public int              ContentHeight       { get; protected set; }
 
+        public AnchoredRect     AnchoredRect;
         public Rectangle        LayoutRect          { get; protected set; }
 
         protected Box           mPadding;
         public Box              Padding
         {
             get { return mPadding; }
-
             set {
                 mPadding = value;
-
                 UpdateContentSize();
             }
         }
@@ -181,12 +89,85 @@ namespace NuclearWinter.UI
         public Rectangle        HitBox              { get; protected set; }
 
         //----------------------------------------------------------------------
-        public Widget( Screen _screen )
+        public Widget( Screen _screen, AnchoredRect _anchoredRect )
         {
             Screen = _screen;
+            AnchoredRect = _anchoredRect;
         }
 
-        internal abstract void  DoLayout( Rectangle _rect );
+        public Widget( Screen _screen )
+        : this( _screen, AnchoredRect.Full )
+        {
+        }
+
+        internal virtual void DoLayout( Rectangle _rect )
+        {
+            Rectangle childRectangle;
+
+            // Horizontal
+            if( AnchoredRect.Left.HasValue )
+            {
+                childRectangle.X = _rect.Left + AnchoredRect.Left.Value;
+                if( AnchoredRect.Right.HasValue )
+                {
+                    // Horizontally anchored
+                    childRectangle.Width = ( _rect.Right - AnchoredRect.Right.Value ) - childRectangle.X;
+                }
+                else
+                {
+                    // Left-anchored
+                    childRectangle.Width = AnchoredRect.Width;
+                }
+            }
+            else
+            {
+                childRectangle.Width = AnchoredRect.Width;
+
+                if( AnchoredRect.Right.HasValue )
+                {
+                    // Right-anchored
+                    childRectangle.X = ( _rect.Right - AnchoredRect.Right.Value ) - childRectangle.Width;
+                }
+                else
+                {
+                    // Centered
+                    childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
+                }
+            }
+
+            // Vertical
+            if( AnchoredRect.Top.HasValue )
+            {
+                childRectangle.Y = _rect.Top + AnchoredRect.Top.Value;
+                if( AnchoredRect.Bottom.HasValue )
+                {
+                    // Horizontally anchored
+                    childRectangle.Height = ( _rect.Bottom - AnchoredRect.Bottom.Value ) - childRectangle.Y;
+                }
+                else
+                {
+                    // Top-anchored
+                    childRectangle.Height = AnchoredRect.Height;
+                }
+            }
+            else
+            {
+                childRectangle.Height = AnchoredRect.Height;
+
+                if( AnchoredRect.Bottom.HasValue )
+                {
+                    // Bottom-anchored
+                    childRectangle.Y = ( _rect.Bottom - AnchoredRect.Bottom.Value ) - childRectangle.Height;
+                }
+                else
+                {
+                    // Centered
+                    childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
+                }
+            }
+
+            LayoutRect = childRectangle;
+        }
 
         //----------------------------------------------------------------------
         public virtual Widget   HitTest( Point _point )

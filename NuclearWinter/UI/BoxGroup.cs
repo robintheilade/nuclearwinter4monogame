@@ -166,7 +166,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
             HitBox = LayoutRect;
 
             Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );

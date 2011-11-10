@@ -152,10 +152,10 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            if( LayoutRect == _rect ) return;
+            Rectangle previousLayoutRect = LayoutRect;
+            base.DoLayout( _rect );
 
-            bool bWrapTextNeeded = ( LayoutRect.Width != _rect.Width || LayoutRect.Height != _rect.Height );
-            LayoutRect = _rect;
+            bool bWrapTextNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
             if( bWrapTextNeeded )
             {
@@ -182,7 +182,7 @@ namespace NuclearWinter.UI
                     break;
                 case UI.Anchor.End:
                     mpTextPosition = new Point(
-                        LayoutRect.Right - Padding.Right     - ContentWidth,
+                        LayoutRect.Right - ContentWidth,
                         iTop
                     );
                     break;

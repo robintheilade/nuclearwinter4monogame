@@ -115,7 +115,7 @@ namespace NuclearWinter.UI
         //-----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
 
             bool bHidePane = mbCollapsed || mCollapseAnim.CurrentValue != 0f;
 

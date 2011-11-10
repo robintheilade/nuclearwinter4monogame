@@ -11,7 +11,7 @@ namespace NuclearWinter.UI
      * A widget that draws a box with the specified texture & corner size
      * Can also contain stuff
      */
-    public class Panel: FixedGroup
+    public class Panel: Group
     {
         public Texture2D        Texture;
         public int              CornerSize;
@@ -69,7 +69,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DoLayout( Rectangle _rect )
         {
-            LayoutRect = _rect;
+            base.DoLayout( _rect );
 
             if( EnableScrolling )
             {
@@ -84,9 +84,17 @@ namespace NuclearWinter.UI
                 }
             }
 
-            base.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)mfLerpScrollOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical ) );
-
             HitBox = LayoutRect;
+        }
+
+        protected override void LayoutChildren()
+        {
+            Rectangle childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)mfLerpScrollOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
+            
+            foreach( Widget widget in mlChildren )
+            {
+                widget.DoLayout( childRectangle );
+            }
         }
 
         public override Widget HitTest( Point _point )
