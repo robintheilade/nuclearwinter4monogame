@@ -14,7 +14,7 @@ namespace NuclearWinter.UI
      */
     public class Group: Widget
     {
-        public List<Widget>      mlChildren { get; private set; }
+        protected List<Widget> mlChildren;
 
         public void Clear()
         {
@@ -34,6 +34,11 @@ namespace NuclearWinter.UI
             _widget.Parent = this;
             mlChildren.Insert( _iIndex, _widget );
             UpdateContentSize();
+        }
+
+        public Widget GetChild( int _iIndex )
+        {
+            return mlChildren[ _iIndex ];
         }
 
         public virtual void RemoveChild( Widget _widget )
