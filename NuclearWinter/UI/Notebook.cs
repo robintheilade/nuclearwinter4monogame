@@ -24,7 +24,7 @@ namespace NuclearWinter.UI
 
         public bool             Active { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
         bool                    mbIsHovered;
-        //bool                    mbIsPressed;
+        internal int            DragOffset;
 
         public bool             IsUnread;
 
@@ -189,12 +189,23 @@ namespace NuclearWinter.UI
             if( _iButton != 0 ) return;
 
             Screen.Focus( this );
-            //OnActivateDown();
+
+            if( Closable )
+            {
+                mNotebook.DraggedTab = this;
+                DragOffset = _hitPoint.X - LayoutRect.X;
+            }
         }
 
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != 0 ) return;
+
+            if( mNotebook.DraggedTab == this )
+            {
+                mNotebook.DropTab();
+                DragOffset = 0;
+            }
 
             if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.TabHeight /* && IsInTab */ )
             {
@@ -203,10 +214,6 @@ namespace NuclearWinter.UI
                     OnActivateUp();
                 }
             }
-            /*else
-            {
-                ResetPressState();
-            }*/
         }
 
         internal override void OnMouseEnter( Point _hitPoint )
@@ -221,6 +228,13 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseMove( Point _hitPoint )
         {
+            if( mNotebook.DraggedTab == this )
+            {
+                if( mNotebook.Tabs[ mNotebook.ActiveTabIndex ] != this )
+                {
+                    mNotebook.SetActiveTab( this );
+                }
+            }
         }
 
         internal override void OnPadMove( Direction _direction )
@@ -252,11 +266,19 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
+            if( mNotebook.DraggedTab != this )
+            {
+                DrawTab();
+            }
+        }
+
+        void DrawTab()
+        {
             bool bIsActive = Active;
 
             Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTab : mNotebook.Style.Tab, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
 
-            if( mbIsHovered && ! bIsActive ) // && ! mbIsPressed && mPressedAnim.IsOver )
+            if( mbIsHovered && ! bIsActive )
             {
                 if( Screen.IsActive )
                 {
@@ -280,6 +302,14 @@ namespace NuclearWinter.UI
             if( Closable )
             {
                 mCloseButton.Draw();
+            }
+        }
+
+        internal override void DrawFocused()
+        {
+            if( mNotebook.DraggedTab == this )
+            {
+                DrawTab();
             }
         }
 
@@ -321,14 +351,18 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public NotebookStyle        Style;
+        public int                  TabHeight = 50;
+
         public Action<NotebookTab>  TabClosedHandler;
 
         Panel                       mPanel;
 
-        public ObservableList<NotebookTab>  Tabs            { get; private set; }
-        public int                          ActiveTabIndex  { get; private set; }
+        public ObservableList<NotebookTab> 
+                                    Tabs                { get; private set; }
+        public int                  ActiveTabIndex      { get; private set; }
 
-        public int                  TabHeight = 50;
+        internal NotebookTab        DraggedTab;
+        int                         miDraggedTabIndex;
 
         //----------------------------------------------------------------------
         public Notebook( Screen _screen )
@@ -347,8 +381,11 @@ namespace NuclearWinter.UI
             Tabs = new ObservableList<NotebookTab>();
 
             Tabs.ListChanged += delegate {
-                ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
-                Tabs[ActiveTabIndex].IsUnread = false;
+                if( Tabs.Count > 0 )
+                {
+                    ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
+                    Tabs[ActiveTabIndex].IsUnread = false;
+                }
             };
         }
 
@@ -363,19 +400,38 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
             HitBox = LayoutRect;
 
-            NotebookTab activeTab = Tabs[ActiveTabIndex];
-
             Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( TabHeight - 10 ), LayoutRect.Width, LayoutRect.Height - ( TabHeight - 10 ) );
 
             mPanel.DoLayout( contentRect );
 
+            int iTabStartX = LayoutRect.Left + 20;
+            int iTabEndX = LayoutRect.Right - 20;
+
+            int iDraggedTabX = 0;
+            if( DraggedTab != null )
+            {
+                iDraggedTabX = Math.Min( iTabEndX - DraggedTab.ContentWidth, Math.Max( iTabStartX, Screen.Game.InputMgr.MouseState.X - DraggedTab.DragOffset ) );
+            }
+
             int iTabX = 0;
+            int iTabIndex = 0;
+            bool bDraggedTabInserted = DraggedTab == null;
+            miDraggedTabIndex = Tabs.Count - 1;
             foreach( NotebookTab tab in Tabs )
             {
+                if( tab == DraggedTab ) continue;
+
                 int iTabWidth = tab.ContentWidth;
 
+                if( tab.Closable && ! bDraggedTabInserted && iDraggedTabX - iTabStartX < iTabX + iTabWidth / 2 )
+                {
+                    miDraggedTabIndex = iTabIndex;
+                    iTabX += DraggedTab.ContentWidth;
+                    bDraggedTabInserted = true;
+                }
+
                 Rectangle tabRect = new Rectangle(
-                    LayoutRect.X + 20 + iTabX,
+                    iTabStartX + iTabX,
                     LayoutRect.Y,
                     iTabWidth,
                     TabHeight
@@ -384,9 +440,22 @@ namespace NuclearWinter.UI
                 tab.DoLayout( tabRect );
 
                 iTabX += iTabWidth;
+                iTabIndex++;
             }
 
-            activeTab.PageGroup.DoLayout( contentRect );
+            if( DraggedTab != null )
+            {
+                Rectangle tabRect = new Rectangle(
+                    iDraggedTabX,
+                    LayoutRect.Y,
+                    DraggedTab.ContentWidth,
+                    TabHeight
+                    );
+
+                DraggedTab.DoLayout( tabRect );
+            }
+
+            Tabs[ActiveTabIndex].PageGroup.DoLayout( contentRect );
         }
 
         //----------------------------------------------------------------------
@@ -396,6 +465,21 @@ namespace NuclearWinter.UI
 
             ActiveTabIndex = Tabs.IndexOf( _tab );
             Tabs[ActiveTabIndex].IsUnread = false;
+        }
+
+        //----------------------------------------------------------------------
+        internal void DropTab()
+        {
+            int iOldIndex = Tabs.IndexOf( DraggedTab );
+
+            if( miDraggedTabIndex != iOldIndex )
+            {
+                Tabs.RemoveAt( iOldIndex );
+                Tabs.Insert( miDraggedTabIndex, DraggedTab );
+                ActiveTabIndex = miDraggedTabIndex;
+            }
+
+            DraggedTab = null;
         }
 
         //----------------------------------------------------------------------
