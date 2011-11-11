@@ -197,14 +197,19 @@ namespace NuclearWinter.UI
         public Action<ListView>     ValidateHandler;
 
         int                         miFocusedRowIndex;
-        bool                        mbIsHovered;
         Point                       mHoverPoint;
+        int                         miHoveredRowIndex;
 
         public ListViewStyle        Style;
         public Color                TextColor;
 
         //----------------------------------------------------------------------
-        public int                  ScrollOffset    { get; private set; }
+        public List<Button>         ActionButtons       { get; private set; }
+        Button                      mHoveredActionButton;
+        bool                        mbIsHoveredActionButtonDown;
+
+        //----------------------------------------------------------------------
+        public int                  ScrollOffset        { get; private set; }
         int                         miScrollMax;
         int                         miScrollbarHeight;
         int                         miScrollbarOffset;
@@ -218,12 +223,15 @@ namespace NuclearWinter.UI
             Rows    = new List<ListViewRow>();
             SelectedRowIndex    = -1;
             miFocusedRowIndex   = -1;
+            miHoveredRowIndex   = -1;
             TextColor = Screen.Style.DefaultTextColor;
 
             Style.ListFrame             = Screen.Style.ListFrame;
             Style.FrameSelected         = Screen.Style.GridBoxFrameSelected;
             Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
             Style.FrameSelectedFocus    = Screen.Style.GridBoxFrameSelectedFocus;
+
+            ActionButtons = new List<Button>();
 
             UpdateContentSize();
         }
@@ -238,8 +246,9 @@ namespace NuclearWinter.UI
         public void Clear()
         {
             Rows.Clear();
-            SelectedRowIndex = -1;
-            miFocusedRowIndex = -1;
+            SelectedRowIndex    = -1;
+            miFocusedRowIndex   = -1;
+            miHoveredRowIndex   = -1;
         }
 
         //----------------------------------------------------------------------
@@ -254,6 +263,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Update( float _fElapsedTime )
         {
+            foreach( Button actionButton in ActionButtons )
+            {
+                actionButton.Update( _fElapsedTime );
+            }
+
             float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
             mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
             mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
@@ -282,6 +296,23 @@ namespace NuclearWinter.UI
                 iColIndex++;
             }
 
+            //------------------------------------------------------------------
+            if( miHoveredRowIndex != -1 )
+            {
+                int iButtonX = 0;
+                foreach( Button button in ActionButtons.Reverse<Button>() )
+                {
+                    button.DoLayout( new Rectangle(
+                        LayoutRect.Right - 20 - iButtonX - button.ContentWidth,
+                        LayoutRect.Y + 10 + GetRowY( miHoveredRowIndex ) + RowHeight / 2 - button.ContentHeight / 2,
+                        button.ContentWidth, button.ContentHeight )
+                    );
+
+                    iButtonX += button.ContentWidth;
+                }
+            }
+
+            //------------------------------------------------------------------
             int iHeight = Rows.Count * ( RowHeight + RowSpacing );
 
             miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
@@ -297,18 +328,73 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseEnter( Point _hitPoint )
         {
-            mbIsHovered = true;
             mHoverPoint = _hitPoint;
+            UpdateHoveredRow();
         }
 
-        internal override void OnMouseMove(Point _hitPoint)
+        internal override void OnMouseMove( Point _hitPoint )
         {
             mHoverPoint = _hitPoint;
+            UpdateHoveredRow();
+        }
+
+        void UpdateHoveredRow()
+        {
+            miHoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
+
+            if( miHoveredRowIndex >= Rows.Count )
+            {
+                miHoveredRowIndex = -1;
+
+                if( mbIsHoveredActionButtonDown )
+                {
+                    mHoveredActionButton.ResetPressState();
+                    mbIsHoveredActionButtonDown = false;
+                }
+                mHoveredActionButton = null;
+            }
+            else
+            {
+                if( mHoveredActionButton != null )
+                {
+                    if( mHoveredActionButton.HitTest( mHoverPoint ) != null )
+                    {
+                        mHoveredActionButton.OnMouseMove( mHoverPoint );
+                    }
+                    else
+                    {
+                        mHoveredActionButton.OnMouseOut( mHoverPoint );
+
+                        if( mbIsHoveredActionButtonDown )
+                        {
+                            mHoveredActionButton.ResetPressState();
+                            mbIsHoveredActionButtonDown = false;
+                        }
+
+                        mHoveredActionButton = null;
+                    }
+                }
+
+                if( mHoveredActionButton == null )
+                {
+                    mbIsHoveredActionButtonDown = false;
+
+                    foreach( Button button in ActionButtons )
+                    {
+                        if( button.HitTest( mHoverPoint ) != null )
+                        {
+                            mHoveredActionButton = button;
+                            mHoveredActionButton.OnMouseEnter( mHoverPoint );
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         internal override void OnMouseOut( Point _hitPoint )
         {
-            mbIsHovered = false;
+            miHoveredRowIndex = -1;
         }
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
@@ -322,11 +408,19 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
-            Screen.Focus( this );
-            miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
-            if( miFocusedRowIndex > Rows.Count - 1 )
+            if( mHoveredActionButton != null )
             {
-                miFocusedRowIndex = -1;
+                mHoveredActionButton.OnActivateDown();
+                mbIsHoveredActionButtonDown = true;
+            }
+            else
+            {
+                Screen.Focus( this );
+                miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
+                if( miFocusedRowIndex > Rows.Count - 1 )
+                {
+                    miFocusedRowIndex = -1;
+                }
             }
         }
 
@@ -334,24 +428,47 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
-            SelectRowAt( _hitPoint );
+            if( mHoveredActionButton != null )
+            {
+                if( mbIsHoveredActionButtonDown )
+                {
+                    mHoveredActionButton.OnMouseUp( _hitPoint, _iButton );
+                    mbIsHoveredActionButtonDown = false;
+                }
+            }
+            else
+            {
+                SelectRowAt( _hitPoint );
+            }
         }
 
         //----------------------------------------------------------------------
         internal override void OnMouseDoubleClick( Point _hitPoint )
         {
-            SelectRowAt( _hitPoint );
-            if( ValidateHandler != null ) ValidateHandler( this );
+            if( mHoveredActionButton == null && ValidateHandler != null )
+            {
+                SelectRowAt( _hitPoint );
+
+                if( SelectedRowIndex != -1 )
+                {
+                    ValidateHandler( this );
+                }
+            }
         }
 
         void SelectRowAt( Point _hitPoint )
         {
-            int iSelectedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
+            UpdateHoveredRow();
 
-            if( iSelectedRowIndex <= Rows.Count - 1 && iSelectedRowIndex == miFocusedRowIndex && SelectedRowIndex != miFocusedRowIndex )
+            if( miHoveredRowIndex != SelectedRowIndex )
             {
-                SelectedRowIndex = miFocusedRowIndex;
-                if( SelectHandler != null ) SelectHandler( this );
+                if( miHoveredRowIndex != -1 || SelectFocusedRow )
+                {
+                    SelectedRowIndex = miHoveredRowIndex;
+                    miFocusedRowIndex = SelectedRowIndex;
+
+                    if( SelectHandler != null ) SelectHandler( this );
+                }
             }
         }
 
@@ -413,6 +530,14 @@ namespace NuclearWinter.UI
             miFocusedRowIndex = -1;
         }
 
+        int GetRowY( int _iRowIndex )
+        {
+            int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
+            if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - 20 ) );
+
+            return iRowY;
+        }
+
         //----------------------------------------------------------------------
         internal override void Draw()
         {
@@ -431,19 +556,13 @@ namespace NuclearWinter.UI
 
             Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ), LayoutRect.Width - 20, LayoutRect.Height - 20 - ( DisplayColumnHeaders ? RowHeight : 0 ) ) );
 
-            int iHoverRow = -1;
-            if( mbIsHovered )
-            {
-                iHoverRow = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
-            }
-
-            int iRow = 0;
+            int iRowIndex = 0;
             foreach( ListViewRow row in Rows )
             {
-                int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + iRow ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
+                int iRowY = GetRowY( iRowIndex );
                 if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - 20 ) )
                 {
-                    iRow++;
+                    iRowIndex++;
                     continue;
                 }
 
@@ -451,11 +570,11 @@ namespace NuclearWinter.UI
                 {
                     Rectangle rowRect = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + iRowY, LayoutRect.Width - 20, RowHeight );
 
-                    Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Screen.DrawBox( SelectedRowIndex == iRowIndex ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
-                    if( HasFocus && miFocusedRowIndex == iRow )
+                    if( HasFocus && miFocusedRowIndex == iRowIndex )
                     {
-                        if( SelectedRowIndex != iRow )
+                        if( SelectedRowIndex != iRowIndex )
                         {
                             Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
@@ -466,9 +585,9 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    if( iHoverRow == iRow )
+                    if( miHoveredRowIndex == iRowIndex )
                     {
-                        if( SelectedRowIndex != iRow )
+                        if( SelectedRowIndex != iRowIndex )
                         {
                             Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                         }
@@ -489,11 +608,11 @@ namespace NuclearWinter.UI
 
                     if( ! MergeColumns )
                     {
-                        Screen.DrawBox( SelectedRowIndex == iRow ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        Screen.DrawBox( SelectedRowIndex == iRowIndex ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
-                        if( HasFocus && miFocusedRowIndex == iRow )
+                        if( HasFocus && miFocusedRowIndex == iRowIndex )
                         {
-                            if( SelectedRowIndex != iRow )
+                            if( SelectedRowIndex != iRowIndex )
                             {
                                 Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
@@ -504,9 +623,9 @@ namespace NuclearWinter.UI
                             }
                         }
 
-                        if( iHoverRow == iRow )
+                        if( miHoveredRowIndex == iRowIndex )
                         {
-                            if( SelectedRowIndex != iRow )
+                            if( SelectedRowIndex != iRowIndex )
                             {
                                 Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                             }
@@ -523,7 +642,15 @@ namespace NuclearWinter.UI
                     iColX += col.Width + ColSpacing;
                 }
 
-                iRow++;
+                iRowIndex++;
+            }
+
+            if( miHoveredRowIndex != -1 )
+            {
+                foreach( Button button in ActionButtons )
+                {
+                    button.Draw();
+                }
             }
 
             Screen.PopScissorRectangle();
