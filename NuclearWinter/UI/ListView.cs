@@ -534,10 +534,7 @@ namespace NuclearWinter.UI
 
         int GetRowY( int _iRowIndex )
         {
-            int iRowY = ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
-            if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - 20 ) );
-
-            return iRowY;
+            return ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
         }
 
         //----------------------------------------------------------------------
