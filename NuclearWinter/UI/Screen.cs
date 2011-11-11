@@ -62,7 +62,27 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void HandleInput()
         {
-            if( ! IsActive ) return;
+            Point mouseHitPoint = new Point(
+                (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
+                (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
+            );
+
+            if( ! IsActive )
+            {
+                if( mHoveredWidget != null )
+                {
+                    mHoveredWidget.OnMouseOut( mouseHitPoint );
+                    mHoveredWidget = null;
+                }
+
+                if( mClickedWidget != null )
+                {
+                    mClickedWidget.OnMouseUp( mouseHitPoint, miClickedWidgetMouseButton );
+                    mClickedWidget = null;
+                }
+
+                return;
+            }
 
             foreach( Buttons button in Enum.GetValues(typeof(Buttons)) )
             {
@@ -134,11 +154,6 @@ namespace NuclearWinter.UI
 #if WINDOWS
             //------------------------------------------------------------------
             // Mouse buttons
-            Point mouseHitPoint = new Point(
-                (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
-                (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )
-            );
-
             bool bHasMouseEvent = false;
 
             if( miIgnoreClickFrames == 0 )
