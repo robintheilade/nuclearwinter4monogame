@@ -80,6 +80,14 @@ namespace NuclearWinter.UI
             Panel.Screen.Focus( Panel.GetFirstFocusableDescendant( Direction.Down ) );
         }
 
+        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel )
+        {
+            TitleLabel.Text     = _strTitleText;
+            MessageLabel.Text   = _strMessageText;
+            CloseButton.Text    = _strCloseButtonCaption;
+            ShowSpinningWheel   = _bShowSpinningWheel;
+        }
+
         //----------------------------------------------------------------------
         void Close()
         {

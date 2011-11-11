@@ -41,7 +41,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public MessagePopup MessagePopupPane        { get; private set; }
+        public MessagePopup MessagePopup        { get; private set; }
 
         //----------------------------------------------------------------------
         public MenuManager( T _game, Style _style, ContentManager _content )
@@ -62,7 +62,7 @@ namespace NuclearWinter.UI
             PopupScreen.Root.AddChild( fade );
 
             //------------------------------------------------------------------
-            MessagePopupPane        = new MessagePopup( this );
+            MessagePopup        = new MessagePopup( this );
         }
 
         //----------------------------------------------------------------------

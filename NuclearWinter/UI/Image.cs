@@ -20,7 +20,9 @@ namespace NuclearWinter.UI
 
         public Color Color = Color.White;
 
-        public Action<Image> ClickHandler;
+        public Action<Image>    ClickHandler;
+        public Action<Image>    MouseEnterHandler;
+        public Action<Image>    MouseOutHandler;
 
         //----------------------------------------------------------------------
         protected Texture2D mTexture;
@@ -71,6 +73,7 @@ namespace NuclearWinter.UI
             {
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
                 
+                if( MouseEnterHandler != null ) MouseEnterHandler( this );
             }
         }
 
@@ -79,6 +82,8 @@ namespace NuclearWinter.UI
             if( ClickHandler != null )
             {
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+
+                if( MouseOutHandler != null ) MouseOutHandler( this );
             }
         }
 
