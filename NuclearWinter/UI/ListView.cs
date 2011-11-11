@@ -193,12 +193,14 @@ namespace NuclearWinter.UI
         public int                  ColSpacing  = 0;
 
         public int                  SelectedRowIndex;
+        public ListViewRow          SelectedRow         { get { return SelectedRowIndex != -1 ? Rows[ SelectedRowIndex ] : null; } }
         public Action<ListView>     SelectHandler;
         public Action<ListView>     ValidateHandler;
 
         int                         miFocusedRowIndex;
         Point                       mHoverPoint;
-        int                         miHoveredRowIndex;
+        public int                  HoveredRowIndex     { get; private set; }
+        public ListViewRow          HoveredRow          { get { return HoveredRowIndex != -1 ? Rows[ HoveredRowIndex ] : null; } }
 
         public ListViewStyle        Style;
         public Color                TextColor;
@@ -223,7 +225,7 @@ namespace NuclearWinter.UI
             Rows    = new List<ListViewRow>();
             SelectedRowIndex    = -1;
             miFocusedRowIndex   = -1;
-            miHoveredRowIndex   = -1;
+            HoveredRowIndex   = -1;
             TextColor = Screen.Style.DefaultTextColor;
 
             Style.ListFrame             = Screen.Style.ListFrame;
@@ -248,7 +250,7 @@ namespace NuclearWinter.UI
             Rows.Clear();
             SelectedRowIndex    = -1;
             miFocusedRowIndex   = -1;
-            miHoveredRowIndex   = -1;
+            HoveredRowIndex   = -1;
         }
 
         //----------------------------------------------------------------------
@@ -297,14 +299,14 @@ namespace NuclearWinter.UI
             }
 
             //------------------------------------------------------------------
-            if( miHoveredRowIndex != -1 )
+            if( HoveredRowIndex != -1 )
             {
                 int iButtonX = 0;
                 foreach( Button button in ActionButtons.Reverse<Button>() )
                 {
                     button.DoLayout( new Rectangle(
                         LayoutRect.Right - 20 - iButtonX - button.ContentWidth,
-                        LayoutRect.Y + 10 + GetRowY( miHoveredRowIndex ) + RowHeight / 2 - button.ContentHeight / 2,
+                        LayoutRect.Y + 10 + GetRowY( HoveredRowIndex ) + RowHeight / 2 - button.ContentHeight / 2,
                         button.ContentWidth, button.ContentHeight )
                     );
 
@@ -340,11 +342,11 @@ namespace NuclearWinter.UI
 
         void UpdateHoveredRow()
         {
-            miHoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
+            HoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
 
-            if( miHoveredRowIndex >= Rows.Count )
+            if( HoveredRowIndex >= Rows.Count )
             {
-                miHoveredRowIndex = -1;
+                HoveredRowIndex = -1;
 
                 if( mbIsHoveredActionButtonDown )
                 {
@@ -394,7 +396,7 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseOut( Point _hitPoint )
         {
-            miHoveredRowIndex = -1;
+            HoveredRowIndex = -1;
         }
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
@@ -460,11 +462,11 @@ namespace NuclearWinter.UI
         {
             UpdateHoveredRow();
 
-            if( miHoveredRowIndex != SelectedRowIndex )
+            if( HoveredRowIndex != SelectedRowIndex )
             {
-                if( miHoveredRowIndex != -1 || SelectFocusedRow )
+                if( HoveredRowIndex != -1 || SelectFocusedRow )
                 {
-                    SelectedRowIndex = miHoveredRowIndex;
+                    SelectedRowIndex = HoveredRowIndex;
                     miFocusedRowIndex = SelectedRowIndex;
 
                     if( SelectHandler != null ) SelectHandler( this );
@@ -585,7 +587,7 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    if( miHoveredRowIndex == iRowIndex )
+                    if( HoveredRowIndex == iRowIndex )
                     {
                         if( SelectedRowIndex != iRowIndex )
                         {
@@ -623,7 +625,7 @@ namespace NuclearWinter.UI
                             }
                         }
 
-                        if( miHoveredRowIndex == iRowIndex )
+                        if( HoveredRowIndex == iRowIndex )
                         {
                             if( SelectedRowIndex != iRowIndex )
                             {
@@ -645,7 +647,7 @@ namespace NuclearWinter.UI
                 iRowIndex++;
             }
 
-            if( miHoveredRowIndex != -1 )
+            if( HoveredRowIndex != -1 )
             {
                 foreach( Button button in ActionButtons )
                 {
