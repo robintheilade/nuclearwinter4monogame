@@ -68,8 +68,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public virtual void Update( float _fElapsedTime )
         {
-            MenuScreen.IsActive     = Game.IsActive && ! Game.GameStateMgr.IsSwitching && PopupGroup == null;
-            PopupScreen.IsActive    = Game.IsActive && ! Game.GameStateMgr.IsSwitching && PopupGroup != null;
+            MenuScreen.IsActive     = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && PopupGroup == null;
+            PopupScreen.IsActive    = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && PopupGroup != null;
 
             MenuScreen.HandleInput();
             if( PopupGroup != null )

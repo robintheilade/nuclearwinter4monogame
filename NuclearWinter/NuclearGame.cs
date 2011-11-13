@@ -57,6 +57,7 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Game States
+        protected bool                              UseGameStateManager;
         public GameFlow.GameStateMgr<NuclearGame>   GameStateMgr            { get; private set; }
 
         //----------------------------------------------------------------------
@@ -72,7 +73,7 @@ namespace NuclearWinter
         public const float                          LerpMultiplier = 15f;
 
         //----------------------------------------------------------------------
-        public NuclearGame()
+        public NuclearGame( bool _bUseGameStateManager=true )
         {
 #if WINDOWS_PHONE
             PhoneApplicationService.Current.Deactivated += new EventHandler<DeactivatedEventArgs>( OnDeactivated );
@@ -89,6 +90,8 @@ namespace NuclearWinter
 
             Graphics = new GraphicsDeviceManager(this);
             SpriteMatrix = Matrix.Identity;
+
+            UseGameStateManager = _bUseGameStateManager;
         }
 
         //----------------------------------------------------------------------
@@ -99,8 +102,11 @@ namespace NuclearWinter
             ScissorRasterizerState = new RasterizerState();
             ScissorRasterizerState.ScissorTestEnable = true;
 
-            GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
-            Components.Add( GameStateMgr );
+            if( UseGameStateManager )
+            {
+                GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
+                Components.Add( GameStateMgr );
+            }
 
 #if WINDOWS || XBOX
             InputMgr                = new Input.InputManager( this );
