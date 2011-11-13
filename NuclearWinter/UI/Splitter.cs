@@ -176,7 +176,7 @@ namespace NuclearWinter.UI
                 switch( mDirection )
                 {
                     case Direction.Left: {
-                        if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
+                        if( LayoutRect.Width >= FirstPaneMinSize + SecondPaneMinSize )
                         {
                             SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, LayoutRect.Width - SecondPaneMinSize );
                         }
@@ -199,7 +199,7 @@ namespace NuclearWinter.UI
                         break;
                     }
                     case Direction.Right: {
-                        if( LayoutRect.Width > FirstPaneMinSize + SecondPaneMinSize )
+                        if( LayoutRect.Width >= FirstPaneMinSize + SecondPaneMinSize )
                         {
                             SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, LayoutRect.Width - FirstPaneMinSize );
                         }
@@ -222,7 +222,7 @@ namespace NuclearWinter.UI
                         break;
                     }
                     case Direction.Up: {
-                        if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
+                        if( LayoutRect.Height >= FirstPaneMinSize + SecondPaneMinSize )
                         {
                             SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, FirstPaneMinSize, LayoutRect.Height - SecondPaneMinSize );
                         }
@@ -245,7 +245,7 @@ namespace NuclearWinter.UI
                         break;
                     }
                     case Direction.Down: {
-                        if( LayoutRect.Height > FirstPaneMinSize + SecondPaneMinSize )
+                        if( LayoutRect.Height >= FirstPaneMinSize + SecondPaneMinSize )
                         {
                             SplitterOffset = (int)MathHelper.Clamp( SplitterOffset, SecondPaneMinSize, LayoutRect.Height - FirstPaneMinSize );
                         }
