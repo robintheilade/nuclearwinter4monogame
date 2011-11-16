@@ -410,6 +410,8 @@ namespace NuclearWinter.UI
         {
             if( _iButton != 0 ) return;
 
+            mHoverPoint = _hitPoint;
+
             if( mHoveredActionButton != null )
             {
                 mHoveredActionButton.OnActivateDown();
@@ -429,6 +431,8 @@ namespace NuclearWinter.UI
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != 0 ) return;
+
+            mHoverPoint = _hitPoint;
 
             if( mHoveredActionButton != null )
             {
