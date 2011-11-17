@@ -26,7 +26,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public int                      SelectedItemIndex;
-        public DropDownItem             SelectedItem            { get { return Items[ SelectedItemIndex ]; } }
+        public DropDownItem             SelectedItem            { get { return SelectedItemIndex != -1 ? Items[ SelectedItemIndex ] : null; } }
         public bool                     IsOpen                  { get; private set; }
         public Action<DropDownBox>      ChangeHandler;
 
@@ -58,6 +58,28 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             Items = new ObservableList<DropDownItem>( _lItems );
+
+            Items.ListChanged += delegate( object _source, ObservableList<DropDownItem>.ListChangedEventArgs _args )
+            {
+                if( SelectedItemIndex == -1 )
+                {
+                    if( _args.Added )
+                    {
+                        SelectedItemIndex = _args.Index;
+                    }
+                }
+                else
+                if( _args.Index <= SelectedItemIndex )
+                {
+                    SelectedItemIndex += _args.Added ? 1 : -1;
+                }
+            };
+            
+            Items.ListCleared += delegate( object _source, EventArgs _args )
+            {
+                SelectedItemIndex = -1;
+            };
+
             SelectedItemIndex = _iInitialValueIndex;
             miScrollOffset = Math.Max( 0, Math.Min( SelectedItemIndex, Items.Count - siMaxLineDisplayed ) );
 
