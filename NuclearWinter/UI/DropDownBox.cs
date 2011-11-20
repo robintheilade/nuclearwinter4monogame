@@ -42,7 +42,8 @@ namespace NuclearWinter.UI
                                         Items           { get; private set; }
 
         bool                            mbIsHovered;
-        int                             miHoveredValueIndex;
+        int                             miHoveredItemIndex;
+        Point                           mHoverPoint;
 
         AnimatedValue                   mPressedAnim;
         bool                            mbIsPressed;
@@ -157,16 +158,16 @@ namespace NuclearWinter.UI
             }
             else
             {
-                miHoveredValueIndex = SelectedItemIndex;
+                miHoveredItemIndex = SelectedItemIndex;
 
-                if( miHoveredValueIndex < miScrollOffset )
+                if( miHoveredItemIndex < miScrollOffset )
                 {
-                    miScrollOffset = miHoveredValueIndex;
+                    miScrollOffset = miHoveredItemIndex;
                 }
                 else
-                if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
 
                 IsOpen = ! IsOpen;
@@ -180,12 +181,18 @@ namespace NuclearWinter.UI
 
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
-                SelectedItemIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
+                mHoverPoint = _hitPoint;
+                UpdateHoveredItem();
+                
                 mPressedAnim.SetTime( 1f );
                 IsOpen = false;
                 mbIsPressed = false;
 
-                if( ChangeHandler != null ) ChangeHandler( this );
+                if( miHoveredItemIndex != -1 )
+                {
+                    SelectedItemIndex = miHoveredItemIndex;
+                    if( ChangeHandler != null ) ChangeHandler( this );
+                }
             }
             else
             if( HitTest( _hitPoint ) == this )
@@ -204,7 +211,8 @@ namespace NuclearWinter.UI
         {
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
-                miHoveredValueIndex = (int)( ( _hitPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
+                mHoverPoint = _hitPoint;
+                UpdateHoveredItem();
             }
             else
             {
@@ -215,8 +223,18 @@ namespace NuclearWinter.UI
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
-            miHoveredValueIndex += iNewScrollOffset - miScrollOffset;
+            miHoveredItemIndex += iNewScrollOffset - miScrollOffset;
             miScrollOffset = iNewScrollOffset;
+        }
+
+        void UpdateHoveredItem()
+        {
+            miHoveredItemIndex = (int)( ( mHoverPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
+
+            if( miHoveredItemIndex >= Items.Count )
+            {
+                miHoveredItemIndex = -1;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -233,16 +251,16 @@ namespace NuclearWinter.UI
             }
             else
             {
-                miHoveredValueIndex = SelectedItemIndex;
+                miHoveredItemIndex = SelectedItemIndex;
 
-                if( miHoveredValueIndex < miScrollOffset )
+                if( miHoveredItemIndex < miScrollOffset )
                 {
-                    miScrollOffset = miHoveredValueIndex;
+                    miScrollOffset = miHoveredItemIndex;
                 }
                 else
-                if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
 
                 mbIsPressed = true;
@@ -254,7 +272,7 @@ namespace NuclearWinter.UI
         {
             if( IsOpen )
             {
-                SelectedItemIndex = miHoveredValueIndex;
+                SelectedItemIndex = miHoveredItemIndex;
                 if( ChangeHandler != null ) ChangeHandler( this );
 
                 mPressedAnim.SetTime( 1f );
@@ -299,21 +317,21 @@ namespace NuclearWinter.UI
 
             if( _direction == Direction.Up )
             {
-                miHoveredValueIndex = Math.Max( 0, miHoveredValueIndex - 1 );
+                miHoveredItemIndex = Math.Max( 0, miHoveredItemIndex - 1 );
 
-                if( miHoveredValueIndex < miScrollOffset )
+                if( miHoveredItemIndex < miScrollOffset )
                 {
-                    miScrollOffset = miHoveredValueIndex;
+                    miScrollOffset = miHoveredItemIndex;
                 }
             }
             else
             if( _direction == Direction.Down )
             {
-                miHoveredValueIndex = Math.Min( Items.Count - 1, miHoveredValueIndex + 1 );
+                miHoveredItemIndex = Math.Min( Items.Count - 1, miHoveredItemIndex + 1 );
 
-                if( miHoveredValueIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredValueIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
             }
         }
@@ -383,7 +401,7 @@ namespace NuclearWinter.UI
                 int iMaxIndex = Math.Min( Items.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
                 for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
-                    if( Screen.IsActive && miHoveredValueIndex == iIndex )
+                    if( Screen.IsActive && miHoveredItemIndex == iIndex )
                     {
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
                     }
