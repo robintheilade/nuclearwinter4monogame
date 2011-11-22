@@ -37,7 +37,6 @@ namespace NuclearWinter.UI
         public Texture2D                ButtonFramePressed      { get; set; }
 
         //----------------------------------------------------------------------
-        // FIXME: Use a ObservableList to monitor changes
         public ObservableList<DropDownItem>
                                         Items           { get; private set; }
 
