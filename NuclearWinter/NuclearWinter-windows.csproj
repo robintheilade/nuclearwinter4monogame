@@ -134,7 +134,6 @@
     <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
-    <Compile Include="UI\RootGroup.cs" />
     <Compile Include="UI\Screen.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpinningWheel.cs" />

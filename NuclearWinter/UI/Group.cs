@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace NuclearWinter.UI
 {
     /*
-     * Abstract base class for all types of group
+     * A widget to lay out a bunch of child widgets
      */
     public class Group: Widget
     {
