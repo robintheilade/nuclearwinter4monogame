@@ -27,8 +27,8 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int              ScrollOffset        { get; private set; }
-        int                     miScrollMax;
+        public int              ScrollOffset;
+        public int              ScrollMax           { get; private set; }
         int                     miScrollbarHeight;
         int                     miScrollbarOffset;
         float                   mfLerpScrollOffset;
@@ -60,7 +60,7 @@ namespace NuclearWinter.UI
             {
                 float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
                 mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
-                mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
+                mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, ScrollMax );
             }
 
             base.Update( _fElapsedTime );
@@ -74,13 +74,13 @@ namespace NuclearWinter.UI
             if( EnableScrolling )
             {
                 int iHeight = ContentHeight;
-                miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
-                ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
+                ScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
+                ScrollOffset = Math.Min( ScrollOffset, ScrollMax );
 
-                if( miScrollMax > 0 )
+                if( ScrollMax > 0 )
                 {
                     miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
-                    miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
+                    miScrollbarOffset = (int)( (float)mfLerpScrollOffset / ScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
                 }
             }
 
@@ -110,7 +110,7 @@ namespace NuclearWinter.UI
 
         void DoScroll( int _iDelta )
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -ScrollOffset, Math.Max( 0, miScrollMax - ScrollOffset ) );
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -ScrollOffset, Math.Max( 0, ScrollMax - ScrollOffset ) );
             ScrollOffset += iScrollChange;
         }
 
@@ -131,7 +131,7 @@ namespace NuclearWinter.UI
                 Screen.PopScissorRectangle();
             }
 
-            if( EnableScrolling && miScrollMax > 0 )
+            if( EnableScrolling && ScrollMax > 0 )
             {
                 Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
             }
