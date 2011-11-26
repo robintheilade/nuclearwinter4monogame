@@ -8,9 +8,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
-    /*
-     * An EditBox to enter some text
-     */
+    //--------------------------------------------------------------------------
+    // An EditBox to enter some text
     public class EditBox: Widget
     {
         UIFont mFont;
@@ -536,6 +535,7 @@ namespace NuclearWinter.UI
             if( BlurHandler != null ) BlurHandler( this );
         }
 
+        //----------------------------------------------------------------------
         internal override void Update( float _fElapsedTime )
         {
             if( ! HasFocus )
