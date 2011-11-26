@@ -277,13 +277,18 @@ namespace NuclearWinter
 
                 foreach( string strWord in aWords )
                 {
-                    if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth && strLine != "" )
+                    if( strLine != "" )
                     {
-                        lText.Add( strLine );
-                        strLine = string.Empty;
+                        strLine += " ";
+
+                        if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
+                        {
+                            lText.Add( strLine );
+                            strLine = string.Empty;
+                        }
                     }
 
-                    strLine += strWord + ' ';
+                    strLine += strWord != "" ? strWord :  " ";
                 }
 
                 lText.Add( strLine );
