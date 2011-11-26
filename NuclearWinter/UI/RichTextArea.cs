@@ -11,37 +11,53 @@ namespace NuclearWinter.UI
     public class Caret
     {
         //----------------------------------------------------------------------
-        public int          TextBlockIndex;
+        int miTextBlockIndex;
 
-        public int          Offset
+        public Action<Caret>    TextBlockChangedHandler;
+
+        public int              TextBlockIndex
+        {
+            get { return miTextBlockIndex; }
+            set
+            {
+                miTextBlockIndex = value;
+
+                if( TextBlockChangedHandler != null )
+                {
+                    TextBlockChangedHandler( this );
+                }
+            }
+        }
+
+        public int              Offset
         {
             get { return miOffset; }
             set 
             {
-                miOffset = (int)MathHelper.Clamp( value, 0, mTextArea.TextBlocks[ TextBlockIndex ].Text.Length );
+                miOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ TextBlockIndex ].Text.Length );
                 //miSelectionOffset = 0;
-                mfTimer = 0f;
+                Timer = 0f;
             }
         }
 
-        public int          SelectionOffset;
+        public int              SelectionOffset;
 
         //----------------------------------------------------------------------
-        RichTextArea        mTextArea;
+        public RichTextArea TextArea { get; private set; }
 
-        float               mfTimer;
+        internal float      Timer;
         int                 miOffset;
 
         //----------------------------------------------------------------------
         public Caret( RichTextArea _textArea )
         {
-            mTextArea = _textArea;
+            TextArea = _textArea;
         }
 
         //----------------------------------------------------------------------
         internal void Update( float _fElapsedTime )
         {
-            mfTimer = mTextArea.HasFocus ? ( mfTimer + _fElapsedTime ) : 0f;
+            Timer = TextArea.HasFocus ? ( Timer + _fElapsedTime ) : 0f;
         }
 
         //----------------------------------------------------------------------
@@ -50,21 +66,21 @@ namespace NuclearWinter.UI
             const float fBlinkInterval = 0.3f;
             const int iCaretWidth = 2;
 
-            if( mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
+            if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
             {
-                Point caretPos = mTextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset );
-                caretPos.X += mTextArea.LayoutRect.X + mTextArea.Padding.Left;
-                caretPos.Y += mTextArea.LayoutRect.Y + mTextArea.Padding.Top;
+                Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset );
+                caretPos.X += TextArea.LayoutRect.X + TextArea.Padding.Left;
+                caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top;
 
                 for( int iTextBlock = 0; iTextBlock < TextBlockIndex; iTextBlock++ )
                 {
-                    TextBlock block = mTextArea.TextBlocks[ iTextBlock ];
+                    TextBlock block = TextArea.TextBlocks[ iTextBlock ];
                     caretPos.Y += block.TotalHeight;
                 }
 
-                int iCaretHeight = mTextArea.TextBlocks[ TextBlockIndex ].LineHeight;
+                int iCaretHeight = TextArea.TextBlocks[ TextBlockIndex ].LineHeight;
 
-                mTextArea.Screen.Game.SpriteBatch.Draw( mTextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), mTextArea.Screen.Style.DefaultTextColor );
+                TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
             }
         }
 
@@ -74,9 +90,9 @@ namespace NuclearWinter.UI
             int iBlockY         = 0;
             int iBlockCaretY    = 0;
 
-            while( iTextBlock < mTextArea.TextBlocks.Count )
+            while( iTextBlock < TextArea.TextBlocks.Count )
             {
-                TextBlock block = mTextArea.TextBlocks[ iTextBlock ];
+                TextBlock block = TextArea.TextBlocks[ iTextBlock ];
 
                 iBlockCaretY = _point.Y - iBlockY;
                 iBlockY += block.TotalHeight;
@@ -90,21 +106,21 @@ namespace NuclearWinter.UI
                 iTextBlock++;
             }
 
-            if( iTextBlock == mTextArea.TextBlocks.Count )
+            if( iTextBlock == TextArea.TextBlocks.Count )
             {
                 // Clicked after the last block
                 // Setup caret to point to the last offset of the last block
-                TextBlockIndex = mTextArea.TextBlocks.Count - 1;
-                Offset = mTextArea.TextBlocks[ TextBlockIndex ].Text.Length;
+                TextBlockIndex = TextArea.TextBlocks.Count - 1;
+                Offset = TextArea.TextBlocks[ TextBlockIndex ].Text.Length;
                 return;
             }
 
-            MoveInsideBlock( _point.X, iBlockCaretY / mTextArea.TextBlocks[ TextBlockIndex ].LineHeight );
+            MoveInsideBlock( _point.X, iBlockCaretY / TextArea.TextBlocks[ TextBlockIndex ].LineHeight );
         }
 
         internal void MoveInsideBlock( int _iX, int _iLine )
         {
-            TextBlock caretBlock = mTextArea.TextBlocks[ TextBlockIndex ];
+            TextBlock caretBlock = TextArea.TextBlocks[ TextBlockIndex ];
 
             int iOffset = 0;
             int iBlockLineIndex = Math.Min( caretBlock.WrappedLines.Count - 1, _iLine );
@@ -114,8 +130,9 @@ namespace NuclearWinter.UI
                 iOffset += caretBlock.WrappedLines[ iLine ].Length;
             }
 
-            iOffset += ComputeCaretOffsetAtX( _iX - caretBlock.IndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ], caretBlock.Font );
-            if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffset == caretBlock.WrappedLines[ iBlockLineIndex ].Length )
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.IndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ], caretBlock.Font );
+            iOffset += iOffsetInLine;
+            if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Length )
             {
                 iOffset--;
             }
@@ -126,21 +143,21 @@ namespace NuclearWinter.UI
         internal void MoveStart()
         {
             int iLine;
-            mTextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
             MoveInsideBlock( 0, iLine );
         }
 
         internal void MoveEnd()
         {
             int iLine;
-            mTextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
             MoveInsideBlock( int.MaxValue, iLine );
         }
 
         internal void MoveUp()
         {
             int iLine;
-            Point caretPos = mTextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
 
             if( iLine > 0 )
             {
@@ -150,7 +167,7 @@ namespace NuclearWinter.UI
             if( TextBlockIndex > 0 )
             {
                 TextBlockIndex--;
-                MoveInsideBlock( caretPos.X, mTextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 );
+                MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 );
             }
             else
             {
@@ -161,21 +178,21 @@ namespace NuclearWinter.UI
         internal void MoveDown()
         {
             int iLine;
-            Point caretPos = mTextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
 
-            if( iLine < mTextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 )
+            if( iLine < TextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 )
             {
                 MoveInsideBlock( caretPos.X, iLine + 1 );
             }
             else
-            if( TextBlockIndex < mTextArea.TextBlocks.Count - 1 )
+            if( TextBlockIndex < TextArea.TextBlocks.Count - 1 )
             {
                 TextBlockIndex++;
                 MoveInsideBlock( caretPos.X, 0 );
             }
             else
             {
-                Offset = mTextArea.TextBlocks[ TextBlockIndex ].Text.Length;
+                Offset = TextArea.TextBlocks[ TextBlockIndex ].Text.Length;
             }
         }
 
@@ -207,9 +224,9 @@ namespace NuclearWinter.UI
     //--------------------------------------------------------------------------
     public enum TextBlockType
     {
+        Paragraph,
         Header,
         SubHeader,
-        Paragraph,
         OrderedListItem,
         UnorderedListItem,
 
@@ -524,8 +541,8 @@ namespace NuclearWinter.UI
                     //DeleteSelectedText();
                 }
 
-                TextBlock line = TextBlocks[ Caret.TextBlockIndex ];
-                line.Text = line.Text.Insert( Caret.Offset, _char.ToString() );
+                TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
+                textBlock.Text = textBlock.Text.Insert( Caret.Offset, _char.ToString() );
                 Caret.Offset++;
             }
         }
@@ -540,7 +557,6 @@ namespace NuclearWinter.UI
                 case Keys.A:
                     if( bCtrl )
                     {
-                        TextBlocks[ Caret.TextBlockIndex ].BlockType = (TextBlockType)( ( (int)( TextBlocks[ Caret.TextBlockIndex ].BlockType ) + 1 ) % (int)TextBlockType.Count );
                         SelectAll();
                     }
                     break;
@@ -566,13 +582,37 @@ namespace NuclearWinter.UI
                 case Keys.Enter:
                     if( ! IsReadOnly )
                     {
-                        Caret.TextBlockIndex++;
-                        TextBlocks.Insert( Caret.TextBlockIndex, new TextBlock( this, "" ) );
-                        Caret.Offset = 0;
+                        TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
+                        if( bShift )
+                        {
+                            textBlock.Text = textBlock.Text.Insert( Caret.Offset, "\n" );
+                            Caret.Offset++;
+                        }
+                        else
+                        {
+                            if( Caret.Offset == 0 )
+                            {
+                                TextBlocks.Insert( Caret.TextBlockIndex, new TextBlock( this, "" ) );
+                                Caret.Timer = 0f;
+                            }
+                            else
+                            {
+                                string strNewBlockText = "";
+                                if( Caret.Offset < textBlock.Text.Length )
+                                {
+                                    strNewBlockText = textBlock.Text.Substring( Caret.Offset, textBlock.Text.Length - Caret.Offset );
+                                    textBlock.Text = textBlock.Text.Remove( Caret.Offset );
+                                }
+
+                                TextBlocks.Insert( Caret.TextBlockIndex + 1, new TextBlock( this, strNewBlockText ) );
+                                Caret.TextBlockIndex++;
+                                Caret.Offset = 0;
+                            }
+                        }
                     }
                     break;
                 case Keys.Back:
-                    if( ! IsReadOnly && TextBlocks[ Caret.TextBlockIndex ].Text.Length > 0 )
+                    if( ! IsReadOnly )
                     {
                         if( Caret.SelectionOffset != 0 )
                         {
@@ -582,12 +622,21 @@ namespace NuclearWinter.UI
                         if( Caret.Offset > 0 )
                         {
                             Caret.Offset--;
+
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
+                        }
+                        else
+                        if( Caret.TextBlockIndex > 0 )
+                        {
+                            Caret.TextBlockIndex--;
+                            Caret.Offset = TextBlocks[ Caret.TextBlockIndex ].Text.Length;
+                            TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
+                            TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
                         }
                     }
                     break;
                 case Keys.Delete:
-                    if( ! IsReadOnly && TextBlocks[ Caret.TextBlockIndex ].Text.Length > 0 )
+                    if( ! IsReadOnly )
                     {
                         if( Caret.SelectionOffset != 0 )
                         {
@@ -597,6 +646,14 @@ namespace NuclearWinter.UI
                         if( Caret.Offset < TextBlocks[ Caret.TextBlockIndex ].Text.Length )
                         {
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
+                        }
+                        else
+                        if( Caret.TextBlockIndex < TextBlocks.Count - 1 )
+                        {
+                            TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
+                            TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
+
+                            Caret.Timer = 0f;
                         }
                     }
                     break;
@@ -734,6 +791,12 @@ namespace NuclearWinter.UI
                     base.OnKeyPress( _key );
                     break;
             }
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnPadMove( Direction _direction )
+        {
+            return;
         }
 
         //----------------------------------------------------------------------

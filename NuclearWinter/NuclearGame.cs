@@ -273,25 +273,28 @@ namespace NuclearWinter
             foreach( string strChunk in _strText.Split( '\n' ) )
             {
                 string strLine = string.Empty;
-                string[] aWords = strChunk.Split( ' ' );
 
-                foreach( string strWord in aWords )
+                if( strChunk != "" )
                 {
-                    if( strLine != "" )
-                    {
-                        strLine += " ";
+                    string[] aWords = strChunk.Split( ' ' );
 
-                        if( _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
+                    bool bFirst = true;
+                    foreach( string strWord in aWords )
+                    {
+                        if( bFirst ) bFirst = false;
+                        else strLine += " ";
+
+                        if( strLine != "" && _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
                         {
                             lText.Add( strLine );
                             strLine = string.Empty;
                         }
-                    }
 
-                    strLine += strWord != "" ? strWord :  " ";
+                        strLine += strWord;
+                    }
                 }
 
-                lText.Add( strLine );
+                lText.Add( strLine + " " );
             }
 
             return lText;
