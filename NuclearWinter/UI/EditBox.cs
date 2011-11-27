@@ -28,10 +28,10 @@ namespace NuclearWinter.UI
         Point   mpTextPosition;
 
         int     miCaretOffset;
-        int     CaretOffset {
+        public int     CaretOffset {
             get { return miCaretOffset; }
 
-            set {
+            private set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miSelectionOffset = 0;
                 ComputeCaretAndSelectionX();
