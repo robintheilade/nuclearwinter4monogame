@@ -130,7 +130,7 @@ namespace NuclearWinter.UI
                 iOffset += caretBlock.WrappedLines[ iLine ].Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.IndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ], caretBlock.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ], caretBlock.Font );
             iOffset += iOffsetInLine;
             if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Length )
             {
@@ -279,10 +279,16 @@ namespace NuclearWinter.UI
                     default:
                         throw new NotSupportedException();
                 }
+
+                mbWrapNeeded = true;
             }
         }
 
         public int                  IndentLevel;
+        public int                  EffectiveIndentLevel
+        {
+            get { return IndentLevel + ( ( BlockType == TextBlockType.OrderedListItem || BlockType == TextBlockType.UnorderedListItem ) ? 1 : 0 ); }
+        }
 
         bool                        mbWrapNeeded;
         string                      mstrText;
@@ -327,30 +333,32 @@ namespace NuclearWinter.UI
                 DoWrap( _iWidth );
             }
 
-            UIFont font;
+            int iIndentedX = _iX + EffectiveIndentLevel * RichTextArea.IndentOffset;
 
             switch( BlockType )
             {
                 case TextBlockType.Header:
-                    font = mTextArea.Screen.Style.ExtraLargeFont;
                     break;
                 case TextBlockType.SubHeader:
-                    font = mTextArea.Screen.Style.LargeFont;
                     break;
                 case TextBlockType.Paragraph:
+                    break;
                 case TextBlockType.OrderedListItem:
+                    string strItemPrefix = mTextArea.CurrentListIndex.ToString() + ". ";
+                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strItemPrefix, new Vector2( iIndentedX - Font.MeasureString( strItemPrefix ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                    break;
                 case TextBlockType.UnorderedListItem:
-                    font = mTextArea.Screen.Style.MediumFont;
+                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, "*", new Vector2( iIndentedX - Font.MeasureString( "* " ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
                     break;
                 default:
                     throw new NotSupportedException();
             }
-            
+
             int iTextY = _iY;
             foreach( string strText in WrappedLines )
             {
-                mTextArea.Screen.Game.SpriteBatch.DrawString( font, strText, new Vector2( _iX, iTextY + font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
-                iTextY += font.LineSpacing;
+                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iIndentedX, iTextY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                iTextY += Font.LineSpacing;
             }
         }
 
@@ -381,7 +389,7 @@ namespace NuclearWinter.UI
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - ( iOffset ) ) ).X + IndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
+                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - ( iOffset ) ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -403,6 +411,8 @@ namespace NuclearWinter.UI
         public const int        IndentOffset        = 50;
 
         public bool             IsReadOnly;
+
+        internal int            CurrentListIndex;
 
         //----------------------------------------------------------------------
         Vector2                 mvViewOffset;
@@ -583,6 +593,7 @@ namespace NuclearWinter.UI
                     if( ! IsReadOnly )
                     {
                         TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
+
                         if( bShift )
                         {
                             textBlock.Text = textBlock.Text.Insert( Caret.Offset, "\n" );
@@ -590,9 +601,33 @@ namespace NuclearWinter.UI
                         }
                         else
                         {
-                            if( Caret.Offset == 0 )
+                            if( textBlock.Text.Length == 0 && textBlock.BlockType != TextBlockType.Paragraph )
                             {
-                                TextBlocks.Insert( Caret.TextBlockIndex, new TextBlock( this, "" ) );
+                                textBlock.BlockType = TextBlockType.Paragraph;
+                                textBlock.IndentLevel = 0;
+                                Caret.TextBlockIndex = Caret.TextBlockIndex; // Trigger block change handler
+                                break;
+                            }
+                        
+                            TextBlockType newBlockType      = TextBlockType.Paragraph;
+                            int iNewBlockIndentLevel        = 0;
+                            if( textBlock.Text.Length != 0 )
+                            {
+                                switch( textBlock.BlockType )
+                                {
+                                    case TextBlockType.Paragraph:
+                                    case TextBlockType.OrderedListItem:
+                                    case TextBlockType.UnorderedListItem:
+                                        newBlockType = textBlock.BlockType;
+                                        iNewBlockIndentLevel = textBlock.IndentLevel;
+                                        break;
+                                }
+                            }
+
+                            if( Caret.Offset == 0 && textBlock.Text.Length > 0 )
+                            {
+                                TextBlocks.Insert( Caret.TextBlockIndex, new TextBlock( this, "", newBlockType, iNewBlockIndentLevel ) );
+
                                 Caret.Timer = 0f;
                             }
                             else
@@ -604,10 +639,11 @@ namespace NuclearWinter.UI
                                     textBlock.Text = textBlock.Text.Remove( Caret.Offset );
                                 }
 
-                                TextBlocks.Insert( Caret.TextBlockIndex + 1, new TextBlock( this, strNewBlockText ) );
-                                Caret.TextBlockIndex++;
+                                TextBlocks.Insert( Caret.TextBlockIndex + 1, new TextBlock( this, strNewBlockText, newBlockType, iNewBlockIndentLevel ) );
                                 Caret.Offset = 0;
                             }
+
+                            Caret.TextBlockIndex++;
                         }
                     }
                     break;
@@ -628,10 +664,21 @@ namespace NuclearWinter.UI
                         else
                         if( Caret.TextBlockIndex > 0 )
                         {
-                            Caret.TextBlockIndex--;
-                            Caret.Offset = TextBlocks[ Caret.TextBlockIndex ].Text.Length;
-                            TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
-                            TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
+                            int iNewCaretOffset = TextBlocks[ Caret.TextBlockIndex - 1 ].Text.Length;
+
+                            if( iNewCaretOffset > 0 )
+                            {
+                                Caret.TextBlockIndex--;
+                                TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
+                                TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
+                            }
+                            else
+                            {
+                                TextBlocks.RemoveAt( Caret.TextBlockIndex - 1 );
+                                Caret.TextBlockIndex--;
+                            }
+
+                            Caret.Offset = iNewCaretOffset;
                         }
                     }
                     break;
@@ -817,9 +864,42 @@ namespace NuclearWinter.UI
             int iX = LayoutRect.X + Padding.Left;
             int iY = LayoutRect.Y + Padding.Top;
 
-            foreach( TextBlock block in TextBlocks )
+            Stack<int> lListIndices = new Stack<int>();
+            CurrentListIndex = 0;
+
+            for( int iBlock = 0; iBlock < TextBlocks.Count; iBlock++ )
             {
-                block.Draw( iX + block.IndentLevel * RichTextArea.IndentOffset, iY, LayoutRect.Width - Padding.Horizontal );
+                TextBlock block = TextBlocks[iBlock];
+
+                if( block.BlockType == TextBlockType.OrderedListItem )
+                {
+                    int iIndentDiff = 0;
+                    if( CurrentListIndex != 0 )
+                    {
+                        iIndentDiff = block.IndentLevel - TextBlocks[iBlock - 1].IndentLevel;
+                    }
+
+                    if( iIndentDiff == 0 )
+                    {
+                        CurrentListIndex++;
+                    }
+                    else
+                    if( iIndentDiff > 0 )
+                    {
+                        lListIndices.Push( CurrentListIndex );
+                        CurrentListIndex = 1;
+                    }
+                    else
+                    {
+                        CurrentListIndex = lListIndices.Pop() + 1;
+                    }
+                }
+                else
+                {
+                    CurrentListIndex = 0;
+                }
+
+                block.Draw( iX, iY, LayoutRect.Width - Padding.Horizontal );
                 iY += block.TotalHeight;
             }
 
