@@ -162,6 +162,7 @@ namespace NuclearWinter.UI
                 SelectionOffset = 0;
             }
             else
+            if( SelectionOffset < 0 )
             {
                 int iNewCaretOffset = CaretOffset + SelectionOffset;
 
