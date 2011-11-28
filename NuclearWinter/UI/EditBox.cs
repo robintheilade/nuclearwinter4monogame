@@ -115,6 +115,9 @@ namespace NuclearWinter.UI
         public Action<EditBox>  FocusHandler;
         public Action<EditBox>  BlurHandler;
 
+        public Action<EditBox,int,string>   OnTextInserted;
+        public Action<EditBox,int,int>      OnTextRemoved;
+
         public bool             IsReadOnly;
         public int              MaxLength;
 
@@ -154,12 +157,15 @@ namespace NuclearWinter.UI
         {
             if( SelectionOffset > 0 )
             {
+                if( OnTextRemoved != null ) OnTextRemoved( this, CaretOffset, SelectionOffset );
                 Text = Text.Remove( CaretOffset, SelectionOffset );
                 SelectionOffset = 0;
             }
             else
             {
                 int iNewCaretOffset = CaretOffset + SelectionOffset;
+
+                if( OnTextRemoved != null ) OnTextRemoved( this, CaretOffset + SelectionOffset, -SelectionOffset );
                 Text = Text.Remove( CaretOffset + SelectionOffset, -SelectionOffset );
                 CaretOffset = iNewCaretOffset;
             }
@@ -197,6 +203,7 @@ namespace NuclearWinter.UI
                     strPastedText = strPastedText.Substring( 0, MaxLength - Text.Length );
                 }
 
+                if( OnTextInserted != null ) OnTextInserted( this, CaretOffset, strPastedText );
                 Text = Text.Insert( CaretOffset, strPastedText );
                 CaretOffset += strPastedText.Length;
             }
@@ -328,7 +335,11 @@ namespace NuclearWinter.UI
                     DeleteSelectedText();
                 }
 
-                Text = Text.Insert( CaretOffset, _char.ToString() );
+                string strAddedText = _char.ToString();
+                if( OnTextInserted != null ) OnTextInserted( this, CaretOffset, strAddedText );
+
+                Text = Text.Insert( CaretOffset, strAddedText );
+
                 CaretOffset++;
             }
         }
@@ -379,6 +390,8 @@ namespace NuclearWinter.UI
                         if( CaretOffset > 0 )
                         {
                             CaretOffset--;
+
+                            if( OnTextRemoved != null ) OnTextRemoved( this, CaretOffset, 1 );
                             Text = Text.Remove( CaretOffset, 1 );
                         }
                     }
@@ -393,6 +406,7 @@ namespace NuclearWinter.UI
                         else
                         if( CaretOffset < Text.Length )
                         {
+                            if( OnTextRemoved != null ) OnTextRemoved( this, CaretOffset, 1 );
                             Text = Text.Remove( CaretOffset, 1 );
                         }
                     }
