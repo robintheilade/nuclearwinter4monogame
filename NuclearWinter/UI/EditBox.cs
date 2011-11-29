@@ -30,8 +30,7 @@ namespace NuclearWinter.UI
         int     miCaretOffset;
         public int     CaretOffset {
             get { return miCaretOffset; }
-
-            private set {
+            set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miSelectionOffset = 0;
                 ComputeCaretAndSelectionX();
@@ -42,7 +41,7 @@ namespace NuclearWinter.UI
         int     miCaretWidth = 3;
 
         int     miSelectionOffset;
-        int     SelectionOffset {
+        public int     SelectionOffset {
             get { return miSelectionOffset; }
             set {
                 miSelectionOffset = (int)MathHelper.Clamp( value, -miCaretOffset, mstrText.Length - miCaretOffset );
