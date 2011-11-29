@@ -15,20 +15,6 @@ namespace NuclearWinter.UI
 
         public Action<Caret>    TextBlockChangedHandler;
 
-        public int              AbsoluteIndex
-        {
-            get {
-                int iIndex = 3;
-
-                for( int i = 0; i < miTextBlockIndex; i++ )
-                {
-                    iIndex += 3 + TextArea.TextBlocks[i].Text.Length;
-                }
-
-                return iIndex + miOffset;
-            }
-        }
-
         public int              TextBlockIndex
         {
             get { return miTextBlockIndex; }
@@ -429,12 +415,14 @@ namespace NuclearWinter.UI
 
         internal int            CurrentListIndex;
 
-        public Action<RichTextArea,int,string>   TextInsertedHandler;
-        public Action<RichTextArea,int,int>      TextRemovedHandler;
+        public Action<RichTextArea,int,int,TextBlockType,int>   BlockStartInsertedHandler;
+        public Action<RichTextArea,int>                         BlockStartRemovedHandler;
+
+        public Action<RichTextArea,int,int,string>              TextInsertedHandler;
+        public Action<RichTextArea,int,int,int>                 TextRemovedHandler;
 
         //----------------------------------------------------------------------
-        Vector2                 mvViewOffset;
-        float                   mfZoom              = 1f;
+        float                   mfScrolling;
 
         bool                    mbIsDragging;
 
@@ -570,30 +558,11 @@ namespace NuclearWinter.UI
                 }
 
                 string strAddedText = _char.ToString();
-                if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, strAddedText );
+                if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, strAddedText );
 
                 TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
                 textBlock.Text = textBlock.Text.Insert( Caret.Offset, strAddedText );
                 Caret.Offset++;
-            }
-        }
-
-        char GetBlockTypeCode( TextBlockType _blockType )
-        {
-            switch( _blockType )
-            {
-                case TextBlockType.Paragraph:
-                    return 'p';
-                case TextBlockType.Header:
-                    return 'h';
-                case TextBlockType.SubHeader:
-                    return 's';
-                case TextBlockType.OrderedListItem:
-                    return 'o';
-                case TextBlockType.UnorderedListItem:
-                    return 'u';
-                default:
-                    throw new NotSupportedException();
             }
         }
 
@@ -636,7 +605,7 @@ namespace NuclearWinter.UI
 
                         if( bShift )
                         {
-                            if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, "\n" );
+                            if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, "\n" );
                             textBlock.Text = textBlock.Text.Insert( Caret.Offset, "\n" );
                             Caret.Offset++;
                         }
@@ -665,7 +634,7 @@ namespace NuclearWinter.UI
                                 }
                             }
 
-                            if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, "\0" + GetBlockTypeCode( newBlockType ) + (char)(1+iNewBlockIndentLevel) );
+                            if( BlockStartInsertedHandler != null ) BlockStartInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, newBlockType, iNewBlockIndentLevel );
 
                             if( Caret.Offset == 0 && textBlock.Text.Length > 0 )
                             {
@@ -702,7 +671,7 @@ namespace NuclearWinter.UI
                         {
                             Caret.Offset--;
 
-                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 1 );
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.TextBlockIndex, Caret.Offset, 1 );
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
                         }
                         else
@@ -710,7 +679,7 @@ namespace NuclearWinter.UI
                         {
                             int iNewCaretOffset = TextBlocks[ Caret.TextBlockIndex - 1 ].Text.Length;
 
-                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex - 3, 3 /* \0 + block type + indent level */ );
+                            if( BlockStartRemovedHandler != null ) BlockStartRemovedHandler( this, Caret.TextBlockIndex );
 
                             if( iNewCaretOffset > 0 )
                             {
@@ -738,13 +707,13 @@ namespace NuclearWinter.UI
                         else
                         if( Caret.Offset < TextBlocks[ Caret.TextBlockIndex ].Text.Length )
                         {
-                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 1 );
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.TextBlockIndex, Caret.Offset, 1 );
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
                         }
                         else
                         if( Caret.TextBlockIndex < TextBlocks.Count - 1 )
                         {
-                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 3 /* \0 + block type + indent level */ );
+                            if( BlockStartRemovedHandler != null ) BlockStartRemovedHandler( this, Caret.TextBlockIndex + 1 );
 
                             TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
                             TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
@@ -977,37 +946,9 @@ namespace NuclearWinter.UI
             }
         }
 
-        public void Deserialize( string _strSerializedContent )
+        public void ReplaceContent( List<TextBlock> _blocks )
         {
-            TextBlocks = new List<TextBlock>();
-
-            foreach( string strBlock in _strSerializedContent.Split( new string[] { "\0" }, StringSplitOptions.RemoveEmptyEntries ) )
-            {
-                TextBlock block = new TextBlock( this, strBlock.Substring( 2 ) );
-
-                switch( strBlock[0] )
-                {
-                    case 'p':
-                        block.BlockType = TextBlockType.Paragraph;
-                        break;
-                    case 'h':
-                        block.BlockType = TextBlockType.Header;
-                        break;
-                    case 's':
-                        block.BlockType = TextBlockType.SubHeader;
-                        break;
-                    case 'o':
-                        block.BlockType = TextBlockType.OrderedListItem;
-                        break;
-                    case 'u':
-                        block.BlockType = TextBlockType.UnorderedListItem;
-                        break;
-                }
-
-                block.IndentLevel = (int)strBlock[1] - 1;
-
-                TextBlocks.Add( block );
-            }
+            TextBlocks = _blocks;
         }
     }
 }
