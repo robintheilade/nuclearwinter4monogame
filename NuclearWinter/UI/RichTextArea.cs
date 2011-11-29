@@ -15,6 +15,20 @@ namespace NuclearWinter.UI
 
         public Action<Caret>    TextBlockChangedHandler;
 
+        public int              AbsoluteIndex
+        {
+            get {
+                int iIndex = 3;
+
+                for( int i = 0; i < miTextBlockIndex; i++ )
+                {
+                    iIndex += 3 + TextArea.TextBlocks[i].Text.Length;
+                }
+
+                return iIndex + miOffset;
+            }
+        }
+
         public int              TextBlockIndex
         {
             get { return miTextBlockIndex; }
@@ -312,10 +326,11 @@ namespace NuclearWinter.UI
 
         public TextBlock( RichTextArea _textArea, string _strText, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
         {
-            mTextArea = _textArea;
+            mTextArea   = _textArea;
             Text        = _strText;
-            BlockType    = _lineType;
+            BlockType   = _lineType;
             IndentLevel = _iIndentLevel;
+            WrappedLines = new List<string>();
         }
 
         public void DoWrap( int _iWidth )
@@ -413,6 +428,9 @@ namespace NuclearWinter.UI
         public bool             IsReadOnly;
 
         internal int            CurrentListIndex;
+
+        public Action<RichTextArea,int,string>   TextInsertedHandler;
+        public Action<RichTextArea,int,int>      TextRemovedHandler;
 
         //----------------------------------------------------------------------
         Vector2                 mvViewOffset;
@@ -551,9 +569,31 @@ namespace NuclearWinter.UI
                     //DeleteSelectedText();
                 }
 
+                string strAddedText = _char.ToString();
+                if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, strAddedText );
+
                 TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
-                textBlock.Text = textBlock.Text.Insert( Caret.Offset, _char.ToString() );
+                textBlock.Text = textBlock.Text.Insert( Caret.Offset, strAddedText );
                 Caret.Offset++;
+            }
+        }
+
+        char GetBlockTypeCode( TextBlockType _blockType )
+        {
+            switch( _blockType )
+            {
+                case TextBlockType.Paragraph:
+                    return 'p';
+                case TextBlockType.Header:
+                    return 'h';
+                case TextBlockType.SubHeader:
+                    return 's';
+                case TextBlockType.OrderedListItem:
+                    return 'o';
+                case TextBlockType.UnorderedListItem:
+                    return 'u';
+                default:
+                    throw new NotSupportedException();
             }
         }
 
@@ -596,6 +636,7 @@ namespace NuclearWinter.UI
 
                         if( bShift )
                         {
+                            if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, "\n" );
                             textBlock.Text = textBlock.Text.Insert( Caret.Offset, "\n" );
                             Caret.Offset++;
                         }
@@ -610,7 +651,7 @@ namespace NuclearWinter.UI
                             }
                         
                             TextBlockType newBlockType      = TextBlockType.Paragraph;
-                            int iNewBlockIndentLevel        = 0;
+                            int iNewBlockIndentLevel    = 0;
                             if( textBlock.Text.Length != 0 )
                             {
                                 switch( textBlock.BlockType )
@@ -623,6 +664,8 @@ namespace NuclearWinter.UI
                                         break;
                                 }
                             }
+
+                            if( TextInsertedHandler != null ) TextInsertedHandler( this, Caret.AbsoluteIndex, "\0" + GetBlockTypeCode( newBlockType ) + (char)(1+iNewBlockIndentLevel) );
 
                             if( Caret.Offset == 0 && textBlock.Text.Length > 0 )
                             {
@@ -659,12 +702,15 @@ namespace NuclearWinter.UI
                         {
                             Caret.Offset--;
 
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 1 );
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
                         }
                         else
                         if( Caret.TextBlockIndex > 0 )
                         {
                             int iNewCaretOffset = TextBlocks[ Caret.TextBlockIndex - 1 ].Text.Length;
+
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex - 3, 3 /* \0 + block type + indent level */ );
 
                             if( iNewCaretOffset > 0 )
                             {
@@ -692,11 +738,14 @@ namespace NuclearWinter.UI
                         else
                         if( Caret.Offset < TextBlocks[ Caret.TextBlockIndex ].Text.Length )
                         {
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 1 );
                             TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
                         }
                         else
                         if( Caret.TextBlockIndex < TextBlocks.Count - 1 )
                         {
+                            if( TextRemovedHandler != null ) TextRemovedHandler( this, Caret.AbsoluteIndex, 3 /* \0 + block type + indent level */ );
+
                             TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
                             TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
 
@@ -709,11 +758,11 @@ namespace NuclearWinter.UI
                     {
                         if( bShift )
                         {
-                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Max( 0, TextBlocks[ Caret.TextBlockIndex ].IndentLevel - 1 );
+                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Max( 0, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel - 1 );
                         }
                         else
                         {
-                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Min( 4, TextBlocks[ Caret.TextBlockIndex ].IndentLevel + 1 );
+                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Min( 4, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel + 1 );
                         }
                     }
                     break;
@@ -925,6 +974,39 @@ namespace NuclearWinter.UI
             if( Screen.IsActive && HasFocus )
             {
                 Caret.Draw();
+            }
+        }
+
+        public void Deserialize( string _strSerializedContent )
+        {
+            TextBlocks = new List<TextBlock>();
+
+            foreach( string strBlock in _strSerializedContent.Split( new string[] { "\0" }, StringSplitOptions.RemoveEmptyEntries ) )
+            {
+                TextBlock block = new TextBlock( this, strBlock.Substring( 2 ) );
+
+                switch( strBlock[0] )
+                {
+                    case 'p':
+                        block.BlockType = TextBlockType.Paragraph;
+                        break;
+                    case 'h':
+                        block.BlockType = TextBlockType.Header;
+                        break;
+                    case 's':
+                        block.BlockType = TextBlockType.SubHeader;
+                        break;
+                    case 'o':
+                        block.BlockType = TextBlockType.OrderedListItem;
+                        break;
+                    case 'u':
+                        block.BlockType = TextBlockType.UnorderedListItem;
+                        break;
+                }
+
+                block.IndentLevel = (int)strBlock[1] - 1;
+
+                TextBlocks.Add( block );
             }
         }
     }
