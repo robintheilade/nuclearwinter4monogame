@@ -70,7 +70,7 @@ namespace NuclearWinter.UI
             {
                 Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset );
                 caretPos.X += TextArea.LayoutRect.X + TextArea.Padding.Left;
-                caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top;
+                caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset;
 
                 for( int iTextBlock = 0; iTextBlock < TextBlockIndex; iTextBlock++ )
                 {
@@ -428,7 +428,7 @@ namespace NuclearWinter.UI
         public Action<RichTextArea,int,int,int>                 TextRemovedHandler;
 
         //----------------------------------------------------------------------
-        float                   mfScrolling;
+        public Scrollbar        Scrollbar           { get; private set; }
 
         bool                    mbIsDragging;
 
@@ -441,6 +441,8 @@ namespace NuclearWinter.UI
             TextBlocks.Add( new TextBlock( this, "" ) );
 
             Padding         = new Box(20);
+
+            Scrollbar = new Scrollbar( this );
         }
 
         //----------------------------------------------------------------------
@@ -452,14 +454,30 @@ namespace NuclearWinter.UI
 
             bool bWrapTextNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
-            if( bWrapTextNeeded )
+            ContentHeight = 0;
+
+            foreach( TextBlock textBlock in TextBlocks )
             {
-                foreach( TextBlock textBlock in TextBlocks )
+                if( bWrapTextNeeded )
                 {
                     textBlock.DoWrap( LayoutRect.Width - Padding.Horizontal );
                 }
+                ContentHeight += textBlock.TotalHeight;
             }
 
+            Scrollbar.DoLayout();
+        }
+
+        //----------------------------------------------------------------------
+        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        {
+            DoScroll( -_iDelta / 120 * 50 );
+        }
+
+        void DoScroll( int _iDelta )
+        {
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            Scrollbar.Offset += iScrollChange;
         }
 
         //----------------------------------------------------------------------
@@ -477,7 +495,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                Caret.MoveTo( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) ) );
+                Caret.MoveTo( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ) );
             }
 
             Screen.Focus( this );
@@ -872,6 +890,8 @@ namespace NuclearWinter.UI
         internal override void Update( float _fElapsedTime )
         {
             Caret.Update( _fElapsedTime );
+
+            Scrollbar.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -881,7 +901,7 @@ namespace NuclearWinter.UI
 
             //------------------------------------------------------------------
             // Text
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
 
             int iX = LayoutRect.X + Padding.Left;
             int iY = LayoutRect.Y + Padding.Top;
@@ -921,11 +941,9 @@ namespace NuclearWinter.UI
                     CurrentListIndex = 0;
                 }
 
-                block.Draw( iX, iY, LayoutRect.Width - Padding.Horizontal );
+                block.Draw( iX, iY - (int)Scrollbar.LerpOffset, LayoutRect.Width - Padding.Horizontal );
                 iY += block.TotalHeight;
             }
-
-            Screen.PopScissorRectangle();
 
             //------------------------------------------------------------------
             // Selection & cursor
@@ -948,6 +966,10 @@ namespace NuclearWinter.UI
             {
                 Caret.Draw();
             }
+
+            Screen.PopScissorRectangle();
+
+            Scrollbar.Draw();
         }
 
         public void ReplaceContent( List<TextBlock> _blocks )
