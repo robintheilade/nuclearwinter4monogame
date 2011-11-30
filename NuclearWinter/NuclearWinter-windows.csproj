@@ -135,6 +135,7 @@
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
     <Compile Include="UI\Screen.cs" />
+    <Compile Include="UI\Scrollbar.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\SpinningWheel.cs" />
     <Compile Include="UI\Splitter.cs" />

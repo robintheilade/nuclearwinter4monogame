@@ -334,15 +334,13 @@ namespace NuclearWinter.UI
         bool                                mbIsHovered;
         Point                               mHoverPoint;
 
-        public int                          ScrollOffset        { get; private set; }
-        int                                 miScrollMax;
-        int                                 miScrollbarHeight;
-        int                                 miScrollbarOffset;
-        float                               mfLerpScrollOffset;
+        //----------------------------------------------------------------------
+        public Scrollbar                    Scrollbar       { get; private set; }
 
         //----------------------------------------------------------------------
         // Drag & drop
-        public Func<TreeViewNode,TreeViewNode,bool>     DragNDropHandler;
+        public Func<TreeViewNode,TreeViewNode,bool>
+                                            DragNDropHandler;
         bool                                mbIsMouseDown;
         bool                                mbIsDragging;
         Point                               mMouseDownPoint;
@@ -384,6 +382,7 @@ namespace NuclearWinter.UI
                 }
             };
 
+            Scrollbar = new UI.Scrollbar( this );
 
             ActionButtons = new List<Button>();
         }
@@ -408,7 +407,7 @@ namespace NuclearWinter.UI
             int iHeight = 0;
             foreach( TreeViewNode node in Nodes )
             {
-                node.DoLayout( new Rectangle( iX, iY + iHeight - (int)mfLerpScrollOffset, LayoutRect.Width - 20, node.ContentHeight ) );
+                node.DoLayout( new Rectangle( iX, iY + iHeight - (int)Scrollbar.LerpOffset, LayoutRect.Width - 20, node.ContentHeight ) );
                 iHeight += node.ContentHeight;
             }
 
@@ -427,13 +426,8 @@ namespace NuclearWinter.UI
                 }
             }
 
-            miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
-            ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
-            if( miScrollMax > 0 )
-            {
-                miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
-                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
-            }
+            ContentHeight = iHeight;
+            Scrollbar.DoLayout();
         }
 
         //----------------------------------------------------------------------
@@ -471,7 +465,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)mfLerpScrollOffset ) / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)Scrollbar.LerpOffset ) / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
@@ -696,8 +690,8 @@ namespace NuclearWinter.UI
 
         void DoScroll( int _iDelta )
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -ScrollOffset, Math.Max( 0, miScrollMax - ScrollOffset ) );
-            ScrollOffset += iScrollChange;
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            Scrollbar.Offset += iScrollChange;
 
             if( mbIsDragging )
             {
@@ -740,10 +734,8 @@ namespace NuclearWinter.UI
                 mfScrollRepeatTimer += _fElapsedTime;
             }
 
-            float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
-            bool bIsScrolling = Math.Abs( mfLerpScrollOffset - ScrollOffset ) > 1f;
-            mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
-            mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
+            bool bIsScrolling = Math.Abs( Scrollbar.LerpOffset - Scrollbar.Offset ) > 1f;
+            Scrollbar.Update( _fElapsedTime );
 
             if( bIsScrolling )
             {
@@ -772,10 +764,7 @@ namespace NuclearWinter.UI
 
             Screen.PopScissorRectangle();
 
-            if( miScrollMax > 0 )
-            {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
-            }
+            Scrollbar.Draw();
         }
 
         //----------------------------------------------------------------------

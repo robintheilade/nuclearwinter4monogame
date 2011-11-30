@@ -211,11 +211,7 @@ namespace NuclearWinter.UI
         bool                        mbIsHoveredActionButtonDown;
 
         //----------------------------------------------------------------------
-        public int                  ScrollOffset        { get; private set; }
-        int                         miScrollMax;
-        int                         miScrollbarHeight;
-        int                         miScrollbarOffset;
-        float                       mfLerpScrollOffset;
+        public Scrollbar            Scrollbar           { get; private set; }
 
         //----------------------------------------------------------------------
         public ListView( Screen _screen )
@@ -232,6 +228,8 @@ namespace NuclearWinter.UI
             Style.FrameSelected         = Screen.Style.GridBoxFrameSelected;
             Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
             Style.FrameSelectedFocus    = Screen.Style.GridBoxFrameSelectedFocus;
+
+            Scrollbar = new Scrollbar( this );
 
             ActionButtons = new List<Button>();
 
@@ -270,9 +268,7 @@ namespace NuclearWinter.UI
                 actionButton.Update( _fElapsedTime );
             }
 
-            float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
-            mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
-            mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, miScrollMax );
+            Scrollbar.Update( _fElapsedTime );
 
             base.Update( _fElapsedTime );
         }
@@ -315,16 +311,8 @@ namespace NuclearWinter.UI
             }
 
             //------------------------------------------------------------------
-            int iHeight = Rows.Count * ( RowHeight + RowSpacing );
-
-            miScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
-            ScrollOffset = Math.Min( ScrollOffset, miScrollMax );
-
-            if( miScrollMax > 0 )
-            {
-                miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
-                miScrollbarOffset = (int)( (float)mfLerpScrollOffset / miScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
-            }
+            ContentHeight = Rows.Count * ( RowHeight + RowSpacing );
+            Scrollbar.DoLayout();
         }
 
         //----------------------------------------------------------------------
@@ -342,7 +330,7 @@ namespace NuclearWinter.UI
 
         void UpdateHoveredRow()
         {
-            HoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)mfLerpScrollOffset ) ) / ( RowHeight + RowSpacing );
+            HoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) ) / ( RowHeight + RowSpacing );
 
             if( HoveredRowIndex >= Rows.Count )
             {
@@ -401,8 +389,8 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( ScrollOffset - ( _iDelta / 120 * 3 * ( RowHeight + RowSpacing ) ), 0, Math.Max( 0, miScrollMax ) );
-            ScrollOffset = iNewScrollOffset;
+            int iNewScrollOffset = (int)MathHelper.Clamp( Scrollbar.Offset - ( _iDelta / 120 * 3 * ( RowHeight + RowSpacing ) ), 0, Math.Max( 0, Scrollbar.Max ) );
+            Scrollbar.Offset = iNewScrollOffset;
         }
 
         //----------------------------------------------------------------------
@@ -420,7 +408,7 @@ namespace NuclearWinter.UI
             else
             {
                 Screen.Focus( this );
-                miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)mfLerpScrollOffset ) / ( RowHeight + RowSpacing ) );
+                miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)Scrollbar.LerpOffset ) / ( RowHeight + RowSpacing ) );
                 if( miFocusedRowIndex > Rows.Count - 1 )
                 {
                     miFocusedRowIndex = -1;
@@ -538,7 +526,7 @@ namespace NuclearWinter.UI
 
         int GetRowY( int _iRowIndex )
         {
-            return ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)mfLerpScrollOffset;
+            return ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)Scrollbar.LerpOffset;
         }
 
         //----------------------------------------------------------------------
@@ -658,10 +646,7 @@ namespace NuclearWinter.UI
 
             Screen.PopScissorRectangle();
 
-            if( miScrollMax > 0 )
-            {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
-            }
+            Scrollbar.Draw();
         }
     }
 }

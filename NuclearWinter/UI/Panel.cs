@@ -27,11 +27,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int              ScrollOffset;
-        public int              ScrollMax           { get; private set; }
-        int                     miScrollbarHeight;
-        int                     miScrollbarOffset;
-        float                   mfLerpScrollOffset;
+        public Scrollbar        Scrollbar { get; private set; }
 
         protected Box           mMargin;
         public Box              Margin
@@ -51,6 +47,7 @@ namespace NuclearWinter.UI
             Texture     = _texture;
             CornerSize  = _iCornerSize;
             Padding     = new Box( CornerSize );
+            Scrollbar  = new Scrollbar( this );
         }
 
         //----------------------------------------------------------------------
@@ -58,9 +55,7 @@ namespace NuclearWinter.UI
         {
             if( EnableScrolling )
             {
-                float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
-                mfLerpScrollOffset = MathHelper.Lerp( mfLerpScrollOffset, ScrollOffset, fLerpAmount );
-                mfLerpScrollOffset = Math.Min( mfLerpScrollOffset, ScrollMax );
+                Scrollbar.Update( _fElapsedTime );
             }
 
             base.Update( _fElapsedTime );
@@ -73,15 +68,7 @@ namespace NuclearWinter.UI
 
             if( EnableScrolling )
             {
-                int iHeight = ContentHeight;
-                ScrollMax = Math.Max( 0, iHeight - ( LayoutRect.Height - 20 ) + 5 );
-                ScrollOffset = Math.Min( ScrollOffset, ScrollMax );
-
-                if( ScrollMax > 0 )
-                {
-                    miScrollbarHeight = (int)( ( LayoutRect.Height - 20 ) / ( (float)iHeight / ( LayoutRect.Height - 20 ) ) );
-                    miScrollbarOffset = (int)( (float)mfLerpScrollOffset / ScrollMax * (float)( LayoutRect.Height - 20 - miScrollbarHeight ) );
-                }
+                Scrollbar.DoLayout();
             }
 
             HitBox = LayoutRect;
@@ -89,7 +76,7 @@ namespace NuclearWinter.UI
 
         protected override void LayoutChildren()
         {
-            Rectangle childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)mfLerpScrollOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
+            Rectangle childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - ( EnableScrolling ? (int)Scrollbar.LerpOffset : 0 ), LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
             
             foreach( Widget widget in mlChildren )
             {
@@ -110,8 +97,8 @@ namespace NuclearWinter.UI
 
         void DoScroll( int _iDelta )
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -ScrollOffset, Math.Max( 0, ScrollMax - ScrollOffset ) );
-            ScrollOffset += iScrollChange;
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            Scrollbar.Offset += iScrollChange;
         }
 
         //----------------------------------------------------------------------
@@ -131,9 +118,9 @@ namespace NuclearWinter.UI
                 Screen.PopScissorRectangle();
             }
 
-            if( EnableScrolling && ScrollMax > 0 )
+            if( EnableScrolling )
             {
-                Screen.DrawBox( Screen.Style.VerticalScrollbar, new Rectangle( LayoutRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2, LayoutRect.Y + 10 + miScrollbarOffset, Screen.Style.VerticalScrollbar.Width, miScrollbarHeight ), Screen.Style.VerticalScrollbarCornerSize, Color.White );
+                Scrollbar.Draw();
             }
         }
     }
