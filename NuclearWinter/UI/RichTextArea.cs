@@ -280,7 +280,7 @@ namespace NuclearWinter.UI
                         throw new NotSupportedException();
                 }
 
-                mbWrapNeeded = true;
+                mlWrappedLines = null;
             }
         }
 
@@ -290,7 +290,6 @@ namespace NuclearWinter.UI
             get { return IndentLevel + ( ( BlockType == TextBlockType.OrderedListItem || BlockType == TextBlockType.UnorderedListItem ) ? 1 : 0 ); }
         }
 
-        bool                        mbWrapNeeded;
         string                      mstrText;
 
         public string               Text
@@ -298,11 +297,24 @@ namespace NuclearWinter.UI
             get { return mstrText; }
             set {
                 mstrText = value;
-                mbWrapNeeded = true;
+                mlWrappedLines = null;
             }
         }
 
-        public List<string>         WrappedLines        { get; private set; }
+        List<string> mlWrappedLines;
+        public List<string> WrappedLines
+        {
+            get {
+                if( mlWrappedLines == null )
+                {
+                    DoWrap( mTextArea.LayoutRect.Width - mTextArea.Padding.Horizontal );
+                }
+                return mlWrappedLines; 
+            }
+            private set {
+                mlWrappedLines = value;
+            }
+        }
 
         public UIFont               Font        { get; private set; }
         public int                  LineHeight  { get { return Font.LineSpacing; } }
@@ -316,24 +328,16 @@ namespace NuclearWinter.UI
             Text        = _strText;
             BlockType   = _lineType;
             IndentLevel = _iIndentLevel;
-            WrappedLines = new List<string>();
         }
 
         public void DoWrap( int _iWidth )
         {
             int iActualWidth = _iWidth - IndentLevel * RichTextArea.IndentOffset;
-
-            WrappedLines = mTextArea.Screen.Game.WrapText( Font, Text, iActualWidth );
-            mbWrapNeeded = false;
+            mlWrappedLines = mTextArea.Screen.Game.WrapText( Font, Text, iActualWidth );
         }
 
         public void Draw( int _iX, int _iY, int _iWidth )
         {
-            if( mbWrapNeeded )
-            {
-                DoWrap( _iWidth );
-            }
-
             int iIndentedX = _iX + EffectiveIndentLevel * RichTextArea.IndentOffset;
 
             switch( BlockType )
@@ -448,9 +452,9 @@ namespace NuclearWinter.UI
 
             if( bWrapTextNeeded )
             {
-                foreach( TextBlock line in TextBlocks )
+                foreach( TextBlock textBlock in TextBlocks )
                 {
-                    line.DoWrap( LayoutRect.Width - Padding.Horizontal );
+                    textBlock.DoWrap( LayoutRect.Width - Padding.Horizontal );
                 }
             }
 
