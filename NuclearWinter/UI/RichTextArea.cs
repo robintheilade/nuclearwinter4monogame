@@ -11,16 +11,35 @@ namespace NuclearWinter.UI
     public class Caret
     {
         //----------------------------------------------------------------------
-        int miTextBlockIndex;
-
-        public Action<Caret>    TextBlockChangedHandler;
-
-        public int              TextBlockIndex
+        public int StartTextBlockIndex
         {
-            get { return miTextBlockIndex; }
+            get { return miStartTextBlockIndex; }
             set
             {
-                miTextBlockIndex = value;
+                miStartTextBlockIndex = value;
+                EndTextBlockIndex = miStartTextBlockIndex;
+            }
+        }
+
+        public int StartOffset
+        {
+            get { return miStartOffset; }
+            set 
+            {
+                miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length );
+
+                EndTextBlockIndex   = StartTextBlockIndex;
+                EndOffset           = StartOffset;
+                Timer = 0f;
+            }
+        }
+
+        public int EndTextBlockIndex
+        {
+            get { return miEndTextBlockIndex; }
+            set
+            {
+                miEndTextBlockIndex = value;
                 Timer = 0f;
 
                 if( TextBlockChangedHandler != null )
@@ -30,24 +49,39 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int              Offset
+        public int EndOffset;
+
+        //----------------------------------------------------------------------
+        public bool HasSelection
         {
-            get { return miOffset; }
-            set 
-            {
-                miOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ TextBlockIndex ].Text.Length );
-                //miSelectionOffset = 0;
-                Timer = 0f;
+            get { return StartTextBlockIndex != EndTextBlockIndex || StartOffset != EndOffset; }
+        }
+
+        public bool HasLeftwardsSelection
+        {
+            get {
+                return EndTextBlockIndex < StartTextBlockIndex || ( StartTextBlockIndex == EndTextBlockIndex && EndOffset < StartOffset );
             }
         }
 
-        public int              SelectionOffset;
+        public bool HasRightwardsSelection
+        {
+            get {
+                return EndTextBlockIndex > StartTextBlockIndex || ( StartTextBlockIndex == EndTextBlockIndex && EndOffset > StartOffset );
+            }
+        }
 
         //----------------------------------------------------------------------
-        public RichTextArea TextArea { get; private set; }
+        public RichTextArea     TextArea { get; private set; }
+        public Action<Caret>    TextBlockChangedHandler;
 
-        internal float      Timer;
-        int                 miOffset;
+        internal float          Timer;
+
+        //----------------------------------------------------------------------
+        int                     miStartTextBlockIndex;
+        int                     miStartOffset;
+
+        int                     miEndTextBlockIndex;
 
         //----------------------------------------------------------------------
         public Caret( RichTextArea _textArea )
@@ -64,24 +98,42 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal void Draw()
         {
-            const float fBlinkInterval = 0.3f;
-            const int iCaretWidth = 2;
-
-            if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
+            if( HasSelection )
             {
-                Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset );
-                caretPos.X += TextArea.LayoutRect.X + TextArea.Padding.Left;
-                caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset;
-
-                for( int iTextBlock = 0; iTextBlock < TextBlockIndex; iTextBlock++ )
+                /*Rectangle selectionRectangle;
+                if( Caret.SelectionOffset > 0 )
                 {
-                    TextBlock block = TextArea.TextBlocks[ iTextBlock ];
-                    caretPos.Y += block.TotalHeight;
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miSelectionX - miCaretX, LayoutRect.Height - Padding.Vertical );
+                }
+                else
+                {
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretX - miSelectionX, LayoutRect.Height - Padding.Vertical );
                 }
 
-                int iCaretHeight = TextArea.TextBlocks[ TextBlockIndex ].LineHeight;
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );*/
+            }
+            else
+            if( TextArea.Screen.IsActive && TextArea.HasFocus )
+            {
+                const float fBlinkInterval = 0.3f;
+                const int iCaretWidth = 2;
 
-                TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
+                if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
+                {
+                    Point caretPos = TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset );
+                    caretPos.X += TextArea.LayoutRect.X + TextArea.Padding.Left;
+                    caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset;
+
+                    for( int iTextBlock = 0; iTextBlock < StartTextBlockIndex; iTextBlock++ )
+                    {
+                        TextBlock block = TextArea.TextBlocks[ iTextBlock ];
+                        caretPos.Y += block.TotalHeight;
+                    }
+
+                    int iCaretHeight = TextArea.TextBlocks[ StartTextBlockIndex ].LineHeight;
+
+                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
+                }
             }
         }
 
@@ -100,7 +152,7 @@ namespace NuclearWinter.UI
 
                 if( _point.Y < iBlockY )
                 {
-                    TextBlockIndex = iTextBlock;
+                    StartTextBlockIndex = iTextBlock;
                     break;
                 }
 
@@ -111,17 +163,17 @@ namespace NuclearWinter.UI
             {
                 // Clicked after the last block
                 // Setup caret to point to the last offset of the last block
-                TextBlockIndex = TextArea.TextBlocks.Count - 1;
-                Offset = TextArea.TextBlocks[ TextBlockIndex ].Text.Length;
+                StartTextBlockIndex = TextArea.TextBlocks.Count - 1;
+                StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length;
                 return;
             }
 
-            MoveInsideBlock( _point.X, iBlockCaretY / TextArea.TextBlocks[ TextBlockIndex ].LineHeight );
+            MoveInsideBlock( _point.X, iBlockCaretY / TextArea.TextBlocks[ StartTextBlockIndex ].LineHeight );
         }
 
         internal void MoveInsideBlock( int _iX, int _iLine )
         {
-            TextBlock caretBlock = TextArea.TextBlocks[ TextBlockIndex ];
+            TextBlock caretBlock = TextArea.TextBlocks[ StartTextBlockIndex ];
 
             int iOffset = 0;
             int iBlockLineIndex = Math.Min( caretBlock.WrappedLines.Count - 1, _iLine );
@@ -138,62 +190,62 @@ namespace NuclearWinter.UI
                 iOffset--;
             }
 
-            Offset = iOffset;
+            StartOffset = iOffset;
         }
 
         internal void MoveStart()
         {
             int iLine;
-            TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset, out iLine );
             MoveInsideBlock( 0, iLine );
         }
 
         internal void MoveEnd()
         {
             int iLine;
-            TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset, out iLine );
             MoveInsideBlock( int.MaxValue, iLine );
         }
 
         internal void MoveUp()
         {
             int iLine;
-            Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            Point caretPos = TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset, out iLine );
 
             if( iLine > 0 )
             {
                 MoveInsideBlock( caretPos.X, iLine- 1 );
             }
             else
-            if( TextBlockIndex > 0 )
+            if( StartTextBlockIndex > 0 )
             {
-                TextBlockIndex--;
-                MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 );
+                StartTextBlockIndex--;
+                MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ StartTextBlockIndex ].WrappedLines.Count - 1 );
             }
             else
             {
-                Offset = 0;
+                StartOffset = 0;
             }
         }
 
         internal void MoveDown()
         {
             int iLine;
-            Point caretPos = TextArea.TextBlocks[ TextBlockIndex ].GetXYForCaretOffset( Offset, out iLine );
+            Point caretPos = TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset, out iLine );
 
-            if( iLine < TextArea.TextBlocks[ TextBlockIndex ].WrappedLines.Count - 1 )
+            if( iLine < TextArea.TextBlocks[ StartTextBlockIndex ].WrappedLines.Count - 1 )
             {
                 MoveInsideBlock( caretPos.X, iLine + 1 );
             }
             else
-            if( TextBlockIndex < TextArea.TextBlocks.Count - 1 )
+            if( StartTextBlockIndex < TextArea.TextBlocks.Count - 1 )
             {
-                TextBlockIndex++;
+                StartTextBlockIndex++;
                 MoveInsideBlock( caretPos.X, 0 );
             }
             else
             {
-                Offset = TextArea.TextBlocks[ TextBlockIndex ].Text.Length;
+                StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length;
             }
         }
 
@@ -420,6 +472,7 @@ namespace NuclearWinter.UI
 
         internal int            CurrentListIndex;
 
+        // FIXME: Use EventHandler for those?
         public Func<RichTextArea,int,int,TextBlockType,int,bool>    BlockStartInsertedHandler;
         public Func<RichTextArea,int,bool>                          BlockStartRemovedHandler;
         public Func<RichTextArea,int,TextBlockType,bool>            BlockTypeChangedHandler;
@@ -505,6 +558,48 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void DeleteSelectedText()
         {
+            // TODO: call handler to ensure it's okay!
+
+            if( Caret.EndTextBlockIndex > Caret.StartTextBlockIndex )
+            {
+                // Remove text from start block
+                TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( Caret.StartOffset );
+
+                // Remove text from end block
+                TextBlocks[ Caret.EndTextBlockIndex ].Text.Remove( 0, Caret.EndOffset );
+
+                // Delete blocks in between
+                for( int i = Caret.EndTextBlockIndex - 1; i > Caret.StartTextBlockIndex; i-- )
+                {
+                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
+                }
+            }
+            else
+            if( Caret.EndTextBlockIndex < Caret.StartTextBlockIndex )
+            {
+                // Remove text from start block
+                TextBlocks[ Caret.EndTextBlockIndex ].Text.Remove( Caret.EndOffset );
+
+                // Remove text from end block
+                TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( 0, Caret.StartOffset );
+
+                // Delete blocks in between
+                for( int i = Caret.EndTextBlockIndex + 1; i < Caret.StartTextBlockIndex; i-- )
+                {
+                    TextBlocks.RemoveAt( Caret.EndTextBlockIndex + 1 );
+                }
+            }
+            else
+            if( Caret.EndOffset > Caret.StartOffset )
+            {
+
+            }
+            else
+            if( Caret.EndOffset > Caret.StartOffset )
+            {
+
+            }
+
             /*if( SelectionOffset > 0 )
             {
                 Text = Text.Remove( CaretOffset, SelectionOffset );
@@ -577,17 +672,17 @@ namespace NuclearWinter.UI
         {
             if( ! IsReadOnly && ! char.IsControl( _char ) )
             {
-                if( Caret.SelectionOffset != 0 )
+                if( Caret.HasSelection )
                 {
                     DeleteSelectedText();
                 }
 
                 string strAddedText = _char.ToString();
-                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, strAddedText ) )
+                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strAddedText ) )
                 {
-                    TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
-                    textBlock.Text = textBlock.Text.Insert( Caret.Offset, strAddedText );
-                    Caret.Offset++;
+                    TextBlock textBlock = TextBlocks[ Caret.StartTextBlockIndex ];
+                    textBlock.Text = textBlock.Text.Insert( Caret.StartOffset, strAddedText );
+                    Caret.StartOffset++;
                 }
             }
         }
@@ -627,27 +722,27 @@ namespace NuclearWinter.UI
                 case Keys.Enter:
                     if( ! IsReadOnly )
                     {
-                        TextBlock textBlock = TextBlocks[ Caret.TextBlockIndex ];
+                        TextBlock textBlock = TextBlocks[ Caret.StartTextBlockIndex ];
 
                         if( bShift )
                         {
-                            if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, "\n" ) )
+                            if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, "\n" ) )
                             {
-                                textBlock.Text = textBlock.Text.Insert( Caret.Offset, "\n" );
-                                Caret.Offset++;
+                                textBlock.Text = textBlock.Text.Insert( Caret.StartOffset, "\n" );
+                                Caret.StartOffset++;
                             }
                         }
                         else
                         {
                             if( textBlock.Text.Length == 0 && textBlock.BlockType != TextBlockType.Paragraph )
                             {
-                                if( BlockTypeChangedHandler == null || BlockTypeChangedHandler( this, Caret.TextBlockIndex, TextBlockType.Paragraph ) )
+                                if( BlockTypeChangedHandler == null || BlockTypeChangedHandler( this, Caret.StartTextBlockIndex, TextBlockType.Paragraph ) )
                                 {
-                                    if( BlockIndentLevelChangedHandler == null || BlockIndentLevelChangedHandler( this, Caret.TextBlockIndex, 0 ) )
+                                    if( BlockIndentLevelChangedHandler == null || BlockIndentLevelChangedHandler( this, Caret.StartTextBlockIndex, 0 ) )
                                     {
                                         textBlock.BlockType = TextBlockType.Paragraph;
                                         textBlock.IndentLevel = 0;
-                                        Caret.TextBlockIndex = Caret.TextBlockIndex; // Trigger block change handler
+                                        Caret.StartTextBlockIndex = Caret.StartTextBlockIndex; // Trigger block change handler
                                     }
                                 }
                                 break;
@@ -669,28 +764,28 @@ namespace NuclearWinter.UI
                                 }
                             }
 
-                            if( BlockStartInsertedHandler == null || BlockStartInsertedHandler( this, Caret.TextBlockIndex, Caret.Offset, newBlockType, iNewBlockIndentLevel ) )
+                            if( BlockStartInsertedHandler == null || BlockStartInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, newBlockType, iNewBlockIndentLevel ) )
                             {
-                                if( Caret.Offset == 0 && textBlock.Text.Length > 0 )
+                                if( Caret.StartOffset == 0 && textBlock.Text.Length > 0 )
                                 {
-                                    TextBlocks.Insert( Caret.TextBlockIndex, new TextBlock( this, "", newBlockType, iNewBlockIndentLevel ) );
+                                    TextBlocks.Insert( Caret.StartTextBlockIndex, new TextBlock( this, "", newBlockType, iNewBlockIndentLevel ) );
 
                                     Caret.Timer = 0f;
                                 }
                                 else
                                 {
                                     string strNewBlockText = "";
-                                    if( Caret.Offset < textBlock.Text.Length )
+                                    if( Caret.StartOffset < textBlock.Text.Length )
                                     {
-                                        strNewBlockText = textBlock.Text.Substring( Caret.Offset, textBlock.Text.Length - Caret.Offset );
-                                        textBlock.Text = textBlock.Text.Remove( Caret.Offset );
+                                        strNewBlockText = textBlock.Text.Substring( Caret.StartOffset, textBlock.Text.Length - Caret.StartOffset );
+                                        textBlock.Text = textBlock.Text.Remove( Caret.StartOffset );
                                     }
 
-                                    TextBlocks.Insert( Caret.TextBlockIndex + 1, new TextBlock( this, strNewBlockText, newBlockType, iNewBlockIndentLevel ) );
-                                    Caret.Offset = 0;
+                                    TextBlocks.Insert( Caret.StartTextBlockIndex + 1, new TextBlock( this, strNewBlockText, newBlockType, iNewBlockIndentLevel ) );
+                                    Caret.StartOffset = 0;
                                 }
 
-                                Caret.TextBlockIndex++;
+                                Caret.StartTextBlockIndex++;
                             }
                         }
                     }
@@ -698,39 +793,39 @@ namespace NuclearWinter.UI
                 case Keys.Back:
                     if( ! IsReadOnly )
                     {
-                        if( Caret.SelectionOffset != 0 )
+                        if( Caret.HasSelection )
                         {
                             DeleteSelectedText();
                         }
                         else
-                        if( Caret.Offset > 0 )
+                        if( Caret.StartOffset > 0 )
                         {
-                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.TextBlockIndex, Caret.Offset - 1, 1 ) )
+                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset - 1, 1 ) )
                             {
-                                Caret.Offset--;
-                                TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
+                                Caret.StartOffset--;
+                                TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( Caret.StartOffset, 1 );
                             }
                         }
                         else
-                        if( Caret.TextBlockIndex > 0 )
+                        if( Caret.StartTextBlockIndex > 0 )
                         {
-                            int iNewCaretOffset = TextBlocks[ Caret.TextBlockIndex - 1 ].Text.Length;
+                            int iNewCaretOffset = TextBlocks[ Caret.StartTextBlockIndex - 1 ].Text.Length;
 
-                            if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.TextBlockIndex ) )
+                            if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.StartTextBlockIndex ) )
                             {
                                 if( iNewCaretOffset > 0 )
                                 {
-                                    Caret.TextBlockIndex--;
-                                    TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
-                                    TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
+                                    Caret.StartTextBlockIndex--;
+                                    TextBlocks[ Caret.StartTextBlockIndex ].Text += TextBlocks[ Caret.StartTextBlockIndex + 1 ].Text;
+                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
                                 }
                                 else
                                 {
-                                    TextBlocks.RemoveAt( Caret.TextBlockIndex - 1 );
-                                    Caret.TextBlockIndex--;
+                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex - 1 );
+                                    Caret.StartTextBlockIndex--;
                                 }
 
-                                Caret.Offset = iNewCaretOffset;
+                                Caret.StartOffset = iNewCaretOffset;
                             }
                         }
                     }
@@ -738,25 +833,25 @@ namespace NuclearWinter.UI
                 case Keys.Delete:
                     if( ! IsReadOnly )
                     {
-                        if( Caret.SelectionOffset != 0 )
+                        if( Caret.HasSelection )
                         {
                             DeleteSelectedText();
                         }
                         else
-                        if( Caret.Offset < TextBlocks[ Caret.TextBlockIndex ].Text.Length )
+                        if( Caret.StartOffset < TextBlocks[ Caret.StartTextBlockIndex ].Text.Length )
                         {
-                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.TextBlockIndex, Caret.Offset, 1 ) )
+                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, 1 ) )
                             {
-                                TextBlocks[ Caret.TextBlockIndex ].Text = TextBlocks[ Caret.TextBlockIndex ].Text.Remove( Caret.Offset, 1 );
+                                TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( Caret.StartOffset, 1 );
                             }
                         }
                         else
-                        if( Caret.TextBlockIndex < TextBlocks.Count - 1 )
+                        if( Caret.StartTextBlockIndex < TextBlocks.Count - 1 )
                         {
-                            if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.TextBlockIndex + 1 ) )
+                            if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.StartTextBlockIndex + 1 ) )
                             {
-                                TextBlocks[ Caret.TextBlockIndex ].Text += TextBlocks[ Caret.TextBlockIndex + 1 ].Text;
-                                TextBlocks.RemoveAt( Caret.TextBlockIndex + 1 );
+                                TextBlocks[ Caret.StartTextBlockIndex ].Text += TextBlocks[ Caret.StartTextBlockIndex + 1 ].Text;
+                                TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
 
                                 Caret.Timer = 0f;
                             }
@@ -766,10 +861,10 @@ namespace NuclearWinter.UI
                 case Keys.Tab:
                     if( ! IsReadOnly )
                     {
-                        int iNewIndentLevel = bShift ? Math.Max( 0, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel - 1 ) : Math.Min( 4, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel + 1 );
-                        if( BlockIndentLevelChangedHandler == null || BlockIndentLevelChangedHandler( this, Caret.TextBlockIndex, iNewIndentLevel ) )
+                        int iNewIndentLevel = bShift ? Math.Max( 0, (int)TextBlocks[ Caret.StartTextBlockIndex ].IndentLevel - 1 ) : Math.Min( 4, (int)TextBlocks[ Caret.StartTextBlockIndex ].IndentLevel + 1 );
+                        if( BlockIndentLevelChangedHandler == null || BlockIndentLevelChangedHandler( this, Caret.StartTextBlockIndex, iNewIndentLevel ) )
                         {
-                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = iNewIndentLevel;
+                            TextBlocks[ Caret.StartTextBlockIndex ].IndentLevel = iNewIndentLevel;
                             Caret.Timer = 0f;
                         }
                     }
@@ -777,50 +872,53 @@ namespace NuclearWinter.UI
                 case Keys.Left:
                     if( bShift )
                     {
-                        /*if( bCtrl )
-                        {
-                            int iNewSelectionTarget = CaretOffset + SelectionOffset;
-
-                            if( iNewSelectionTarget > 0 )
-                            {
-                                iNewSelectionTarget = Text.LastIndexOf( ' ', iNewSelectionTarget - 2, iNewSelectionTarget - 2 ) + 1;
-                            }
-
-                            SelectionOffset = iNewSelectionTarget - CaretOffset;
-                        }
-                        else
-                        {
-                            SelectionOffset--;
-                        }*/
                     }
                     else
                     {
-                        int iNewCaretOffset = Caret.Offset - 1;
+                        int iNewStartTextBlockIndex = Caret.StartTextBlockIndex;
+                        int iNewStartOffset = Caret.StartOffset - 1;
 
                         if( bCtrl )
                         {
-                            Caret.SelectionOffset = 0;
-
-                            if( iNewCaretOffset > 0 )
+                            if( iNewStartOffset > 0 )
                             {
-                                iNewCaretOffset = TextBlocks[ Caret.TextBlockIndex ].Text.LastIndexOf( ' ', iNewCaretOffset - 1, iNewCaretOffset - 1 ) + 1;
+                                iNewStartOffset = TextBlocks[ Caret.StartTextBlockIndex ].Text.LastIndexOf( ' ', iNewStartOffset - 1, iNewStartOffset - 1 ) + 1;
+                            }
+                            else
+                            {
+
                             }
                         }
                         else
-                        if( Caret.SelectionOffset != 0 )
+                        if( Caret.HasSelection )
                         {
-                            iNewCaretOffset = ( Caret.SelectionOffset > 0 ) ? Caret.Offset : ( Caret.Offset + Caret.SelectionOffset );
-                            Caret.SelectionOffset = 0;
+                            if( Caret.HasLeftwardsSelection )
+                            {
+                                iNewStartOffset = Caret.EndOffset;
+                                iNewStartTextBlockIndex = Caret.EndTextBlockIndex;
+                            }
+                            else
+                            {
+                                iNewStartOffset = Caret.StartOffset;
+                            }
                         }
-                        Caret.Offset = iNewCaretOffset;
+
+                        if( iNewStartOffset < 0 && iNewStartTextBlockIndex > 0 )
+                        {
+                            iNewStartTextBlockIndex--;
+                            iNewStartOffset = TextBlocks[ iNewStartTextBlockIndex ].Text.Length;
+                        }
+
+                        Caret.StartTextBlockIndex = iNewStartTextBlockIndex;
+                        Caret.StartOffset = iNewStartOffset;
                     }
                     break;
                 case Keys.Right:
                     if( bShift )
                     {
-                        /*if( bCtrl )
+                        if( bCtrl )
                         {
-                            int iNewSelectionTarget = CaretOffset + SelectionOffset;
+                            /*int iNewSelectionTarget = CaretOffset + SelectionOffset;
 
                             if( iNewSelectionTarget < Text.Length )
                             {
@@ -832,37 +930,54 @@ namespace NuclearWinter.UI
                                 }
 
                                 SelectionOffset = iNewSelectionTarget - CaretOffset;
-                            }
+                            }*/
                         }
                         else
                         {
-                            SelectionOffset++;
-                        }*/
+                            Caret.EndOffset++;
+                        }
                     }
                     else
                     {
-                        int iNewCaretOffset = Caret.Offset + 1;
+                        int iNewStartTextBlockIndex = Caret.StartTextBlockIndex;
+                        int iNewStartOffset = Caret.StartOffset + 1;
 
                         if( bCtrl )
                         {
-                            string strText = TextBlocks[ Caret.TextBlockIndex ].Text;
+                            string strText = TextBlocks[ iNewStartTextBlockIndex ].Text;
 
-                            if( iNewCaretOffset < strText.Length )
+                            if( iNewStartOffset < strText.Length )
                             {
-                                iNewCaretOffset = strText.IndexOf( ' ', iNewCaretOffset, strText.Length - iNewCaretOffset ) + 1;
+                                iNewStartOffset = strText.IndexOf( ' ', iNewStartOffset, strText.Length - iNewStartOffset ) + 1;
 
-                                if( iNewCaretOffset == 0 )
+                                if( iNewStartOffset == 0 )
                                 {
-                                    iNewCaretOffset = strText.Length;
+                                    iNewStartOffset = strText.Length;
                                 }
                             }
                         }
                         else
-                        if( Caret.SelectionOffset != 0 )
+                        if( Caret.HasSelection )
                         {
-                            iNewCaretOffset = ( Caret.SelectionOffset < 0 ) ? Caret.Offset : ( Caret.Offset + Caret.SelectionOffset );
+                            if( Caret.HasRightwardsSelection )
+                            {
+                                iNewStartOffset = Caret.EndOffset;
+                                iNewStartTextBlockIndex = Caret.EndTextBlockIndex;
+                            }
+                            else
+                            {
+                                iNewStartOffset = Caret.StartOffset;
+                            }
                         }
-                        Caret.Offset = iNewCaretOffset;
+
+                        if( iNewStartOffset > TextBlocks[ iNewStartTextBlockIndex ].Text.Length && iNewStartTextBlockIndex < TextBlocks.Count - 1 )
+                        {
+                            iNewStartTextBlockIndex++;
+                            iNewStartOffset = 0;
+                        }
+
+                        Caret.StartTextBlockIndex = iNewStartTextBlockIndex;
+                        Caret.StartOffset = iNewStartOffset;
                     }
                     break;
                 case Keys.End:
@@ -963,26 +1078,8 @@ namespace NuclearWinter.UI
             }
 
             //------------------------------------------------------------------
-            // Selection & cursor
-            if( Caret.SelectionOffset != 0 )
-            {
-                Rectangle selectionRectangle;
-                /*if( Caret.SelectionOffset > 0 )
-                {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miSelectionX - miCaretX, LayoutRect.Height - Padding.Vertical );
-                }
-                else
-                {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretX - miSelectionX, LayoutRect.Height - Padding.Vertical );
-                }
-
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );*/
-            }
-            else
-            if( Screen.IsActive && HasFocus )
-            {
-                Caret.Draw();
-            }
+            // Draw caret & selection
+            Caret.Draw();
 
             Screen.PopScissorRectangle();
 
