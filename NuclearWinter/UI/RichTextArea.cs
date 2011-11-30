@@ -421,6 +421,8 @@ namespace NuclearWinter.UI
 
         public Action<RichTextArea,int,int,TextBlockType,int>   BlockStartInsertedHandler;
         public Action<RichTextArea,int>                         BlockStartRemovedHandler;
+        public Action<RichTextArea,int,TextBlockType>           BlockTypeChangedHandler;
+        public Action<RichTextArea,int,int>                     BlockIndentLevelChangedHandler;
 
         public Action<RichTextArea,int,int,string>              TextInsertedHandler;
         public Action<RichTextArea,int,int,int>                 TextRemovedHandler;
@@ -617,6 +619,9 @@ namespace NuclearWinter.UI
                         {
                             if( textBlock.Text.Length == 0 && textBlock.BlockType != TextBlockType.Paragraph )
                             {
+                                if( BlockTypeChangedHandler != null ) BlockTypeChangedHandler( this, Caret.TextBlockIndex, TextBlockType.Paragraph );
+                                if( BlockIndentLevelChangedHandler != null ) BlockIndentLevelChangedHandler( this, Caret.TextBlockIndex, 0 );
+
                                 textBlock.BlockType = TextBlockType.Paragraph;
                                 textBlock.IndentLevel = 0;
                                 Caret.TextBlockIndex = Caret.TextBlockIndex; // Trigger block change handler
@@ -729,14 +734,9 @@ namespace NuclearWinter.UI
                 case Keys.Tab:
                     if( ! IsReadOnly )
                     {
-                        if( bShift )
-                        {
-                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Max( 0, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel - 1 );
-                        }
-                        else
-                        {
-                            TextBlocks[ Caret.TextBlockIndex ].IndentLevel = Math.Min( 4, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel + 1 );
-                        }
+                        int iNewIndentLevel = bShift ? Math.Max( 0, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel - 1 ) : Math.Min( 4, (int)TextBlocks[ Caret.TextBlockIndex ].IndentLevel + 1 );
+                        if( BlockIndentLevelChangedHandler != null ) BlockIndentLevelChangedHandler( this, Caret.TextBlockIndex, iNewIndentLevel );
+                        TextBlocks[ Caret.TextBlockIndex ].IndentLevel = iNewIndentLevel;
                     }
                     break;
                 case Keys.Left:
