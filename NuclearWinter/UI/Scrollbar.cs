@@ -9,17 +9,17 @@ namespace NuclearWinter.UI
     public class Scrollbar
     {
         //----------------------------------------------------------------------
+
         public int              Offset;
+
         public int              Max
         {
-            get {
-                return miScrollMax;
-            }
+            get { return miMax; }
 
             set
             {
-                miScrollMax = value;
-                Offset = Math.Min( Offset, miScrollMax );
+                miMax = value;
+                Offset = Math.Min( Offset, miMax );
             }
         }
 
@@ -28,7 +28,7 @@ namespace NuclearWinter.UI
         public bool             ScrollToBottom;
 
         //----------------------------------------------------------------------
-        int                     miScrollMax;
+        int                     miMax;
 
         int                     miScrollbarHeight;
         int                     miScrollbarOffset;
@@ -52,9 +52,10 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void DoLayout()
         {
-            bool bScrolledToBottom = ScrollToBottom && Offset == Max;
+            bool bScrolledToBottom = ScrollToBottom && Offset >= Max;
 
             Max = Math.Max( 0, Parent.ContentHeight - ( Parent.LayoutRect.Height - 20 ) + 5 );
+            Offset = (int)MathHelper.Clamp( Offset, 0, Max );
 
             if( bScrolledToBottom )
             {
@@ -68,7 +69,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Draw()
         {
-            if( miScrollMax > 0 )
+            if( miMax > 0 )
             {
                 Parent.Screen.DrawBox(
                     Parent.Screen.Style.VerticalScrollbar,
