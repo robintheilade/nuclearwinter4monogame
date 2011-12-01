@@ -120,7 +120,7 @@ namespace NuclearWinter.UI
             LayoutChildren();
             UpdateContentSize();
 
-            HitBox = Resolution.InternalMode.Rectangle;
+            HitBox = LayoutRect;
         }
 
         //----------------------------------------------------------------------

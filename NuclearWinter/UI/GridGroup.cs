@@ -175,9 +175,10 @@ namespace NuclearWinter.UI
         internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
+        }
 
-            Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );
-
+        protected override void LayoutChildren()
+        {
             if( ! mbExpand )
             {
                 int iColumnCount    = maTiles.GetLength(0);
@@ -195,8 +196,6 @@ namespace NuclearWinter.UI
 
                     kvpChild.Key.DoLayout( new Rectangle( widgetPosition.X, widgetPosition.Y, widgetSize.X, widgetSize.Y ) );
                 }
-
-                HitBox = LayoutRect;
             }
         }
     }

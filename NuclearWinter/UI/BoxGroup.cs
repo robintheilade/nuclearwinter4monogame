@@ -167,10 +167,10 @@ namespace NuclearWinter.UI
         internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
-            HitBox = LayoutRect;
+        }
 
-            Debug.Assert( LayoutRect.Width != 0 && LayoutRect.Height != 0 );
-
+        protected override void LayoutChildren()
+        {
             int iUnexpandedSize = 0;
             int iExpandedChildrenCount = 0;
             for( int iIndex = 0; iIndex < mlChildren.Count; iIndex++ )

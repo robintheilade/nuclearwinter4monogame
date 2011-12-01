@@ -61,6 +61,8 @@ namespace NuclearWinter.UI
         public Color            OutlineColor;
         public float            OutlineRadius;
 
+        int                     miEllipsizedTextWidth;
+
         //----------------------------------------------------------------------
         public Label( Screen _screen, string _strText, Anchor _anchor, Color _color )
         : base( _screen )
@@ -99,14 +101,16 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Left + Padding.Right;
-            ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+            ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Horizontal;
 
             if( mbWrapText )
             {
-                ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Left + Padding.Right;
                 mlstrWrappedText = null;
                 DoWrapText();
+            }
+            else
+            {
+                ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Vertical;
             }
 
             base.UpdateContentSize();
@@ -121,7 +125,7 @@ namespace NuclearWinter.UI
                     // Wrap text
                     mlstrWrappedText = Screen.Game.WrapText( Font, Text, LayoutRect.Width - Padding.Horizontal );
                     ContentWidth = LayoutRect.Width;
-                    ContentHeight = (int)( Font.LineSpacing * mlstrWrappedText.Count ) + Padding.Top + Padding.Bottom;
+                    ContentHeight = (int)( Font.LineSpacing * mlstrWrappedText.Count ) + Padding.Vertical;
                 }
                 else
                 if( mlstrWrappedText == null )
@@ -136,15 +140,15 @@ namespace NuclearWinter.UI
                 // Ellipsize
                 mstrDisplayedText = Text;
 
-                int iWidth = ContentWidth;
+                miEllipsizedTextWidth = ContentWidth;
                 int iOffset = Text.Length;
-                while( iWidth > LayoutRect.Width )
+                while( miEllipsizedTextWidth > LayoutRect.Width )
                 {
                     iOffset--;
                     mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
                     if( iOffset == 0 ) break;
 
-                    iWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
+                    miEllipsizedTextWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Horizontal;
                 }
             }
         }
@@ -176,13 +180,13 @@ namespace NuclearWinter.UI
                     break;
                 case UI.Anchor.Center:
                     mpTextPosition = new Point(
-                        pCenter.X - ContentWidth / 2 + Padding.Left,
+                        pCenter.X - ( ContentWidth > LayoutRect.Width ? miEllipsizedTextWidth : ContentWidth ) / 2 + Padding.Left,
                         iTop
                     );
                     break;
                 case UI.Anchor.End:
                     mpTextPosition = new Point(
-                        LayoutRect.Right - ContentWidth,
+                        LayoutRect.Right + Padding.Right - ( ContentWidth > LayoutRect.Width ? miEllipsizedTextWidth : ContentWidth ),
                         iTop
                     );
                     break;
