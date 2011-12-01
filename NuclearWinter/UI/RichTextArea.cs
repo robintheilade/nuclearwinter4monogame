@@ -558,7 +558,7 @@ namespace NuclearWinter.UI
                 {
                     iLine++;
                     _iLine = iLine;
-                    return new Point( 0, iLine * LineHeight );
+                    return new Point( EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
                 }
 
                 if( iOffset + strLine.Length < _iCaretOffset )
