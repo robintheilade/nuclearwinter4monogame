@@ -729,6 +729,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void DeleteSelectedText()
         {
+            if( ! Caret.HasSelection ) return;
+
             bool bHasForwardSelection = Caret.HasForwardSelection;
             int iStartBlockIndex    = bHasForwardSelection ? Caret.StartTextBlockIndex : Caret.EndTextBlockIndex;
             int iStartOffset        = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
@@ -758,45 +760,56 @@ namespace NuclearWinter.UI
 
         public void CopySelectionToClipboard()
         {
-            /*
-            if( SelectionOffset != 0 )
+            if( Caret.HasSelection )
             {
-                string strText;
-                if( SelectionOffset > 0 )
+                bool bHasForwardSelection = Caret.HasForwardSelection;
+                int iStartBlockIndex    = bHasForwardSelection ? Caret.StartTextBlockIndex : Caret.EndTextBlockIndex;
+                int iStartOffset        = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
+                int iEndBlockIndex      = bHasForwardSelection ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
+                int iEndOffset          = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
+
+                string strText = "";
+
+                if( iStartBlockIndex != iEndBlockIndex )
                 {
-                    strText = Text.Substring( CaretOffset, SelectionOffset );
+                    strText += TextBlocks[ iStartBlockIndex ].Text.Substring( iStartOffset ) + "\n\n";
+
+                    for( int i = iStartBlockIndex + 1; i < iEndBlockIndex; i++ )
+                    {
+                        strText += TextBlocks[ i ].Text + "\n\n";
+                    }
+
+                    strText += TextBlocks[ iEndBlockIndex ].Text.Substring( 0, iEndOffset );
                 }
                 else
                 {
-                    strText = Text.Substring( CaretOffset + SelectionOffset, -SelectionOffset );
+                    strText += TextBlocks[ iStartBlockIndex ].Text.Substring( iStartOffset, iEndOffset - iStartOffset );
                 }
 
                 // NOTE: For this to work, you must put [STAThread] before your Main()
-                System.Windows.Forms.Clipboard.SetText( strText );
+
+                // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
+                System.Windows.Forms.Clipboard.SetText( strText ); //, System.Windows.Forms.TextDataFormat.Html );
             }
-            */
         }
 
         public void PasteFromClipboard()
         {
-            /*
             // NOTE: For this to work, you must put [STAThread] before your Main()
-            string strPastedText = (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName );
+
+            // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
+            string strPastedText = (string)System.Windows.Forms.Clipboard.GetText(); // System.Windows.Forms.TextDataFormat.Html );
             if( strPastedText != null )
             {
                 DeleteSelectedText();
 
-                if( MaxLength != 0 && strPastedText.Length > MaxLength - Text.Length )
+                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strPastedText ) )
                 {
-                    strPastedText = strPastedText.Substring( 0, MaxLength - Text.Length );
+                    TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Insert( Caret.StartOffset, strPastedText );
+                    Caret.StartOffset += strPastedText.Length;
+                    mbScrollToCaret = true;
                 }
-
-                Text = Text.Insert( CaretOffset, strPastedText );
-                CaretOffset += strPastedText.Length;
-                
-                mbMovedCaret = true;
             }
-            */
         }
 
         //----------------------------------------------------------------------
@@ -822,10 +835,7 @@ namespace NuclearWinter.UI
         {
             if( ! IsReadOnly && ! char.IsControl( _char ) )
             {
-                if( Caret.HasSelection )
-                {
-                    DeleteSelectedText();
-                }
+                DeleteSelectedText();
 
                 string strAddedText = _char.ToString();
                 if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strAddedText ) )
