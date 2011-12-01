@@ -49,7 +49,14 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int EndOffset;
+        public int EndOffset
+        {
+            get { return miEndOffset; }
+            set 
+            {
+                miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length );
+            }
+        }
 
         //----------------------------------------------------------------------
         public bool HasSelection
@@ -57,14 +64,14 @@ namespace NuclearWinter.UI
             get { return StartTextBlockIndex != EndTextBlockIndex || StartOffset != EndOffset; }
         }
 
-        public bool HasLeftwardsSelection
+        public bool HasBackwardSelection
         {
             get {
                 return EndTextBlockIndex < StartTextBlockIndex || ( StartTextBlockIndex == EndTextBlockIndex && EndOffset < StartOffset );
             }
         }
 
-        public bool HasRightwardsSelection
+        public bool HasForwardSelection
         {
             get {
                 return EndTextBlockIndex > StartTextBlockIndex || ( StartTextBlockIndex == EndTextBlockIndex && EndOffset > StartOffset );
@@ -82,6 +89,7 @@ namespace NuclearWinter.UI
         int                     miStartOffset;
 
         int                     miEndTextBlockIndex;
+        int                     miEndOffset;
 
         //----------------------------------------------------------------------
         public Caret( RichTextArea _textArea )
@@ -100,19 +108,83 @@ namespace NuclearWinter.UI
         {
             if( HasSelection )
             {
-                /*Rectangle selectionRectangle;
-                if( Caret.SelectionOffset > 0 )
+                Point origin = new Point(
+                    TextArea.LayoutRect.X + TextArea.Padding.Left,
+                    TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset
+                    );
+
+                //--------------------------------------------------------------
+                // Start
+                int iStartBlockIndex    = HasForwardSelection ? StartTextBlockIndex : EndTextBlockIndex;
+                int iStartOffset        = HasForwardSelection ? StartOffset: EndOffset;
+
+                int iStartBlockLine;
+                Point startPos = TextArea.TextBlocks[ iStartBlockIndex ].GetXYForCaretOffset( iStartOffset, out iStartBlockLine );
+
+                int iStartBlockY = 0;
+                for( int iBlock = 0; iBlock < iStartBlockIndex; iBlock++ )
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miSelectionX - miCaretX, LayoutRect.Height - Padding.Vertical );
+                    iStartBlockY += TextArea.TextBlocks[ iBlock ].TotalHeight;
+                }
+                startPos.Y += iStartBlockY;
+
+                int iStartCaretHeight = TextArea.TextBlocks[ iStartBlockIndex ].LineHeight;
+
+                //--------------------------------------------------------------
+                // End
+                int iEndBlockIndex      = HasForwardSelection ? EndTextBlockIndex : StartTextBlockIndex;
+                int iEndOffset          = HasForwardSelection ? EndOffset: StartOffset;
+
+                int iEndBlockLine;
+                Point endPos = TextArea.TextBlocks[ iEndBlockIndex ].GetXYForCaretOffset( iEndOffset, out iEndBlockLine );
+
+                int iEndBlockY = 0;
+                for( int iBlock = 0; iBlock < iEndBlockIndex; iBlock++ )
+                {
+                    iEndBlockY += TextArea.TextBlocks[ iBlock ].TotalHeight;
+                }
+                endPos.Y += iEndBlockY;
+
+                //--------------------------------------------------------------
+                if( iStartBlockIndex == iEndBlockIndex && iStartBlockLine == iEndBlockLine )
+                {
+                    Rectangle selectionRectangle = new Rectangle( startPos.X, startPos.Y, endPos.X - startPos.X, iStartCaretHeight );
+                    selectionRectangle.Offset( origin );
+                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
                 }
                 else
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretX - miSelectionX, LayoutRect.Height - Padding.Vertical );
-                }
+                    Rectangle startSelectionRectangle = new Rectangle( startPos.X, startPos.Y, TextArea.LayoutRect.Width - TextArea.Padding.Horizontal - startPos.X, iStartCaretHeight );
+                    startSelectionRectangle.Offset( origin );
+                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, startSelectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
 
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );*/
+                    if( iStartBlockIndex == iEndBlockIndex )
+                    {
+                        if( iEndBlockLine > iStartBlockLine + 1 )
+                        {
+                            Rectangle selectionRectangle = new Rectangle( 0, startPos.Y + iStartCaretHeight, TextArea.LayoutRect.Width - TextArea.Padding.Horizontal, iStartCaretHeight * ( iEndBlockLine - iStartBlockLine - 1 ) );
+                            selectionRectangle.Offset( origin );
+                            TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
+                        }
+                    }
+                    else
+                    {
+                        int iBlockSelectionStartY   = startPos.Y + iStartCaretHeight;
+                        int iBlockSelectionEndY     = endPos.Y;
+
+                        Rectangle selectionRectangle = new Rectangle( 0, iBlockSelectionStartY, TextArea.LayoutRect.Width - TextArea.Padding.Horizontal, iBlockSelectionEndY - iBlockSelectionStartY );
+                        selectionRectangle.Offset( origin );
+                        TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
+                    }
+
+                    int iEndCaretHeight = TextArea.TextBlocks[ iEndBlockIndex ].LineHeight;
+
+                    Rectangle endSelectionRectangle = new Rectangle( 0, endPos.Y, endPos.X, iEndCaretHeight );
+                    endSelectionRectangle.Offset( origin );
+                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, endSelectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
+                }
             }
-            else
+
             if( TextArea.Screen.IsActive && TextArea.HasFocus )
             {
                 const float fBlinkInterval = 0.3f;
@@ -120,17 +192,17 @@ namespace NuclearWinter.UI
 
                 if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
                 {
-                    Point caretPos = TextArea.TextBlocks[ StartTextBlockIndex ].GetXYForCaretOffset( StartOffset );
+                    Point caretPos = TextArea.TextBlocks[ EndTextBlockIndex ].GetXYForCaretOffset( EndOffset );
                     caretPos.X += TextArea.LayoutRect.X + TextArea.Padding.Left;
                     caretPos.Y += TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset;
 
-                    for( int iTextBlock = 0; iTextBlock < StartTextBlockIndex; iTextBlock++ )
+                    for( int iTextBlock = 0; iTextBlock < EndTextBlockIndex; iTextBlock++ )
                     {
                         TextBlock block = TextArea.TextBlocks[ iTextBlock ];
                         caretPos.Y += block.TotalHeight;
                     }
 
-                    int iCaretHeight = TextArea.TextBlocks[ StartTextBlockIndex ].LineHeight;
+                    int iCaretHeight = TextArea.TextBlocks[ EndTextBlockIndex ].LineHeight;
 
                     TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
                 }
@@ -440,6 +512,7 @@ namespace NuclearWinter.UI
                     _iLine = iLine;
                     return new Point( 0, iLine * LineHeight );
                 }
+
                 if( iOffset + strLine.Length < _iCaretOffset )
                 {
                     iOffset += strLine.Length;
@@ -447,7 +520,7 @@ namespace NuclearWinter.UI
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - ( iOffset ) ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
+                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -869,117 +942,99 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case Keys.Left:
-                    if( bShift )
+                case Keys.Left: {
+                    int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
+                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
+
+                    if( bCtrl )
                     {
-                    }
-                    else
-                    {
-                        int iNewStartTextBlockIndex = Caret.StartTextBlockIndex;
-                        int iNewStartOffset = Caret.StartOffset - 1;
-
-                        if( bCtrl )
+                        if( iNewOffset > 0 )
                         {
-                            if( iNewStartOffset > 0 )
-                            {
-                                iNewStartOffset = TextBlocks[ Caret.StartTextBlockIndex ].Text.LastIndexOf( ' ', iNewStartOffset - 1, iNewStartOffset - 1 ) + 1;
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                        else
-                        if( Caret.HasSelection )
-                        {
-                            if( Caret.HasLeftwardsSelection )
-                            {
-                                iNewStartOffset = Caret.EndOffset;
-                                iNewStartTextBlockIndex = Caret.EndTextBlockIndex;
-                            }
-                            else
-                            {
-                                iNewStartOffset = Caret.StartOffset;
-                            }
-                        }
-
-                        if( iNewStartOffset < 0 && iNewStartTextBlockIndex > 0 )
-                        {
-                            iNewStartTextBlockIndex--;
-                            iNewStartOffset = TextBlocks[ iNewStartTextBlockIndex ].Text.Length;
-                        }
-
-                        Caret.StartTextBlockIndex = iNewStartTextBlockIndex;
-                        Caret.StartOffset = iNewStartOffset;
-                    }
-                    break;
-                case Keys.Right:
-                    if( bShift )
-                    {
-                        if( bCtrl )
-                        {
-                            /*int iNewSelectionTarget = CaretOffset + SelectionOffset;
-
-                            if( iNewSelectionTarget < Text.Length )
-                            {
-                                iNewSelectionTarget = Text.IndexOf( ' ', iNewSelectionTarget, Text.Length - iNewSelectionTarget ) + 1;
-
-                                if( iNewSelectionTarget == 0 )
-                                {
-                                    iNewSelectionTarget = Text.Length;
-                                }
-
-                                SelectionOffset = iNewSelectionTarget - CaretOffset;
-                            }*/
-                        }
-                        else
-                        {
-                            Caret.EndOffset++;
+                            iNewOffset = TextBlocks[ iNewTextBlockIndex ].Text.LastIndexOf( ' ', iNewOffset - 1, iNewOffset - 1 ) + 1;
                         }
                     }
                     else
+                    if( ! bShift && Caret.HasSelection )
                     {
-                        int iNewStartTextBlockIndex = Caret.StartTextBlockIndex;
-                        int iNewStartOffset = Caret.StartOffset + 1;
-
-                        if( bCtrl )
+                        if( Caret.HasBackwardSelection )
                         {
-                            string strText = TextBlocks[ iNewStartTextBlockIndex ].Text;
-
-                            if( iNewStartOffset < strText.Length )
-                            {
-                                iNewStartOffset = strText.IndexOf( ' ', iNewStartOffset, strText.Length - iNewStartOffset ) + 1;
-
-                                if( iNewStartOffset == 0 )
-                                {
-                                    iNewStartOffset = strText.Length;
-                                }
-                            }
+                            iNewOffset = Caret.EndOffset;
+                            iNewTextBlockIndex = Caret.EndTextBlockIndex;
                         }
                         else
-                        if( Caret.HasSelection )
                         {
-                            if( Caret.HasRightwardsSelection )
-                            {
-                                iNewStartOffset = Caret.EndOffset;
-                                iNewStartTextBlockIndex = Caret.EndTextBlockIndex;
-                            }
-                            else
-                            {
-                                iNewStartOffset = Caret.StartOffset;
-                            }
+                            iNewOffset++;
                         }
+                    }
 
-                        if( iNewStartOffset > TextBlocks[ iNewStartTextBlockIndex ].Text.Length && iNewStartTextBlockIndex < TextBlocks.Count - 1 )
-                        {
-                            iNewStartTextBlockIndex++;
-                            iNewStartOffset = 0;
-                        }
+                    if( iNewOffset < 0 && iNewTextBlockIndex > 0 )
+                    {
+                        iNewTextBlockIndex--;
+                        iNewOffset = TextBlocks[ iNewTextBlockIndex ].Text.Length;
+                    }
 
-                        Caret.StartTextBlockIndex = iNewStartTextBlockIndex;
-                        Caret.StartOffset = iNewStartOffset;
+                    if( bShift )
+                    {
+                        Caret.EndTextBlockIndex     = iNewTextBlockIndex;
+                        Caret.EndOffset             = iNewOffset;
+                    }
+                    else
+                    {
+                        Caret.StartTextBlockIndex   = iNewTextBlockIndex;
+                        Caret.StartOffset           = iNewOffset;
                     }
                     break;
+                }
+                case Keys.Right: {
+                    int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
+                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) + 1;
+
+                    if( bCtrl )
+                    {
+                        string strText = TextBlocks[ iNewTextBlockIndex ].Text;
+
+                        if( iNewOffset < strText.Length )
+                        {
+                            iNewOffset = strText.IndexOf( ' ', iNewOffset, strText.Length - iNewOffset ) + 1;
+
+                            if( iNewOffset == 0 )
+                            {
+                                iNewOffset = strText.Length;
+                            }
+                        }
+                    }
+                    else
+                    if( ! bShift && Caret.HasSelection )
+                    {
+                        if( Caret.HasForwardSelection )
+                        {
+                            iNewOffset = Caret.EndOffset;
+                            iNewTextBlockIndex = Caret.EndTextBlockIndex;
+                        }
+                        else
+                        {
+                            iNewOffset--;
+                        }
+                    }
+
+                    if( iNewOffset > TextBlocks[ iNewTextBlockIndex ].Text.Length && iNewTextBlockIndex < TextBlocks.Count - 1 )
+                    {
+                        iNewTextBlockIndex++;
+                        iNewOffset = 0;
+                    }
+
+                    if( bShift )
+                    {
+                        Caret.EndTextBlockIndex     = iNewTextBlockIndex;
+                        Caret.EndOffset             = iNewOffset;
+                    }
+                    else
+                    {
+                        Caret.StartTextBlockIndex   = iNewTextBlockIndex;
+                        Caret.StartOffset           = iNewOffset;
+                    }
+                    break;
+                }
                 case Keys.End:
                     if( bShift )
                     {
