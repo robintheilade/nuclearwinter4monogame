@@ -505,7 +505,7 @@ namespace NuclearWinter.UI
 
         public void DoWrap( int _iWidth )
         {
-            int iActualWidth = _iWidth - IndentLevel * RichTextArea.IndentOffset;
+            int iActualWidth = _iWidth - EffectiveIndentLevel * RichTextArea.IndentOffset;
             mlWrappedLines = mTextArea.Screen.Game.WrapText( Font, Text, iActualWidth );
         }
 
