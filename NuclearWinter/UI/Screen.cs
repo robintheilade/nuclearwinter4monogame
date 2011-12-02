@@ -193,6 +193,7 @@ namespace NuclearWinter.UI
                     Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
                     if( widget != null )
                     {
+                        mClickedWidget = widget;
                         widget.OnMouseDoubleClick( mouseHitPoint );
                     }
                 }
