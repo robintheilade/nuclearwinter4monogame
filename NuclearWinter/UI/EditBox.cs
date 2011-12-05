@@ -105,7 +105,8 @@ namespace NuclearWinter.UI
         int                     miScrollOffset;
         int                     miMaxScrollOffset;
 
-        public Func<char,bool>  TextEnteredHandler;
+        public Func<char,bool>      TextEnteredHandler;
+        public Func<string,string>  LookupHandler;
 
         public static bool IntegerValidator( char _char )   { return ( _char >= '0' && _char <= '9' ) || _char == '-'; }
         public static bool FloatValidator( char _char )     { return ( _char >= '0' && _char <= '9' ) || _char == '.' || _char == '-'; }
@@ -518,6 +519,33 @@ namespace NuclearWinter.UI
                     else
                     {
                         CaretOffset = 0;
+                    }
+                    break;
+                case Keys.Tab:
+                    if( LookupHandler != null )
+                    {
+                        if( CaretOffset > 0 && ( CaretOffset == Text.Length || Text[CaretOffset] == ' ' ) )
+                        {
+                            int iOffset = Text.LastIndexOf( ' ', CaretOffset - 1 );
+
+                            iOffset++;
+
+                            string strLookup = Text.Substring( iOffset, CaretOffset - iOffset );
+                            if( strLookup != "" )
+                            {
+                                string strResult = LookupHandler( strLookup );
+                                if( ! string.IsNullOrEmpty( strResult ) )
+                                {
+                                    Text = Text.Substring( 0, iOffset ) + strResult + Text.Substring( CaretOffset );
+                                    CaretOffset = iOffset + strResult.Length;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        base.OnKeyPress( _key );
                     }
                     break;
                 default:
