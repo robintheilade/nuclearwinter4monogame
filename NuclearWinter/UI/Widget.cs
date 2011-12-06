@@ -268,5 +268,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal abstract void  Draw();
         internal virtual void   DrawFocused() {}
+        internal virtual void   DrawHovered() {}
     }
 }

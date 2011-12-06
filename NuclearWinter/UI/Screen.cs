@@ -403,6 +403,11 @@ namespace NuclearWinter.UI
                 FocusedWidget.DrawFocused();
             }
 
+            if( mHoveredWidget != null && IsActive )
+            {
+                mHoveredWidget.DrawHovered();
+            }
+
             Game.SpriteBatch.End();
 
             Debug.Assert( mlScissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles" );

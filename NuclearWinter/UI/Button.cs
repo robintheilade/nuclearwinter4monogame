@@ -164,7 +164,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center )
+        public Button( Screen _screen, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="" )
         : this( _screen, new ButtonStyle(
                 _screen.Style.ButtonCornerSize,
                 _screen.Style.ButtonFrame,
