@@ -54,6 +54,8 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )     { if( EventHandler != null ) EventHandler.OnMouseWheel( TransformPoint( _hitPoint ), _iDelta ); }
 
+        internal override void OnBlur()                                         { if( EventHandler != null ) EventHandler.OnBlur(); }
+
         internal override void Update( float _fElapsedTime )
         {
             if( UpdateHandler != null )
