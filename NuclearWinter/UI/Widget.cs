@@ -212,7 +212,7 @@ namespace NuclearWinter.UI
         internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
         internal virtual void       OnMouseMove ( Point _hitPoint ) {}
 
-        internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) {}
+        internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
         internal virtual void       OnKeyPress  ( Keys _key )
         {
