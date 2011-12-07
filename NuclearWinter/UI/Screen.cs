@@ -188,7 +188,6 @@ namespace NuclearWinter.UI
 
                 if( Game.InputMgr.WasMouseJustDoubleClicked() )
                 {
-                    Console.WriteLine( "Double click" );
                     bHasMouseEvent = true;
 
                     Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
@@ -213,7 +212,6 @@ namespace NuclearWinter.UI
             {
                 if( Game.InputMgr.WasMouseButtonJustReleased( iButton ) )
                 {
-                    Console.WriteLine( "Mouse release" );
                     bHasMouseEvent = true;
 
                     if( mClickedWidget != null && iButton == miClickedWidgetMouseButton )
