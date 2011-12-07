@@ -17,6 +17,8 @@ namespace NuclearWinter.UI
         void OnMouseUp( Point _hitPoint, int _iButton );
 
         void OnMouseWheel( Point _hitPoint, int _iDelta );
+
+        void OnBlur();
     }
 
     public class CustomViewport: Widget
