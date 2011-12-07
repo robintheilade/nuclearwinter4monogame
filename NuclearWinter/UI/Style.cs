@@ -26,6 +26,9 @@ namespace NuclearWinter.UI
         public Color            DefaultTextColor = Color.White;
         public Texture2D        ButtonFrame;
 
+        public int              TooltipCornerSize   = 10;
+        public Texture2D        TooltipFrame;
+
         public Texture2D        ButtonHover;
 
         public Texture2D        ButtonFrameDown;
