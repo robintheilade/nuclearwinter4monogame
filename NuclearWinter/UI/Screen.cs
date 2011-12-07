@@ -32,7 +32,7 @@ namespace NuclearWinter.UI
         bool                mbHasActivatedFocusedWidget;
         Widget              mClickedWidget;
         int                 miClickedWidgetMouseButton;
-        Widget              mHoveredWidget;
+        public Widget       HoveredWidget       { get; private set; }
         Point               mPreviousMouseHitPoint;
 
         int                 miIgnoreClickFrames;
@@ -69,10 +69,10 @@ namespace NuclearWinter.UI
 
             if( ! IsActive )
             {
-                if( mHoveredWidget != null )
+                if( HoveredWidget != null )
                 {
-                    mHoveredWidget.OnMouseOut( mouseHitPoint );
-                    mHoveredWidget = null;
+                    HoveredWidget.OnMouseOut( mouseHitPoint );
+                    HoveredWidget = null;
                 }
 
                 if( mClickedWidget != null )
@@ -188,12 +188,18 @@ namespace NuclearWinter.UI
 
                 if( Game.InputMgr.WasMouseJustDoubleClicked() )
                 {
+                    Console.WriteLine( "Double click" );
                     bHasMouseEvent = true;
 
                     Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
                     if( widget != null )
                     {
-                        mClickedWidget = widget;
+                        if( Game.InputMgr.MouseState.LeftButton == ButtonState.Pressed )
+                        {
+                            mClickedWidget = widget;
+                            miClickedWidgetMouseButton = 0;
+                        }
+
                         widget.OnMouseDoubleClick( mouseHitPoint );
                     }
                 }
@@ -207,6 +213,7 @@ namespace NuclearWinter.UI
             {
                 if( Game.InputMgr.WasMouseButtonJustReleased( iButton ) )
                 {
+                    Console.WriteLine( "Mouse release" );
                     bHasMouseEvent = true;
 
                     if( mClickedWidget != null && iButton == miClickedWidgetMouseButton )
@@ -225,21 +232,21 @@ namespace NuclearWinter.UI
                 {
                     if( mClickedWidget == null )
                     {
-                        if( hoveredWidget != null && hoveredWidget == mHoveredWidget )
+                        if( hoveredWidget != null && hoveredWidget == HoveredWidget )
                         {
-                            mHoveredWidget.OnMouseMove( mouseHitPoint );
+                            HoveredWidget.OnMouseMove( mouseHitPoint );
                         }
                         else
                         {
-                            if( mHoveredWidget != null )
+                            if( HoveredWidget != null )
                             {
-                                mHoveredWidget.OnMouseOut( mouseHitPoint );
+                                HoveredWidget.OnMouseOut( mouseHitPoint );
                             }
                         
-                            mHoveredWidget = hoveredWidget;
-                            if( mHoveredWidget != null )
+                            HoveredWidget = hoveredWidget;
+                            if( HoveredWidget != null )
                             {
-                                mHoveredWidget.OnMouseEnter( mouseHitPoint );
+                                HoveredWidget.OnMouseEnter( mouseHitPoint );
                             }
                         }
                     }
@@ -403,9 +410,9 @@ namespace NuclearWinter.UI
                 FocusedWidget.DrawFocused();
             }
 
-            if( mHoveredWidget != null && IsActive )
+            if( HoveredWidget != null && IsActive )
             {
-                mHoveredWidget.DrawHovered();
+                HoveredWidget.DrawHovered();
             }
 
             Game.SpriteBatch.End();

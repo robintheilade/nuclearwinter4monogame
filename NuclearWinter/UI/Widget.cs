@@ -86,6 +86,14 @@ namespace NuclearWinter.UI
             }
         }
 
+        public bool IsHovered
+        {
+            get
+            {
+                return Screen.HoveredWidget == this;
+            }
+        }
+
         public Rectangle        HitBox              { get; protected set; }
 
         //----------------------------------------------------------------------
