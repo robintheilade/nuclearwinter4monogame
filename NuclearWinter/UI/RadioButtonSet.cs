@@ -100,9 +100,9 @@ namespace NuclearWinter.UI
 
         public bool Expand;
 
-        public Action<RadioButtonSet>   ClickHandler;
-        int                             miSelectedButtonIndex = 0;
-        public int                      SelectedButtonIndex
+        public Action<RadioButtonSet,int>   ClickHandler;
+        int                                 miSelectedButtonIndex = 0;
+        public int                          SelectedButtonIndex
         {
             get {
                 return miSelectedButtonIndex;
@@ -361,11 +361,12 @@ namespace NuclearWinter.UI
 
         internal void ButtonClicked( Button _button )
         {
-            SelectedButtonIndex = mlButtons.IndexOf( _button );
+            int iSelectedButtonIndex = mlButtons.IndexOf( _button );
             if( ClickHandler != null )
             {
-                ClickHandler( this );
+                ClickHandler( this, iSelectedButtonIndex );
             }
+            SelectedButtonIndex = iSelectedButtonIndex;
         }
 
         //----------------------------------------------------------------------
