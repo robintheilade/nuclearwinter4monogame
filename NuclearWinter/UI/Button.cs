@@ -136,6 +136,11 @@ namespace NuclearWinter.UI
 
         public Action<Button>   ClickHandler;
 
+        float               mfTooltipTimer;
+        const float         sfTooltipDelay      = 0.6f;
+
+        public string       TooltipText;
+
         //----------------------------------------------------------------------
         public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center )
         : base( _screen )
@@ -176,6 +181,7 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonHorizontalPadding
             ), _strText, _iconTex, _anchor )
         {
+            TooltipText = _strTooltipText;
         }
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
@@ -231,6 +237,11 @@ namespace NuclearWinter.UI
             {
                 mPressedAnim.Update( _fElapsedTime );
             }
+
+            if( mbIsHovered )
+            {
+                mfTooltipTimer += _fElapsedTime;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -244,6 +255,7 @@ namespace NuclearWinter.UI
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
+            mfTooltipTimer = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -361,6 +373,27 @@ namespace NuclearWinter.UI
             mLabel.Draw();
 
             mIcon.Draw();
+        }
+
+        //----------------------------------------------------------------------
+        internal override void DrawHovered()
+        {
+            if( mfTooltipTimer < sfTooltipDelay || string.IsNullOrEmpty( TooltipText ) ) return;
+
+            Point topLeft = new Point(
+                Screen.Game.InputMgr.MouseState.X,
+                Screen.Game.InputMgr.MouseState.Y + 20 );
+
+            UIFont font = Screen.Style.MediumFont;
+
+            Box padding = new Box( 5, 10 );
+
+            Vector2 vSize = font.MeasureString( TooltipText );
+            int iWidth = (int)vSize.X;
+            int iHeight = (int)vSize.Y;
+
+            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
+            Screen.Game.SpriteBatch.DrawString( font, TooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top ), Screen.Style.TooltipTextColor );
         }
     }
 }

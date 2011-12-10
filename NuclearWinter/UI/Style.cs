@@ -28,6 +28,7 @@ namespace NuclearWinter.UI
 
         public int              TooltipCornerSize   = 10;
         public Texture2D        TooltipFrame;
+        public Color            TooltipTextColor = Color.White;
 
         public Texture2D        ButtonHover;
 

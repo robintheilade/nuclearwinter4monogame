@@ -289,7 +289,15 @@ namespace NuclearWinter.UI
                 iButton++;
             }
         }
-        
+
+        internal override void Update( float _fElapsedTime )
+        {
+            foreach( Button button in mlButtons )
+            {
+                button.Update( _fElapsedTime );
+            }
+        }
+
         //----------------------------------------------------------------------
         internal override void OnMouseEnter( Point _hitPoint )
         {
@@ -376,6 +384,11 @@ namespace NuclearWinter.UI
             {
                 button.Draw();
             }
+        }
+
+        internal override void DrawHovered()
+        {
+            mlButtons[ miHoveredButton ].DrawHovered();
         }
     }
 }
