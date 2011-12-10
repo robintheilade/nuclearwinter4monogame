@@ -380,17 +380,17 @@ namespace NuclearWinter.UI
         {
             if( mfTooltipTimer < sfTooltipDelay || string.IsNullOrEmpty( TooltipText ) ) return;
 
-            Point topLeft = new Point(
-                Screen.Game.InputMgr.MouseState.X,
-                Screen.Game.InputMgr.MouseState.Y + 20 );
-
             UIFont font = Screen.Style.MediumFont;
 
             Box padding = new Box( 5, 10 );
 
             Vector2 vSize = font.MeasureString( TooltipText );
-            int iWidth = (int)vSize.X;
+            int iWidth  = (int)vSize.X;
             int iHeight = (int)vSize.Y;
+
+            Point topLeft = new Point(
+                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
+                Screen.Game.InputMgr.MouseState.Y + 20 );
 
             Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
             Screen.Game.SpriteBatch.DrawString( font, TooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top ), Screen.Style.TooltipTextColor );
