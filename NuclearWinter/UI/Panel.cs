@@ -76,7 +76,16 @@ namespace NuclearWinter.UI
 
         protected override void LayoutChildren()
         {
-            Rectangle childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - ( EnableScrolling ? (int)Scrollbar.LerpOffset : 0 ), LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
+            Rectangle childRectangle;
+            
+            if( EnableScrolling )
+            {
+                childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)Scrollbar.LerpOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical + Scrollbar.Max );
+            }
+            else
+            {
+                childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
+            }
             
             foreach( Widget widget in mlChildren )
             {
@@ -86,7 +95,7 @@ namespace NuclearWinter.UI
 
         public override Widget HitTest( Point _point )
         {
-            return base.HitTest( _point ) ?? ( EnableScrolling && HitBox.Contains( _point ) ? this : null );
+            return base.HitTest( _point ) ?? ( HitBox.Contains( _point ) ? this : null );
         }
 
         //----------------------------------------------------------------------
