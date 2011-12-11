@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
@@ -608,6 +609,8 @@ namespace NuclearWinter.UI
         bool                    mbIsDragging;
         bool                    mbScrollToCaret;
 
+        public Texture2D        PanelTex;
+
         //----------------------------------------------------------------------
         public RichTextArea( Screen _screen )
         : base( _screen )
@@ -618,7 +621,8 @@ namespace NuclearWinter.UI
 
             Padding         = new Box(20);
 
-            Scrollbar = new Scrollbar( this );
+            Scrollbar       = new Scrollbar( this );
+            PanelTex        = Screen.Style.ListFrame;
         }
 
         //----------------------------------------------------------------------
@@ -660,11 +664,20 @@ namespace NuclearWinter.UI
             }
 
             Scrollbar.DoLayout();
+
+            ContentHeight += Padding.Vertical;
         }
 
         //----------------------------------------------------------------------
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
+            if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
+             || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
+            {
+                base.OnMouseWheel( _hitPoint, _iDelta );
+                return;
+            }
+
             DoScroll( -_iDelta / 120 * 50 );
         }
 
@@ -737,7 +750,7 @@ namespace NuclearWinter.UI
             int iEndBlockIndex      = bHasForwardSelection ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
             int iEndOffset          = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
 
-            if( TextRemovedHandler( this, iStartBlockIndex, iStartOffset, iEndBlockIndex, iEndOffset ) )
+            if( TextRemovedHandler == null || TextRemovedHandler( this, iStartBlockIndex, iStartOffset, iEndBlockIndex, iEndOffset ) )
             {
                 // Merge start and end block
                 TextBlocks[ iStartBlockIndex ].Text =
@@ -1152,6 +1165,20 @@ namespace NuclearWinter.UI
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;
+                case Keys.PageUp: {
+                    Point target = GetPositionForCaret( Caret.EndTextBlockIndex, Caret.EndOffset );
+                    target.Y -= LayoutRect.Height;
+                    SetCaretPosition( target, bShift );
+                    mbScrollToCaret = true;
+                    break;
+                }
+                case Keys.PageDown: {
+                    Point target = GetPositionForCaret( Caret.EndTextBlockIndex, Caret.EndOffset );
+                    target.Y += LayoutRect.Height;
+                    SetCaretPosition( target, bShift );
+                    mbScrollToCaret = true;
+                    break;
+                }
                 default:
                     base.OnKeyPress( _key );
                     break;
@@ -1175,7 +1202,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+            Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
 
             //------------------------------------------------------------------
             // Text
