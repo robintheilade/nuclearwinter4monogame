@@ -101,6 +101,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
+            if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
+             || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
+            {
+                base.OnMouseWheel( _hitPoint, _iDelta );
+                return;
+            }
+
             DoScroll( -_iDelta / 120 * 50 );
         }
 
