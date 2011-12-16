@@ -189,6 +189,7 @@ namespace NuclearWinter.UI
                 if( Game.InputMgr.WasMouseJustDoubleClicked() )
                 {
                     bHasMouseEvent = true;
+                    miIgnoreClickFrames = 3;
 
                     Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
                     if( widget != null )
