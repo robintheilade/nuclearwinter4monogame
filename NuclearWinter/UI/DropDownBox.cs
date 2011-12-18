@@ -48,10 +48,21 @@ namespace NuclearWinter.UI
         bool                            mbIsPressed;
 
         Rectangle                       mDropDownHitBox;
-        const int                       siMaxLineDisplayed = 3;
-        int                             miScrollOffset;
+        const int                       siMaxLineDisplayed = 5;
+
+        int                             miScrollItemOffset;
+        public Scrollbar                mScrollbar;
 
         public Box                      TextPadding;
+
+        //----------------------------------------------------------------------
+        int ScrollItemOffset {
+            get { return miScrollItemOffset; }
+            set {
+                miScrollItemOffset = value;
+                mScrollbar.Offset = miScrollItemOffset * ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical );
+            }
+        }
 
         //----------------------------------------------------------------------
         public DropDownBox( Screen _screen, List<DropDownItem> _lItems, int _iInitialValueIndex )
@@ -81,7 +92,9 @@ namespace NuclearWinter.UI
             };
 
             SelectedItemIndex = _iInitialValueIndex;
-            miScrollOffset = Math.Max( 0, Math.Min( SelectedItemIndex, Items.Count - siMaxLineDisplayed ) );
+            mScrollbar = new Scrollbar( this );
+            ScrollItemOffset = Math.Max( 0, Math.Min( SelectedItemIndex, Items.Count - siMaxLineDisplayed ) );
+            mScrollbar.LerpOffset = mScrollbar.Offset;
 
             Padding = new Box( 10 );
             TextPadding = new Box( 5 );
@@ -122,7 +135,9 @@ namespace NuclearWinter.UI
 
             mDropDownHitBox = new Rectangle(
                 HitBox.Left, HitBox.Bottom,
-                HitBox.Width, Padding.Vertical + Math.Min( siMaxLineDisplayed, Items.Count ) * ( Screen.Style.MediumFont.LineSpacing + Padding.Vertical ) );
+                HitBox.Width, Math.Min( siMaxLineDisplayed, Items.Count ) * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical );
+            
+            mScrollbar.DoLayout( mDropDownHitBox, Items.Count * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) );
         }
 
         //----------------------------------------------------------------------
@@ -132,6 +147,8 @@ namespace NuclearWinter.UI
             {
                 mPressedAnim.Update( _fElapsedTime );
             }
+
+            mScrollbar.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -159,15 +176,17 @@ namespace NuclearWinter.UI
             {
                 miHoveredItemIndex = SelectedItemIndex;
 
-                if( miHoveredItemIndex < miScrollOffset )
+                if( miHoveredItemIndex < ScrollItemOffset )
                 {
-                    miScrollOffset = miHoveredItemIndex;
+                    ScrollItemOffset = miHoveredItemIndex;
                 }
                 else
-                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= ScrollItemOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    ScrollItemOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
+
+                mScrollbar.LerpOffset = mScrollbar.Offset;
 
                 IsOpen = ! IsOpen;
                 mPressedAnim.SetTime( 0f );
@@ -221,14 +240,14 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( miScrollOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
-            miHoveredItemIndex += iNewScrollOffset - miScrollOffset;
-            miScrollOffset = iNewScrollOffset;
+            int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
+            miHoveredItemIndex += iNewScrollOffset - ScrollItemOffset;
+            ScrollItemOffset = iNewScrollOffset;
         }
 
         void UpdateHoveredItem()
         {
-            miHoveredItemIndex = (int)( ( mHoverPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + miScrollOffset;
+            miHoveredItemIndex = (int)( ( mHoverPoint.Y - ( LayoutRect.Bottom + Padding.Top ) ) / ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) ) + ScrollItemOffset;
 
             if( miHoveredItemIndex >= Items.Count )
             {
@@ -252,14 +271,14 @@ namespace NuclearWinter.UI
             {
                 miHoveredItemIndex = SelectedItemIndex;
 
-                if( miHoveredItemIndex < miScrollOffset )
+                if( miHoveredItemIndex < ScrollItemOffset )
                 {
-                    miScrollOffset = miHoveredItemIndex;
+                    ScrollItemOffset = miHoveredItemIndex;
                 }
                 else
-                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= ScrollItemOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    ScrollItemOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
 
                 mbIsPressed = true;
@@ -318,9 +337,9 @@ namespace NuclearWinter.UI
             {
                 miHoveredItemIndex = Math.Max( 0, miHoveredItemIndex - 1 );
 
-                if( miHoveredItemIndex < miScrollOffset )
+                if( miHoveredItemIndex < ScrollItemOffset )
                 {
-                    miScrollOffset = miHoveredItemIndex;
+                    ScrollItemOffset = miHoveredItemIndex;
                 }
             }
             else
@@ -328,9 +347,9 @@ namespace NuclearWinter.UI
             {
                 miHoveredItemIndex = Math.Min( Items.Count - 1, miHoveredItemIndex + 1 );
 
-                if( miHoveredItemIndex >= miScrollOffset + siMaxLineDisplayed )
+                if( miHoveredItemIndex >= ScrollItemOffset + siMaxLineDisplayed )
                 {
-                    miScrollOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
+                    ScrollItemOffset = Math.Min( miHoveredItemIndex - siMaxLineDisplayed + 1, Items.Count - siMaxLineDisplayed );
                 }
             }
         }
@@ -397,21 +416,23 @@ namespace NuclearWinter.UI
 
                 Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, iLinesDisplayed * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical ), Screen.Style.ButtonCornerSize, Color.White );
 
-                int iMaxIndex = Math.Min( Items.Count - 1, miScrollOffset + iLinesDisplayed - 1 );
-                for( int iIndex = miScrollOffset; iIndex <= iMaxIndex; iIndex++ )
+                int iMaxIndex = Math.Min( Items.Count - 1, ScrollItemOffset + iLinesDisplayed - 1 );
+                for( int iIndex = ScrollItemOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
                     if( Screen.IsActive && miHoveredItemIndex == iIndex )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
+                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
                     }
 
                     Screen.Game.DrawBlurredText(
                         Screen.Style.BlurRadius,
                         Screen.Style.MediumFont,
                         Items[iIndex].Text,
-                        new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - miScrollOffset ) + TextPadding.Top + Padding.Top + Screen.Style.MediumFont.YOffset ),
+                        new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top + Padding.Top + Screen.Style.MediumFont.YOffset ),
                         Screen.Style.DefaultTextColor );
                 }
+
+                mScrollbar.Draw();
             }
         }
 

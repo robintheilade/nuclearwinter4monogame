@@ -427,7 +427,7 @@ namespace NuclearWinter.UI
             }
 
             ContentHeight = iHeight;
-            Scrollbar.DoLayout();
+            Scrollbar.DoLayout( LayoutRect, ContentHeight );
         }
 
         //----------------------------------------------------------------------

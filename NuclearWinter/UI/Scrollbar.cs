@@ -23,7 +23,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public float            LerpOffset  { get; private set; }
+        public float            LerpOffset;
 
         public bool             ScrollToBottom;
 
@@ -34,6 +34,8 @@ namespace NuclearWinter.UI
         int                     miScrollbarOffset;
 
         public Widget           Parent;
+
+        public Rectangle        ScrollRect;
 
         //----------------------------------------------------------------------
         public Scrollbar( Widget _parent )
@@ -50,11 +52,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void DoLayout()
+        public void DoLayout( Rectangle _rect, int _iContentHeight )
         {
+            ScrollRect = _rect;
+
             bool bScrolledToBottom = ScrollToBottom && Offset >= Max;
 
-            Max = Math.Max( 0, Parent.ContentHeight - ( Parent.LayoutRect.Height - 20 ) + 5 );
+            Max = Math.Max( 0, _iContentHeight - ( ScrollRect.Height - 20 ) );
             Offset = (int)MathHelper.Clamp( Offset, 0, Max );
 
             if( bScrolledToBottom )
@@ -62,8 +66,8 @@ namespace NuclearWinter.UI
                 Offset = Max;
             }
 
-            miScrollbarHeight = (int)( ( Parent.LayoutRect.Height - 20 ) / ( (float)Parent.ContentHeight / ( Parent.LayoutRect.Height - 20 ) ) );
-            miScrollbarOffset = (int)( (float)LerpOffset / Max * (float)( Parent.LayoutRect.Height - 20 - miScrollbarHeight ) );
+            miScrollbarHeight = (int)( ( ScrollRect.Height - 20 ) / ( (float)_iContentHeight / ( ScrollRect.Height - 20 ) ) );
+            miScrollbarOffset = (int)( (float)LerpOffset / Max * (float)( ScrollRect.Height - 20 - miScrollbarHeight ) );
         }
 
         //----------------------------------------------------------------------
@@ -74,8 +78,8 @@ namespace NuclearWinter.UI
                 Parent.Screen.DrawBox(
                     Parent.Screen.Style.VerticalScrollbar,
                     new Rectangle(
-                        Parent.LayoutRect.Right - 5 - Parent.Screen.Style.VerticalScrollbar.Width / 2,
-                        Parent.LayoutRect.Y + 10 + miScrollbarOffset,
+                        ScrollRect.Right - 5 - Parent.Screen.Style.VerticalScrollbar.Width / 2,
+                        ScrollRect.Y + 10 + miScrollbarOffset,
                         Parent.Screen.Style.VerticalScrollbar.Width,
                         miScrollbarHeight ),
                     Parent.Screen.Style.VerticalScrollbarCornerSize,

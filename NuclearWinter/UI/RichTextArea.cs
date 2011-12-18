@@ -663,7 +663,7 @@ namespace NuclearWinter.UI
                 mbScrollToCaret = false;
             }
 
-            Scrollbar.DoLayout();
+            Scrollbar.DoLayout( LayoutRect, ContentHeight );
 
             ContentHeight += Padding.Vertical;
         }

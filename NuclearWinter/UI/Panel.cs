@@ -68,7 +68,7 @@ namespace NuclearWinter.UI
 
             if( EnableScrolling )
             {
-                Scrollbar.DoLayout();
+                Scrollbar.DoLayout( LayoutRect, ContentHeight );
             }
 
             HitBox = LayoutRect;
