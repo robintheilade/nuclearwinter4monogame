@@ -634,7 +634,7 @@ namespace NuclearWinter.UI
 
             bool bWrapTextNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
-            ContentHeight = 0;
+            ContentHeight = Padding.Vertical;
 
             foreach( TextBlock textBlock in TextBlocks )
             {
@@ -664,8 +664,6 @@ namespace NuclearWinter.UI
             }
 
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
-
-            ContentHeight += Padding.Vertical;
         }
 
         //----------------------------------------------------------------------

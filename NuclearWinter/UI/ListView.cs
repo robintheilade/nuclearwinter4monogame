@@ -311,7 +311,7 @@ namespace NuclearWinter.UI
             }
 
             //------------------------------------------------------------------
-            ContentHeight = Rows.Count * ( RowHeight + RowSpacing );
+            ContentHeight = Padding.Vertical + 25 + Rows.Count * ( RowHeight + RowSpacing );
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
         }
 

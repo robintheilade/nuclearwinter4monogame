@@ -94,7 +94,7 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    ContentHeight = Math.Max( ContentHeight, iHeight );
+                    ContentHeight = Math.Max( ContentHeight, iHeight ) + Padding.Vertical;
                 }
             }
 

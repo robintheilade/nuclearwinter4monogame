@@ -47,7 +47,7 @@ namespace NuclearWinter.UI
             Texture     = _texture;
             CornerSize  = _iCornerSize;
             Padding     = new Box( CornerSize );
-            Scrollbar  = new Scrollbar( this );
+            Scrollbar   = new Scrollbar( this );
         }
 
         //----------------------------------------------------------------------

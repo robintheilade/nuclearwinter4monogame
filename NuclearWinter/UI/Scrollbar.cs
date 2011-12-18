@@ -58,7 +58,7 @@ namespace NuclearWinter.UI
 
             bool bScrolledToBottom = ScrollToBottom && Offset >= Max;
 
-            Max = Math.Max( 0, _iContentHeight - ( ScrollRect.Height - 20 ) );
+            Max = Math.Max( 0, _iContentHeight - ScrollRect.Height );
             Offset = (int)MathHelper.Clamp( Offset, 0, Max );
 
             if( bScrolledToBottom )
