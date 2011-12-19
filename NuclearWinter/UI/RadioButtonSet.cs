@@ -274,18 +274,40 @@ namespace NuclearWinter.UI
                 iHeight
             );
 
-            int iExpandedButtonWidth = LayoutRect.Width / mlButtons.Count;
+            float fExpandedButtonWidth = (float)LayoutRect.Width / mlButtons.Count;
 
             int iButton = 0;
             int iButtonX = 0;
+
+            float fOffset = 0f;
+
             foreach( Button button in mlButtons )
             {
+                int iWidth = button.ContentWidth;
+
+                if( Expand )
+                {
+                    if( iButton < mlButtons.Count - 1 )
+                    {
+                        iWidth = (int)Math.Floor( fExpandedButtonWidth + fOffset - Math.Floor( fOffset ) );
+                    }
+                    else
+                    {
+                        iWidth = (int)( LayoutRect.Width - Math.Floor( fOffset ) );
+                    }
+                    fOffset += fExpandedButtonWidth;
+                }
+                else
+                {
+                    fOffset += iWidth;
+                }
+
                 button.DoLayout( new Rectangle(
                     HitBox.X + iButtonX, pCenter.Y - iHeight / 2,
-                    Expand ? iExpandedButtonWidth : button.ContentWidth, iHeight
+                    iWidth, iHeight
                 ) );
 
-                iButtonX += Expand ? iExpandedButtonWidth : button.ContentWidth;
+                iButtonX += iWidth;
                 iButton++;
             }
         }

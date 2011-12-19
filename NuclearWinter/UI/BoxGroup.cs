@@ -185,10 +185,10 @@ namespace NuclearWinter.UI
                 }
             }
 
-            int iExpandedWidgetSize = 0;
+            float fExpandedWidgetSize = 0f;
             if( iExpandedChildrenCount > 0 )
             {
-                iExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - iUnexpandedSize ) / iExpandedChildrenCount;
+                fExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - iUnexpandedSize ) / (float)iExpandedChildrenCount;
             }
 
             if( mlChildren.Count > 1 )
@@ -238,6 +238,7 @@ namespace NuclearWinter.UI
                     throw new NotSupportedException();
             }
 
+            float fOffset = 0;
             for( int iIndex = 0; iIndex < mlChildren.Count; iIndex++ )
             {
                 Widget widget = mlChildren[iIndex];
@@ -245,8 +246,21 @@ namespace NuclearWinter.UI
                 int iWidgetSize = ( mOrientation == Orientation.Horizontal ) ? widget.ContentWidth : widget.ContentHeight;
                 if( mlExpandedChildren[iIndex] )
                 {
-                    iWidgetSize = iExpandedWidgetSize;
+                    if( iIndex < mlChildren.Count - 1 )
+                    {
+                        iWidgetSize = (int)Math.Floor( fExpandedWidgetSize + fOffset - Math.Floor( fOffset ) );
+                    }
+                    else
+                    {
+                        iWidgetSize = (int)( LayoutRect.Width - Math.Floor( fOffset ) );
+                    }
+                    fOffset += fExpandedWidgetSize;
                 }
+                else
+                {
+                    fOffset += iWidgetSize;
+                }
+
                 widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : LayoutRect.Width, mOrientation == Orientation.Horizontal ? LayoutRect.Height : iWidgetSize ) );
                 
                 switch( mOrientation )
