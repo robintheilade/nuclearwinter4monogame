@@ -130,20 +130,20 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
+            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
             int handleSize = LayoutRect.Height;
             int handleX = LayoutRect.X + (int)( ( LayoutRect.Width - handleSize ) * (float)( Value - MinValue ) / MaxValue );
 
-            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
+            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), 30, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
         }
     }
