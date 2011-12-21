@@ -206,7 +206,7 @@ namespace NuclearWinter.UI
         // Events
         internal virtual void       OnMouseDown ( Point _hitPoint, int _iButton ) {}
         internal virtual void       OnMouseUp   ( Point _hitPoint, int _iButton ) {}
-        internal virtual void       OnMouseDoubleClick( Point _hitPoint ) {}
+        internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
 
         internal virtual void       OnMouseEnter( Point _hitPoint ) {}
         internal virtual void       OnMouseOut  ( Point _hitPoint ) {}

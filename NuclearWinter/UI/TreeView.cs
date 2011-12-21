@@ -642,7 +642,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDoubleClick( Point _hitPoint )
+        internal override bool OnMouseDoubleClick( Point _hitPoint )
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
@@ -651,8 +651,11 @@ namespace NuclearWinter.UI
                 if( SelectedNode != null )
                 {
                     ValidateHandler( this );
+                    return true;
                 }
             }
+
+            return false;
         }
 
         void SelectNodeAt( Point _hitPoint, bool _bDoCollapse )

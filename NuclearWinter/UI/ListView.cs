@@ -437,7 +437,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDoubleClick( Point _hitPoint )
+        internal override bool OnMouseDoubleClick( Point _hitPoint )
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
@@ -446,8 +446,11 @@ namespace NuclearWinter.UI
                 if( SelectedRowIndex != -1 )
                 {
                     ValidateHandler( this );
+                    return true;
                 }
             }
+
+            return false;
         }
 
         void SelectRowAt( Point _hitPoint )
