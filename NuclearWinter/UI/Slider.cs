@@ -133,7 +133,7 @@ namespace NuclearWinter.UI
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
             int handleSize = LayoutRect.Height;
-            int handleX = LayoutRect.X + (int)( ( LayoutRect.Width - handleSize ) * (float)( Value - MinValue ) / MaxValue );
+            int handleX = LayoutRect.X + (int)( ( LayoutRect.Width - handleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
 
             Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
