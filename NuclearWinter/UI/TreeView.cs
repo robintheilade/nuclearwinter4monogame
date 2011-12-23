@@ -771,6 +771,15 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void DrawHovered()
+        {
+            if( mHoveredActionButton != null )
+            {
+                mHoveredActionButton.DrawHovered();
+            }
+        }
+
+        //----------------------------------------------------------------------
         internal override void DrawFocused()
         {
             if( mbIsDragging )

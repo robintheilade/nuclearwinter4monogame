@@ -142,7 +142,7 @@ namespace NuclearWinter.UI
         public string       TooltipText;
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center )
+        public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="" )
         : base( _screen )
         {
             Style = _style;
@@ -157,13 +157,14 @@ namespace NuclearWinter.UI
             mIcon.Padding   = new Box( Style.VerticalPadding, 0, Style.VerticalPadding, Style.HorizontalPadding );
 
             Text            = _strText;
+            TextColor       = Screen.Style.DefaultTextColor;
 
             Anchor          = _anchor;
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
-            TextColor           = Screen.Style.DefaultTextColor;
+            TooltipText     = _strTooltipText;
 
             UpdateContentSize();
         }
@@ -179,10 +180,10 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonFocus,
                 _screen.Style.ButtonVerticalPadding,
                 _screen.Style.ButtonHorizontalPadding
-            ), _strText, _iconTex, _anchor )
+            ), _strText, _iconTex, _anchor, _strTooltipText )
         {
-            TooltipText = _strTooltipText;
         }
+
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {

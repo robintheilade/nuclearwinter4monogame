@@ -651,5 +651,14 @@ namespace NuclearWinter.UI
 
             Scrollbar.Draw();
         }
+
+        //----------------------------------------------------------------------
+        internal override void DrawHovered()
+        {
+            if( mHoveredActionButton != null )
+            {
+                mHoveredActionButton.DrawHovered();
+            }
+        }
     }
 }
