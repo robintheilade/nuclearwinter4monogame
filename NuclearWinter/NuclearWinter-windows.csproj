@@ -118,6 +118,7 @@
     <Compile Include="UI\AnchoredRect.cs" />
     <Compile Include="UI\BoxGroup.cs" />
     <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\Common.cs" />
     <Compile Include="UI\DropDownBox.cs" />
     <Compile Include="UI\EditBox.cs" />

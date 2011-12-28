@@ -53,6 +53,8 @@ namespace NuclearWinter.UI
             }
         }
 
+        public CheckBoxStatus       CheckBoxStatus;
+
         //----------------------------------------------------------------------
         TreeView                    mTreeView;
 
@@ -251,6 +253,39 @@ namespace NuclearWinter.UI
 
             }
 
+            if( mTreeView.HasCheckBoxes )
+            {
+                Rectangle checkBoxRect = new Rectangle( nodeRect.X + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0 ), nodeRect.Y, nodeRect.Height, nodeRect.Height );
+
+                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
+
+                /*
+                if( mTreeView.HoveredNode == this )
+                {
+                    Screen.DrawBox( Screen.Style.GridBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                }
+                */
+
+                Texture2D tex;
+                
+                switch( CheckBoxStatus )
+                {
+                    case UI.CheckBoxStatus.Checked:
+                        tex = Screen.Style.TreeViewCheckBoxChecked;
+                        break;
+                    case UI.CheckBoxStatus.Unchecked:
+                        tex = Screen.Style.TreeViewCheckBoxUnchecked;
+                        break;
+                    case UI.CheckBoxStatus.Inconsistent:
+                        tex = Screen.Style.TreeViewCheckBoxInconsistent;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                Screen.Game.SpriteBatch.Draw( tex, new Vector2( checkBoxRect.Center.X, checkBoxRect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
+            }
+
             DrawNode( LayoutRect.Location );
 
             if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
@@ -293,7 +328,17 @@ namespace NuclearWinter.UI
         {
             Rectangle nodeRect = new Rectangle( _position.X, _position.Y, LayoutRect.Width, mTreeView.NodeHeight );
 
-            int iLabelX = ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0;
+            int iLabelX = 0;
+            if( Children.Count > 0 || DisplayAsContainer )
+            {
+                iLabelX += mTreeView.NodeBranchWidth;
+            }
+            
+            if( mTreeView.HasCheckBoxes )
+            {
+                iLabelX += mTreeView.NodeHeight + mTreeView.NodeSpacing;
+            }
+
             if( mImage.Texture != null )
             {
                 mImage.DoLayout( new Rectangle( LayoutRect.X + iLabelX, LayoutRect.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
@@ -336,6 +381,13 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public Scrollbar                    Scrollbar       { get; private set; }
+        const float                         sfScrollRepeatDelay = 0.3f;
+        float                               mfScrollRepeatTimer = sfScrollRepeatDelay;
+
+        //----------------------------------------------------------------------
+        // Checkboxes
+        public bool                         HasCheckBoxes;
+        public bool                         CheckBoxCascading;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -346,6 +398,7 @@ namespace NuclearWinter.UI
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
         const int                           siDragTriggerDistance   = 10;
+
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -662,7 +715,21 @@ namespace NuclearWinter.UI
         {
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
-                if( ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && _hitPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
+                bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );
+
+                if( HasCheckBoxes && _hitPoint.X >= HoveredNode.LayoutRect.X && _hitPoint.X < HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 ) + NodeHeight + NodeSpacing )
+                {
+                    if( HoveredNode.CheckBoxStatus == CheckBoxStatus.Checked )
+                    {
+                        HoveredNode.CheckBoxStatus = CheckBoxStatus.Unchecked;
+                    }
+                    else
+                    {
+                        HoveredNode.CheckBoxStatus = CheckBoxStatus.Checked;
+                    }
+                }
+                else
+                if( bBranch && _hitPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
                 {
                     if( _bDoCollapse )
                     {
@@ -704,8 +771,6 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
-        const float sfScrollRepeatDelay = 0.3f;
-        float mfScrollRepeatTimer = sfScrollRepeatDelay;
         internal override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
