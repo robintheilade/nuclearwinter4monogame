@@ -386,6 +386,8 @@ namespace NuclearWinter.UI
         // Checkboxes
         public bool                         HasCheckBoxes;
         public bool                         CheckBoxCascading;
+        public Action<TreeViewNode,CheckBoxStatus>
+                                            NodeCheckStatusChangedHandler;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -722,14 +724,10 @@ namespace NuclearWinter.UI
 
                 if( HasCheckBoxes && IsHoveringNodeCheckBox() )
                 {
-                    if( HoveredNode.CheckBoxStatus == CheckBoxStatus.Checked )
-                    {
-                        HoveredNode.CheckBoxStatus = CheckBoxStatus.Unchecked;
-                    }
-                    else
-                    {
-                        HoveredNode.CheckBoxStatus = CheckBoxStatus.Checked;
-                    }
+                    CheckBoxStatus newStatus = ( HoveredNode.CheckBoxStatus == CheckBoxStatus.Checked ) ? CheckBoxStatus.Unchecked : CheckBoxStatus.Checked;
+                    NodeCheckStatusChangedHandler( HoveredNode, newStatus );
+
+                    HoveredNode.CheckBoxStatus = newStatus;
                 }
                 else
                 if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
