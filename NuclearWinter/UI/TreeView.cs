@@ -259,12 +259,10 @@ namespace NuclearWinter.UI
 
                 Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
 
-                /*
-                if( mTreeView.HoveredNode == this )
+                if( mTreeView.HoveredNode == this && mTreeView.IsHoveringNodeCheckBox() )
                 {
-                    Screen.DrawBox( Screen.Style.GridBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                 }
-                */
 
                 Texture2D tex;
                 
@@ -301,7 +299,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( mTreeView.HoveredNode == this )
+            if( mTreeView.HoveredNode == this && ! mTreeView.IsHoveringNodeCheckBox() )
             {
                 if( mTreeView.SelectedNode != this )
                 {
@@ -398,7 +396,6 @@ namespace NuclearWinter.UI
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
         const int                           siDragTriggerDistance   = 10;
-
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -690,7 +687,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                SelectNodeAt( _hitPoint, true );
+                SelectHoveredNode( true );
             }
         }
 
@@ -699,7 +696,7 @@ namespace NuclearWinter.UI
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
-                SelectNodeAt( _hitPoint, false );
+                SelectHoveredNode( false );
 
                 if( SelectedNode != null )
                 {
@@ -711,13 +708,19 @@ namespace NuclearWinter.UI
             return false;
         }
 
-        void SelectNodeAt( Point _hitPoint, bool _bDoCollapse )
+        internal bool IsHoveringNodeCheckBox()
+        {
+            bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );
+            return HasCheckBoxes && mHoverPoint.X >= HoveredNode.LayoutRect.X && mHoverPoint.X < HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 ) + NodeHeight + NodeSpacing;
+        }
+
+        void SelectHoveredNode( bool _bDoCollapse )
         {
             if( HoveredNode != null && FocusedNode == HoveredNode )
             {
                 bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );
 
-                if( HasCheckBoxes && _hitPoint.X >= HoveredNode.LayoutRect.X && _hitPoint.X < HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 ) + NodeHeight + NodeSpacing )
+                if( HasCheckBoxes && IsHoveringNodeCheckBox() )
                 {
                     if( HoveredNode.CheckBoxStatus == CheckBoxStatus.Checked )
                     {
@@ -729,7 +732,7 @@ namespace NuclearWinter.UI
                     }
                 }
                 else
-                if( bBranch && _hitPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
+                if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
                 {
                     if( _bDoCollapse )
                     {
