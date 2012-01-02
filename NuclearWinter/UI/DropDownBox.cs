@@ -82,7 +82,7 @@ namespace NuclearWinter.UI
                 else
                 if( _args.Index <= SelectedItemIndex )
                 {
-                    SelectedItemIndex += _args.Added ? 1 : -1;
+                    SelectedItemIndex = Math.Max( 0, SelectedItemIndex + ( _args.Added ? 1 : -1 ) );
                 }
             };
             
