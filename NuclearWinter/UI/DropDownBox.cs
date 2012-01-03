@@ -11,21 +11,47 @@ namespace NuclearWinter.UI
     public class DropDownItem
     {
         //----------------------------------------------------------------------
-        public string               Text;
+        public string               Text {
+            get { return mLabel.Text; }
+            set { mLabel.Text = value; }
+        }
+
+        Label                       mLabel;
         public object               Tag;
 
         //----------------------------------------------------------------------
-        public DropDownItem( string _strText, object _tag=null )
+        public DropDownItem( Screen _screen, string _strText, object _tag=null )
         {
-            Text    = _strText;
+            mLabel = new Label( _screen, _strText, Anchor.Start );
             Tag     = _tag;
+        }
+
+        internal void DoLayout( Rectangle _rect )
+        {
+            mLabel.DoLayout( _rect );
+        }
+
+        internal void Draw()
+        {
+            mLabel.Draw();
         }
     }
 
     public class DropDownBox: Widget
     {
         //----------------------------------------------------------------------
-        public int                      SelectedItemIndex;
+        int miSelectedItemIndex;
+        public int                      SelectedItemIndex {
+            get { return miSelectedItemIndex; }
+            set
+            {
+                miSelectedItemIndex = value;
+                if( Items.Count > 0 )
+                {
+                    mCurrentItemLabel.Text = Items[miSelectedItemIndex].Text;
+                }
+            }
+        }
         public DropDownItem             SelectedItem            { get { return SelectedItemIndex != -1 ? Items[ SelectedItemIndex ] : null; } }
         public bool                     IsOpen                  { get; private set; }
         public Action<DropDownBox>      ChangeHandler;
@@ -55,6 +81,8 @@ namespace NuclearWinter.UI
 
         public Box                      TextPadding;
 
+        Label                           mCurrentItemLabel;
+
         //----------------------------------------------------------------------
         int ScrollItemOffset {
             get { return miScrollItemOffset; }
@@ -68,6 +96,8 @@ namespace NuclearWinter.UI
         public DropDownBox( Screen _screen, List<DropDownItem> _lItems, int _iInitialValueIndex )
         : base( _screen )
         {
+            mCurrentItemLabel = new Label( Screen, _anchor: Anchor.Start );
+
             Items = new ObservableList<DropDownItem>( _lItems );
 
             Items.ListChanged += delegate( object _source, ObservableList<DropDownItem>.ListChangedEventArgs _args )
@@ -138,6 +168,19 @@ namespace NuclearWinter.UI
                 HitBox.Width, Math.Min( siMaxLineDisplayed, Items.Count ) * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical );
             
             mScrollbar.DoLayout( mDropDownHitBox, Items.Count * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) );
+
+            mCurrentItemLabel.DoLayout( new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Top + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal - Screen.Style.DropDownArrow.Width, LayoutRect.Height - TextPadding.Vertical ) );
+
+            if( IsOpen )
+            {
+                int iLinesDisplayed = Math.Min( siMaxLineDisplayed, Items.Count );
+
+                int iMaxIndex = Math.Min( Items.Count - 1, ScrollItemOffset + iLinesDisplayed - 1 );
+                for( int iIndex = ScrollItemOffset; iIndex <= iMaxIndex; iIndex++ )
+                {
+                    Items[iIndex].DoLayout( new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ) );
+                }
+            }
         }
 
         //----------------------------------------------------------------------
@@ -381,12 +424,7 @@ namespace NuclearWinter.UI
                 Color.White
             );
 
-            Screen.Game.DrawBlurredText(
-                Screen.Style.BlurRadius,
-                Screen.Style.MediumFont,
-                SelectedItem.Text,
-                new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top + TextPadding.Top + Screen.Style.MediumFont.YOffset ),
-                Screen.Style.DefaultTextColor );
+            mCurrentItemLabel.Draw();
         }
 
         //----------------------------------------------------------------------
@@ -424,12 +462,7 @@ namespace NuclearWinter.UI
                         Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
                     }
 
-                    Screen.Game.DrawBlurredText(
-                        Screen.Style.BlurRadius,
-                        Screen.Style.MediumFont,
-                        Items[iIndex].Text,
-                        new Vector2( LayoutRect.X + Padding.Left + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top + Padding.Top + Screen.Style.MediumFont.YOffset ),
-                        Screen.Style.DefaultTextColor );
+                    Items[iIndex].Draw();
                 }
 
                 mScrollbar.Draw();

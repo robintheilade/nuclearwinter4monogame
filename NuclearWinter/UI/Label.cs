@@ -106,17 +106,18 @@ namespace NuclearWinter.UI
             if( mbWrapText )
             {
                 mlstrWrappedText = null;
-                DoWrapText();
             }
             else
             {
                 ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Vertical;
             }
 
+            DoTextLayout();
+
             base.UpdateContentSize();
         }
 
-        void DoWrapText()
+        void DoTextLayout()
         {
             if( mbWrapText )
             {
@@ -159,11 +160,11 @@ namespace NuclearWinter.UI
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
 
-            bool bWrapTextNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
+            bool bTextLayoutNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
-            if( bWrapTextNeeded )
+            if( bTextLayoutNeeded )
             {
-                DoWrapText();
+                DoTextLayout();
             }
 
             Point pCenter = LayoutRect.Center;
