@@ -15,6 +15,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public Label        Label { get; private set; }
+        public Image        Image { get; private set; }
         public int          Width;
         public Anchor       Anchor;
 
@@ -23,6 +24,14 @@ namespace NuclearWinter.UI
         {
             Width   = _iWidth;
             Label   = new UI.Label( _listView.Screen, _strText );
+            Anchor  = _anchor;
+        }
+
+        public ListViewColumn( ListView _listView, Texture2D _tex, Color _color, int _iWidth, Anchor _anchor )
+        {
+            Width   = _iWidth;
+            Image   = new Image( _listView.Screen, _tex );
+            Image.Color = _color;
             Anchor  = _anchor;
         }
     }
@@ -242,6 +251,11 @@ namespace NuclearWinter.UI
             Columns.Add( new ListViewColumn( this, _strText, _iWidth, _anchor ) );
         }
 
+        public void AddColumn( Texture2D _tex, Color _color, int _iWidth, Anchor _anchor = Anchor.Center )
+        {
+            Columns.Add( new ListViewColumn( this, _tex, _color, _iWidth, _anchor ) );
+        }
+
         //----------------------------------------------------------------------
         public void Clear()
         {
@@ -278,12 +292,21 @@ namespace NuclearWinter.UI
         {
             base.DoLayout( _rect );
             HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
-        
+            
             int iColX = 0;
             int iColIndex = 0;
             foreach( ListViewColumn col in Columns )
             {
-                col.Label.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
+                if( col.Label != null )
+                {
+                    col.Label.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
+                }
+                else
+                {
+                    col.Image.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
+                }
+
+
                 iColX += col.Width + ColSpacing;
 
                 foreach( ListViewRow row in Rows )
@@ -535,15 +558,23 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Style.ListFrame, LayoutRect, 30, Color.White );
+            Screen.DrawBox( Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
             if( DisplayColumnHeaders )
             {
                 int iColX = 0;
                 foreach( ListViewColumn col in Columns )
                 {
-                    Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ), 30, Color.White );
-                    col.Label.Draw();
+                    Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+
+                    if( col.Label != null )
+                    {
+                        col.Label.Draw();
+                    }
+                    else
+                    {
+                        col.Image.Draw();
+                    }
                     iColX += col.Width + ColSpacing;
                 }
             }
