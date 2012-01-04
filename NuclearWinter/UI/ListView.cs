@@ -284,7 +284,7 @@ namespace NuclearWinter.UI
             foreach( ListViewColumn col in Columns )
             {
                 col.Label.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
-                iColX += col.Width;
+                iColX += col.Width + ColSpacing;
 
                 foreach( ListViewRow row in Rows )
                 {
@@ -544,7 +544,7 @@ namespace NuclearWinter.UI
                 {
                     Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ), 30, Color.White );
                     col.Label.Draw();
-                    iColX += col.Width;
+                    iColX += col.Width + ColSpacing;
                 }
             }
 
