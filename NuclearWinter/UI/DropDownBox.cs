@@ -13,8 +13,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public string               Text {
             get { return mLabel.Text; }
-            set { mLabel.Text = value; }
+            set {
+                mLabel.Text = value;
+
+                if( DropDownBox != null && DropDownBox.SelectedItem == this )
+                {
+                    DropDownBox.UpdateLabelText();
+                }
+            }
         }
+
+        internal DropDownBox        DropDownBox;
 
         Label                       mLabel;
         public object               Tag;
@@ -48,10 +57,16 @@ namespace NuclearWinter.UI
                 miSelectedItemIndex = value;
                 if( Items.Count > 0 )
                 {
-                    mCurrentItemLabel.Text = Items[miSelectedItemIndex].Text;
+                    UpdateLabelText();
                 }
             }
         }
+
+        internal void UpdateLabelText()
+        {
+            mCurrentItemLabel.Text = Items[miSelectedItemIndex].Text;
+        }
+
         public DropDownItem             SelectedItem            { get { return SelectedItemIndex != -1 ? Items[ SelectedItemIndex ] : null; } }
         public bool                     IsOpen                  { get; private set; }
         public Action<DropDownBox>      ChangeHandler;
@@ -102,6 +117,11 @@ namespace NuclearWinter.UI
 
             Items.ListChanged += delegate( object _source, ObservableList<DropDownItem>.ListChangedEventArgs _args )
             {
+                if( _args.Added )
+                {
+                    _args.Item.DropDownBox = this;
+                }
+
                 if( SelectedItemIndex == -1 )
                 {
                     if( _args.Added )
