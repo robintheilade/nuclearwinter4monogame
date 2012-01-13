@@ -44,6 +44,7 @@ namespace NuclearWinter.UI
 
         public string                   Text;
         public Texture2D                Image;
+        public Color                    Color;
 
         //----------------------------------------------------------------------
         public ListViewCell( ListView _view, string _strText, Texture2D _image )
@@ -69,7 +70,7 @@ namespace NuclearWinter.UI
         public ListViewTextCell( ListView _view, string _strText )
         : base( _view, _strText, null )
         {
-
+            Color   = mListView.TextColor;
         }
 
         //----------------------------------------------------------------------
@@ -113,7 +114,7 @@ namespace NuclearWinter.UI
             vTextPos += mvTextOffset;
             vTextPos.Y += mListView.Screen.Style.MediumFont.YOffset;
 
-            mListView.Screen.Game.SpriteBatch.DrawString( mListView.Screen.Style.MediumFont, mstrText, vTextPos, mListView.TextColor );
+            mListView.Screen.Game.SpriteBatch.DrawString( mListView.Screen.Style.MediumFont, mstrText, vTextPos, Color );
         }
     }
 
@@ -126,7 +127,7 @@ namespace NuclearWinter.UI
         public ListViewImageCell( ListView _view, Texture2D _image )
         : base( _view, null, _image )
         {
-
+            Color   = Color.White;
         }
 
         //----------------------------------------------------------------------
@@ -153,7 +154,7 @@ namespace NuclearWinter.UI
             Vector2 vImagePos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - Image.Height / 2f );
             vImagePos += mvOffset;
 
-            mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color.White );
+            mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color );
         }
     }
 
