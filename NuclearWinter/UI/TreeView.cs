@@ -430,6 +430,7 @@ namespace NuclearWinter.UI
                     if( _args.Item == FocusedNode )
                     {
                         FocusedNode = null;
+                        mbIsDragging = false;
                     }
                 }
             };
