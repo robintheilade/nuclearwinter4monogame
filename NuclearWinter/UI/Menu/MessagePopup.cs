@@ -78,6 +78,8 @@ namespace NuclearWinter.UI
 
             Manager.PopupGroup = Panel;
             Panel.Screen.Focus( Panel.GetFirstFocusableDescendant( Direction.Down ) );
+
+            mSpinningWheel.Reset();
         }
 
         public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel )
