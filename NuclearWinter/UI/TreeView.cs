@@ -714,7 +714,8 @@ namespace NuclearWinter.UI
         internal bool IsHoveringNodeCheckBox()
         {
             bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );
-            return HasCheckBoxes && mHoverPoint.X >= HoveredNode.LayoutRect.X && mHoverPoint.X < HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 ) + NodeHeight + NodeSpacing;
+            int x = HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 );
+            return HasCheckBoxes && mHoverPoint.X >= x && mHoverPoint.X < x + NodeHeight + NodeSpacing;
         }
 
         void SelectHoveredNode( bool _bDoCollapse )
