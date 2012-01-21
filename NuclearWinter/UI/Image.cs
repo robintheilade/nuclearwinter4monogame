@@ -23,6 +23,7 @@ namespace NuclearWinter.UI
         public Action<Image>    ClickHandler;
         public Action<Image>    MouseEnterHandler;
         public Action<Image>    MouseOutHandler;
+        public Action<Image>    MouseDownHandler;
 
         //----------------------------------------------------------------------
         protected Texture2D mTexture;
@@ -72,9 +73,9 @@ namespace NuclearWinter.UI
             if( ClickHandler != null )
             {
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
-                
-                if( MouseEnterHandler != null ) MouseEnterHandler( this );
             }
+
+            if( MouseEnterHandler != null ) MouseEnterHandler( this );
         }
 
         internal override void OnMouseOut( Point _hitPoint )
@@ -82,9 +83,14 @@ namespace NuclearWinter.UI
             if( ClickHandler != null )
             {
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-
-                if( MouseOutHandler != null ) MouseOutHandler( this );
             }
+
+            if( MouseOutHandler != null ) MouseOutHandler( this );
+        }
+
+        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        {
+            if( MouseDownHandler != null ) MouseDownHandler( this );
         }
 
         internal override void OnMouseUp(Point _hitPoint, int _iButton)
