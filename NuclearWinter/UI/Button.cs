@@ -383,7 +383,7 @@ namespace NuclearWinter.UI
 
             UIFont font = Screen.Style.MediumFont;
 
-            Box padding = new Box( 5, 10 );
+            Box padding = new Box( 10, 10 );
 
             Vector2 vSize = font.MeasureString( TooltipText );
             int iWidth  = (int)vSize.X;
@@ -394,7 +394,7 @@ namespace NuclearWinter.UI
                 Screen.Game.InputMgr.MouseState.Y + 20 );
 
             Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
-            Screen.Game.SpriteBatch.DrawString( font, TooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top ), Screen.Style.TooltipTextColor );
+            Screen.Game.SpriteBatch.DrawString( font, TooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
         }
     }
 }
