@@ -14,6 +14,7 @@ using System.Diagnostics;
 
 #if WINDOWS
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 #endif
 
 #if WINDOWS_PHONE
@@ -24,11 +25,6 @@ namespace NuclearWinter
 {
     public class NuclearGame: Game
     {
-        //----------------------------------------------------------------------
-#if WINDOWS
-        public Form                                 Form                    { get; private set; }
-#endif
-
         //----------------------------------------------------------------------
         public Texture2D                            WhitePixelTex           { get; protected set; }
         public Matrix                               SpriteMatrix            { get; protected set; }
@@ -73,6 +69,39 @@ namespace NuclearWinter
         public const float                          LerpMultiplier = 15f;
 
         //----------------------------------------------------------------------
+#if WINDOWS
+        public Form                                 Form                    { get; private set; }
+
+        [DllImport("user32.dll")]
+        static extern bool IsWindowUnicode(IntPtr hWnd);
+
+        /// <summary>
+        /// Changes an attribute of the specified window. The function also sets the 32-bit (long) value at the specified offset into the extra window memory.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window and, indirectly, the class to which the window belongs..</param>
+        /// <param name="nIndex">The zero-based offset to the value to be set. Valid values are in the range zero through the number of bytes of extra window memory, minus the size of an integer. To set any other value, specify one of the following values: GWL_EXSTYLE, GWL_HINSTANCE, GWL_ID, GWL_STYLE, GWL_USERDATA, GWL_WNDPROC </param>
+        /// <param name="dwNewLong">The replacement value.</param>
+        /// <returns>If the function succeeds, the return value is the previous value of the specified 32-bit integer. 
+        /// If the function fails, the return value is zero. To get extended error information, call GetLastError. </returns>
+        [DllImport("user32.dll")]
+        static extern int SetWindowLongW(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", SetLastError=true)]
+        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        public enum GWL
+        {
+             GWL_WNDPROC =      (-4),
+             GWL_HINSTANCE =    (-6),
+             GWL_HWNDPARENT =   (-8),
+             GWL_STYLE =        (-16),
+             GWL_EXSTYLE =      (-20),
+             GWL_USERDATA =     (-21),
+             GWL_ID =           (-12)
+        }
+#endif
+
+        //----------------------------------------------------------------------
         public NuclearGame( bool _bUseGameStateManager=true )
         {
 #if WINDOWS_PHONE
@@ -86,6 +115,13 @@ namespace NuclearWinter
 
 #if WINDOWS
             Form = (Form)Form.FromHandle( Window.Handle );
+
+            // Is the Game window unicode-aware?
+            if( ! IsWindowUnicode( Window.Handle ) )
+            {
+                // No? Well, no problem, we'll just make it aware!
+                SetWindowLongW( Window.Handle, (int)GWL.GWL_WNDPROC, GetWindowLong( Window.Handle, (int)GWL.GWL_WNDPROC ) );
+            }
 #endif
 
             Graphics = new GraphicsDeviceManager(this);
