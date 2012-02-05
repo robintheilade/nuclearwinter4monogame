@@ -527,7 +527,7 @@ namespace NuclearWinter.UI
                     mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strItemPrefix, new Vector2( iIndentedX - Font.MeasureString( strItemPrefix ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
                     break;
                 case TextBlockType.UnorderedListItem:
-                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, "*", new Vector2( iIndentedX - Font.MeasureString( "* " ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, "•", new Vector2( iIndentedX - Font.MeasureString( "• " ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
                     break;
                 default:
                     throw new NotSupportedException();
