@@ -362,7 +362,21 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
         public Action<TreeView>             SelectHandler;
-        public TreeViewNode                 SelectedNode    = null;
+
+        TreeViewNode                        mSelectedNode = null;
+        public TreeViewNode SelectedNode
+        {
+            get { return mSelectedNode; }
+            set {
+                mSelectedNode = value;
+
+                if( mSelectedNode != null )
+                {
+                    // FIXME: Scroll to selected node
+                    // Computing the selected node's position at this point is complicated at best
+                }
+            }
+        }
 
         //----------------------------------------------------------------------
         public List<Button>                 ActionButtons       { get; private set; }
