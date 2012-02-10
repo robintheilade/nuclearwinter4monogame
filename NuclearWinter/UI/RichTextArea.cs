@@ -588,7 +588,7 @@ namespace NuclearWinter.UI
         public List<TextBlock>  TextBlocks          { get; private set; }
         public Caret            Caret               { get; private set; }
 
-        public const int        IndentOffset        = 50;
+        public const int        IndentOffset        = 30;
 
         public bool             IsReadOnly;
 
