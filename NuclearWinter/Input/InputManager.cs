@@ -293,9 +293,16 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
-        public bool WasKeyJustPressed( Keys _key )
+        public bool WasKeyJustPressed( Keys _key, bool _bNative=false )
         {
-            return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
+            if( ! _bNative )
+            {
+                return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
+            }
+            else
+            {
+                return KeyboardState.Native.IsKeyDown(_key) && ! PreviousKeyboardState.Native.IsKeyDown(_key);
+            }
         }
 
         //----------------------------------------------------------------------
