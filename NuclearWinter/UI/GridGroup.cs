@@ -38,6 +38,9 @@ namespace NuclearWinter.UI
         public void AddChildAt( Widget _child, int _iColumn, int _iRow )
         {
             Debug.Assert( ! maWidgetLocations.ContainsKey( _child ) );
+            Debug.Assert( _child.Parent == null );
+
+            _child.Parent = this;
 
             maTiles[ _iColumn, _iRow ] = _child;
             maWidgetLocations[ _child ] = new Point( _iColumn, _iRow );
@@ -46,6 +49,10 @@ namespace NuclearWinter.UI
 
         public override void RemoveChild( Widget _widget )
         {
+            Debug.Assert( _widget.Parent == this );
+
+            _widget.Parent = null;
+            
             Point widgetLocation = maWidgetLocations[ _widget ];
             maWidgetLocations.Remove( _widget );
 
@@ -142,19 +149,19 @@ namespace NuclearWinter.UI
                 switch( _direction )
                 {
                     case Direction.Left:
-                        if( childLocation.X - iOffset < 0 ) return base.GetSibling( _direction, this );
+                        if( childLocation.X - iOffset < 0 ) return base.GetSibling( _direction, _child );
                         tileChild = maTiles[ childLocation.X - iOffset, childLocation.Y ];
                         break;
                     case Direction.Right:
-                        if( childLocation.X + iOffset >= maTiles.GetLength(0) ) return base.GetSibling( _direction, this );
+                        if( childLocation.X + iOffset >= maTiles.GetLength(0) ) return base.GetSibling( _direction, _child );
                         tileChild = maTiles[ childLocation.X + iOffset, childLocation.Y ];
                         break;
                     case Direction.Up:
-                        if( childLocation.Y - iOffset < 0 ) return base.GetSibling( _direction, this );
+                        if( childLocation.Y - iOffset < 0 ) return base.GetSibling( _direction, _child );
                         tileChild = maTiles[ childLocation.X, childLocation.Y - iOffset ];
                         break;
                     case Direction.Down:
-                        if( childLocation.Y + iOffset >= maTiles.GetLength(1) ) return base.GetSibling( _direction, this );
+                        if( childLocation.Y + iOffset >= maTiles.GetLength(1) ) return base.GetSibling( _direction, _child );
                         tileChild = maTiles[ childLocation.X, childLocation.Y + iOffset ];
                         break;
                 }
