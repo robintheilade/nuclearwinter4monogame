@@ -600,9 +600,13 @@ namespace NuclearWinter.UI
                 Screen.DrawBox( Screen.Style.ButtonPress, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
 
             Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), Color.White );
+
+            Screen.PopScissorRectangle();
+
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
 
             const float fBlinkInterval = 0.3f;
 
