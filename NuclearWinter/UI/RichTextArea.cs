@@ -107,6 +107,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal void Draw()
         {
+            if( TextArea.TextBlocks.Count == 0 ) return;
+
             if( HasSelection )
             {
                 Point origin = new Point(
@@ -203,6 +205,8 @@ namespace NuclearWinter.UI
 
         internal void MoveTo( Point _point, bool _bSelect )
         {
+            if( TextArea.TextBlocks.Count == 0 ) return;
+
             int iTextBlock      = 0;
             int iBlockY         = 0;
             int iBlockCaretY    = 0;
