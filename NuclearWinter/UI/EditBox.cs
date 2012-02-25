@@ -61,7 +61,7 @@ namespace NuclearWinter.UI
                 iTarget = miSelectionX;
             }
 
-            int iScrollStep = LayoutRect.X / 3;
+            int iScrollStep = LayoutRect.Width / 3;
 
             if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - miCaretWidth )
             {
@@ -103,7 +103,13 @@ namespace NuclearWinter.UI
 
         string                  mstrDisplayedText;
         int                     miScrollOffset;
-        int                     miMaxScrollOffset;
+
+        int                     miTextWidth;
+        int                     miMaxScrollOffset {
+            get {
+                return (int)Math.Max( 0, miTextWidth - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth );
+            }
+        }
 
         public Func<char,bool>      TextEnteredHandler;
         public Func<string,string>  LookupHandler;
@@ -215,7 +221,7 @@ namespace NuclearWinter.UI
         {
             mstrDisplayedText = ( mPasswordChar == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordChar );
 
-            miMaxScrollOffset = (int)Math.Max( 0, Font.MeasureString( mstrDisplayedText ).X - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth );
+            miTextWidth = (int)Font.MeasureString( mstrDisplayedText ).X;
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
