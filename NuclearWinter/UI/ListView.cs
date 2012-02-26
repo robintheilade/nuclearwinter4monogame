@@ -85,7 +85,7 @@ namespace NuclearWinter.UI
                 while( mfTextWidth > _col.Width )
                 {
                     iOffset--;
-                    mstrText = Text.Substring( 0, iOffset ) + "...";
+                    mstrText = Text.Substring( 0, iOffset ) + "…";
                     if( iOffset == 0 ) break;
 
                     mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;

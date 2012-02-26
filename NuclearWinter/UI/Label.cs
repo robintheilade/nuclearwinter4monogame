@@ -146,7 +146,7 @@ namespace NuclearWinter.UI
                 while( miEllipsizedTextWidth > LayoutRect.Width )
                 {
                     iOffset--;
-                    mstrDisplayedText = Text.Substring( 0, iOffset ) + "...";
+                    mstrDisplayedText = Text.Substring( 0, iOffset ) + "…";
                     if( iOffset == 0 ) break;
 
                     miEllipsizedTextWidth = (int)Font.MeasureString( mstrDisplayedText ).X + Padding.Horizontal;
