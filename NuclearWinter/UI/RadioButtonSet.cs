@@ -63,6 +63,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         List<Button>                    mlButtons;
+        public IList<Button>            Buttons { get { return mlButtons.AsReadOnly(); } }
 
         int                             miHoveredButton;
         bool                            mbIsPressed;
@@ -154,6 +155,11 @@ namespace NuclearWinter.UI
                     }
                 }
             }
+        }
+
+        public Button SelectedButton
+        {
+            get { return mlButtons[ miSelectedButtonIndex ]; }
         }
 
         //----------------------------------------------------------------------
