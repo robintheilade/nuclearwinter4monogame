@@ -135,6 +135,7 @@ namespace NuclearWinter.UI
         public ButtonStyle Style;
 
         public Action<Button>   ClickHandler;
+        public object           Tag;
 
         float               mfTooltipTimer;
         const float         sfTooltipDelay      = 0.6f;
@@ -142,7 +143,7 @@ namespace NuclearWinter.UI
         public string       TooltipText;
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="" )
+        public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="", object _tag=null )
         : base( _screen )
         {
             Style = _style;
@@ -165,12 +166,13 @@ namespace NuclearWinter.UI
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
             TooltipText     = _strTooltipText;
+            Tag             = _tag;
 
             UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        public Button( Screen _screen, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="" )
+        public Button( Screen _screen, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="", object _tag=null )
         : this( _screen, new ButtonStyle(
                 _screen.Style.ButtonCornerSize,
                 _screen.Style.ButtonFrame,
@@ -180,7 +182,7 @@ namespace NuclearWinter.UI
                 _screen.Style.ButtonFocus,
                 _screen.Style.ButtonVerticalPadding,
                 _screen.Style.ButtonHorizontalPadding
-            ), _strText, _iconTex, _anchor, _strTooltipText )
+            ), _strText, _iconTex, _anchor, _strTooltipText, _tag )
         {
         }
 
