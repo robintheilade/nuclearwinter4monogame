@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
@@ -44,6 +45,9 @@ namespace NuclearWinter.UI
         {
             return new Point( _point.X - LayoutRect.X, _point.Y - LayoutRect.Y );
         }
+
+        internal override void OnPadMove( Direction _direction ) { }
+        internal override void OnKeyPress( Keys _key ) { }
 
         internal override void OnMouseEnter( Point _hitPoint )                  { if( EventHandler != null ) EventHandler.OnMouseEnter( TransformPoint( _hitPoint ) );  }
         internal override void OnMouseMove( Point _hitPoint )                   { if( EventHandler != null ) EventHandler.OnMouseMove( TransformPoint( _hitPoint ) );  }
