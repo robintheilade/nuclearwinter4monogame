@@ -7,10 +7,9 @@ using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    /*
-     * BoxGroup allows packing widgets in one direction
-     * It takes care of positioning each child widget properly
-     */
+    /// <summary>
+    /// A BoxGroup packs widgets on a single-axis (horizontal or vertical)
+    /// </summary>
     public class BoxGroup: Group
     {
         //----------------------------------------------------------------------

@@ -335,6 +335,71 @@ namespace NuclearWinter.UI
             Game.SpriteBatch.Draw( _tex, new Rectangle( _extents.Right - _cornerSize,   _extents.Top + _cornerSize,     _cornerSize, _extents.Height - _cornerSize * 2 ), new Rectangle( _tex.Width - _cornerSize, _cornerSize, _cornerSize, _tex.Height - _cornerSize * 2 ), _color );
         }
 
+        public void DrawNinepatch( Ninepatch _ninepatch, Rectangle _extents, Color _color )
+        {
+            // Stretched center
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left + _ninepatch.Borders.Top, _extents.Top + _ninepatch.Borders.Top, _extents.Width - _ninepatch.Borders.Horizontal, _extents.Height - _ninepatch.Borders.Vertical ),
+                new Rectangle( _ninepatch.SourceRectangle.Left + _ninepatch.Borders.Left, _ninepatch.SourceRectangle.Top + _ninepatch.Borders.Top, _ninepatch.SourceRectangle.Width - _ninepatch.Borders.Horizontal, _ninepatch.SourceRectangle.Height - _ninepatch.Borders.Vertical ),
+                _color );
+
+            // Top-left corner
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left, _extents.Top, _ninepatch.Borders.Left, _ninepatch.Borders.Top ),
+                new Rectangle( _ninepatch.SourceRectangle.Left, _ninepatch.SourceRectangle.Top, _ninepatch.Borders.Left, _ninepatch.Borders.Top ),
+                _color );
+
+            // Top-right corner
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Right - _ninepatch.Borders.Right, _extents.Top, _ninepatch.Borders.Right, _ninepatch.Borders.Top ),
+                new Rectangle( _ninepatch.SourceRectangle.Right - _ninepatch.Borders.Right, _ninepatch.SourceRectangle.Top, _ninepatch.Borders.Right, _ninepatch.Borders.Top ), _color );
+
+            // Bottom-left corner
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left, _extents.Bottom - _ninepatch.Borders.Bottom, _ninepatch.Borders.Left, _ninepatch.Borders.Bottom ),
+                new Rectangle( _ninepatch.SourceRectangle.Left, _ninepatch.SourceRectangle.Bottom - _ninepatch.Borders.Bottom, _ninepatch.Borders.Left, _ninepatch.Borders.Bottom ),
+                _color );
+
+            // Top-right corner
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Right - _ninepatch.Borders.Right, _ninepatch.Borders.Bottom, _ninepatch.Borders.Right, _ninepatch.Borders.Bottom ),
+                new Rectangle( _ninepatch.SourceRectangle.Right - _ninepatch.Borders.Right, _ninepatch.SourceRectangle.Bottom - _ninepatch.Borders.Bottom, _ninepatch.Borders.Right, _ninepatch.Borders.Bottom ),
+                _color );
+
+            // Top border
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left + _ninepatch.Borders.Left, _extents.Top, _extents.Width - _ninepatch.Borders.Horizontal, _ninepatch.Borders.Top ),
+                new Rectangle( _ninepatch.SourceRectangle.Left + _ninepatch.Borders.Left, _ninepatch.SourceRectangle.Top, _ninepatch.SourceRectangle.Width - _ninepatch.Borders.Horizontal, _ninepatch.Borders.Top ),
+                _color );
+
+            // Bottom border
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left + _ninepatch.Borders.Left, _extents.Bottom - _ninepatch.Borders.Bottom, _extents.Width - _ninepatch.Borders.Horizontal, _ninepatch.Borders.Bottom ),
+                new Rectangle( _ninepatch.SourceRectangle.Left + _ninepatch.Borders.Left, _ninepatch.SourceRectangle.Bottom - _ninepatch.Borders.Bottom, _ninepatch.SourceRectangle.Width - _ninepatch.Borders.Horizontal, _ninepatch.Borders.Bottom ),
+                _color );
+
+            // Left border
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Left, _extents.Top + _ninepatch.Borders.Top, _ninepatch.Borders.Left, _extents.Height - _ninepatch.Borders.Vertical ),
+                new Rectangle( _ninepatch.SourceRectangle.Left, _ninepatch.SourceRectangle.Top + _ninepatch.Borders.Top, _ninepatch.Borders.Left, _ninepatch.SourceRectangle.Height - _ninepatch.Borders.Vertical ),
+                _color );
+
+            // Right border
+            Game.SpriteBatch.Draw(
+                _ninepatch.Texture,
+                new Rectangle( _extents.Right - _ninepatch.Borders.Right, _extents.Top + _ninepatch.Borders.Top, _ninepatch.Borders.Right, _extents.Height - _ninepatch.Borders.Vertical ),
+                new Rectangle( _ninepatch.SourceRectangle.Right - _ninepatch.Borders.Right, _ninepatch.SourceRectangle.Top + _ninepatch.Borders.Top, _ninepatch.Borders.Right, _ninepatch.SourceRectangle.Height - _ninepatch.Borders.Vertical ),
+                _color );
+        }
+
         //----------------------------------------------------------------------
         Stack<Rectangle> mlScissorRects = new Stack<Rectangle>();
 
