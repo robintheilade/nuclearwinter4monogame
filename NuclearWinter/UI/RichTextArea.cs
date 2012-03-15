@@ -744,7 +744,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void DeleteSelectedText()
         {
-            if( ! Caret.HasSelection ) return;
+            if( ! Caret.HasSelection || IsReadOnly ) return;
 
             bool bHasForwardSelection = Caret.HasForwardSelection;
             int iStartBlockIndex    = bHasForwardSelection ? Caret.StartTextBlockIndex : Caret.EndTextBlockIndex;
@@ -810,6 +810,8 @@ namespace NuclearWinter.UI
 
         public void PasteFromClipboard()
         {
+            if( IsReadOnly ) return;
+
             // NOTE: For this to work, you must put [STAThread] before your Main()
 
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
