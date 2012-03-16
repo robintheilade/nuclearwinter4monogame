@@ -19,6 +19,8 @@ namespace NuclearWinter.UI
 
         void OnMouseWheel( Point _hitPoint, int _iDelta );
 
+        void OnKeyPress( Keys _key );
+
         void OnBlur();
     }
 
@@ -47,7 +49,7 @@ namespace NuclearWinter.UI
         }
 
         internal override void OnPadMove( Direction _direction ) { }
-        internal override void OnKeyPress( Keys _key ) { }
+        internal override void OnKeyPress( Keys _key )                          { if( EventHandler != null ) EventHandler.OnKeyPress( _key );  }
 
         internal override void OnMouseEnter( Point _hitPoint )                  { if( EventHandler != null ) EventHandler.OnMouseEnter( TransformPoint( _hitPoint ) );  }
         internal override void OnMouseMove( Point _hitPoint )                   { if( EventHandler != null ) EventHandler.OnMouseMove( TransformPoint( _hitPoint ) );  }
