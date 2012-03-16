@@ -64,7 +64,7 @@ namespace NuclearWinter.Input
 
             mMessageFilter              = new WindowMessageFilter( Game.Window.Handle );
             mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
-            mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
+            //mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #endif
         }
@@ -139,7 +139,11 @@ namespace NuclearWinter.Input
             }
 
             EnteredText.Clear();
-            JustPressedKeys.Clear();
+
+            Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
+            Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
+            
+            JustPressedKeys = currentPressedKeys.Except( previousPressedKeys ).ToList();
 
             mbDoubleClicked = false;
 #endif
@@ -311,28 +315,6 @@ namespace NuclearWinter.Input
             return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
         }
 
-        /*
-        public IEnumerable<Keys> GetJustPressedKeys()
-        {
-
-            Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
-            Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
-            
-            List<Keys> keys = currentPressedKeys.Except( previousPressedKeys ).ToList();
-
-            if( mbRepeatKey )
-            {
-                Debug.Assert( mLastKeyPressed != Keys.None );
-
-                if( ! keys.Contains( mLastKeyPressed ) )
-                {
-                    keys.Add( mLastKeyPressed );
-                }
-            }
-
-            return keys;
-        }
-        */
 
         //----------------------------------------------------------------------
         public int GetMouseWheelDelta()
