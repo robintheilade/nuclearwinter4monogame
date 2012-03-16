@@ -34,6 +34,9 @@ namespace NuclearWinter.UI
 
         public Action           ChangeHandler;
 
+        float                   mfTooltipTimer;
+        const float             sfTooltipDelay      = 0.6f;
+
         //----------------------------------------------------------------------
         public Slider( Screen _screen, int _iMin, int _iMax, int _iInitialValue, int _iStep )
         : base( _screen )
@@ -69,6 +72,7 @@ namespace NuclearWinter.UI
         internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
+            mfTooltipTimer = 0f;
         }
 
         //----------------------------------------------------------------------
@@ -78,6 +82,7 @@ namespace NuclearWinter.UI
 
             Screen.Focus( this );
             mbIsPressed = true;
+            mfTooltipTimer = sfTooltipDelay;
 
             int handleSize = LayoutRect.Height;
             Value = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - LayoutRect.X - handleSize / 4 ) / ( LayoutRect.Width - handleSize ) );
@@ -128,6 +133,15 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void Update( float _fElapsedTime )
+        {
+            if( mbIsHovered )
+            {
+                mfTooltipTimer += _fElapsedTime;
+            }
+        }
+
+        //----------------------------------------------------------------------
         internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
@@ -145,6 +159,29 @@ namespace NuclearWinter.UI
             {
                 Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
+        }
+
+        //----------------------------------------------------------------------
+        internal override void DrawHovered()
+        {
+            if( mfTooltipTimer < sfTooltipDelay ) return;
+
+            UIFont font = Screen.Style.MediumFont;
+
+            Box padding = new Box( 10, 10 );
+
+            string strTooltipText = Value.ToString();
+
+            Vector2 vSize = font.MeasureString( strTooltipText );
+            int iWidth  = (int)vSize.X;
+            int iHeight = (int)vSize.Y;
+
+            Point topLeft = new Point(
+                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
+                Screen.Game.InputMgr.MouseState.Y + 20 );
+
+            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
+            Screen.Game.SpriteBatch.DrawString( font, strTooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
         }
     }
 }
