@@ -120,4 +120,7 @@
   <data name="Close" xml:space="preserve">
     <value>Fermer</value>
   </data>
+  <data name="NoKey" xml:space="preserve">
+    <value>(Aucun)</value>
+  </data>
 </root>

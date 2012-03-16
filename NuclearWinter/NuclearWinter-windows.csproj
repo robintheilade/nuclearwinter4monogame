@@ -125,6 +125,7 @@
     <Compile Include="UI\GridGroup.cs" />
     <Compile Include="UI\Group.cs" />
     <Compile Include="UI\Image.cs" />
+    <Compile Include="UI\KeyBox.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListView.cs" />
     <Compile Include="UI\Menu\IMenuManager.cs" />

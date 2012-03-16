@@ -120,4 +120,7 @@
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="NoKey" xml:space="preserve">
+    <value>(None)</value>
+  </data>
 </root>

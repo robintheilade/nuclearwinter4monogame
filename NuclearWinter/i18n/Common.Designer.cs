@@ -68,5 +68,14 @@ namespace NuclearWinter.i18n {
                 return ResourceManager.GetString("Close", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (None).
+        /// </summary>
+        internal static string NoKey {
+            get {
+                return ResourceManager.GetString("NoKey", resourceCulture);
+            }
+        }
     }
 }
