@@ -497,15 +497,22 @@ namespace NuclearWinter.UI
         public UIFont               Font        { get; private set; }
         public int                  LineHeight  { get { return Font.LineSpacing; } }
         public int                  TotalHeight { get { return LineHeight * WrappedLines.Count + LineHeight / 2; } }
+        public Color                Color;
 
         RichTextArea                mTextArea;
 
-        public TextBlock( RichTextArea _textArea, string _strText, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        public TextBlock( RichTextArea _textArea, string _strText, Color _color, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
         {
             mTextArea   = _textArea;
             Text        = _strText;
             BlockType   = _lineType;
             IndentLevel = _iIndentLevel;
+            Color       = _color;
+        }
+
+        public TextBlock( RichTextArea _textArea, string _strText, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        : this( _textArea, _strText, _textArea.Screen.Style.DefaultTextColor, _lineType, _iIndentLevel )
+        {
         }
 
         public void DoWrap( int _iWidth )
@@ -528,10 +535,10 @@ namespace NuclearWinter.UI
                     break;
                 case TextBlockType.OrderedListItem:
                     string strItemPrefix = mTextArea.CurrentListIndex.ToString() + ". ";
-                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strItemPrefix, new Vector2( iIndentedX - Font.MeasureString( strItemPrefix ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strItemPrefix, new Vector2( iIndentedX - Font.MeasureString( strItemPrefix ).X, _iY + Font.YOffset ), Color  );
                     break;
                 case TextBlockType.UnorderedListItem:
-                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, "•", new Vector2( iIndentedX - Font.MeasureString( "• " ).X, _iY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                    mTextArea.Screen.Game.SpriteBatch.DrawString( Font, "•", new Vector2( iIndentedX - Font.MeasureString( "• " ).X, _iY + Font.YOffset ), Color );
                     break;
                 default:
                     throw new NotSupportedException();
@@ -540,7 +547,7 @@ namespace NuclearWinter.UI
             int iTextY = _iY;
             foreach( string strText in WrappedLines )
             {
-                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iIndentedX, iTextY + Font.YOffset ), mTextArea.Screen.Style.DefaultTextColor );
+                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iIndentedX, iTextY + Font.YOffset ), Color );
                 iTextY += Font.LineSpacing;
             }
         }
