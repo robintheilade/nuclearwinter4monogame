@@ -127,6 +127,9 @@ namespace NuclearWinter.UI
         public bool             IsReadOnly;
         public int              MaxLength;
 
+        public Texture2D        Frame;
+        public int              FrameCornerSize;
+
         //----------------------------------------------------------------------
         public EditBox( Screen _screen, string _strText = "", Func<char,bool> _textEnteredHandler = null )
         : base( _screen )
@@ -135,6 +138,10 @@ namespace NuclearWinter.UI
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 15 );
             TextEnteredHandler = _textEnteredHandler;
+
+            Frame               = Screen.Style.EditBoxFrame;
+            FrameCornerSize     = Screen.Style.EditBoxCornerSize;
+
 
             UpdateContentSize();
         }
@@ -599,7 +606,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.EditBoxFrame, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+            Screen.DrawBox( Frame, LayoutRect, FrameCornerSize, Color.White );
 
             if( Screen.IsActive && mbIsHovered )
             {
