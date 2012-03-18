@@ -21,8 +21,8 @@ namespace NuclearWinter.UI
             }
         }
 
-        Keys? mKey;
-        public Keys?                Key
+        Keys mKey;
+        public Keys                 Key
         {
             get { return mKey; }
 
@@ -36,21 +36,21 @@ namespace NuclearWinter.UI
         public string               DisplayedKey
         {
             get {
-                return Key.HasValue ? Key.ToString() : i18n.Common.NoKey;
+                return Key.ToString();
             }
         }
 
         Point                       mpTextPosition;
         int                         miTextWidth;
 
-        public Func<Keys?,bool>     ChangeHandler;
+        public Func<Keys,bool>      ChangeHandler;
         public Action<KeyBox>       FocusHandler;
         public Action<KeyBox>       BlurHandler;
 
         bool                        mbIsHovered;
 
         //----------------------------------------------------------------------
-        public KeyBox( Screen _screen, Keys? _key )
+        public KeyBox( Screen _screen, Keys _key )
         : base( _screen )
         {
             mKey        = _key;
@@ -137,7 +137,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnKeyPress( Keys _key )
         {
-            Keys? newKey = ( _key != Keys.Back ) ? _key : (Keys?)null;
+            Keys newKey = ( _key != Keys.Back ) ? _key : Keys.None;
 
             if( ChangeHandler( newKey ) )
             {
