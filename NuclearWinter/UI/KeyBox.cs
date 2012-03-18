@@ -134,6 +134,11 @@ namespace NuclearWinter.UI
             // Nothing
         }
 
+        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        {
+            // Nothing
+        }
+
         //----------------------------------------------------------------------
         internal override void OnKeyPress( Keys _key )
         {

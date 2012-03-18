@@ -281,6 +281,11 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnKeyPress( key );
                 }
 
+                foreach( System.Windows.Forms.Keys key in Game.InputMgr.JustPressedWindowsKeys )
+                {
+                    FocusedWidget.OnWindowsKeyPress( key );
+                }
+
                 foreach( char character in Game.InputMgr.EnteredText )
                 {
                     FocusedWidget.OnTextEntered( character );

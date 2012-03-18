@@ -535,11 +535,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnKeyPress( Keys _key )
+        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             switch( _key )
             {
-                case Keys.Enter:
+                case System.Windows.Forms.Keys.Enter:
                     if( SelectedRowIndex != -1 && ValidateHandler != null ) ValidateHandler( this );
                     break;
             }

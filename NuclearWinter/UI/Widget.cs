@@ -214,9 +214,9 @@ namespace NuclearWinter.UI
 
         internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
-        internal virtual void       OnKeyPress  ( Keys _key )
+        internal virtual void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
-            if( _key == Keys.Tab )
+            if( _key == System.Windows.Forms.Keys.Tab )
             {
                 List<Direction> directions = new List<Direction>();
 
@@ -248,6 +248,9 @@ namespace NuclearWinter.UI
                 }
             }
         }
+
+        internal virtual void       OnKeyPress  ( Keys _key ) {}
+
         internal virtual void       OnTextEntered( char _char ) {}
 
         internal virtual void       OnActivateDown() {}

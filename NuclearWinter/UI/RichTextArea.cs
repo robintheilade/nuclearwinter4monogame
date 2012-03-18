@@ -873,39 +873,39 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnKeyPress( Keys _key )
+        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
             bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
 
             switch( _key )
             {
-                case Keys.A:
+                case System.Windows.Forms.Keys.A:
                     if( bCtrl )
                     {
                         SelectAll();
                     }
                     break;
-                case Keys.X:
+                case System.Windows.Forms.Keys.X:
                     if( bCtrl )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
-                case Keys.C:
+                case System.Windows.Forms.Keys.C:
                     if( bCtrl )
                     {
                         CopySelectionToClipboard();
                     }
                     break;
-                case Keys.V:
+                case System.Windows.Forms.Keys.V:
                     if( bCtrl )
                     {
                         PasteFromClipboard();
                     }
                     break;
-                case Keys.Enter:
+                case System.Windows.Forms.Keys.Enter:
                     if( ! IsReadOnly )
                     {
                         TextBlock textBlock = TextBlocks[ Caret.StartTextBlockIndex ];
@@ -979,7 +979,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case Keys.Back:
+                case System.Windows.Forms.Keys.Back:
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -1021,7 +1021,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case Keys.Delete:
+                case System.Windows.Forms.Keys.Delete:
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -1051,7 +1051,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case Keys.Tab:
+                case System.Windows.Forms.Keys.Tab:
                     if( ! IsReadOnly )
                     {
                         int iNewIndentLevel = bShift ? Math.Max( 0, (int)TextBlocks[ Caret.EndTextBlockIndex ].IndentLevel - 1 ) : Math.Min( 4, (int)TextBlocks[ Caret.EndTextBlockIndex ].IndentLevel + 1 );
@@ -1063,7 +1063,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case Keys.Left: {
+                case System.Windows.Forms.Keys.Left: {
                     int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
 
@@ -1108,7 +1108,7 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
-                case Keys.Right: {
+                case System.Windows.Forms.Keys.Right: {
                     int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) + 1;
 
@@ -1160,30 +1160,30 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
-                case Keys.End:
+                case System.Windows.Forms.Keys.End:
                     Caret.MoveEnd( bShift );
                     mbScrollToCaret = true;
                     break;
-                case Keys.Home:
+                case System.Windows.Forms.Keys.Home:
                     Caret.MoveStart( bShift );
                     mbScrollToCaret = true;
                     break;
-                case Keys.Up:
+                case System.Windows.Forms.Keys.Up:
                     Caret.MoveUp( bShift );
                     mbScrollToCaret = true;
                     break;
-                case Keys.Down:
+                case System.Windows.Forms.Keys.Down:
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;
-                case Keys.PageUp: {
+                case System.Windows.Forms.Keys.PageUp: {
                     Point target = GetPositionForCaret( Caret.EndTextBlockIndex, Caret.EndOffset );
                     target.Y -= LayoutRect.Height;
                     SetCaretPosition( target, bShift );
                     mbScrollToCaret = true;
                     break;
                 }
-                case Keys.PageDown: {
+                case System.Windows.Forms.Keys.PageDown: {
                     Point target = GetPositionForCaret( Caret.EndTextBlockIndex, Caret.EndOffset );
                     target.Y += LayoutRect.Height;
                     SetCaretPosition( target, bShift );
@@ -1191,7 +1191,7 @@ namespace NuclearWinter.UI
                     break;
                 }
                 default:
-                    base.OnKeyPress( _key );
+                    base.OnWindowsKeyPress( _key );
                     break;
             }
         }

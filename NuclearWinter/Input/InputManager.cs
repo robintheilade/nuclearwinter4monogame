@@ -32,6 +32,7 @@ namespace NuclearWinter.Input
 
         public List<char>                           EnteredText             { get; private set; }
         public List<Keys>                           JustPressedKeys         { get; private set; }
+        public List<System.Windows.Forms.Keys>      JustPressedWindowsKeys  { get; private set; }
 
         WindowMessageFilter                         mMessageFilter;
         bool                                        mbDoubleClicked;
@@ -61,10 +62,11 @@ namespace NuclearWinter.Input
 #if WINDOWS
             EnteredText             = new List<char>();
             JustPressedKeys         = new List<Keys>();
+            JustPressedWindowsKeys  = new List<System.Windows.Forms.Keys>();
 
             mMessageFilter              = new WindowMessageFilter( Game.Window.Handle );
             mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
-            //mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedKeys.Add( (Keys)_key ); };
+            mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedWindowsKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #endif
         }
@@ -87,47 +89,6 @@ namespace NuclearWinter.Input
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
 
-            /*
-            Keys[] pressedKeys = KeyboardState.Native.GetPressedKeys();
-
-            mbRepeatKey = false;
-            bool bIsKeyStillDown = false;
-            if( pressedKeys.Length > 0 )
-            {
-                if( pressedKeys[0] != mLastKeyPressed )
-                {
-                    mLastKeyPressed = pressedKeys[0];
-                    mfRepeatKeyTimer = 0f;
-                }
-                else
-                {
-                    bIsKeyStillDown = true;
-                }
-            }
-            else
-            {
-                mLastKeyPressed = Keys.None;
-            }
-
-            if( bIsKeyStillDown )
-            {
-                float fRepeatValue      = ( mfRepeatKeyTimer - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
-                float fNewRepeatValue   = ( mfRepeatKeyTimer + fElapsedTime - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
-
-                if( mfRepeatKeyTimer < sfButtonRepeatDelay && mfRepeatKeyTimer + fElapsedTime >= sfButtonRepeatDelay )
-                {
-                    mbRepeatKey = true;
-                }
-                else
-                if( mfRepeatKeyTimer > sfButtonRepeatDelay && fRepeatValue > fNewRepeatValue )
-                {
-                    mbRepeatKey = true;
-                }
-
-                mfRepeatKeyTimer += fElapsedTime;
-            }
-            */
-
             KeyboardPlayerIndex = null;
             for( int i = 0; i < siMaxInput; i++ )
             {
@@ -139,6 +100,7 @@ namespace NuclearWinter.Input
             }
 
             EnteredText.Clear();
+            JustPressedWindowsKeys.Clear();
 
             Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
             Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
