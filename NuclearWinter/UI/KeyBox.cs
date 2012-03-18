@@ -129,6 +129,11 @@ namespace NuclearWinter.UI
             if( BlurHandler != null ) BlurHandler( this );
         }
 
+        internal override void OnPadMove( Direction _direction )
+        {
+            // Nothing
+        }
+
         //----------------------------------------------------------------------
         internal override void OnKeyPress( Keys _key )
         {
