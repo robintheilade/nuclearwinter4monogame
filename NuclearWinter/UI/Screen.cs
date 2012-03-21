@@ -388,7 +388,7 @@ namespace NuclearWinter.UI
         {
             Rectangle rect = TransformRect( _scissorRect, Game.SpriteMatrix );
             rect.Offset( 0, NuclearWinter.Resolution.Viewport.Y );
-            Rectangle parentRect = mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds;
+            Rectangle parentRect = ScissorRectangle;
 
             Rectangle newRect = IntersectRects( IntersectRects( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds );
 
@@ -402,6 +402,11 @@ namespace NuclearWinter.UI
             SuspendBatch();
             mlScissorRects.Pop();
             ResumeBatch();
+        }
+
+        public Rectangle ScissorRectangle
+        {
+            get { return mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds; }
         }
 
         //----------------------------------------------------------------------

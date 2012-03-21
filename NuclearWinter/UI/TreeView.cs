@@ -209,6 +209,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
+            Rectangle containerRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Width, ( mTreeView.NodeHeight + mTreeView.NodeSpacing ) * ( 1 + ( Collapsed ? 0 : ContainedNodeCount ) ) );
+            if( ! containerRect.Intersects( Screen.ScissorRectangle ) ) return;
+
             if( Parent != null )
             {
                 if( ! mbIsLast )
