@@ -209,8 +209,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Rectangle containerRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Width, ( mTreeView.NodeHeight + mTreeView.NodeSpacing ) * ( 1 + ( Collapsed ? 0 : ContainedNodeCount ) ) );
-            if( ! containerRect.Intersects( Screen.ScissorRectangle ) ) return;
+            if( ! LayoutRect.Intersects( Screen.ScissorRectangle ) ) return;
 
             if( Parent != null )
             {
@@ -302,7 +301,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( mTreeView.HoveredNode == this && ! mTreeView.IsHoveringNodeCheckBox() )
+            if( mTreeView.HoveredNode == this && ! mTreeView.IsHoveringNodeCheckBox() && mTreeView.InsertMode == TreeView.NodeInsertMode.Over )
             {
                 if( mTreeView.SelectedNode != this )
                 {
@@ -388,6 +387,16 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public TreeViewNode                 HoveredNode     = null;
+
+        internal enum NodeInsertMode
+        {
+            Before,
+            Over,
+            After
+        }
+
+        internal NodeInsertMode             InsertMode;
+
         internal TreeViewNode               FocusedNode     = null;
 
         //----------------------------------------------------------------------
@@ -408,7 +417,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         // Drag & drop
-        public Func<TreeViewNode,TreeViewNode,bool>
+        public Func<TreeViewNode,TreeViewNode,int,bool>
                                             DragNDropHandler;
         bool                                mbIsMouseDown;
         bool                                mbIsDragging;
@@ -496,8 +505,8 @@ namespace NuclearWinter.UI
                 }
             }
 
-            ContentHeight = iHeight + Padding.Vertical + 25;
-            Scrollbar.DoLayout( LayoutRect, ContentHeight );
+            ContentHeight = iHeight;
+            Scrollbar.DoLayout( LayoutRect, ContentHeight + Padding.Vertical + 30 );
         }
 
         //----------------------------------------------------------------------
@@ -518,6 +527,8 @@ namespace NuclearWinter.UI
                 mMouseDragPoint = _hitPoint;
             }
 
+            mbIsHovered = HitBox.Contains( _hitPoint );
+
             mHoverPoint = _hitPoint;
             UpdateHoveredNode();
         }
@@ -535,9 +546,32 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                int iNodeIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)Scrollbar.LerpOffset ) / ( NodeHeight + NodeSpacing );
+                int iNodeY = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)Scrollbar.LerpOffset );
+
+                int iOffset = iNodeY % ( NodeHeight + NodeSpacing );
+
+                if( iOffset < ( NodeHeight + NodeSpacing ) / 4 )
+                {
+                    InsertMode = NodeInsertMode.Before;
+                }
+                else
+                if( iOffset > ( NodeHeight + NodeSpacing ) * 3 / 4 )
+                {
+                    InsertMode = NodeInsertMode.After;
+                }
+                else
+                {
+                    InsertMode = NodeInsertMode.Over;
+                }
+
+                int iNodeIndex = iNodeY / ( NodeHeight + NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
+
+                if( HoveredNode == null )
+                {
+                    InsertMode = iNodeY < ( NodeHeight + NodeSpacing ) / 4 ? NodeInsertMode.Before : NodeInsertMode.After;
+                }
 
                 if( oldHoveredNode != HoveredNode )
                 {
@@ -660,14 +694,42 @@ namespace NuclearWinter.UI
             {
                 Debug.Assert( FocusedNode != null );
 
-                if( HitBox.Contains( _hitPoint ) && HoveredNode != FocusedNode && DragNDropHandler != null )
+                TreeViewNode draggedNode = FocusedNode;
+                TreeViewNode currentParentNode = (TreeViewNode)draggedNode.Parent;
+
+                int iIndex = ( HoveredNode != null ) ? HoveredNode.Children.Count : Nodes.Count;
+                TreeViewNode targetParentNode = HoveredNode;
+
+                if( HoveredNode != null )
                 {
-                    TreeViewNode ancestorNode = HoveredNode;
+                    switch( InsertMode )
+                    {
+                        case NodeInsertMode.Before:
+                            targetParentNode = (TreeViewNode)HoveredNode.Parent;
+                            iIndex = ( targetParentNode != null ) ? targetParentNode.Children.IndexOf( HoveredNode ) : Nodes.IndexOf( HoveredNode );
+                            break;
+                        case NodeInsertMode.After:
+                            if( ! HoveredNode.DisplayAsContainer && HoveredNode.Children.Count == 0 )
+                            {
+                                targetParentNode = (TreeViewNode)HoveredNode.Parent;
+                                iIndex = ( targetParentNode != null ) ? targetParentNode.Children.IndexOf( HoveredNode ) : Nodes.IndexOf( HoveredNode );
+                            }
+                            else
+                            {
+                                iIndex = 0;
+                            }
+                            break;
+                    }
+                }
+
+                if( HitBox.Contains( _hitPoint ) && targetParentNode != draggedNode && DragNDropHandler != null )
+                {
+                    TreeViewNode ancestorNode = targetParentNode;
 
                     bool bIsCycle = false;
                     while( ancestorNode != null )
                     {
-                        if( ancestorNode == FocusedNode )
+                        if( ancestorNode == draggedNode )
                         {
                             bIsCycle = true;
                             break;
@@ -676,24 +738,50 @@ namespace NuclearWinter.UI
                         ancestorNode = (TreeViewNode)ancestorNode.Parent;
                     }
 
-                    if( ! bIsCycle && DragNDropHandler(FocusedNode, HoveredNode ) )
+                    if( ! bIsCycle )
                     {
-                        if( FocusedNode.Parent != null )
+                        // Offset index if the node is moving inside the same parent
+                        if( targetParentNode == currentParentNode )
                         {
-                            ( (TreeViewNode)(FocusedNode.Parent) ).Children.Remove( FocusedNode );
-                        }
-                        else
-                        {
-                            Nodes.Remove( FocusedNode );
+                            if( currentParentNode != null )
+                            {
+                                if( currentParentNode.Children.IndexOf( draggedNode ) < iIndex )
+                                {
+                                    iIndex--;
+                                }
+                            }
+                            else
+                            {
+                                if( Nodes.IndexOf( draggedNode ) < iIndex )
+                                {
+                                    iIndex--;
+                                }
+                            }
                         }
 
-                        if( HoveredNode != null )
+                        if( DragNDropHandler( draggedNode, targetParentNode, iIndex ) )
                         {
-                            HoveredNode.Children.Add( FocusedNode );
-                        }
-                        else
-                        {
-                            Nodes.Add( FocusedNode );
+
+                            if( draggedNode.Parent != null )
+                            {
+                                ( (TreeViewNode)(draggedNode.Parent) ).Children.Remove( draggedNode );
+                            }
+                            else
+                            {
+                                Nodes.Remove( draggedNode );
+                            }
+
+
+                            if( targetParentNode != null )
+                            {
+                                targetParentNode.Children.Insert( iIndex, draggedNode );
+                            }
+                            else
+                            {
+                                Nodes.Insert( iIndex, draggedNode );
+                            }
+
+                            FocusedNode = draggedNode;
                         }
                     }
                 }
@@ -836,7 +924,9 @@ namespace NuclearWinter.UI
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
+            Rectangle paddedRect = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
+
+            Screen.PushScissorRectangle( paddedRect );
             foreach( TreeViewNode node in Nodes )
             {
                 node.Draw();
@@ -847,6 +937,38 @@ namespace NuclearWinter.UI
                 foreach( Button button in ActionButtons )
                 {
                     button.Draw();
+                }
+            }
+
+            if( mbIsDragging )
+            {
+                if( HoveredNode != null )
+                {
+                    if( InsertMode != NodeInsertMode.Over )
+                    {
+                        int iX = HoveredNode.LayoutRect.X;
+                        int iWidth = HoveredNode.LayoutRect.Width;
+                        int iY = HoveredNode.LayoutRect.Y - ( NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? NodeHeight + NodeSpacing : 0 );
+
+                        if( InsertMode == NodeInsertMode.After && ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && ! HoveredNode.Collapsed )
+                        {
+                            iX += NodeBranchWidth;
+                            iWidth -= NodeBranchWidth;
+                        }
+
+                        Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
+                        Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );
+                    }
+                }
+                else
+                if( mbIsHovered )
+                {
+                    int iX = paddedRect.X;
+                    int iWidth = paddedRect.Width;
+                    int iY = paddedRect.Y - ( NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? ( ContentHeight - (int)Scrollbar.LerpOffset ) : 0 );
+
+                    Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
+                    Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );
                 }
             }
 

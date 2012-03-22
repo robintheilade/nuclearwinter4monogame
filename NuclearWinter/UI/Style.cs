@@ -56,6 +56,10 @@ namespace NuclearWinter.UI
         public Texture2D        DropDownArrow;
 
         public Texture2D        ListFrame;
+
+        public Texture2D        ListRowInsertMarker;
+        public int              ListRowInsertMarkerCornerSize = 10;
+
         public Texture2D        GridHeaderFrame;
 
         public int              GridBoxFrameCornerSize = 30;
