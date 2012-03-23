@@ -712,7 +712,7 @@ namespace NuclearWinter.UI
                             if( ! HoveredNode.DisplayAsContainer && HoveredNode.Children.Count == 0 )
                             {
                                 targetParentNode = (TreeViewNode)HoveredNode.Parent;
-                                iIndex = ( targetParentNode != null ) ? targetParentNode.Children.IndexOf( HoveredNode ) : Nodes.IndexOf( HoveredNode );
+                                iIndex = 1 + ( targetParentNode != null ? targetParentNode.Children.IndexOf( HoveredNode ) : Nodes.IndexOf( HoveredNode ) );
                             }
                             else
                             {
