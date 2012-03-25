@@ -37,14 +37,16 @@ namespace NuclearWinter.UI
             mLabel.Text = Collapsed ? string.Format( "{0} ({1})", mstrText, ContainedNodeCount ) : mstrText;
         }
 
-        public object               Tag;
+        public List<TreeViewIndicator>          Indicators { get; private set; }
+
+        public object                           Tag;
 
         public ObservableList<TreeViewNode>     Children            { get; private set; }
         public int                              ContainedNodeCount  { get; private set; }
         public int                              UncollapsedContainedNodeCount { get; private set; }
 
-        public bool                 DisplayAsContainer;
-        public bool                 Collapsed {
+        public bool                             DisplayAsContainer;
+        public bool                             Collapsed {
             get { return mbCollapsed; }
             set {
                 mbCollapsed = value;
@@ -53,22 +55,26 @@ namespace NuclearWinter.UI
             }
         }
 
-        public CheckBoxStatus       CheckBoxStatus;
+        public CheckBoxStatus                   CheckBoxStatus;
 
         //----------------------------------------------------------------------
-        TreeView                    mTreeView;
+        TreeView                                mTreeView;
 
-        Label                       mLabel;
-        Image                       mImage;
+        Label                                   mLabel;
+        Image                                   mImage;
 
-        bool                        mbCollapsed;
-        bool                        mbIsLast;
+        bool                                    mbCollapsed;
+        bool                                    mbIsLast;
+
+        int                                     miIndicatorAndActionButtonsWidth;
 
         //----------------------------------------------------------------------
         public TreeViewNode( TreeView _treeView, string _strText, Texture2D _icon = null, object _tag = null )
         : base( _treeView.Screen )
         {
             mTreeView   = _treeView;
+            Indicators = new List<TreeViewIndicator>();
+
             Children    = new ObservableList<TreeViewNode>();
 
             Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
@@ -191,6 +197,23 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
             HitBox = LayoutRect;
 
+            miIndicatorAndActionButtonsWidth = 0;
+
+            if( mTreeView.HoveredNode == this && ! mTreeView.IsDragging )
+            {
+                miIndicatorAndActionButtonsWidth += mTreeView.ActionButtons.Sum( delegate( Button _button ) { return _button.ContentWidth; } );
+            }
+
+            // Indicators
+            int iIndicatorX = LayoutRect.Right;
+
+            foreach( TreeViewIndicator indicator in Indicators )
+            {
+                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 10;
+                indicator.DoLayout( new Rectangle( LayoutRect.Right - miIndicatorAndActionButtonsWidth, LayoutRect.Y + 10, indicator.ContentWidth, mTreeView.NodeHeight - 20 ) );
+            }
+
+            // Child nodes
             int iX = LayoutRect.X;
             int iY = LayoutRect.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
             foreach( TreeViewNode child in Children )
@@ -261,7 +284,7 @@ namespace NuclearWinter.UI
 
                 Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
 
-                if( mTreeView.HoveredNode == this && mTreeView.IsHoveringNodeCheckBox() )
+                if( mTreeView.HoveredNode == this && mTreeView.IsHoveringNodeCheckBox() && ! mTreeView.IsDragging )
                 {
                     Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                 }
@@ -286,7 +309,12 @@ namespace NuclearWinter.UI
                 Screen.Game.SpriteBatch.Draw( tex, new Vector2( checkBoxRect.Center.X, checkBoxRect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
             }
 
-            DrawNode( LayoutRect.Location );
+            DrawNode( LayoutRect.Location, miIndicatorAndActionButtonsWidth );
+
+            foreach( TreeViewIndicator indicator in Indicators )
+            {
+                indicator.Draw();
+            }
 
             if( mTreeView.HasFocus && mTreeView.FocusedNode == this )
             {
@@ -301,7 +329,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( mTreeView.HoveredNode == this && ! mTreeView.IsHoveringNodeCheckBox() && mTreeView.InsertMode == TreeView.NodeInsertMode.Over )
+            if( mTreeView.HoveredNode == this && ! mTreeView.IsHoveringNodeCheckBox() && ( ! mTreeView.IsDragging || mTreeView.InsertMode == TreeView.NodeInsertMode.Over ) )
             {
                 if( mTreeView.SelectedNode != this )
                 {
@@ -324,7 +352,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal void DrawNode( Point _position )
+        internal void DrawNode( Point _position, int _iRight )
         {
             Rectangle nodeRect = new Rectangle( _position.X, _position.Y, LayoutRect.Width, mTreeView.NodeHeight );
 
@@ -346,7 +374,51 @@ namespace NuclearWinter.UI
                 iLabelX += mImage.ContentWidth;
             }
 
-            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX, mTreeView.NodeHeight ) );
+            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX - _iRight, mTreeView.NodeHeight ) );
+            mLabel.Draw();
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    public class TreeViewIndicator: Widget
+    {
+        public Texture2D            Frame;
+        public int                  FrameCornerSize;
+
+        Label                       mLabel;
+
+        //----------------------------------------------------------------------
+        public TreeViewIndicator( Screen _screen, string _strText )
+        : base( _screen )
+        {
+            mLabel = new Label( Screen, _strText );
+            mLabel.Font = Screen.Style.SmallFont;
+            mLabel.Padding = new Box(5);
+
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        internal override void UpdateContentSize()
+        {
+            ContentWidth = mLabel.ContentWidth;
+        }
+
+        internal override void DoLayout( Rectangle _rect )
+        {
+            base.DoLayout( _rect );
+
+            mLabel.DoLayout( LayoutRect );
+        }
+
+        //----------------------------------------------------------------------
+        internal override void Draw()
+        {
+            if( Frame != null )
+            {
+                Screen.DrawBox( Frame, LayoutRect, FrameCornerSize, Color.White );
+            }
+
             mLabel.Draw();
         }
     }
@@ -420,7 +492,7 @@ namespace NuclearWinter.UI
         public Func<TreeViewNode,TreeViewNode,int,bool>
                                             DragNDropHandler;
         bool                                mbIsMouseDown;
-        bool                                mbIsDragging;
+        internal bool                       IsDragging { get; private set; }
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
         const int                           siDragTriggerDistance   = 10;
@@ -456,7 +528,7 @@ namespace NuclearWinter.UI
                     if( _args.Item == FocusedNode )
                     {
                         FocusedNode = null;
-                        mbIsDragging = false;
+                        IsDragging = false;
                     }
                 }
             };
@@ -490,7 +562,7 @@ namespace NuclearWinter.UI
                 iHeight += node.ContentHeight;
             }
 
-            if( HoveredNode != null )
+            if( HoveredNode != null && ! IsDragging )
             {
                 int iButtonX = 0;
                 foreach( Button button in ActionButtons.Reverse<Button>() )
@@ -521,7 +593,7 @@ namespace NuclearWinter.UI
         {
             if( mbIsMouseDown && FocusedNode != null )
             {
-                mbIsDragging = DragNDropHandler != null && (
+                IsDragging = DragNDropHandler != null && (
                         Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
                     ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
@@ -579,7 +651,7 @@ namespace NuclearWinter.UI
                     mbIsHoveredActionButtonDown = false;
                 }
 
-                if( ! mbIsDragging && HoveredNode != null )
+                if( ! IsDragging && HoveredNode != null )
                 {
                     if( mHoveredActionButton != null )
                     {
@@ -690,7 +762,7 @@ namespace NuclearWinter.UI
                 }
             }
             else
-            if( mbIsDragging )
+            if( IsDragging )
             {
                 Debug.Assert( FocusedNode != null );
 
@@ -790,7 +862,7 @@ namespace NuclearWinter.UI
                     // Drag'n'Drop cancelled
                 }
 
-                mbIsDragging = false;
+                IsDragging = false;
                 mfScrollRepeatTimer = sfScrollRepeatDelay;
             }
             else
@@ -871,7 +943,7 @@ namespace NuclearWinter.UI
             int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
             Scrollbar.Offset += iScrollChange;
 
-            if( mbIsDragging )
+            if( IsDragging )
             {
                 mMouseDownPoint.Y -= iScrollChange;
             }
@@ -886,7 +958,7 @@ namespace NuclearWinter.UI
                 actionButton.Update( _fElapsedTime );
             }
 
-            if( mbIsDragging )
+            if( IsDragging )
             {
                 if( mfScrollRepeatTimer >= sfScrollRepeatDelay )
                 {
@@ -932,7 +1004,7 @@ namespace NuclearWinter.UI
                 node.Draw();
             }
 
-            if( HoveredNode != null && ! mbIsDragging )
+            if( HoveredNode != null && ! IsDragging )
             {
                 foreach( Button button in ActionButtons )
                 {
@@ -940,7 +1012,7 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( mbIsDragging )
+            if( IsDragging )
             {
                 if( HoveredNode != null )
                 {
@@ -989,13 +1061,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DrawFocused()
         {
-            if( mbIsDragging )
+            if( IsDragging )
             {
                 Debug.Assert( FocusedNode != null );
 
                 FocusedNode.DrawNode( new Point(
                     FocusedNode.LayoutRect.X + mMouseDragPoint.X - mMouseDownPoint.X,
-                    FocusedNode.LayoutRect.Y + mMouseDragPoint.Y - mMouseDownPoint.Y  ) );
+                    FocusedNode.LayoutRect.Y + mMouseDragPoint.Y - mMouseDownPoint.Y  ), 0 );
             }
         }
     }
