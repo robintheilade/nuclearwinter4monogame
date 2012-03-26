@@ -385,6 +385,14 @@ namespace NuclearWinter.UI
         public Texture2D            Frame;
         public int                  FrameCornerSize;
 
+        public string Text
+        {
+            get { return mLabel.Text; }
+            set {
+                mLabel.Text = value;
+            }
+        }
+
         Label                       mLabel;
 
         //----------------------------------------------------------------------
@@ -394,6 +402,7 @@ namespace NuclearWinter.UI
             mLabel = new Label( Screen, _strText );
             mLabel.Font = Screen.Style.SmallFont;
             mLabel.Padding = new Box(5);
+            mLabel.Parent = this;
 
             UpdateContentSize();
         }
