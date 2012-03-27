@@ -445,6 +445,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
         public Action<TreeView>             SelectHandler;
+        public Action<TreeView>             HoverHandler;
 
         TreeViewNode                        mSelectedNode = null;
         public TreeViewNode SelectedNode
@@ -652,6 +653,11 @@ namespace NuclearWinter.UI
                 if( HoveredNode == null )
                 {
                     InsertMode = iNodeY < ( NodeHeight + NodeSpacing ) / 4 ? NodeInsertMode.Before : NodeInsertMode.After;
+                }
+                else
+                if( HoverHandler != null && oldHoveredNode != HoveredNode )
+                {
+                    HoverHandler( this );
                 }
 
                 if( oldHoveredNode != HoveredNode )
