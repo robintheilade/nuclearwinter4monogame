@@ -1007,6 +1007,82 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        internal override void OnPadMove( Direction _direction )
+        {
+            ObservableList<TreeViewNode> lNodes = null;
+            TreeViewNode parentNode = null;
+            int iIndex = -1;
+
+            if( FocusedNode != null )
+            {
+                parentNode = ( FocusedNode.Parent != null ) ? ( (TreeViewNode)FocusedNode.Parent ) : null;
+                lNodes = ( parentNode != null ) ? parentNode.Children : Nodes;
+                iIndex = lNodes.IndexOf( FocusedNode );
+            }
+
+            if( _direction == Direction.Up )
+            {
+                if( lNodes == null ) return;
+
+                if( iIndex > 0 )
+                {
+                    TreeViewNode node = lNodes[ iIndex - 1 ];
+
+                    while( node.Children.Count > 0 && ! node.Collapsed )
+                    {
+                        node = node.Children[ node.Children.Count - 1 ];
+                    }
+
+                    FocusedNode = node;
+                }
+                else
+                if( parentNode != null )
+                {
+                    FocusedNode = parentNode;
+                }
+            }
+            else
+            if( _direction == Direction.Down )
+            {
+                if( lNodes == null ) return;
+
+                if( FocusedNode.Children.Count > 0 && ! FocusedNode.Collapsed )
+                {
+                    FocusedNode = FocusedNode.Children[0];
+                }
+                else
+                {
+                    TreeViewNode node = FocusedNode;
+
+                    while( true )
+                    {
+                        if( iIndex < lNodes.Count - 1 )
+                        {
+                            FocusedNode = lNodes[ iIndex + 1 ];
+                            break;
+                        }
+                        else
+                        if( parentNode != null )
+                        {
+                            node = parentNode;
+                            parentNode = ( node.Parent != null ) ? ( (TreeViewNode)node.Parent ) : null;
+                            lNodes = ( parentNode != null ) ? parentNode.Children : Nodes;
+                            iIndex = lNodes.IndexOf( node );
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                base.OnPadMove( _direction );
+            }
+        }
+
+        //----------------------------------------------------------------------
         internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
