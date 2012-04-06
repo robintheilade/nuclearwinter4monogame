@@ -55,7 +55,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public CheckBoxStatus                   CheckBoxStatus;
+        public CheckBoxState                   CheckBoxState;
 
         //----------------------------------------------------------------------
         TreeView                                mTreeView;
@@ -291,15 +291,15 @@ namespace NuclearWinter.UI
 
                 Texture2D tex;
                 
-                switch( CheckBoxStatus )
+                switch( CheckBoxState )
                 {
-                    case UI.CheckBoxStatus.Checked:
+                    case UI.CheckBoxState.Checked:
                         tex = Screen.Style.TreeViewCheckBoxChecked;
                         break;
-                    case UI.CheckBoxStatus.Unchecked:
+                    case UI.CheckBoxState.Unchecked:
                         tex = Screen.Style.TreeViewCheckBoxUnchecked;
                         break;
-                    case UI.CheckBoxStatus.Inconsistent:
+                    case UI.CheckBoxState.Inconsistent:
                         tex = Screen.Style.TreeViewCheckBoxInconsistent;
                         break;
                     default:
@@ -494,8 +494,8 @@ namespace NuclearWinter.UI
         // Checkboxes
         public bool                         HasCheckBoxes;
         public bool                         CheckBoxCascading;
-        public Action<TreeViewNode,CheckBoxStatus>
-                                            NodeCheckStatusChangedHandler;
+        public Action<TreeViewNode,CheckBoxState>
+                                            NodeCheckStateChangedHandler;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -918,10 +918,10 @@ namespace NuclearWinter.UI
 
                 if( HasCheckBoxes && IsHoveringNodeCheckBox() )
                 {
-                    CheckBoxStatus newStatus = ( HoveredNode.CheckBoxStatus == CheckBoxStatus.Checked ) ? CheckBoxStatus.Unchecked : CheckBoxStatus.Checked;
-                    NodeCheckStatusChangedHandler( HoveredNode, newStatus );
+                    CheckBoxState newState = ( HoveredNode.CheckBoxState == CheckBoxState.Checked ) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
+                    NodeCheckStateChangedHandler( HoveredNode, newState );
 
-                    HoveredNode.CheckBoxStatus = newStatus;
+                    HoveredNode.CheckBoxState = newState;
                 }
                 else
                 if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
