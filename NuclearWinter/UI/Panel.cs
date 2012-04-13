@@ -23,7 +23,7 @@ namespace NuclearWinter.UI
             get { return mbEnableScrolling; }
             set {
                 mbEnableScrolling = value;
-                AutoSize = mbEnableScrolling;
+                HasDynamicHeight = mbEnableScrolling;
             }
         }
 

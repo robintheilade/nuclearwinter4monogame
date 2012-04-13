@@ -51,7 +51,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public bool                 AutoSize = false;
+        public bool                 HasDynamicHeight = false;
 
         public int Width {
             get { return ContentWidth; }
@@ -73,7 +73,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void UpdateContentSize()
         {
-            if( AutoSize )
+            if( HasDynamicHeight )
             {
                 //ContentWidth = 0;
                 ContentHeight = 0;
