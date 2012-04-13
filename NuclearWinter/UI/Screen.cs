@@ -193,10 +193,24 @@ namespace NuclearWinter.UI
                     Widget widget  = FocusedWidget == null ? null : FocusedWidget.HitTest( mouseHitPoint );
                     if( widget != null )
                     {
-                        if( Game.InputMgr.MouseState.LeftButton == ButtonState.Pressed )
+                        bool bPressed;
+
+                        switch( Game.InputMgr.PrimaryMouseButton )
+                        {
+                            case 0:
+                                bPressed = Game.InputMgr.MouseState.LeftButton == ButtonState.Pressed;
+                                break;
+                            case 2:
+                                bPressed = Game.InputMgr.MouseState.RightButton == ButtonState.Pressed;
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+
+                        if( bPressed )
                         {
                             mClickedWidget = widget;
-                            miClickedWidgetMouseButton = 0;
+                            miClickedWidgetMouseButton = Game.InputMgr.PrimaryMouseButton;
                         }
 
                         if( widget.OnMouseDoubleClick( mouseHitPoint ) )

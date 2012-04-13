@@ -23,6 +23,16 @@ namespace NuclearWinter.Input
         public MouseState                           MouseState              { get; private set; }
         public MouseState                           PreviousMouseState      { get; private set; }
 
+        public int PrimaryMouseButton
+        {
+            get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 2 : 0; }
+        }
+
+        public int SecondaryMouseButton
+        {
+            get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 0 : 2; }
+        }
+
         public LocalizedKeyboardState               KeyboardState           { get; private set; }
         public LocalizedKeyboardState               PreviousKeyboardState   { get; private set; }
         public PlayerIndex?                         KeyboardPlayerIndex     { get; private set; }

@@ -381,7 +381,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != 0 ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
             mbIsPressed = true;
             mlButtons[miHoveredButton].OnMouseDown( _hitPoint, _iButton );
@@ -389,7 +389,7 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
-            if( _iButton != 0 ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
             mbIsPressed = false;
             mlButtons[miHoveredButton].OnMouseUp( _hitPoint, _iButton );

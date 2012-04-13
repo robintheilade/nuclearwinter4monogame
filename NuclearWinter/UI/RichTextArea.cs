@@ -719,7 +719,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != 0 ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
             mbIsDragging = true;
 
@@ -739,7 +739,7 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
-            if( _iButton != 0 ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
             if( mbIsDragging )
             {
