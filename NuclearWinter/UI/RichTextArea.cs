@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace NuclearWinter.UI
 {
     //--------------------------------------------------------------------------
-    public class Caret
+    public class RichTextCaret
     {
         //----------------------------------------------------------------------
         public int StartTextBlockIndex
@@ -81,7 +81,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public RichTextArea     TextArea { get; private set; }
-        public Action<Caret>    TextBlockChangedHandler;
+        public Action<RichTextCaret>    TextBlockChangedHandler;
 
         internal float          Timer;
 
@@ -93,7 +93,7 @@ namespace NuclearWinter.UI
         int                     miEndOffset;
 
         //----------------------------------------------------------------------
-        public Caret( RichTextArea _textArea )
+        public RichTextCaret( RichTextArea _textArea )
         {
             TextArea = _textArea;
         }
@@ -597,7 +597,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public List<TextBlock>  TextBlocks          { get; private set; }
-        public Caret            Caret               { get; private set; }
+        public RichTextCaret            Caret               { get; private set; }
 
         public const int        IndentOffset        = 30;
 
@@ -626,7 +626,7 @@ namespace NuclearWinter.UI
         public RichTextArea( Screen _screen )
         : base( _screen )
         {
-            Caret           = new Caret( this );
+            Caret           = new RichTextCaret( this );
             TextBlocks       = new List<TextBlock>();
             TextBlocks.Add( new TextBlock( this, "" ) );
 
