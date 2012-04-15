@@ -20,10 +20,15 @@ namespace NuclearWinter.UI
         public bool             IsActive        { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
         public bool             IsUnread;
 
+        public bool             IsPinned
+        {
+            get { return mbIsPinned; }
+            set { mbIsPinned = value; UpdateContentSize(); }
+        }
+
         public bool             IsClosable
         {
-            get { return mbClosable; }
-            set { mbClosable = value; UpdateContentSize(); }
+            get { return mNotebook.HasClosableTabs && ! IsPinned; }
         }
 
         //----------------------------------------------------------------------
@@ -66,12 +71,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Label                   mLabel;
         Image                   mIcon;
+
         Button                  mCloseButton;
+        bool                    mbIsPinned;
 
         internal int            DragOffset;
-
-        //----------------------------------------------------------------------
-        bool                    mbClosable;
 
         //----------------------------------------------------------------------
         float                   mfTooltipTimer;
@@ -83,7 +87,7 @@ namespace NuclearWinter.UI
             if( mIcon.Texture != null )
             {
                 mIcon.Padding = mLabel.Text != "" ? new Box( 10, 0, 10, 10 ) : new Box( 10, 0, 10, 20 );
-                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 20, 10, 10 ) : new Box( 10, 20, 10, 0 );
+                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 10, 10, 10 ) : new Box( 10, 20, 10, 0 );
             }
             else
             {
@@ -97,7 +101,7 @@ namespace NuclearWinter.UI
         {
             mNotebook       = _notebook;
 
-            mLabel          = new Label( Screen, "", Screen.Style.DefaultTextColor );
+            mLabel          = new Label( Screen, "", Anchor.Start, Screen.Style.DefaultTextColor );
             mIcon           = new Image( Screen, _iconTex );
 
             mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
@@ -123,11 +127,11 @@ namespace NuclearWinter.UI
         {
             if( mIcon.Texture != null )
             {
-                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mIcon.ContentWidth + mLabel.ContentWidth + Padding.Horizontal;
             }
             else
             {
-                ContentWidth    = mLabel.ContentWidth + Padding.Left + Padding.Right;
+                ContentWidth    = mLabel.ContentWidth + Padding.Horizontal;
             }
 
             if( IsClosable )
@@ -148,7 +152,14 @@ namespace NuclearWinter.UI
 
             if( mNotebook.HoveredTab == this )
             {
-                mfTooltipTimer += _fElapsedTime;
+                if( mNotebook.DraggedTab != this )
+                {
+                    mfTooltipTimer += _fElapsedTime;
+                }
+                else
+                {
+                    mfTooltipTimer = 0f;
+                }
             }
         }
 
@@ -385,24 +396,42 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public NotebookStyle        Style;
-        public int                  TabHeight = 50;
-        public int                  MaxTabWidth = 250;
+        public NotebookStyle                        Style;
+        public int                                  TabHeight           = 50;
+        public int                                  MaxUnpinnedTabWidth = 250;
+        public int                                  TabBarLeftOffset    = 0;
+        public int                                  TabBarRightOffset   = 0;
 
-        public Action<NotebookTab>  TabClosedHandler;
+        public ObservableList<NotebookTab>          Tabs                { get; private set; }
 
-        Panel                       mPanel;
+        public bool                                 HasClosableTabs
+        {
+            get { return mbHasClosableTabs; }
+            set
+            {
+                mbHasClosableTabs = value;
 
-        public ObservableList<NotebookTab> 
-                                    Tabs                { get; private set; }
-        public int                  ActiveTabIndex      { get; private set; }
+                foreach( NotebookTab tab in Tabs )
+                {
+                    tab.UpdateContentSize();
+                }
+            }
+        }
+
+        public Action<NotebookTab>                  TabClosedHandler;
+
+        public int                                  ActiveTabIndex      { get; private set; }
 
         //----------------------------------------------------------------------
-        internal NotebookTab        DraggedTab;
-        int                         miDraggedTabTargetIndex = -1;
+        int                                         miUnpinnedTabWidth;
+
+        internal NotebookTab                        HoveredTab;
+        internal NotebookTab                        DraggedTab;
+        int                                         miDraggedTabTargetIndex = -1;
 
         //----------------------------------------------------------------------
-        internal NotebookTab        HoveredTab;
+        Panel                                       mPanel;
+        bool                                        mbHasClosableTabs;
 
         //----------------------------------------------------------------------
         public Notebook( Screen _screen )
@@ -418,6 +447,7 @@ namespace NuclearWinter.UI
             );
 
             mPanel = new Panel( Screen, Screen.Style.Panel, Screen.Style.PanelCornerSize );
+
             Tabs = new ObservableList<NotebookTab>();
 
             Tabs.ListChanged += delegate( object _source, ObservableList<NotebookTab>.ListChangedEventArgs _args ) {
@@ -457,15 +487,27 @@ namespace NuclearWinter.UI
 
             mPanel.DoLayout( contentRect );
 
-            int iTabStartX = LayoutRect.Left + 20;
-            int iTabEndX = LayoutRect.Right - 20;
+            int iTabBarStartX = LayoutRect.Left + 20 + TabBarLeftOffset;
+            int iTabBarEndX = LayoutRect.Right - 20 - TabBarRightOffset;
+
+            int iTabBarWidth = iTabBarEndX - iTabBarStartX;
+
+            int iUnpinnedTabsCount = Tabs.Count( tab => ! tab.IsPinned );
+
+            int iPinnedTabsWidth = Tabs.Sum( tab => tab.IsPinned ? tab.ContentWidth : 0 );
+            int iUnpinnedTabsWidth = MaxUnpinnedTabWidth * iUnpinnedTabsCount;
+
+            miUnpinnedTabWidth = MaxUnpinnedTabWidth;
+
+            if( iPinnedTabsWidth + iUnpinnedTabsWidth > iTabBarWidth )
+            {
+                miUnpinnedTabWidth = ( iTabBarWidth - iPinnedTabsWidth ) / iUnpinnedTabsCount;
+            }
 
             int iDraggedTabX = 0;
-            int iDraggedTabWidth = 0;
             if( DraggedTab != null )
             {
-                iDraggedTabWidth = Math.Min( DraggedTab.ContentWidth, MaxTabWidth );
-                iDraggedTabX = Math.Min( iTabEndX - iDraggedTabWidth, Math.Max( iTabStartX, Screen.Game.InputMgr.MouseState.X - DraggedTab.DragOffset ) );
+                iDraggedTabX = Math.Min( iTabBarEndX - miUnpinnedTabWidth, Math.Max( iTabBarStartX, Screen.Game.InputMgr.MouseState.X - DraggedTab.DragOffset ) );
             }
 
             int iTabX = 0;
@@ -476,17 +518,17 @@ namespace NuclearWinter.UI
             {
                 if( tab == DraggedTab ) continue;
 
-                int iTabWidth = Math.Min( tab.ContentWidth, MaxTabWidth );
+                int iTabWidth = tab.IsPinned ? tab.ContentWidth : miUnpinnedTabWidth;
 
-                if( tab.IsClosable && ! bDraggedTabInserted && iDraggedTabX - iTabStartX < iTabX + iTabWidth / 2 )
+                if( ! tab.IsPinned && ! bDraggedTabInserted && iDraggedTabX - iTabBarStartX < iTabX + iTabWidth / 2 )
                 {
                     miDraggedTabTargetIndex = iTabIndex;
-                    iTabX += iDraggedTabWidth;
+                    iTabX += miUnpinnedTabWidth;
                     bDraggedTabInserted = true;
                 }
 
                 Rectangle tabRect = new Rectangle(
-                    iTabStartX + iTabX,
+                    iTabBarStartX + iTabX,
                     LayoutRect.Y,
                     iTabWidth,
                     TabHeight
@@ -503,7 +545,7 @@ namespace NuclearWinter.UI
                 Rectangle tabRect = new Rectangle(
                     iDraggedTabX,
                     LayoutRect.Y,
-                    iDraggedTabWidth,
+                    miUnpinnedTabWidth,
                     TabHeight
                     );
 
@@ -544,16 +586,18 @@ namespace NuclearWinter.UI
         {
             if( _point.Y < LayoutRect.Y + TabHeight )
             {
-                if( _point.X < LayoutRect.X + 20 ) return null;
+                int iTabBarStartX = LayoutRect.Left + 20 + TabBarLeftOffset;
+
+                if( _point.X < iTabBarStartX ) return null;
 
                 int iTabX = 0;
                 int iTab = 0;
 
                 foreach( NotebookTab tab in Tabs )
                 {
-                    int iTabWidth = Math.Min( tab.ContentWidth, MaxTabWidth );
+                    int iTabWidth = tab.IsPinned ? tab.ContentWidth : miUnpinnedTabWidth;
 
-                    if( _point.X - LayoutRect.X - 20 < iTabX + iTabWidth )
+                    if( _point.X - iTabBarStartX < iTabX + iTabWidth )
                     {
                         return Tabs[ iTab ].HitTest( _point );
                     }
