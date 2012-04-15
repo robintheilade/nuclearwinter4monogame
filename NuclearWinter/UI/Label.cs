@@ -7,13 +7,27 @@ using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
 {
-    /*
-     * A Label to display some text
-     */
+    //--------------------------------------------------------------------------
+    /// <summary>
+    /// A Label to display some text
+    /// </summary>
     public class Label: Widget
     {
-        UIFont mFont;
-        public UIFont       Font
+        //----------------------------------------------------------------------
+        public string Text
+        {
+            get { return mstrText; }
+            
+            set
+            {
+                mstrText = value;
+                mstrDisplayedText = value;
+                UpdateContentSize();
+            }
+        }
+
+        //----------------------------------------------------------------------
+        public UIFont Font
         {
             get { return mFont; }
             
@@ -24,58 +38,54 @@ namespace NuclearWinter.UI
             }
         }
 
-        List<string>    mlstrWrappedText;
-        string          mstrText;
-        string          mstrDisplayedText;
-        Point           mpTextPosition;
-        public string           Text
-        {
-            get
-            {
-                return mstrText;
-            }
-            
-            set
-            {
-                mstrText = value;
-                mstrDisplayedText = value;
-                UpdateContentSize();
-            }
-        }
-
-        Anchor  mAnchor;
-        public Anchor   Anchor
+        //----------------------------------------------------------------------
+        public Anchor Anchor
         {
             get { return mAnchor; }
             set { mAnchor = value; UpdateContentSize(); }
         }
 
-        bool    mbWrapText;
+        //----------------------------------------------------------------------
         public bool WrapText
         {
             get { return mbWrapText; }
             set { mbWrapText = value; UpdateContentSize(); }
         }
 
-        public Color            Color;
-        public Color            OutlineColor;
-        public float            OutlineRadius;
+        //----------------------------------------------------------------------
+        public Color    Color;
+        public Color    OutlineColor;
+        public float    OutlineRadius;
 
-        int                     miEllipsizedTextWidth;
+        public bool     HasEllipsis { get { return mstrDisplayedText != mstrText; } }
+
+        //----------------------------------------------------------------------
+        string          mstrText;
+        string          mstrDisplayedText;
+
+        UIFont          mFont;
+        Anchor          mAnchor;
+
+        bool            mbWrapText;
+        List<string>    mlstrWrappedText;
+
+        Point           mpTextPosition;
+
+        int             miEllipsizedTextWidth;
 
         //----------------------------------------------------------------------
         public Label( Screen _screen, string _strText, Anchor _anchor, Color _color )
         : base( _screen )
         {
-            mstrText    = _strText;
-            mstrDisplayedText = mstrText;
-            mFont       = _screen.Style.MediumFont;
-            mPadding    = new Box( 10 );
-            mAnchor     = _anchor;
+            mstrText            = _strText;
+            mstrDisplayedText   = mstrText;
+            mFont               = _screen.Style.MediumFont;
+            mPadding            = new Box( 10 );
+            mAnchor             = _anchor;
 
-            Color           = _color;
-            OutlineRadius   = Screen.Style.BlurRadius;
-            OutlineColor    = _color * 0.5f;
+            Color               = _color;
+            OutlineRadius       = Screen.Style.BlurRadius;
+            OutlineColor        = _color * 0.5f;
 
             UpdateContentSize();
         }
