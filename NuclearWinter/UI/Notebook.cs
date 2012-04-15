@@ -14,35 +14,22 @@ namespace NuclearWinter.UI
     public class NotebookTab: Widget
     {
         //----------------------------------------------------------------------
-        Notebook                mNotebook;
+        public Group            PageGroup       { get; private set; }
         public object           Tag;
 
-        //----------------------------------------------------------------------
-        Label                   mLabel;
-        Image                   mIcon;
-        Button                  mCloseButton;
-
-        public bool             Active { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
-        bool                    mbIsHovered;
-        internal int            DragOffset;
-
+        public bool             IsActive        { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
         public bool             IsUnread;
 
-        //----------------------------------------------------------------------
-        bool                    mbClosable;
-        public bool             Closable
+        public bool             IsClosable
         {
             get { return mbClosable; }
             set { mbClosable = value; UpdateContentSize(); }
         }
 
         //----------------------------------------------------------------------
-        public string           Text
+        public string Text
         {
-            get
-            {
-                return mLabel.Text;
-            }
+            get { return mLabel.Text; }
             
             set
             {
@@ -53,11 +40,17 @@ namespace NuclearWinter.UI
             }
         }
 
-        public Texture2D        Icon
+        //----------------------------------------------------------------------
+        public Color TextColor
         {
-            get {
-                return mIcon.Texture;
-            }
+            get { return mLabel.Color; }
+            set { mLabel.Color = value; }
+        }
+
+        //----------------------------------------------------------------------
+        public Texture2D Icon
+        {
+            get { return mIcon.Texture; }
 
             set
             {
@@ -67,6 +60,24 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
+        Notebook                mNotebook;
+
+        //----------------------------------------------------------------------
+        Label                   mLabel;
+        Image                   mIcon;
+        Button                  mCloseButton;
+
+        internal int            DragOffset;
+
+        //----------------------------------------------------------------------
+        bool                    mbClosable;
+
+        //----------------------------------------------------------------------
+        float                   mfTooltipTimer;
+        const float             sfTooltipDelay      = 0.6f;
+
+        //----------------------------------------------------------------------
         void UpdatePaddings()
         {
             if( mIcon.Texture != null )
@@ -79,15 +90,6 @@ namespace NuclearWinter.UI
                 mLabel.Padding = new Box( 10, 20 );
             }
         }
-
-        public Color TextColor
-        {
-            get { return mLabel.Color; }
-            set { mLabel.Color = value; }
-        }
-
-        //----------------------------------------------------------------------
-        public Group            PageGroup        { get; private set; }
 
         //----------------------------------------------------------------------
         public NotebookTab( Notebook _notebook, string _strText, Texture2D _iconTex )
@@ -128,7 +130,7 @@ namespace NuclearWinter.UI
                 ContentWidth    = mLabel.ContentWidth + Padding.Left + Padding.Right;
             }
 
-            if( Closable )
+            if( IsClosable )
             {
                 ContentWidth += mCloseButton.ContentWidth;
             }
@@ -144,7 +146,10 @@ namespace NuclearWinter.UI
             mCloseButton.Update( _fElapsedTime );
             PageGroup.Update( _fElapsedTime );
 
-            base.Update( _fElapsedTime );
+            if( mNotebook.HoveredTab == this )
+            {
+                mfTooltipTimer += _fElapsedTime;
+            }
         }
 
         //----------------------------------------------------------------------
@@ -161,7 +166,7 @@ namespace NuclearWinter.UI
                 mIcon.DoLayout ( new Rectangle( LayoutRect.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
             }
 
-            int iLabelWidth = LayoutRect.Width - Padding.Horizontal - ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ) - ( Closable ? mCloseButton.ContentWidth : 0 );
+            int iLabelWidth = LayoutRect.Width - Padding.Horizontal - ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ) - ( IsClosable ? mCloseButton.ContentWidth : 0 );
 
             mLabel.DoLayout(
                 new Rectangle(
@@ -170,7 +175,7 @@ namespace NuclearWinter.UI
                 )
             );
 
-            if( Closable )
+            if( IsClosable )
             {
                 mCloseButton.DoLayout( new Rectangle(
                     LayoutRect.Right - 10 - mCloseButton.ContentWidth,
@@ -192,7 +197,7 @@ namespace NuclearWinter.UI
 
             Screen.Focus( this );
 
-            if( Closable )
+            if( IsClosable )
             {
                 mNotebook.DraggedTab = this;
                 DragOffset = _hitPoint.X - LayoutRect.X;
@@ -220,12 +225,17 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseEnter( Point _hitPoint )
         {
-            mbIsHovered = true;
+            mNotebook.HoveredTab = this;
         }
 
         internal override void OnMouseOut( Point _hitPoint )
         {
-            mbIsHovered = false;
+            if( mNotebook.HoveredTab == this )
+            {
+                mNotebook.HoveredTab = null;
+            }
+
+            mfTooltipTimer = 0f;
         }
 
         internal override void OnMouseMove( Point _hitPoint )
@@ -276,11 +286,11 @@ namespace NuclearWinter.UI
 
         void DrawTab()
         {
-            bool bIsActive = Active;
+            bool bIsActive = IsActive;
 
             Screen.DrawBox( bIsActive ? mNotebook.Style.ActiveTab : mNotebook.Style.Tab, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
 
-            if( mbIsHovered && ! bIsActive )
+            if( mNotebook.HoveredTab == this && ! bIsActive )
             {
                 if( Screen.IsActive )
                 {
@@ -301,12 +311,34 @@ namespace NuclearWinter.UI
             mLabel.Draw();
             mIcon.Draw();
 
-            if( Closable )
+            if( IsClosable )
             {
                 mCloseButton.Draw();
             }
         }
 
+        //----------------------------------------------------------------------
+        internal override void DrawHovered()
+        {
+            if( mfTooltipTimer < sfTooltipDelay || ! mLabel.HasEllipsis ) return;
+
+            UIFont font = Screen.Style.MediumFont;
+
+            Box padding = new Box( 10, 10 );
+
+            Vector2 vSize = font.MeasureString( Text );
+            int iWidth  = (int)vSize.X;
+            int iHeight = (int)vSize.Y;
+
+            Point topLeft = new Point(
+                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
+                Screen.Game.InputMgr.MouseState.Y + 20 );
+
+            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
+            Screen.Game.SpriteBatch.DrawString( font, Text, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
+        }
+
+        //----------------------------------------------------------------------
         internal override void DrawFocused()
         {
             if( mNotebook.DraggedTab == this )
@@ -315,6 +347,7 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
         public void Close()
         {
             mNotebook.Tabs.Remove( this );
@@ -364,8 +397,12 @@ namespace NuclearWinter.UI
                                     Tabs                { get; private set; }
         public int                  ActiveTabIndex      { get; private set; }
 
+        //----------------------------------------------------------------------
         internal NotebookTab        DraggedTab;
-        int                         miDraggedTabIndex;
+        int                         miDraggedTabTargetIndex = -1;
+
+        //----------------------------------------------------------------------
+        internal NotebookTab        HoveredTab;
 
         //----------------------------------------------------------------------
         public Notebook( Screen _screen )
@@ -383,7 +420,20 @@ namespace NuclearWinter.UI
             mPanel = new Panel( Screen, Screen.Style.Panel, Screen.Style.PanelCornerSize );
             Tabs = new ObservableList<NotebookTab>();
 
-            Tabs.ListChanged += delegate {
+            Tabs.ListChanged += delegate( object _source, ObservableList<NotebookTab>.ListChangedEventArgs _args ) {
+                if( ! _args.Added )
+                {
+                    if( DraggedTab == _args.Item )
+                    {
+                        DraggedTab = null;
+                    }
+
+                    if( HoveredTab == _args.Item )
+                    {
+                        HoveredTab = null;
+                    }
+                }
+
                 if( Tabs.Count > 0 )
                 {
                     ActiveTabIndex = Math.Min( Tabs.Count - 1, ActiveTabIndex );
@@ -421,16 +471,16 @@ namespace NuclearWinter.UI
             int iTabX = 0;
             int iTabIndex = 0;
             bool bDraggedTabInserted = DraggedTab == null;
-            miDraggedTabIndex = Tabs.Count - 1;
+            miDraggedTabTargetIndex = Tabs.Count - 1;
             foreach( NotebookTab tab in Tabs )
             {
                 if( tab == DraggedTab ) continue;
 
                 int iTabWidth = Math.Min( tab.ContentWidth, MaxTabWidth );
 
-                if( tab.Closable && ! bDraggedTabInserted && iDraggedTabX - iTabStartX < iTabX + iTabWidth / 2 )
+                if( tab.IsClosable && ! bDraggedTabInserted && iDraggedTabX - iTabStartX < iTabX + iTabWidth / 2 )
                 {
-                    miDraggedTabIndex = iTabIndex;
+                    miDraggedTabTargetIndex = iTabIndex;
                     iTabX += iDraggedTabWidth;
                     bDraggedTabInserted = true;
                 }
@@ -477,14 +527,15 @@ namespace NuclearWinter.UI
         {
             int iOldIndex = Tabs.IndexOf( DraggedTab );
 
-            if( miDraggedTabIndex != iOldIndex )
+            if( miDraggedTabTargetIndex != iOldIndex )
             {
                 Tabs.RemoveAt( iOldIndex );
-                Tabs.Insert( miDraggedTabIndex, DraggedTab );
-                ActiveTabIndex = miDraggedTabIndex;
+                Tabs.Insert( miDraggedTabTargetIndex, DraggedTab );
+                ActiveTabIndex = miDraggedTabTargetIndex;
             }
 
             DraggedTab = null;
+            miDraggedTabTargetIndex = -1;
         }
 
         //----------------------------------------------------------------------
@@ -525,7 +576,10 @@ namespace NuclearWinter.UI
 
         internal override void Update( float _fElapsedTime )
         {
-            Tabs[ActiveTabIndex].Update( _fElapsedTime );
+            foreach( NotebookTab tab in Tabs )
+            {
+                tab.Update( _fElapsedTime );
+            }
         }
 
         //----------------------------------------------------------------------
