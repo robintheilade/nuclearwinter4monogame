@@ -302,7 +302,11 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
             HitBox = LayoutRect;
 
-            if( mbWrapTextNeeded ) DoWrap( LayoutRect.Width - Padding.Horizontal );
+            if( mbWrapTextNeeded || ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height ) )
+            {
+                DoWrap( LayoutRect.Width - Padding.Horizontal );
+            }
+
             ContentHeight = Padding.Vertical + LineHeight * WrappedLines.Count + LineHeight / 2;
 
             if( mbScrollToCaret )
@@ -400,6 +404,7 @@ namespace NuclearWinter.UI
         {
             int iActualWidth = _iWidth;
             mlWrappedLines = Screen.Game.WrapText( Font, Text, iActualWidth );
+            mbWrapTextNeeded = false;
         }
 
         //----------------------------------------------------------------------
@@ -771,7 +776,7 @@ namespace NuclearWinter.UI
 
             foreach( string strText in WrappedLines )
             {
-                Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iX, iY + Font.YOffset ), Screen.Style.DefaultTextColor );
+                Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iX, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
                 iY += Font.LineSpacing;
             }
 
