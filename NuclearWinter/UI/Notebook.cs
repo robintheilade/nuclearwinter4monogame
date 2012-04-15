@@ -525,12 +525,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal void DropTab()
         {
-            int iOldIndex = Tabs.IndexOf( DraggedTab );
+            NotebookTab droppedTab = DraggedTab;
+            int iOldIndex = Tabs.IndexOf( droppedTab );
 
             if( miDraggedTabTargetIndex != iOldIndex )
             {
                 Tabs.RemoveAt( iOldIndex );
-                Tabs.Insert( miDraggedTabTargetIndex, DraggedTab );
+                Tabs.Insert( miDraggedTabTargetIndex, droppedTab );
                 ActiveTabIndex = miDraggedTabTargetIndex;
             }
 
