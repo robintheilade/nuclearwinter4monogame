@@ -597,7 +597,7 @@ namespace NuclearWinter.UI
     {
         //----------------------------------------------------------------------
         public List<TextBlock>  TextBlocks          { get; private set; }
-        public RichTextCaret            Caret               { get; private set; }
+        public RichTextCaret    Caret               { get; private set; }
 
         public const int        IndentOffset        = 30;
 
@@ -1273,6 +1273,18 @@ namespace NuclearWinter.UI
         public void ReplaceContent( List<TextBlock> _blocks )
         {
             TextBlocks = _blocks;
+
+            // Make sure caret is valid
+            int iStartBlockIndex    = Caret.StartTextBlockIndex;
+            int iStartOffset        = Caret.StartOffset;
+
+            int iEndBlockIndex      = Caret.EndTextBlockIndex;
+            int iEndOffset          = Caret.EndOffset;
+
+            Caret.StartTextBlockIndex   = iStartBlockIndex;
+            Caret.StartOffset           = iStartOffset;
+            Caret.EndTextBlockIndex     = iEndBlockIndex;
+            Caret.EndOffset             = iEndOffset;
         }
     }
 }

@@ -16,8 +16,8 @@ namespace NuclearWinter.UI
             get { return miStartOffset; }
             set 
             {
-                miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.Text.Length );
-                EndOffset           = StartOffset;
+                miStartOffset   = (int)MathHelper.Clamp( value, 0, TextArea.Text.Length );
+                EndOffset       = StartOffset;
                 Timer = 0f;
             }
         }
@@ -787,6 +787,13 @@ namespace NuclearWinter.UI
         public void ReplaceContent( string _strText )
         {
             Text = _strText;
+
+            // Make sure caret is valid
+            int iStartOffset    = Caret.StartOffset;
+            int iEndOffset      = Caret.EndOffset;
+
+            Caret.StartOffset   = iStartOffset;
+            Caret.EndOffset     = iEndOffset;
         }
     }
 }
