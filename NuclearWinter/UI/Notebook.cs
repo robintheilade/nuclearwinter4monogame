@@ -130,7 +130,7 @@ namespace NuclearWinter.UI
 
             if( Closable )
             {
-                ContentWidth += Screen.Style.NotebookTabClose.Width;
+                ContentWidth += mCloseButton.ContentWidth;
             }
 
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Top + Padding.Bottom;
@@ -161,17 +161,19 @@ namespace NuclearWinter.UI
                 mIcon.DoLayout ( new Rectangle( LayoutRect.X + Padding.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
             }
 
+            int iLabelWidth = LayoutRect.Width - Padding.Horizontal - ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ) - ( Closable ? mCloseButton.ContentWidth : 0 );
+
             mLabel.DoLayout(
                 new Rectangle(
                     LayoutRect.X + Padding.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
-                    mLabel.ContentWidth, mLabel.ContentHeight
+                    iLabelWidth, mLabel.ContentHeight
                 )
             );
 
             if( Closable )
             {
                 mCloseButton.DoLayout( new Rectangle(
-                    LayoutRect.Right - 10 - Screen.Style.NotebookTabClose.Width,
+                    LayoutRect.Right - 10 - mCloseButton.ContentWidth,
                     pCenter.Y - Screen.Style.NotebookTabClose.Height / 2,
                     mCloseButton.ContentWidth, mCloseButton.ContentHeight )
                 );
@@ -352,6 +354,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public NotebookStyle        Style;
         public int                  TabHeight = 50;
+        public int                  MaxTabWidth = 250;
 
         public Action<NotebookTab>  TabClosedHandler;
 
@@ -408,9 +411,11 @@ namespace NuclearWinter.UI
             int iTabEndX = LayoutRect.Right - 20;
 
             int iDraggedTabX = 0;
+            int iDraggedTabWidth = 0;
             if( DraggedTab != null )
             {
-                iDraggedTabX = Math.Min( iTabEndX - DraggedTab.ContentWidth, Math.Max( iTabStartX, Screen.Game.InputMgr.MouseState.X - DraggedTab.DragOffset ) );
+                iDraggedTabWidth = Math.Min( DraggedTab.ContentWidth, MaxTabWidth );
+                iDraggedTabX = Math.Min( iTabEndX - iDraggedTabWidth, Math.Max( iTabStartX, Screen.Game.InputMgr.MouseState.X - DraggedTab.DragOffset ) );
             }
 
             int iTabX = 0;
@@ -421,12 +426,12 @@ namespace NuclearWinter.UI
             {
                 if( tab == DraggedTab ) continue;
 
-                int iTabWidth = tab.ContentWidth;
+                int iTabWidth = Math.Min( tab.ContentWidth, MaxTabWidth );
 
                 if( tab.Closable && ! bDraggedTabInserted && iDraggedTabX - iTabStartX < iTabX + iTabWidth / 2 )
                 {
                     miDraggedTabIndex = iTabIndex;
-                    iTabX += DraggedTab.ContentWidth;
+                    iTabX += iDraggedTabWidth;
                     bDraggedTabInserted = true;
                 }
 
@@ -448,7 +453,7 @@ namespace NuclearWinter.UI
                 Rectangle tabRect = new Rectangle(
                     iDraggedTabX,
                     LayoutRect.Y,
-                    DraggedTab.ContentWidth,
+                    iDraggedTabWidth,
                     TabHeight
                     );
 
@@ -494,7 +499,7 @@ namespace NuclearWinter.UI
 
                 foreach( NotebookTab tab in Tabs )
                 {
-                    int iTabWidth = tab.ContentWidth;
+                    int iTabWidth = Math.Min( tab.ContentWidth, MaxTabWidth );
 
                     if( _point.X - LayoutRect.X - 20 < iTabX + iTabWidth )
                     {
