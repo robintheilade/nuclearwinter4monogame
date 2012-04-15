@@ -203,7 +203,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal void MoveTo( Point _point, bool _bSelect )
+        internal void SetCaretAt( Point _point, bool _bSelect )
         {
             if( TextArea.TextBlocks.Count == 0 ) return;
 
@@ -698,7 +698,7 @@ namespace NuclearWinter.UI
 
         void SetCaretPosition( Point _hitPoint, bool _bSelect )
         {
-            Caret.MoveTo( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
+            Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
         }
 
         internal Point GetPositionForCaret( int _iTextBlockIndex, int _iOffset )

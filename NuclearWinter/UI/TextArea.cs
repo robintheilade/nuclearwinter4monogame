@@ -141,7 +141,12 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal void MoveTo( int _iX, int _iLine, bool _bSelect )
+        internal void SetCaretAt( Point _point, bool _bSelect )
+        {
+            Move( _point.X, _point.Y / TextArea.LineHeight, _bSelect );
+        }
+
+        internal void Move( int _iX, int _iLine, bool _bSelect )
         {
             int iOffset = 0;
             int iBlockLineIndex = Math.Max( 0, Math.Min( TextArea.WrappedLines.Count - 1, _iLine ) );
@@ -172,28 +177,28 @@ namespace NuclearWinter.UI
         {
             int iLine;
             TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            MoveTo( 0, iLine, _bSelect );
+            Move( 0, iLine, _bSelect );
         }
 
         internal void MoveEnd( bool _bSelect )
         {
             int iLine;
             TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            MoveTo( int.MaxValue, iLine, _bSelect );
+            Move( int.MaxValue, iLine, _bSelect );
         }
 
         internal void MoveUp( bool _bSelect )
         {
             int iLine;
             Point caretPos = TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            MoveTo( caretPos.X, Math.Max( 0, iLine - 1 ), _bSelect );
+            Move( caretPos.X, Math.Max( 0, iLine - 1 ), _bSelect );
         }
 
         internal void MoveDown( bool _bSelect )
         {
             int iLine;
             Point caretPos = TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            MoveTo( caretPos.X, Math.Min( TextArea.WrappedLines.Count - 1, iLine + 1 ), _bSelect );
+            Move( caretPos.X, Math.Min( TextArea.WrappedLines.Count - 1, iLine + 1 ), _bSelect );
         }
 
         int ComputeCaretOffsetAtX( int _iX, string _strText, UIFont _font )
@@ -342,7 +347,7 @@ namespace NuclearWinter.UI
 
         void SetCaretPosition( Point _hitPoint, bool _bSelect )
         {
-            Caret.MoveTo( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset, _bSelect );
+            Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
         }
 
         internal Point GetPositionForCaret( int _iOffset )
