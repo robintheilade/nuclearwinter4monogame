@@ -640,9 +640,20 @@ namespace NuclearWinter.UI
 
                     if( bCtrl )
                     {
-                        if( iNewOffset > 0 )
+                        // FIXME: This needs to be improved, the behavior isn't exactly right
+                        if( iNewOffset > 0 && Text[ iNewOffset ] != '\n' )
                         {
-                            iNewOffset = Text.LastIndexOf( ' ', iNewOffset - 1, iNewOffset - 1 ) + 1;
+                            int iPreviousSpaceOffset = Text.LastIndexOf( ' ', iNewOffset - 1, iNewOffset - 1 ) + 1;
+                            int iPreviousLineBreakOffset = Text.LastIndexOf( '\n', iNewOffset - 1, iNewOffset - 1 ) + 1;
+
+                            if( iPreviousSpaceOffset == 0 || iPreviousLineBreakOffset > iPreviousSpaceOffset )
+                            {
+                                iNewOffset = iPreviousLineBreakOffset;
+                            }
+                            else
+                            {
+                                iNewOffset = iPreviousSpaceOffset;
+                            }
                         }
                     }
                     else
@@ -675,13 +686,24 @@ namespace NuclearWinter.UI
 
                     if( bCtrl )
                     {
+                        // FIXME: This needs to be improved, the behavior isn't exactly right
                         string strText = Text;
 
-                        if( iNewOffset < strText.Length )
+                        if( iNewOffset < strText.Length && Text[iNewOffset] != '\n' )
                         {
-                            iNewOffset = strText.IndexOf( ' ', iNewOffset, strText.Length - iNewOffset ) + 1;
+                            int iNextSpaceOffset = strText.IndexOf( ' ', iNewOffset, strText.Length - iNewOffset ) + 1;
+                            int iNextLineBreakOffset = strText.IndexOf( '\n', iNewOffset, strText.Length - iNewOffset );
 
-                            if( iNewOffset == 0 )
+                            if( iNextSpaceOffset == 0 || iNextLineBreakOffset < iNextSpaceOffset )
+                            {
+                                iNewOffset = iNextLineBreakOffset;
+                            }
+                            else
+                            {
+                                iNewOffset = iNextSpaceOffset;
+                            }
+
+                            if( iNewOffset <= 0 )
                             {
                                 iNewOffset = strText.Length;
                             }
