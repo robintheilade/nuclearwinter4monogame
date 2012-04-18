@@ -57,6 +57,7 @@ namespace NuclearWinter.UI
             maWidgetLocations.Remove( _widget );
 
             maTiles[ widgetLocation.X, widgetLocation.Y ] = null;
+            mlChildren.Remove( _widget );
         }
 
         public override Widget GetFirstFocusableDescendant( Direction _direction )
