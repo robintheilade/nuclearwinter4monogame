@@ -135,6 +135,7 @@
     <Compile Include="UI\Menu\Popup.cs" />
     <Compile Include="UI\Notebook.cs" />
     <Compile Include="UI\Panel.cs" />
+    <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\RadioButtonSet.cs" />
     <Compile Include="UI\Screen.cs" />
     <Compile Include="UI\Scrollbar.cs" />
