@@ -450,8 +450,8 @@ namespace NuclearWinter.UI
 
             if( TextRemovedHandler == null || TextRemovedHandler( this, iStartOffset, iEndOffset ) )
             {
-                // Merge start and end block
-                Text = ( iStartOffset < Text.Length  ? Text.Remove( iStartOffset ) : "" ) + Text.Substring( iEndOffset );
+                // Merge start and end
+                Text = ( iStartOffset < Text.Length ? Text.Remove( iStartOffset ) : "" ) + Text.Substring( iEndOffset );
 
                 // Clear selection
                 Caret.StartOffset = iStartOffset;

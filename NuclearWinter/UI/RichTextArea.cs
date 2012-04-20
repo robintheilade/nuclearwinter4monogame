@@ -763,7 +763,7 @@ namespace NuclearWinter.UI
             {
                 // Merge start and end block
                 TextBlocks[ iStartBlockIndex ].Text =
-                    ( iStartOffset < TextBlocks[ iStartBlockIndex ].Text.Length  ? TextBlocks[ iStartBlockIndex ].Text.Remove( iStartOffset ) : "" )
+                    ( iStartOffset < TextBlocks[ iStartBlockIndex ].Text.Length ? TextBlocks[ iStartBlockIndex ].Text.Remove( iStartOffset ) : TextBlocks[ iStartBlockIndex ].Text )
                     + TextBlocks[ iEndBlockIndex ].Text.Substring( iEndOffset );
 
                 // Delete blocks in between
