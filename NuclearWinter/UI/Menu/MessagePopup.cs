@@ -49,7 +49,7 @@ namespace NuclearWinter.UI
                 // Message label
                 MessageLabel = new Label( Panel.Screen, "", Anchor.Start );
                 MessageLabel.WrapText = true;
-                MessageLabel.AnchoredRect = AnchoredRect.CreateTopAnchored( 0, 80, 0, 200 );
+                MessageLabel.AnchoredRect = AnchoredRect.CreateFull( 0, Panel.Screen.Style.DefaultButtonHeight + 10, 0, Panel.Screen.Style.DefaultButtonHeight + 10 );
                 Panel.AddChild( MessageLabel );
 
                 // Actions
@@ -91,7 +91,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        void Close()
+        public void Close()
         {
             TitleLabel.Text = "";
             MessageLabel.Text = "";
