@@ -89,6 +89,15 @@ namespace NuclearWinter
         [DllImport("user32.dll", SetLastError=true)]
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
+        [DllImport("user32.dll")]
+        public static extern int SetWindowTextW( IntPtr hwnd, string strText );
+
+        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        static extern int GetWindowTextLength(IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
         public enum GWL
         {
              GWL_WNDPROC =      (-4),
@@ -120,7 +129,13 @@ namespace NuclearWinter
             if( ! IsWindowUnicode( Window.Handle ) )
             {
                 // No? Well, no problem, we'll just make it aware!
+
+                int iTitleLength = GetWindowTextLength( Window.Handle );
+                StringBuilder sbTitle = new StringBuilder(iTitleLength + 1);
+                GetWindowText( Window.Handle, sbTitle, sbTitle.Capacity);
+
                 SetWindowLongW( Window.Handle, (int)GWL.GWL_WNDPROC, GetWindowLong( Window.Handle, (int)GWL.GWL_WNDPROC ) );
+                SetWindowTextW( Window.Handle, sbTitle.ToString() ); 
             }
 #endif
 
