@@ -115,5 +115,11 @@ namespace NuclearWinter.UI
         public Texture2D        SplitterFrame;
         public Texture2D        SplitterDragHandle;
         public Texture2D        SplitterCollapseArrow;
+
+        public Texture2D        ProgressBarFrame;
+        public int              ProgressBarFrameCornerSize;
+
+        public Texture2D        ProgressBar;
+        public int              ProgressBarCornerSize;
     }
 }
