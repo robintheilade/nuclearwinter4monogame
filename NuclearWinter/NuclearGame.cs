@@ -451,31 +451,5 @@ namespace NuclearWinter
                 Song = _song;
             }
         }
-
-        //----------------------------------------------------------------------
-        Point                   mSavedMousePosition;
-        public bool             IsMouseCaptured     { get; private set; }
-
-        //----------------------------------------------------------------------
-        public void CaptureMouse()
-        {
-            mSavedMousePosition = new Point( Mouse.GetState().X, Mouse.GetState().Y );
-            IsMouseVisible = false;
-            Point mouseCenter = new Point( Window.ClientBounds.Width / 2, Window.ClientBounds.Height / 2);
-            Mouse.SetPosition( mouseCenter.X, mouseCenter.Y );
-
-            IsMouseCaptured = true;
-        }
-
-        //----------------------------------------------------------------------
-        public void ReleaseMouse()
-        {
-            Debug.Assert( IsMouseCaptured );
-
-            IsMouseCaptured = false;
-
-            IsMouseVisible = true;
-            Mouse.SetPosition( mSavedMousePosition.X, mSavedMousePosition.Y );
-        }
     }
 }

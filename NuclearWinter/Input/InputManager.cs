@@ -78,6 +78,9 @@ namespace NuclearWinter.Input
             mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
             mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedWindowsKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
+
+            MouseState = Mouse.GetState();
+            PreviousMouseState = MouseState;
 #endif
         }
 
@@ -93,8 +96,18 @@ namespace NuclearWinter.Input
             }
 
 #if WINDOWS
-            PreviousMouseState = MouseState;
+            if( ! IsMouseCaptured )
+            {
+                PreviousMouseState = MouseState;
+            }
+
             MouseState = Mouse.GetState();
+
+            if( IsMouseCaptured )
+            {
+                Mouse.SetPosition( PreviousMouseState.X, PreviousMouseState.Y );
+            }
+
 
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
@@ -489,6 +502,36 @@ namespace NuclearWinter.Input
             return Keys.None;
         }
 
+        //----------------------------------------------------------------------
+        Point                   mSavedMousePosition;
+        public bool             IsMouseCaptured     { get; private set; }
 
+        //----------------------------------------------------------------------
+        public void CaptureMouse()
+        {
+            mSavedMousePosition = new Point( Mouse.GetState().X, Mouse.GetState().Y );
+            Game.IsMouseVisible = false;
+            Point mouseCenter = new Point( Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
+            Mouse.SetPosition( mouseCenter.X, mouseCenter.Y );
+
+            MouseState = Mouse.GetState();
+            PreviousMouseState = MouseState;
+
+            IsMouseCaptured = true;
+        }
+
+        //----------------------------------------------------------------------
+        public void ReleaseMouse()
+        {
+            Debug.Assert( IsMouseCaptured );
+
+            IsMouseCaptured = false;
+
+            Game.IsMouseVisible = true;
+            Mouse.SetPosition( mSavedMousePosition.X, mSavedMousePosition.Y );
+
+            MouseState = Mouse.GetState();
+            PreviousMouseState = MouseState;
+        }
     }
 }
