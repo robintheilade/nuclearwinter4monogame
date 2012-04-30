@@ -17,7 +17,7 @@ namespace NuclearWinter.UI
             get { return miStartTextBlockIndex; }
             set
             {
-                miStartTextBlockIndex = value;
+                miStartTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
                 EndTextBlockIndex = miStartTextBlockIndex;
             }
         }
@@ -40,7 +40,7 @@ namespace NuclearWinter.UI
             get { return miEndTextBlockIndex; }
             set
             {
-                miEndTextBlockIndex = value;
+                miEndTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
                 Timer = 0f;
 
                 if( TextBlockChangedHandler != null )
