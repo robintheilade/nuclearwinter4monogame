@@ -311,8 +311,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void Update( float _fElapsedTime )
         {
-            Root.Update( _fElapsedTime );
             Root.DoLayout( new Rectangle( 0, 0, Width, Height ) );
+            Root.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
