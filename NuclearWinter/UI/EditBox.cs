@@ -97,6 +97,7 @@ namespace NuclearWinter.UI
                     CaretOffset = Math.Min( miCaretOffset, mstrText.Length );
 
                     UpdateContentSize();
+                    miScrollOffset = Math.Min( miScrollOffset, miMaxScrollOffset );
                 }
             }
         }
