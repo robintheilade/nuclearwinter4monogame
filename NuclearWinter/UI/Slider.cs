@@ -15,6 +15,7 @@ namespace NuclearWinter.UI
         bool                    mbIsHovered;
         bool                    mbIsPressed;
 
+        // FIXME: There should be a IntSlider/FloatSlider or a Discrete/Continuous setting for the Slider
         public int              MinValue;
         public int              MaxValue;
         public int              Step = 1;
@@ -144,20 +145,21 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+            Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
 
-            int handleSize = LayoutRect.Height;
-            int handleX = LayoutRect.X + (int)( ( LayoutRect.Width - handleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
+            Screen.DrawBox( Screen.Style.ListFrame, rect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
-            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
+            int handleX = rect.X + (int)( ( rect.Width - Screen.Style.SliderHandleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
+
+            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, LayoutRect.Y, handleSize, handleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
         }
 

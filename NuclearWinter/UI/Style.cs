@@ -121,5 +121,7 @@ namespace NuclearWinter.UI
 
         public Texture2D        ProgressBar;
         public int              ProgressBarCornerSize;
+
+        public int              SliderHandleSize = 30;
     }
 }
