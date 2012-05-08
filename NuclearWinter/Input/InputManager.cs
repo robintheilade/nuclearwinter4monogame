@@ -235,6 +235,26 @@ namespace NuclearWinter.Input
         
 #if WINDOWS
         //----------------------------------------------------------------------
+        public bool IsMouseButtonDown( int _iButton )
+        {
+            switch( _iButton )
+            {
+                case 0:
+                    return MouseState.LeftButton    == ButtonState.Pressed;
+                case 1:
+                    return MouseState.MiddleButton  == ButtonState.Pressed;
+                case 2:
+                    return MouseState.RightButton   == ButtonState.Pressed;
+                case 3:
+                    return MouseState.XButton1      == ButtonState.Pressed;
+                case 4:
+                    return MouseState.XButton2      == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
+        //----------------------------------------------------------------------
         public bool WasMouseButtonJustPressed( int _iButton )
         {
             switch( _iButton )
@@ -252,7 +272,6 @@ namespace NuclearWinter.Input
                 default:
                     return false;
             }
-
         }
 
         //----------------------------------------------------------------------
