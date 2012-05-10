@@ -156,20 +156,10 @@ namespace NuclearWinter.UI
                 }
             }
 
-            if( Parent is TreeViewNode )
-            {
-                ((TreeViewNode)Parent).ChildSizeChanged();
-            }
-
             base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        void ChildSizeChanged()
-        {
-            UpdateContentSize();
-        }
-
         void OnNodeAdded( int _iAddedNodeCount )
         {
             ContainedNodeCount += _iAddedNodeCount;
