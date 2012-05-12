@@ -144,7 +144,7 @@ namespace NuclearWinter.UI
         {
             Keys newKey = ( _key != Keys.Back ) ? _key : Keys.None;
 
-            if( ChangeHandler( newKey ) )
+            if( ChangeHandler == null || ChangeHandler( newKey ) )
             {
                 Key = newKey;
             }
