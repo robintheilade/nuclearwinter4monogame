@@ -359,7 +359,7 @@ namespace NuclearWinter.UI
 
             if( mImage.Texture != null )
             {
-                mImage.DoLayout( new Rectangle( LayoutRect.X + iLabelX, LayoutRect.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
+                mImage.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
                 mImage.Draw();
                 iLabelX += mImage.ContentWidth;
             }
