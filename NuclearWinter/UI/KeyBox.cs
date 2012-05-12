@@ -21,6 +21,8 @@ namespace NuclearWinter.UI
             }
         }
 
+        public bool StoreKeyAsUSEnglish = false;
+
         Keys mKey;
         public Keys                 Key
         {
@@ -36,7 +38,7 @@ namespace NuclearWinter.UI
         public string               DisplayedKey
         {
             get {
-                return Key.ToString();
+                return ( StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.USEnglishToLocal( Key ) : Key ).ToString();
             }
         }
 
@@ -142,7 +144,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void OnKeyPress( Keys _key )
         {
-            Keys newKey = ( _key != Keys.Back ) ? _key : Keys.None;
+            Keys newKey = ( _key != Keys.Back ) ? ( StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.LocalToUSEnglish( _key ) : _key ) : Keys.None;
 
             if( ChangeHandler == null || ChangeHandler( newKey ) )
             {

@@ -88,9 +88,22 @@ namespace NuclearWinter
 
         // Maps a localized character like 'S' to the virtual scan code
         //  for that key on the user's keyboard ('O' in dvorak, for example)
-        public static Keys USEnglishToLocal (Keys key) {
-            var activeScanCode = MapVirtualKeyEx((uint)key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
+        public static Keys USEnglishToLocal( Keys _key )
+        {
+            if( _key > Keys.Z ) return _key;
+
+            var activeScanCode = MapVirtualKeyEx((uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
             var nativeVirtualCode = MapVirtualKeyEx(activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle);
+
+            return (Keys)nativeVirtualCode;
+        }
+
+        public static Keys LocalToUSEnglish( Keys _key )
+        {
+            if( _key > Keys.Z ) return _key;
+
+            var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
+            var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
 
             return (Keys)nativeVirtualCode;
         }
