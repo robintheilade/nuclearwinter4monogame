@@ -24,6 +24,7 @@ namespace NuclearWinter.UI
         public Action<Image>    MouseEnterHandler;
         public Action<Image>    MouseOutHandler;
         public Action<Image>    MouseDownHandler;
+        public Action<Image,float>  UpdateHandler;
 
         //----------------------------------------------------------------------
         protected Texture2D mTexture;
@@ -101,6 +102,16 @@ namespace NuclearWinter.UI
             {
                 ClickHandler( this );
             }
+        }
+
+        internal override void Update( float _fElapsedTime )
+        {
+            if( UpdateHandler != null )
+            {
+                UpdateHandler( this, _fElapsedTime );
+            }
+
+            base.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
