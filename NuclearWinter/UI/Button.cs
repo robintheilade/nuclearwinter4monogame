@@ -44,11 +44,16 @@ namespace NuclearWinter.UI
                 FrameDown       = _buttonFrameDown;
                 FrameHover      = _buttonFrameHover;
                 FramePressed    = _buttonFramePressed;
-                FrameFocus    = _buttonFrameFocused;
+                FrameFocus      = _buttonFrameFocused;
 
                 VerticalPadding     = _iVerticalPadding;
                 HorizontalPadding   = _iHorizontalPadding;
             }
+        }
+
+        public UIFont Font {
+            get { return mLabel.Font; }
+            set { mLabel.Font = value; UpdateContentSize(); }
         }
 
         //----------------------------------------------------------------------
