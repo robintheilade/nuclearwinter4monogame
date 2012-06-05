@@ -459,15 +459,30 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
         internal override void OnMouseOut( Point _hitPoint )
         {
             HoveredRow = null;
         }
 
+        //----------------------------------------------------------------------
         internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( Scrollbar.Offset - ( _iDelta / 120 * 3 * ( RowHeight + RowSpacing ) ), 0, Math.Max( 0, Scrollbar.Max ) );
-            Scrollbar.Offset = iNewScrollOffset;
+            DoScroll( -_iDelta / 120 * 3 * ( RowHeight + RowSpacing ) );
+        }
+
+        //----------------------------------------------------------------------
+        void DoScroll( int _iDelta )
+        {
+            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            Scrollbar.Offset += iScrollChange;
+
+            if( IsDragging )
+            {
+                mMouseDownPoint.Y -= iScrollChange;
+            }
+
+            UpdateHoveredRow();
         }
 
         //----------------------------------------------------------------------
