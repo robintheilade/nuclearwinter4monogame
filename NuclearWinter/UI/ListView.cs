@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NuclearWinter.Animation;
 using Microsoft.Xna.Framework.Input;
+using NuclearWinter.Collections;
+using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
@@ -197,7 +199,8 @@ namespace NuclearWinter.UI
         public bool                 MergeColumns            = false;
         public bool                 SelectFocusedRow        = true;
 
-        public List<ListViewRow>    Rows;
+        public ObservableList<ListViewRow>
+                                    Rows                { get; private set; }
         public int                  RowHeight   = 60;
         public int                  RowSpacing  = 0;
         public int                  ColSpacing  = 0;
@@ -208,6 +211,7 @@ namespace NuclearWinter.UI
         public Action<ListView>     ValidateHandler;
 
         int                         miFocusedRowIndex;
+        public ListViewRow          FocusedRow         { get { return miFocusedRowIndex != -1 ? Rows[ miFocusedRowIndex ] : null; } }
         Point                       mHoverPoint;
         public int                  HoveredRowIndex     { get; private set; }
         public ListViewRow          HoveredRow          { get { return HoveredRowIndex != -1 ? Rows[ HoveredRowIndex ] : null; } }
@@ -224,11 +228,54 @@ namespace NuclearWinter.UI
         public Scrollbar            Scrollbar           { get; private set; }
 
         //----------------------------------------------------------------------
+        // Drag & drop
+        public Func<ListViewRow,int,bool>   DragNDropHandler;
+        bool                                mbIsMouseDown;
+        internal bool                       IsDragging { get; private set; }
+        Point                               mMouseDownPoint;
+        Point                               mMouseDragPoint;
+        const int                           siDragTriggerDistance   = 10;
+        bool                                mbInsertAfter;
+
+        //----------------------------------------------------------------------
         public ListView( Screen _screen )
         : base( _screen )
         {
             Columns = new List<ListViewColumn>();
-            Rows    = new List<ListViewRow>();
+            
+            Rows    = new ObservableList<ListViewRow>();
+
+            Rows.ListCleared += delegate {
+                SelectedRowIndex    = -1;
+                HoveredRowIndex     = -1;
+                miFocusedRowIndex   = -1;
+
+                mHoveredActionButton = null;
+                mbIsHoveredActionButtonDown = false;
+            };
+
+            Rows.ListChanged += delegate( object _source, ObservableList<ListViewRow>.ListChangedEventArgs _args )
+            {
+                if( ! _args.Added )
+                {
+                    if( _args.Item == SelectedRow )
+                    {
+                        SelectedRowIndex = -1;
+                    }
+
+                    if( _args.Item == HoveredRow )
+                    {
+                        UpdateHoveredRow();
+                    }
+
+                    if( _args.Item == FocusedRow )
+                    {
+                        miFocusedRowIndex = -1;
+                        IsDragging = false;
+                    }
+                }
+            };
+
             SelectedRowIndex    = -1;
             miFocusedRowIndex   = -1;
             HoveredRowIndex   = -1;
@@ -348,17 +395,30 @@ namespace NuclearWinter.UI
 
         internal override void OnMouseMove( Point _hitPoint )
         {
+            if( mbIsMouseDown && miFocusedRowIndex != -1 )
+            {
+                IsDragging = DragNDropHandler != null && (
+                        Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
+                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
+                mMouseDragPoint = _hitPoint;
+            }
+
             mHoverPoint = _hitPoint;
             UpdateHoveredRow();
         }
 
         void UpdateHoveredRow()
         {
-            HoveredRowIndex = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) ) / ( RowHeight + RowSpacing );
+            int iRowY = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) );
+            HoveredRowIndex = Math.Max( -1, iRowY / ( RowHeight + RowSpacing ) );
+
+            int iOffset = iRowY % ( RowHeight + RowSpacing );
+            mbInsertAfter = iOffset >= ( RowHeight + RowSpacing ) / 2;
 
             if( HoveredRowIndex >= Rows.Count )
             {
                 HoveredRowIndex = -1;
+                mbInsertAfter = true;
 
                 if( mbIsHoveredActionButtonDown )
                 {
@@ -431,6 +491,9 @@ namespace NuclearWinter.UI
             }
             else
             {
+                mbIsMouseDown = true;
+                mMouseDownPoint = _hitPoint;
+
                 Screen.Focus( this );
                 miFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)Scrollbar.LerpOffset ) / ( RowHeight + RowSpacing ) );
                 if( miFocusedRowIndex > Rows.Count - 1 )
@@ -444,6 +507,8 @@ namespace NuclearWinter.UI
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
+            mbIsMouseDown = false;
+
             mHoverPoint = _hitPoint;
 
             if( mHoveredActionButton != null )
@@ -453,6 +518,31 @@ namespace NuclearWinter.UI
                     mHoveredActionButton.OnMouseUp( _hitPoint, _iButton );
                     mbIsHoveredActionButtonDown = false;
                 }
+            }
+            else
+            if( IsDragging )
+            {
+                Debug.Assert( FocusedRow != null );
+                ListViewRow draggedRow = FocusedRow;
+
+                if( HitBox.Contains( _hitPoint ) && HoveredRow != draggedRow &&  DragNDropHandler != null )
+                {
+
+                    int iIndex = ( ( HoveredRowIndex == -1 ) ? (Rows.Count - 1) : HoveredRowIndex ) + ( mbInsertAfter ? 1 : 0 );
+
+                    if( iIndex > miFocusedRowIndex )
+                    {
+                        iIndex--;
+                    }
+
+                    if( DragNDropHandler( draggedRow, iIndex ) )
+                    {
+                        Rows.Remove( draggedRow );
+                        Rows.Insert( iIndex, draggedRow );
+                    }
+                }
+
+                IsDragging = false;
             }
             else
             {
@@ -611,7 +701,7 @@ namespace NuclearWinter.UI
                         }
                     }
 
-                    if( HoveredRowIndex == iRowIndex )
+                    if( HoveredRowIndex == iRowIndex && ! IsDragging )
                     {
                         if( SelectedRowIndex != iRowIndex )
                         {
@@ -649,7 +739,7 @@ namespace NuclearWinter.UI
                             }
                         }
 
-                        if( HoveredRowIndex == iRowIndex )
+                        if( HoveredRowIndex == iRowIndex && ! IsDragging )
                         {
                             if( SelectedRowIndex != iRowIndex )
                             {
@@ -671,11 +761,33 @@ namespace NuclearWinter.UI
                 iRowIndex++;
             }
 
-            if( HoveredRowIndex != -1 )
+            if( HoveredRowIndex != -1 && ! IsDragging )
             {
                 foreach( Button button in ActionButtons )
                 {
                     button.Draw();
+                }
+            }
+
+            if( IsDragging )
+            {
+                int iX = LayoutRect.X + 10;
+                int iWidth = LayoutRect.Width - 20;
+
+                if( HoveredRow != null )
+                {
+                    int iY = LayoutRect.Y + 10 + GetRowY( HoveredRowIndex + ( mbInsertAfter ? 1 : 0 ) ) - ( RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
+
+                    Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
+                    Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );
+                }
+                else
+                if( IsHovered )
+                {
+                    int iY = LayoutRect.Y + 10 + ( mbInsertAfter ? GetRowY( Rows.Count ) : 0 ) - ( RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
+
+                    Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
+                    Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );
                 }
             }
 
@@ -687,7 +799,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DrawHovered()
         {
-            if( mHoveredActionButton != null )
+            if( mHoveredActionButton != null && ! IsDragging )
             {
                 mHoveredActionButton.DrawHovered();
             }

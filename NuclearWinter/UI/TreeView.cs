@@ -943,6 +943,7 @@ namespace NuclearWinter.UI
             DoScroll( -_iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) );
         }
 
+        //----------------------------------------------------------------------
         void DoScroll( int _iDelta )
         {
             int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
@@ -956,6 +957,7 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
+        //----------------------------------------------------------------------
         internal override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
