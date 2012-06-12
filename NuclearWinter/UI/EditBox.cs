@@ -38,7 +38,7 @@ namespace NuclearWinter.UI
             }
         }
         int     miCaretX;
-        int     miCaretWidth = 3;
+        int     miCaretWidth = 2;
 
         int     miSelectionOffset;
         public int     SelectionOffset {
