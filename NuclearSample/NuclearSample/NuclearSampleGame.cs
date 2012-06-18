@@ -50,12 +50,15 @@ namespace NuclearSample
             UIStyle.BlurRadius  = 1;
             UIStyle.SmallFont   = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/SmallFont" ) );
             UIStyle.MediumFont  = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/MediumFont" ) );
-            UIStyle.BigFont     = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/BigFont" ) );
+            UIStyle.LargeFont   = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/LargeFont" ) );
 
             UIStyle.ButtonFrame     = Content.Load<Texture2D>( "Sprites/UI/ButtonFrame" );
             UIStyle.ButtonHover     = Content.Load<Texture2D>( "Sprites/UI/ButtonHover" );
             UIStyle.ButtonFocus     = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
             UIStyle.ButtonFrameDown = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameDown" );
+
+            UIStyle.BlurRadius = 0;
+            UIStyle.DefaultTextColor = new Color( 16, 16, 16 );
 
             //------------------------------------------------------------------
             // Game states

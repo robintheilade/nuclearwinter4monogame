@@ -15,30 +15,36 @@ namespace NuclearSample.Menus
         public MainMenuManager( NuclearSampleGame _game, ContentManager _content )
         : base( _game, _game.UIStyle, _content )
         {
+            // Menu group
             NuclearUI.BoxGroup menuGroup = new NuclearUI.BoxGroup( MenuScreen, NuclearUI.Orientation.Vertical, 20 );
+            menuGroup.AnchoredRect = NuclearUI.AnchoredRect.CreateCentered( 200, 800 );
+            MenuScreen.Root.AddChild( menuGroup );
+            MenuScreen.Focus( menuGroup );
 
+            // Start button
             NuclearUI.Button startButton = new NuclearUI.Button( MenuScreen, "Start" );
+            menuGroup.AddChild( startButton );
+
             startButton.ClickHandler = delegate {
 
             };
-            menuGroup.AddChild( startButton );
 
+            // Options button
             NuclearUI.Button optionsButton = new NuclearUI.Button( MenuScreen, "Options" );
+            menuGroup.AddChild( optionsButton );
+
             optionsButton.ClickHandler = delegate {
 
             };
-            menuGroup.AddChild( optionsButton );
 
+            // Quit button
             NuclearUI.Button quitButton = new NuclearUI.Button( MenuScreen, "Quit" );
-            quitButton.ClickHandler = delegate {
-
-            };
-
             menuGroup.AddChild( quitButton );
 
-            MenuScreen.Root.AddChild( new NuclearUI.FixedWidget( menuGroup, NuclearUI.AnchoredRect.CreateCentered( 200, 800 ) ) );
+            quitButton.ClickHandler = delegate {
+                Game.Exit();
+            };
 
-            MenuScreen.Focus( menuGroup );
         }
 
         //----------------------------------------------------------------------

@@ -54,8 +54,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fonts\BigFont.spritefont">
-      <Name>BigFont</Name>
+    <Compile Include="Fonts\LargeFont.spritefont">
+      <Name>LargeFont</Name>
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
