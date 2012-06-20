@@ -7,6 +7,7 @@ using NuclearWinter;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
+using NuclearWinter.Xna;
 
 namespace NuclearWinter.UI
 {
@@ -357,31 +358,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Stack<Rectangle> mlScissorRects = new Stack<Rectangle>();
 
-        Rectangle IntersectRects( Rectangle _rect1, Rectangle _rect2 )
-        {
-            Rectangle rect = new Rectangle(
-                Math.Max( _rect1.X, _rect2.X ),
-                Math.Max( _rect1.Y, _rect2.Y ),
-                0, 0 );
-
-            rect.Width = Math.Min( _rect1.Right, _rect2.Right ) - rect.X;
-            rect.Height = Math.Min( _rect1.Bottom, _rect2.Bottom ) - rect.Y;
-
-            if( rect.Width < 0 )
-            {
-                rect.X += rect.Width;
-                rect.Width = 0;
-            }
-
-            if( rect.Height < 0 )
-            {
-                rect.Y += rect.Height;
-                rect.Height = 0;
-            }
-
-            return rect;
-        }
-
         Rectangle TransformRect( Rectangle _rect, Matrix _matrix )
         {
             Vector2 vMin = new Vector2( _rect.X, _rect.Y );
@@ -404,7 +380,7 @@ namespace NuclearWinter.UI
             rect.Offset( 0, NuclearWinter.Resolution.Viewport.Y );
             Rectangle parentRect = ScissorRectangle;
 
-            Rectangle newRect = IntersectRects( IntersectRects( parentRect, rect ), Game.GraphicsDevice.Viewport.Bounds );
+            Rectangle newRect = parentRect.Clip( rect ).Clip( Game.GraphicsDevice.Viewport.Bounds );
 
             SuspendBatch();
             mlScissorRects.Push( newRect );
