@@ -142,10 +142,14 @@ namespace NuclearWinter.UI
         public Action<Button>   ClickHandler;
         public object           Tag;
 
-        float               mfTooltipTimer;
-        const float         sfTooltipDelay      = 0.6f;
+        public string       TooltipText
+        {
+            get { return mTooltip.Text; }
+            set { mTooltip.Text = value; }
+        }
 
-        public string       TooltipText;
+        //----------------------------------------------------------------------
+        Tooltip             mTooltip;
 
         //----------------------------------------------------------------------
         public Button( Screen _screen, ButtonStyle _style, string _strText = "", Texture2D _iconTex = null, Anchor _anchor = Anchor.Center, string _strTooltipText="", object _tag=null )
@@ -169,6 +173,8 @@ namespace NuclearWinter.UI
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );
+
+            mTooltip        = new Tooltip( Screen, "" );
 
             TooltipText     = _strTooltipText;
             Tag             = _tag;
@@ -246,10 +252,8 @@ namespace NuclearWinter.UI
                 mPressedAnim.Update( _fElapsedTime );
             }
 
-            if( mbIsHovered )
-            {
-                mfTooltipTimer += _fElapsedTime;
-            }
+            mTooltip.EnableDisplayTimer = mbIsHovered;
+            mTooltip.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -263,7 +267,7 @@ namespace NuclearWinter.UI
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
-            mfTooltipTimer = 0f;
+            mTooltip.EnableDisplayTimer = false;
         }
 
         //----------------------------------------------------------------------
@@ -386,22 +390,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DrawHovered()
         {
-            if( mfTooltipTimer < sfTooltipDelay || string.IsNullOrEmpty( TooltipText ) ) return;
-
-            UIFont font = Screen.Style.MediumFont;
-
-            Box padding = new Box( 10, 10 );
-
-            Vector2 vSize = font.MeasureString( TooltipText );
-            int iWidth  = (int)vSize.X;
-            int iHeight = (int)vSize.Y;
-
-            Point topLeft = new Point(
-                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
-                Screen.Game.InputMgr.MouseState.Y + 20 );
-
-            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
-            Screen.Game.SpriteBatch.DrawString( font, TooltipText, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
+            mTooltip.Draw();
         }
     }
 }

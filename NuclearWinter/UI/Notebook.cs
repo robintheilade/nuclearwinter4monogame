@@ -39,6 +39,7 @@ namespace NuclearWinter.UI
             set
             {
                 mLabel.Text = value;
+                mTooltip.Text = value;
 
                 UpdatePaddings();
                 UpdateContentSize();
@@ -67,6 +68,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         Notebook                mNotebook;
+        Tooltip                 mTooltip;
 
         //----------------------------------------------------------------------
         Label                   mLabel;
@@ -76,10 +78,6 @@ namespace NuclearWinter.UI
         bool                    mbIsPinned;
 
         internal int            DragOffset;
-
-        //----------------------------------------------------------------------
-        float                   mfTooltipTimer;
-        const float             sfTooltipDelay      = 0.6f;
 
         //----------------------------------------------------------------------
         void UpdatePaddings()
@@ -103,6 +101,8 @@ namespace NuclearWinter.UI
 
             mLabel          = new Label( Screen, "", Anchor.Start, Screen.Style.DefaultTextColor );
             mIcon           = new Image( Screen, _iconTex );
+
+            mTooltip        = new Tooltip( Screen, "" );
 
             mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
             mCloseButton.Padding = new Box(0);
@@ -150,17 +150,8 @@ namespace NuclearWinter.UI
             mCloseButton.Update( _fElapsedTime );
             PageGroup.Update( _fElapsedTime );
 
-            if( mNotebook.HoveredTab == this )
-            {
-                if( mNotebook.DraggedTab != this )
-                {
-                    mfTooltipTimer += _fElapsedTime;
-                }
-                else
-                {
-                    mfTooltipTimer = 0f;
-                }
-            }
+            mTooltip.EnableDisplayTimer = mNotebook.HoveredTab == this && mNotebook.DraggedTab != this;
+            mTooltip.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
@@ -246,7 +237,7 @@ namespace NuclearWinter.UI
                 mNotebook.HoveredTab = null;
             }
 
-            mfTooltipTimer = 0f;
+            mTooltip.EnableDisplayTimer = false;
         }
 
         internal override void OnMouseMove( Point _hitPoint )
@@ -331,22 +322,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal override void DrawHovered()
         {
-            if( mfTooltipTimer < sfTooltipDelay || ! mLabel.HasEllipsis ) return;
-
-            UIFont font = Screen.Style.MediumFont;
-
-            Box padding = new Box( 10, 10 );
-
-            Vector2 vSize = font.MeasureString( Text );
-            int iWidth  = (int)vSize.X;
-            int iHeight = (int)vSize.Y;
-
-            Point topLeft = new Point(
-                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
-                Screen.Game.InputMgr.MouseState.Y + 20 );
-
-            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
-            Screen.Game.SpriteBatch.DrawString( font, Text, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
+            if( ! mLabel.HasEllipsis ) return;
+            
+            mTooltip.Draw();
         }
 
         //----------------------------------------------------------------------

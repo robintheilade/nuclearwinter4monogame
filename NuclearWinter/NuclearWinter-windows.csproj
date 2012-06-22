@@ -145,6 +145,7 @@
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\RichTextArea.cs" />
     <Compile Include="UI\TextArea.cs" />
+    <Compile Include="UI\Tooltip.cs" />
     <Compile Include="UI\TreeView.cs" />
     <Compile Include="UI\CustomViewport.cs" />
     <Compile Include="UI\Widget.cs" />
