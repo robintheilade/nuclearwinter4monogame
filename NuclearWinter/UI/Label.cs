@@ -67,7 +67,7 @@ namespace NuclearWinter.UI
         Anchor          mAnchor;
 
         bool            mbWrapText;
-        List<string>    mlstrWrappedText;
+        List<Tuple<string,bool>> mlWrappedText;
 
         Point           mpTextPosition;
 
@@ -115,7 +115,7 @@ namespace NuclearWinter.UI
 
             if( mbWrapText )
             {
-                mlstrWrappedText = null;
+                mlWrappedText = null;
             }
             else
             {
@@ -134,15 +134,15 @@ namespace NuclearWinter.UI
                 if( LayoutRect.Width > 0 )
                 {
                     // Wrap text
-                    mlstrWrappedText = Screen.Game.WrapText( Font, Text, LayoutRect.Width - Padding.Horizontal );
+                    mlWrappedText = Screen.Game.WrapText( Font, Text, LayoutRect.Width - Padding.Horizontal );
                     ContentWidth = LayoutRect.Width;
-                    ContentHeight = (int)( Font.LineSpacing * mlstrWrappedText.Count ) + Padding.Vertical;
+                    ContentHeight = (int)( Font.LineSpacing * mlWrappedText.Count ) + Padding.Vertical;
                 }
                 else
-                if( mlstrWrappedText == null )
+                if( mlWrappedText == null )
                 {
-                    mlstrWrappedText = new List<string>();
-                    mlstrWrappedText.Add( mstrText );
+                    mlWrappedText = new List<Tuple<string,bool>>();
+                    mlWrappedText.Add( new Tuple<string,bool>( mstrText, true ) );
                 }
             }
             else
@@ -209,15 +209,15 @@ namespace NuclearWinter.UI
         {
             if( WrapText )
             {
-                for( int i = 0; i < mlstrWrappedText.Count; i++ )
+                for( int i = 0; i < mlWrappedText.Count; i++ )
                 {
                     float fX = mpTextPosition.X;
                     if( Anchor == UI.Anchor.Center )
                     {
-                        fX += ContentWidth / 2 - Padding.Left - mFont.MeasureString( mlstrWrappedText[i] ).X / 2f;
+                        fX += ContentWidth / 2 - Padding.Left - mFont.MeasureString( mlWrappedText[i].Item1 ).X / 2f;
                     }
 
-                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlstrWrappedText[i], new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color, OutlineColor );
+                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color, OutlineColor );
                 }
             }
             else

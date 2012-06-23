@@ -317,9 +317,9 @@ namespace NuclearWinter
         public virtual string GetUIString( string _strId ) { return _strId; }
 
         //----------------------------------------------------------------------
-        public List<string> WrapText( SpriteFont _font, string _strText, float _fLineWidth )
+        public List<Tuple<string,bool>> WrapText( SpriteFont _font, string _strText, float _fLineWidth )
         {
-            List<string> lText = new List<string>();
+            List<Tuple<string,bool>> lText = new List<Tuple<string,bool>>();
 
             foreach( string strChunk in _strText.Split( '\n' ) )
             {
@@ -337,7 +337,7 @@ namespace NuclearWinter
 
                         if( strLine != "" && _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
                         {
-                            lText.Add( strLine );
+                            lText.Add( new Tuple<string,bool>( strLine, false ) );
                             strLine = string.Empty;
                         }
 
@@ -345,7 +345,7 @@ namespace NuclearWinter
                     }
                 }
 
-                lText.Add( strLine + " " );
+                lText.Add( new Tuple<string,bool>( strLine + " ", true ) );
             }
 
             return lText;

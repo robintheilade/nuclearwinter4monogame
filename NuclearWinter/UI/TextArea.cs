@@ -73,13 +73,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal void Draw()
+        internal void Draw( Rectangle _rect )
         {
             if( HasSelection )
             {
                 Point origin = new Point(
-                    TextArea.LayoutRect.X + TextArea.Padding.Left,
-                    TextArea.LayoutRect.Y + TextArea.Padding.Top - (int)TextArea.Scrollbar.LerpOffset
+                    _rect.X,
+                    _rect.Y - (int)TextArea.Scrollbar.LerpOffset
                     );
 
                 //--------------------------------------------------------------
@@ -107,13 +107,13 @@ namespace NuclearWinter.UI
                 }
                 else
                 {
-                    Rectangle startSelectionRectangle = new Rectangle( startPos.X, startPos.Y, TextArea.LayoutRect.Width - TextArea.Padding.Horizontal - startPos.X, iStartCaretHeight );
+                    Rectangle startSelectionRectangle = new Rectangle( startPos.X, startPos.Y, _rect.Width - startPos.X, iStartCaretHeight );
                     startSelectionRectangle.Offset( origin );
                     TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, startSelectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
 
                     if( iEndBlockLine > iStartBlockLine + 1 )
                     {
-                        Rectangle selectionRectangle = new Rectangle( 0, startPos.Y + iStartCaretHeight, TextArea.LayoutRect.Width - TextArea.Padding.Horizontal, iStartCaretHeight * ( iEndBlockLine - iStartBlockLine - 1 ) );
+                        Rectangle selectionRectangle = new Rectangle( 0, startPos.Y + iStartCaretHeight, _rect.Width, iStartCaretHeight * ( iEndBlockLine - iStartBlockLine - 1 ) );
                         selectionRectangle.Offset( origin );
                         TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f );
                     }
@@ -153,12 +153,12 @@ namespace NuclearWinter.UI
 
             for( int iLine = 0; iLine < iBlockLineIndex; iLine++ )
             {
-                iOffset += TextArea.WrappedLines[ iLine ].Length;
+                iOffset += TextArea.WrappedLines[ iLine ].Item1.Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX, TextArea.WrappedLines[ iBlockLineIndex ], TextArea.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX, TextArea.WrappedLines[ iBlockLineIndex ].Item1, TextArea.Font );
             iOffset += iOffsetInLine;
-            if( _iLine < TextArea.WrappedLines.Count - 1 && iOffsetInLine == TextArea.WrappedLines[ iBlockLineIndex ].Length )
+            if( _iLine < TextArea.WrappedLines.Count - 1 && iOffsetInLine == TextArea.WrappedLines[ iBlockLineIndex ].Item1.Length )
             {
                 iOffset--;
             }
@@ -237,11 +237,29 @@ namespace NuclearWinter.UI
             {
                 mstrText = value;
                 mbWrapTextNeeded = true;
+
+                miGutterWidth = 0;
+
+                if( DisplayLineNumbers )
+                {
+                    int iLines = 0;
+                    for( int i = 0; i < mstrText.Length; i++ )
+                    {
+                        if( mstrText[i] == '\n' ) iLines++;
+                    }
+
+                    miGutterWidth = (int)Font.MeasureString( iLines.ToString() ).X + Padding.Right;
+                }
             }
         }
 
-        List<string> mlWrappedLines;
-        public List<string> WrappedLines
+        public bool             DisplayLineNumbers;
+        int                     miGutterWidth;
+
+        //public bool             WrapLines;
+
+        List<Tuple<string,bool>> mlWrappedLines;
+        public List<Tuple<string,bool>> WrappedLines
         {
             get {
                 if( mlWrappedLines == null )
@@ -254,6 +272,8 @@ namespace NuclearWinter.UI
                 mlWrappedLines = value;
             }
         }
+
+        public List<int> WrappedLineNumberMappings;
 
         public TextCaret        Caret               { get; private set; }
         public int              TabSpaces   = 4;
@@ -351,13 +371,13 @@ namespace NuclearWinter.UI
 
         void SetCaretPosition( Point _hitPoint, bool _bSelect )
         {
-            Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
+            Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left + miGutterWidth ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
         }
 
         internal Point GetPositionForCaret( int _iOffset )
         {
             Point caretPos = GetXYForCaretOffset( _iOffset );
-            caretPos.X += LayoutRect.X + Padding.Left;
+            caretPos.X += LayoutRect.X + Padding.Left + miGutterWidth;
             caretPos.Y += LayoutRect.Y + Padding.Top - (int)Scrollbar.LerpOffset;
 
             return caretPos;
@@ -373,23 +393,23 @@ namespace NuclearWinter.UI
         {
             int iOffset = 0;
             int iLine = 0;
-            foreach( string strLine in WrappedLines )
+            foreach( Tuple<string,bool> lineTuple in WrappedLines )
             {
-                if( iOffset + strLine.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
+                if( iOffset + lineTuple.Item1.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
                 {
                     iLine++;
                     _iLine = iLine;
                     return new Point( 0, iLine * LineHeight );
                 }
 
-                if( iOffset + strLine.Length < _iCaretOffset )
+                if( iOffset + lineTuple.Item1.Length < _iCaretOffset )
                 {
-                    iOffset += strLine.Length;
+                    iOffset += lineTuple.Item1.Length;
                 }
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - iOffset ) ).X, iLine * LineHeight );
+                    return new Point( (int)Font.MeasureString( lineTuple.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -788,23 +808,44 @@ namespace NuclearWinter.UI
         internal override void Draw()
         {
             Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+            if( DisplayLineNumbers )
+            {
+                Screen.DrawBox( Screen.Style.TextAreaGutterFrame, new Rectangle( LayoutRect.X, LayoutRect.Y, miGutterWidth + Padding.Left, LayoutRect.Height ), Screen.Style.TextAreaGutterCornerSize, Color.White );
+            }
 
             //------------------------------------------------------------------
             // Text
             Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
 
-            int iX = LayoutRect.X + Padding.Left;
+            int iX = LayoutRect.X + Padding.Left + miGutterWidth;
             int iY = LayoutRect.Y + Padding.Top;
 
-            foreach( string strText in WrappedLines )
+            int iLine = 0;
+            bool bNewLine = true;
+
+            foreach( Tuple<string,bool> lineTuple in WrappedLines )
             {
-                Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iX, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
+                if( DisplayLineNumbers && bNewLine )
+                {
+                    string strLineNumber = iLine.ToString();
+                    int iWidth = (int)Font.MeasureString( strLineNumber ).X;
+                    Screen.Game.SpriteBatch.DrawString( Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor * 0.5f );
+                    bNewLine = false;
+                }
+
+                Screen.Game.SpriteBatch.DrawString( Font, lineTuple.Item1, new Vector2( iX, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
                 iY += Font.LineSpacing;
+
+                if( lineTuple.Item2 )
+                {
+                    iLine++;
+                    bNewLine = true;
+                }
             }
 
             //------------------------------------------------------------------
             // Draw caret & selection
-            Caret.Draw();
+            Caret.Draw( new Rectangle( LayoutRect.X + Padding.Left + miGutterWidth, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - miGutterWidth, LayoutRect.Height - Padding.Vertical ) );
 
             Screen.PopScissorRectangle();
 

@@ -264,12 +264,12 @@ namespace NuclearWinter.UI
 
             for( int iLine = 0; iLine < iBlockLineIndex; iLine++ )
             {
-                iOffset += caretBlock.WrappedLines[ iLine ].Length;
+                iOffset += caretBlock.WrappedLines[ iLine ].Item1.Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ], caretBlock.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ].Item1, caretBlock.Font );
             iOffset += iOffsetInLine;
-            if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Length )
+            if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Item1.Length )
             {
                 iOffset--;
             }
@@ -479,8 +479,8 @@ namespace NuclearWinter.UI
             }
         }
 
-        List<string> mlWrappedLines;
-        public List<string> WrappedLines
+        List<Tuple<string,bool>> mlWrappedLines;
+        public List<Tuple<string,bool>> WrappedLines
         {
             get {
                 if( mlWrappedLines == null )
@@ -545,9 +545,9 @@ namespace NuclearWinter.UI
             }
 
             int iTextY = _iY;
-            foreach( string strText in WrappedLines )
+            foreach( Tuple<string,bool> line in WrappedLines )
             {
-                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, strText, new Vector2( iIndentedX, iTextY + Font.YOffset ), Color );
+                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, line.Item1, new Vector2( iIndentedX, iTextY + Font.YOffset ), Color );
                 iTextY += Font.LineSpacing;
             }
         }
@@ -564,23 +564,23 @@ namespace NuclearWinter.UI
         {
             int iOffset = 0;
             int iLine = 0;
-            foreach( string strLine in WrappedLines )
+            foreach( Tuple<string,bool> line in WrappedLines )
             {
-                if( iOffset + strLine.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
+                if( iOffset + line.Item1.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
                 {
                     iLine++;
                     _iLine = iLine;
                     return new Point( EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
                 }
 
-                if( iOffset + strLine.Length < _iCaretOffset )
+                if( iOffset + line.Item1.Length < _iCaretOffset )
                 {
-                    iOffset += strLine.Length;
+                    iOffset += line.Item1.Length;
                 }
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( strLine.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
+                    return new Point( (int)Font.MeasureString( line.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
                 }
 
                 iLine++;
