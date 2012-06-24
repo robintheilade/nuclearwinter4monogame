@@ -66,7 +66,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void Open()
+        public void Open()
         {
             Open( DefaultSize.X, DefaultSize.Y );
         }

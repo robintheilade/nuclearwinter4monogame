@@ -21,7 +21,5 @@ namespace NuclearWinter.UI
             Panel = new Panel( Manager.PopupScreen, Manager.PopupScreen.Style.PopupFrame, Manager.PopupScreen.Style.PopupFrameCornerSize );
             Panel.AnchoredRect = AnchoredRect.CreateCentered( DefaultSize.X, DefaultSize.Y );
         }
-
-        public abstract void Open();
     }
 }
