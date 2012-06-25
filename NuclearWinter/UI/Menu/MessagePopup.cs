@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using NuclearWinter;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace NuclearWinter.UI
 {
@@ -9,7 +10,8 @@ namespace NuclearWinter.UI
     {
         public Label                TitleLabel      { get; private set; }
         public Label                MessageLabel    { get; private set; }
-        public Button               CloseButton     { get; private set; }
+
+        Button                      mCloseButton;
 
         SpinningWheel               mSpinningWheel;
 
@@ -59,9 +61,9 @@ namespace NuclearWinter.UI
                 Panel.AddChild( actionsGroup );
 
                 // Close
-                CloseButton = new Button( Panel.Screen, i18n.Common.Close );
-                CloseButton.BindPadButton( Buttons.A );
-                actionsGroup.AddChild( CloseButton );
+                mCloseButton = new Button( Panel.Screen, i18n.Common.Close );
+                mCloseButton.BindPadButton( Buttons.A );
+                actionsGroup.AddChild( mCloseButton );
             }
         }
 
@@ -76,17 +78,18 @@ namespace NuclearWinter.UI
             Panel.AnchoredRect.Width = _iWidth;
             Panel.AnchoredRect.Height = _iHeight;
 
-            Manager.PopupGroup = Panel;
+            Manager.PushPopup( this );
             Panel.Screen.Focus( Panel.GetFirstFocusableDescendant( Direction.Down ) );
 
             mSpinningWheel.Reset();
         }
 
-        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel )
+        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel, Action _closeCallback=null )
         {
             TitleLabel.Text     = _strTitleText;
             MessageLabel.Text   = _strMessageText;
-            CloseButton.Text    = _strCloseButtonCaption;
+            mCloseButton.Text    = _strCloseButtonCaption;
+            mCloseButton.ClickHandler = delegate { ( _closeCallback ?? Close )(); };
             ShowSpinningWheel   = _bShowSpinningWheel;
         }
 
@@ -95,11 +98,11 @@ namespace NuclearWinter.UI
         {
             TitleLabel.Text = "";
             MessageLabel.Text = "";
-            CloseButton.ClickHandler = null;
-            CloseButton.Text = "Close";
+            mCloseButton.ClickHandler = null;
+            mCloseButton.Text = "Close";
 
             ShowSpinningWheel = false;
-            Manager.PopupGroup = null;
+            Manager.PopPopup( this );
         }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
 {
-    public abstract class Popup<T> where T:IMenuManager
+    public abstract class Popup<T>: IPopup where T:IMenuManager
     {
         public T                    Manager { get; private set; }
 

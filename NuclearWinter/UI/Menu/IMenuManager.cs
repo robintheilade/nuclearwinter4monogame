@@ -15,6 +15,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Screen              MenuScreen      { get; }
         Screen              PopupScreen     { get; }
-        Group               PopupGroup      { get; set; }
+
+        void PushPopup( IPopup _popup );
+        void PopPopup( IPopup _popup );
     }
 }

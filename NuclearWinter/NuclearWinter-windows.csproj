@@ -129,6 +129,7 @@
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListView.cs" />
     <Compile Include="UI\Menu\IMenuManager.cs" />
+    <Compile Include="UI\Menu\IPopup.cs" />
     <Compile Include="UI\Menu\ManagerPane.cs" />
     <Compile Include="UI\Menu\MenuManager.cs" />
     <Compile Include="UI\Menu\MessagePopup.cs" />
