@@ -22,12 +22,14 @@ namespace NuclearWinter.UI
         void OnKeyPress( Keys _key );
 
         void OnBlur();
+
+        void Update(float _fElapsedTime);
+        void Draw();
+        void DrawHovered();
     }
 
     public class CustomViewport: Widget
     {
-        public Action<float>                UpdateHandler;
-        public Action                       DrawHandler;
         public ICustomViewportHandler       EventHandler;
 
         //----------------------------------------------------------------------
@@ -64,30 +66,36 @@ namespace NuclearWinter.UI
 
         internal override void Update( float _fElapsedTime )
         {
-            if( UpdateHandler != null )
+            if( EventHandler != null )
             {
-                UpdateHandler( _fElapsedTime );
+                EventHandler.Update( _fElapsedTime );
             }
         }
 
         //----------------------------------------------------------------------
         internal override void Draw()
         {
-            if( DrawHandler != null )
+            if( EventHandler != null )
             {
                 Screen.SuspendBatch();
 
                 Viewport previousViewport = Screen.Game.GraphicsDevice.Viewport;
                 Viewport viewport = new Viewport( LayoutRect );
                 Screen.Game.GraphicsDevice.Viewport = viewport;
-                DrawHandler();
+                EventHandler.Draw();
 
                 Screen.Game.GraphicsDevice.Viewport = previousViewport;
 
                 Screen.ResumeBatch();
             }
+        }
 
-            
+        internal override void DrawHovered()
+        {
+            if( EventHandler != null )
+            {
+                EventHandler.DrawHovered();
+            }
         }
     }
 }
