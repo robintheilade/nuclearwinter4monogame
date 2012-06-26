@@ -44,6 +44,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public void ResetTimer()
+        {
+            mfTooltipTimer = 0f;
+        }
+
+        //----------------------------------------------------------------------
         internal override void Update( float _fElapsedTime )
         {
             if( EnableDisplayTimer )
@@ -51,7 +57,8 @@ namespace NuclearWinter.UI
                 mfTooltipTimer += _fElapsedTime;
             }
             base.Update( _fElapsedTime );
-        }
+        }
+
         //----------------------------------------------------------------------
         internal override void Draw()
         {
@@ -71,6 +78,20 @@ namespace NuclearWinter.UI
 
             Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
             Screen.Game.SpriteBatch.DrawString( font, Text, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
+        }
+
+        //----------------------------------------------------------------------
+        // NOTE: Hack to allow external update
+        public void DoUpdate( float _fElapsedTime )
+        {
+            Update( _fElapsedTime );
+        }
+
+        //----------------------------------------------------------------------
+        // NOTE: Hack to allow external draw
+        public void DoDraw()
+        {
+            Draw();
         }
     }
 }
