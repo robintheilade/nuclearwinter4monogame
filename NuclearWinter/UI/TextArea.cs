@@ -820,7 +820,7 @@ namespace NuclearWinter.UI
             int iX = LayoutRect.X + Padding.Left + miGutterWidth;
             int iY = LayoutRect.Y + Padding.Top;
 
-            int iLine = 0;
+            int iLine = 1;
             bool bNewLine = true;
 
             foreach( Tuple<string,bool> lineTuple in WrappedLines )
