@@ -249,7 +249,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Horizontal;
             ContentHeight   = 0;
@@ -265,7 +265,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -318,7 +318,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             foreach( Button button in mlButtons )
             {
@@ -327,7 +327,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             UpdateHoveredButton( _hitPoint );
@@ -335,14 +335,14 @@ namespace NuclearWinter.UI
             mlButtons[miHoveredButton].OnMouseEnter( _hitPoint );
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
 
             mlButtons[miHoveredButton].OnMouseOut( _hitPoint );
         }
 
-        internal override void OnMouseMove(Point _hitPoint)
+        protected internal override void OnMouseMove(Point _hitPoint)
         {
             base.OnMouseMove(_hitPoint);
 
@@ -379,7 +379,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -387,7 +387,7 @@ namespace NuclearWinter.UI
             mlButtons[miHoveredButton].OnMouseDown( _hitPoint, _iButton );
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -406,7 +406,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             foreach( Button button in mlButtons )
             {
@@ -414,7 +414,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             mlButtons[ miHoveredButton ].DrawHovered();
         }

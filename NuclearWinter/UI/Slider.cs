@@ -56,31 +56,31 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
             mTooltip.EnableDisplayTimer = false;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -93,7 +93,7 @@ namespace NuclearWinter.UI
             if( ChangeHandler != null ) ChangeHandler();
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsPressed )
             {
@@ -109,7 +109,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -117,7 +117,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnPadMove(Direction _direction)
+        protected internal override void OnPadMove(Direction _direction)
         {
             if( _direction == Direction.Left )
             {
@@ -137,14 +137,14 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             mTooltip.EnableDisplayTimer = mbIsHovered;
             mTooltip.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
 
@@ -165,7 +165,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             mTooltip.Draw();
         }

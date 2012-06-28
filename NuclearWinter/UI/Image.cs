@@ -43,7 +43,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             int iWidth = mTexture != null ? mTexture.Width : 0;
             int iHeight = mTexture != null ? mTexture.Height : 0;
@@ -69,7 +69,7 @@ namespace NuclearWinter.UI
             return ClickHandler != null ? base.HitTest( _point ) : null;
         }
 
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             if( ClickHandler != null )
             {
@@ -79,7 +79,7 @@ namespace NuclearWinter.UI
             if( MouseEnterHandler != null ) MouseEnterHandler( this );
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             if( ClickHandler != null )
             {
@@ -89,12 +89,12 @@ namespace NuclearWinter.UI
             if( MouseOutHandler != null ) MouseOutHandler( this );
         }
 
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( MouseDownHandler != null ) MouseDownHandler( this );
         }
 
-        internal override void OnMouseUp(Point _hitPoint, int _iButton)
+        protected internal override void OnMouseUp(Point _hitPoint, int _iButton)
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -104,7 +104,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( UpdateHandler != null )
             {
@@ -115,7 +115,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -130,7 +130,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( mTexture == null ) return;
 

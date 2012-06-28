@@ -161,7 +161,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             UIFont uiFont = Screen.Style.MediumFont;
 
@@ -178,7 +178,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -204,7 +204,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( ! mPressedAnim.IsOver )
             {
@@ -215,18 +215,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -256,7 +256,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -288,7 +288,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( IsOpen && mDropDownHitBox.Contains( _hitPoint ) )
             {
@@ -301,7 +301,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
             miHoveredItemIndex += iNewScrollOffset - ScrollItemOffset;
@@ -325,7 +325,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnActivateDown()
+        protected internal override void OnActivateDown()
         {
             if( IsOpen )
             {
@@ -349,7 +349,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnActivateUp()
+        protected internal override void OnActivateUp()
         {
             if( IsOpen )
             {
@@ -366,7 +366,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override bool OnCancel( bool _bPressed )
+        protected internal override bool OnCancel( bool _bPressed )
         {
             if( IsOpen )
             {
@@ -380,7 +380,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnBlur()
+        protected internal override void OnBlur()
         {
             mPressedAnim.SetTime( 1f );
             IsOpen = false;
@@ -388,7 +388,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             if( ! IsOpen )
             {
@@ -418,7 +418,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
 
@@ -466,7 +466,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawFocused()
+        protected internal override void DrawFocused()
         {
             if( IsOpen )
             {

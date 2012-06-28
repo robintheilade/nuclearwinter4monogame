@@ -109,7 +109,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth = (int)Font.MeasureString( Text ).X + Padding.Horizontal;
 
@@ -165,7 +165,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
@@ -205,7 +205,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( WrapText )
             {

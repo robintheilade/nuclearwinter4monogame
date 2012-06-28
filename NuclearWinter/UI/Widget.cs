@@ -108,7 +108,7 @@ namespace NuclearWinter.UI
         {
         }
 
-        internal virtual void DoLayout( Rectangle _rect )
+        protected internal virtual void DoLayout( Rectangle _rect )
         {
             Rectangle childRectangle;
 
@@ -190,9 +190,9 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal virtual void Update( float _fElapsedTime ) {}
+        protected internal virtual void Update( float _fElapsedTime ) {}
 
-        internal virtual void UpdateContentSize()
+        protected internal virtual void UpdateContentSize()
         {
             // Compute content size then call this!
 
@@ -204,17 +204,17 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         // Events
-        internal virtual void       OnMouseDown ( Point _hitPoint, int _iButton ) {}
-        internal virtual void       OnMouseUp   ( Point _hitPoint, int _iButton ) {}
-        internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
+        protected internal virtual void       OnMouseDown ( Point _hitPoint, int _iButton ) {}
+        protected internal virtual void       OnMouseUp   ( Point _hitPoint, int _iButton ) {}
+        protected internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
 
-        internal virtual void       OnMouseEnter( Point _hitPoint ) {}
-        internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
-        internal virtual void       OnMouseMove ( Point _hitPoint ) {}
+        protected internal virtual void       OnMouseEnter( Point _hitPoint ) {}
+        protected internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
+        protected internal virtual void       OnMouseMove ( Point _hitPoint ) {}
 
-        internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
+        protected internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
-        internal virtual void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal virtual void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             if( _key == System.Windows.Forms.Keys.Tab )
             {
@@ -249,20 +249,20 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal virtual void       OnKeyPress  ( Keys _key ) {}
+        protected internal virtual void       OnKeyPress  ( Keys _key ) {}
 
-        internal virtual void       OnTextEntered( char _char ) {}
+        protected internal virtual void       OnTextEntered( char _char ) {}
 
-        internal virtual void       OnActivateDown() {}
-        internal virtual void       OnActivateUp() {}
-        internal virtual bool       OnCancel( bool _bPressed ) { return false; } // return true to consume the event
+        protected internal virtual void       OnActivateDown() {}
+        protected internal virtual void       OnActivateUp() {}
+        protected internal virtual bool       OnCancel( bool _bPressed ) { return false; } // return true to consume the event
 
-        internal virtual void       OnFocus() {}
-        internal virtual void       OnBlur() {}
+        protected internal virtual void       OnFocus() {}
+        protected internal virtual void       OnBlur() {}
 
-        internal virtual bool       OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
+        protected internal virtual bool       OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
 
-        internal virtual void       OnPadMove( Direction _direction ) {
+        protected internal virtual void       OnPadMove( Direction _direction ) {
             Widget widget = GetSibling( _direction, this );
 
             if( widget != null )
@@ -277,8 +277,8 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal abstract void  Draw();
-        internal virtual void   DrawFocused() {}
-        internal virtual void   DrawHovered() {}
+        protected internal abstract void  Draw();
+        protected internal virtual void   DrawFocused() {}
+        protected internal virtual void   DrawHovered() {}
     }
 }

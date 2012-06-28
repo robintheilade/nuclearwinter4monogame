@@ -63,7 +63,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
             ContentWidth = 0;
@@ -73,7 +73,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -85,24 +85,24 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -110,7 +110,7 @@ namespace NuclearWinter.UI
             OnActivateDown();
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -121,28 +121,28 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnFocus()
+        protected internal override void OnFocus()
         {
             if( FocusHandler != null ) FocusHandler( this );
         }
 
-        internal override void OnBlur()
+        protected internal override void OnBlur()
         {
             if( BlurHandler != null ) BlurHandler( this );
         }
 
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             // Nothing
         }
 
-        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             // Nothing
         }
 
         //----------------------------------------------------------------------
-        internal override void OnKeyPress( Keys _key )
+        protected internal override void OnKeyPress( Keys _key )
         {
             Keys newKey = ( _key != Keys.Back ) ? ( StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.LocalToUSEnglish( _key ) : _key ) : Keys.None;
 
@@ -153,7 +153,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.EditBoxFrame, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
 

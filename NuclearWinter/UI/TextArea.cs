@@ -316,7 +316,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle  _rect )
+        protected internal override void DoLayout( Rectangle  _rect )
         {
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
@@ -351,7 +351,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
              || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
@@ -428,7 +428,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -440,7 +440,7 @@ namespace NuclearWinter.UI
             Screen.Focus( this );
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsDragging )
             {
@@ -448,7 +448,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -534,7 +534,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnTextEntered( char _char )
+        protected internal override void OnTextEntered( char _char )
         {
             if( ! IsReadOnly && ! char.IsControl( _char ) )
             {
@@ -551,7 +551,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
             bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
@@ -791,13 +791,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             return;
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             Caret.Update( _fElapsedTime );
 
@@ -805,7 +805,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
             if( DisplayLineNumbers )

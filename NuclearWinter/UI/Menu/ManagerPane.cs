@@ -5,16 +5,15 @@ using System.Text;
 
 namespace NuclearWinter.UI
 {
-    public abstract class ManagerPane<T> where T:IMenuManager
+    public abstract class ManagerPane<T>: Group where T:IMenuManager
     {
         public T                    Manager         { get; private set; }
-        public Group                FixedGroup      { get; private set; }
 
         //----------------------------------------------------------------------
         public ManagerPane( T _manager )
+        : base( _manager.MenuScreen )
         {
             Manager     = _manager;
-            FixedGroup  =  new Group( _manager.MenuScreen );
         }
     }
 }

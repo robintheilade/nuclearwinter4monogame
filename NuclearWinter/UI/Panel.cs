@@ -51,7 +51,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( EnableScrolling )
             {
@@ -62,7 +62,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -99,7 +99,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
              || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
@@ -118,7 +118,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( Texture, new Rectangle( LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical ), CornerSize, Color.White );
 

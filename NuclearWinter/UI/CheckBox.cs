@@ -39,7 +39,7 @@ namespace NuclearWinter.UI
             mLabel = new Label( Screen, _strText, Anchor.Start );
         }
 
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -50,18 +50,18 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             mbIsHovered = mCheckBoxRect.Contains( _hitPoint ) || mLabel.LayoutRect.Contains( _hitPoint );
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( mbIsHovered )
             {
@@ -73,7 +73,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, mCheckBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
 

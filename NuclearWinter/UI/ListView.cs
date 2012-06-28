@@ -57,8 +57,8 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal abstract void DoLayout( ListViewColumn _col );
-        internal abstract void Draw( Point _location );
+        protected internal abstract void DoLayout( ListViewColumn _col );
+        protected internal abstract void Draw( Point _location );
     }
 
     //--------------------------------------------------------------------------
@@ -76,7 +76,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( ListViewColumn _col )
+        protected internal override void DoLayout( ListViewColumn _col )
         {
             mstrText = Text;
             mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
@@ -110,7 +110,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw( Point _location )
+        protected internal override void Draw( Point _location )
         {
             Vector2 vTextPos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - ( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
             vTextPos += mvTextOffset;
@@ -133,7 +133,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( ListViewColumn _col )
+        protected internal override void DoLayout( ListViewColumn _col )
         {
             mvOffset = Vector2.Zero;
             switch( _col.Anchor )
@@ -151,7 +151,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw( Point _location )
+        protected internal override void Draw( Point _location )
         {
             Vector2 vImagePos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - Image.Height / 2f );
             vImagePos += mvOffset;
@@ -304,7 +304,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
@@ -313,7 +313,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
             {
@@ -326,7 +326,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
@@ -377,13 +377,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mHoverPoint = _hitPoint;
             UpdateHoveredRow();
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsMouseDown && FocusedRow != null )
             {
@@ -460,13 +460,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             HoveredRow = null;
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             DoScroll( -_iDelta / 120 * 3 * ( RowHeight + RowSpacing ) );
         }
@@ -486,7 +486,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -515,7 +515,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -562,7 +562,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override bool OnMouseDoubleClick( Point _hitPoint )
+        protected internal override bool OnMouseDoubleClick( Point _hitPoint )
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
@@ -592,7 +592,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnActivateUp()
+        protected internal override void OnActivateUp()
         {
             if( FocusedRow != SelectedRow && FocusedRow != null )
             {
@@ -606,7 +606,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             if( _direction == Direction.Up )
             {
@@ -642,7 +642,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             switch( _key )
             {
@@ -653,7 +653,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnBlur()
+        protected internal override void OnBlur()
         {
             FocusedRow = null;
         }
@@ -664,7 +664,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
 
@@ -814,7 +814,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             if( mHoveredActionButton != null && ! IsDragging )
             {
@@ -823,7 +823,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawFocused()
+        protected internal override void DrawFocused()
         {
             if( IsDragging )
             {

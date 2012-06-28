@@ -123,7 +123,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             if( mIcon.Texture != null )
             {
@@ -145,7 +145,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             mCloseButton.Update( _fElapsedTime );
             PageGroup.Update( _fElapsedTime );
@@ -155,7 +155,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -193,7 +193,7 @@ namespace NuclearWinter.UI
             return mCloseButton.HitTest( _point ) ?? base.HitTest( _point );
         }
 
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -206,7 +206,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -225,12 +225,12 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mNotebook.HoveredTab = this;
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             if( mNotebook.HoveredTab == this )
             {
@@ -240,7 +240,7 @@ namespace NuclearWinter.UI
             mTooltip.EnableDisplayTimer = false;
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( mNotebook.DraggedTab == this )
             {
@@ -251,7 +251,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             int iTabIndex = mNotebook.Tabs.IndexOf( this );
 
@@ -272,13 +272,13 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnActivateUp()
+        protected internal override void OnActivateUp()
         {
             mNotebook.SetActiveTab( this );
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( mNotebook.DraggedTab != this )
             {
@@ -320,7 +320,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             if( ! mLabel.HasEllipsis ) return;
             
@@ -328,7 +328,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawFocused()
+        protected internal override void DrawFocused()
         {
             if( mNotebook.DraggedTab == this )
             {
@@ -451,12 +451,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -592,12 +592,12 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
+        protected internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             return Tabs[ActiveTabIndex].OnPadButton( _button, _bIsDown );
         }
 
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             foreach( NotebookTab tab in Tabs )
             {
@@ -606,7 +606,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             mPanel.Draw();
 

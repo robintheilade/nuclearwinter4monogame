@@ -88,7 +88,7 @@ namespace NuclearWinter.UI
             mCollapseAnim = new Animation.SmoothValue( 0f, 1f, 0.2f );
         }
 
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( mbCollapsed )
             {
@@ -113,7 +113,7 @@ namespace NuclearWinter.UI
         }
 
         //-----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -301,7 +301,7 @@ namespace NuclearWinter.UI
             return null;
         }
 
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
 
@@ -318,13 +318,13 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( ! Collapsable && mbIsDragging )
             {
@@ -346,7 +346,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( Collapsable )
             {
@@ -376,7 +376,7 @@ namespace NuclearWinter.UI
             Screen.Focus( this );
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( Collapsable )
             {
@@ -387,7 +387,7 @@ namespace NuclearWinter.UI
         }
 
         //-----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( mbIsHovered )
             {

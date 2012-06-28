@@ -50,7 +50,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( EnableDisplayTimer )
             {
@@ -60,7 +60,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( mfTooltipTimer < sfTooltipDelay || string.IsNullOrEmpty( Text ) ) return;
 

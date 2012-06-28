@@ -71,7 +71,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             if( HasDynamicHeight )
             {
@@ -102,7 +102,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             foreach( Widget widget in mlChildren )
             {
@@ -113,7 +113,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -283,7 +283,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
+        protected internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             foreach( Widget child in mlChildren )
             {
@@ -297,7 +297,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             foreach( Widget child in mlChildren )
             {

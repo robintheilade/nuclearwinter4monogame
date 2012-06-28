@@ -136,7 +136,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentHeight = mTreeView.NodeHeight + mTreeView.NodeSpacing;
             if( Children.Count > 0 && ! mbCollapsed )
@@ -182,7 +182,7 @@ namespace NuclearWinter.UI
 
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -220,7 +220,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( ! LayoutRect.Intersects( Screen.ScissorRectangle ) ) return;
 
@@ -398,12 +398,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth = mLabel.ContentWidth;
         }
 
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -411,7 +411,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             if( Frame != null )
             {
@@ -539,7 +539,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth    = Padding.Left + Padding.Right;
             ContentHeight   = Padding.Top + Padding.Bottom;
@@ -548,7 +548,7 @@ namespace NuclearWinter.UI
         }
         
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
@@ -582,14 +582,14 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
             mHoverPoint = _hitPoint;
             UpdateHoveredNode();
         }
 
-        internal override void OnMouseMove( Point _hitPoint )
+        protected internal override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsMouseDown && FocusedNode != null )
             {
@@ -605,7 +605,7 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
             UpdateHoveredNode();
@@ -733,7 +733,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -752,7 +752,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -877,7 +877,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override bool OnMouseDoubleClick( Point _hitPoint )
+        protected internal override bool OnMouseDoubleClick( Point _hitPoint )
         {
             if( mHoveredActionButton == null && ValidateHandler != null )
             {
@@ -938,7 +938,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
             DoScroll( -_iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) );
         }
@@ -958,7 +958,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
             {
@@ -999,7 +999,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove( Direction _direction )
         {
             ObservableList<TreeViewNode> lNodes = null;
             TreeViewNode parentNode = null;
@@ -1075,7 +1075,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 
@@ -1133,7 +1133,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             if( mHoveredActionButton != null )
             {
@@ -1142,7 +1142,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawFocused()
+        protected internal override void DrawFocused()
         {
             if( IsDragging )
             {

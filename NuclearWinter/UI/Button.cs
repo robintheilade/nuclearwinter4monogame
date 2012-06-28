@@ -198,7 +198,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void UpdateContentSize()
+        protected internal override void UpdateContentSize()
         {
             ContentWidth    = ( (mIcon.Texture != null ) ? mIcon.ContentWidth : 0 ) + mLabel.ContentWidth + Padding.Horizontal + mMargin.Horizontal;
             ContentHeight   = Math.Max( mIcon.ContentHeight, mLabel.ContentHeight ) + Padding.Vertical + mMargin.Vertical;
@@ -207,7 +207,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DoLayout( Rectangle _rect )
+        protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -245,7 +245,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             if( ! mPressedAnim.IsOver )
             {
@@ -257,13 +257,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseEnter( Point _hitPoint )
+        protected internal override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        internal override void OnMouseOut( Point _hitPoint )
+        protected internal override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
@@ -271,7 +271,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -279,7 +279,7 @@ namespace NuclearWinter.UI
             OnActivateDown();
         }
 
-        internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
@@ -300,7 +300,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override bool OnPadButton( Buttons _button, bool _bIsDown )
+        protected internal override bool OnPadButton( Buttons _button, bool _bIsDown )
         {
             if( _button == mBoundPadButton )
             {
@@ -321,20 +321,20 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void OnActivateDown()
+        protected internal override void OnActivateDown()
         {
             mbIsPressed = true;
             mPressedAnim.SetTime( 0f );
         }
 
-        internal override void OnActivateUp()
+        protected internal override void OnActivateUp()
         {
             mPressedAnim.SetTime( 0f );
             mbIsPressed = false;
             if( ClickHandler != null ) ClickHandler( this );
         }
 
-        internal override void OnBlur()
+        protected internal override void OnBlur()
         {
             ResetPressState();
         }
@@ -347,7 +347,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw()
+        protected internal override void Draw()
         {
             Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.FrameDown;
 
@@ -388,7 +388,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void DrawHovered()
+        protected internal override void DrawHovered()
         {
             mTooltip.Draw();
         }
