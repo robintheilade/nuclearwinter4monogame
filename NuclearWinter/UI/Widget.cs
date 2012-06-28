@@ -249,7 +249,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal virtual void       OnKeyPress  ( Keys _key ) {}
+        protected internal virtual void       OnKeyPress  ( Keys _key ) { if( Parent != null ) Parent.OnKeyPress( _key ); }
 
         protected internal virtual void       OnTextEntered( char _char ) {}
 
