@@ -98,6 +98,7 @@ namespace NuclearWinter.UI
         : base( _notebook.Screen )
         {
             mNotebook       = _notebook;
+            Parent          = _notebook;
 
             mLabel          = new Label( Screen, "", Anchor.Start, Screen.Style.DefaultTextColor );
             mIcon           = new Image( Screen, _iconTex );
@@ -598,6 +599,28 @@ namespace NuclearWinter.UI
             return Tabs[ActiveTabIndex].OnPadButton( _button, _bIsDown );
         }
 
+        //----------------------------------------------------------------------
+        protected internal override void OnKeyPress( Keys _key )
+        {
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+
+            NotebookTab activeTab = Tabs[ ActiveTabIndex ];
+            if( bCtrl && _key == Keys.W && activeTab.IsClosable )
+            {
+                activeTab.Close();
+
+                if( TabClosedHandler != null )
+                {
+                    TabClosedHandler( activeTab );
+                }
+            }
+            else
+            {
+                base.OnKeyPress( _key );
+            }
+        }
+
+        //----------------------------------------------------------------------
         protected internal override void Update( float _fElapsedTime )
         {
             foreach( NotebookTab tab in Tabs )
