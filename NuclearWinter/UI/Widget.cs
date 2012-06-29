@@ -247,6 +247,10 @@ namespace NuclearWinter.UI
                     }
                 }
             }
+            else
+            {
+                if( Parent != null ) Parent.OnWindowsKeyPress( _key );
+            }
         }
 
         protected internal virtual void       OnKeyPress  ( Keys _key ) { if( Parent != null ) Parent.OnKeyPress( _key ); }
