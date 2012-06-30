@@ -121,7 +121,7 @@ namespace NuclearWinter.UI
             Text            = _strText;
 
             PageGroup       = new Group( Screen );
-            PageGroup.Parent = mNotebook;
+            PageGroup.Parent = this;
         }
 
         //----------------------------------------------------------------------
