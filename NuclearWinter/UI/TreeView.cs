@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NuclearWinter.Collections;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
@@ -893,6 +894,29 @@ namespace NuclearWinter.UI
             return false;
         }
 
+        //----------------------------------------------------------------------
+        protected internal override void OnKeyPress( Keys _key )
+        {
+            switch( _key )
+            {
+                case Keys.Home:
+                    Scrollbar.Offset = 0;
+                    break;
+                case Keys.End:
+                    Scrollbar.Offset = Scrollbar.Max;
+                    break;
+                case Keys.PageUp:
+                    Scrollbar.Offset -= LayoutRect.Height;
+                    break;
+                case Keys.PageDown:
+                    Scrollbar.Offset += LayoutRect.Height;
+                    break;
+            }
+
+            base.OnKeyPress( _key );
+        }
+
+        //----------------------------------------------------------------------
         internal bool IsHoveringNodeCheckBox()
         {
             bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );

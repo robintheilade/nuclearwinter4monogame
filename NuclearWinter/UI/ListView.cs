@@ -578,6 +578,29 @@ namespace NuclearWinter.UI
             return false;
         }
 
+        //----------------------------------------------------------------------
+        protected internal override void OnKeyPress( Keys _key )
+        {
+            switch( _key )
+            {
+                case Keys.Home:
+                    Scrollbar.Offset = 0;
+                    break;
+                case Keys.End:
+                    Scrollbar.Offset = Scrollbar.Max;
+                    break;
+                case Keys.PageUp:
+                    Scrollbar.Offset -= LayoutRect.Height;
+                    break;
+                case Keys.PageDown:
+                    Scrollbar.Offset += LayoutRect.Height;
+                    break;
+            }
+
+            base.OnKeyPress( _key );
+        }
+
+        //----------------------------------------------------------------------
         void SelectRowAt( Point _hitPoint )
         {
             UpdateHoveredRow();
