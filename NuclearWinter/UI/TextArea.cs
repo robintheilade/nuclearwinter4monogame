@@ -242,18 +242,32 @@ namespace NuclearWinter.UI
 
                 if( DisplayLineNumbers )
                 {
-                    int iLines = 0;
-                    for( int i = 0; i < mstrText.Length; i++ )
-                    {
-                        if( mstrText[i] == '\n' ) iLines++;
-                    }
-
-                    miGutterWidth = (int)Font.MeasureString( iLines.ToString() ).X + Padding.Right;
+                    UpdateGutterWidth();
                 }
             }
         }
 
-        public bool             DisplayLineNumbers;
+        bool mbDisplayLineNumbers;
+        public bool             DisplayLineNumbers
+        {
+            get { return mbDisplayLineNumbers; }
+            set {
+                mbDisplayLineNumbers = value;
+                UpdateGutterWidth();
+            }
+        }
+
+        void UpdateGutterWidth()
+        {
+            int iLines = 0;
+            for( int i = 0; i < mstrText.Length; i++ )
+            {
+                if( mstrText[i] == '\n' ) iLines++;
+            }
+
+            miGutterWidth = (int)Font.MeasureString( iLines.ToString() ).X + Padding.Right;
+        }
+
         int                     miGutterWidth;
 
         //public bool             WrapLines;
