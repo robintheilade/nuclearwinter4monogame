@@ -90,7 +90,7 @@ namespace NuclearWinter
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
-        public static extern int SetWindowTextW( IntPtr hwnd, string strText );
+        static extern int SetWindowTextW( IntPtr hwnd, string strText );
 
         [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
         static extern int GetWindowTextLength(IntPtr hWnd);
@@ -143,6 +143,15 @@ namespace NuclearWinter
             SpriteMatrix = Matrix.Identity;
 
             UseGameStateManager = _bUseGameStateManager;
+        }
+
+        //----------------------------------------------------------------------
+        /// <summary>
+        /// Sets the window title (Unicode-aware)
+        /// </summary>
+        public void SetWindowTitle( string _strTitle )
+        {
+            SetWindowTextW( Window.Handle, _strTitle );
         }
 
         //----------------------------------------------------------------------

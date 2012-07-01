@@ -11,7 +11,7 @@ namespace NuclearSample.GameStates
     internal class GameStateMainMenu: NuclearWinter.GameFlow.GameStateFadeTransition<NuclearSampleGame>
     {
         //----------------------------------------------------------------------
-        Menus.MainMenuManager       mMainMenuManager;
+        public MainMenuManager      MainMenuManager { get; private set; }
 
         //----------------------------------------------------------------------
         public GameStateMainMenu( NuclearSampleGame _game )
@@ -23,31 +23,42 @@ namespace NuclearSample.GameStates
         //----------------------------------------------------------------------
         public override void Start()
         {
-            mMainMenuManager = new Menus.MainMenuManager( Game, Content );
+            MainMenuManager = new MainMenuManager( Game, Content );
             Game.IsMouseVisible = true;
+
+            Game.GraphicsDevice.DeviceReset += GraphicsDevice_DeviceReset;
 
             base.Start();
         }
 
+        //----------------------------------------------------------------------
         public override void Stop()
         {
-            mMainMenuManager = null;
+            Game.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
+
+            MainMenuManager = null;
 
             base.Stop();
+        }
+        
+        void GraphicsDevice_DeviceReset( object sender, EventArgs e )
+        {
+            MainMenuManager.MenuScreen.Resize( Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height );
+            MainMenuManager.PopupScreen.Resize( Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height );
         }
 
         //----------------------------------------------------------------------
         public override void Update( float _fElapsedTime )
         {
-            mMainMenuManager.Update( _fElapsedTime );
+            MainMenuManager.Update( _fElapsedTime );
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Game.GraphicsDevice.Clear( Color.Black );
+            Game.GraphicsDevice.Clear( new Color( 111, 125, 120 ) );
 
-            mMainMenuManager.Draw();
+            MainMenuManager.Draw();
         }
     }
 }

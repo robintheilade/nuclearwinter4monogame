@@ -199,7 +199,7 @@
   <ItemGroup>
     <EmbeddedResource Include="i18n\Common.fr.resx" />
     <EmbeddedResource Include="i18n\Common.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Common.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

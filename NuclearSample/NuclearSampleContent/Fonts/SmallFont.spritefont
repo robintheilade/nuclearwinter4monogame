@@ -53,8 +53,14 @@ with.
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>
-        <End>&#255;</End>
+        <End>&#1169;</End>
       </CharacterRegion>
+      <!-- Triple-dot (…) -->
+      <CharacterRegion>
+        <Start>&#8230;</Start>
+        <End>&#8230;</End>
+      </CharacterRegion>
+      <!-- List item bullet character (●) -->
       <CharacterRegion>
         <Start>&#9679;</Start>
         <End>&#9679;</End>

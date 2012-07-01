@@ -254,7 +254,7 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        iWidgetSize = (int)( LayoutRect.Width - Math.Floor( fOffset ) );
+                        iWidgetSize = (int)( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - Math.Floor( fOffset ) );
                     }
                     fOffset += fExpandedWidgetSize;
                 }
