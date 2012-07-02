@@ -938,21 +938,23 @@ namespace NuclearWinter.UI
                     HoveredNode.CheckBoxState = newState;
                 }
                 else
-                if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
                 {
-                    if( _bDoCollapse )
+                    if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
                     {
-                        HoveredNode.Collapsed = ! HoveredNode.Collapsed;
+                        if( _bDoCollapse )
+                        {
+                            HoveredNode.Collapsed = ! HoveredNode.Collapsed;
+                        }
+
+                        SelectedNode = null;
+                    }
+                    else
+                    {
+                        SelectedNode = HoveredNode;
                     }
 
-                    SelectedNode = null;
+                    if( SelectHandler != null ) SelectHandler( this );
                 }
-                else
-                {
-                    SelectedNode = HoveredNode;
-                }
-
-                if( SelectHandler != null ) SelectHandler( this );
             }
             else
             {
