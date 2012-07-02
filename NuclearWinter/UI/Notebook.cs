@@ -608,6 +608,7 @@ namespace NuclearWinter.UI
             if( bCtrl && _key == Keys.W && activeTab.IsClosable )
             {
                 activeTab.Close();
+                Screen.Focus( this );
 
                 if( TabClosedHandler != null )
                 {
