@@ -377,17 +377,36 @@ namespace NuclearWinter.UI
             DoScroll( -_iDelta / 120 * 50 );
         }
 
+        //----------------------------------------------------------------------
         void DoScroll( int _iDelta )
         {
             int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
             Scrollbar.Offset += iScrollChange;
         }
 
+        //----------------------------------------------------------------------
+        protected internal override void OnMouseEnter( Point _hitPoint )
+        {
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
+
+            base.OnMouseEnter( _hitPoint );
+        }
+
+        //----------------------------------------------------------------------
+        protected internal override void OnMouseOut( Point _hitPoint )
+        {
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+
+            base.OnMouseOut( _hitPoint );
+        }
+
+        //----------------------------------------------------------------------
         void SetCaretPosition( Point _hitPoint, bool _bSelect )
         {
             Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left + miGutterWidth ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
         }
 
+        //----------------------------------------------------------------------
         internal Point GetPositionForCaret( int _iOffset )
         {
             Point caretPos = GetXYForCaretOffset( _iOffset );
@@ -397,12 +416,14 @@ namespace NuclearWinter.UI
             return caretPos;
         }
 
+        //----------------------------------------------------------------------
         internal Point GetXYForCaretOffset( int _iCaretOffset )
         {
             int iLine;
             return GetXYForCaretOffset( _iCaretOffset, out iLine );
         }
 
+        //----------------------------------------------------------------------
         internal Point GetXYForCaretOffset( int _iCaretOffset, out int _iLine )
         {
             int iOffset = 0;
