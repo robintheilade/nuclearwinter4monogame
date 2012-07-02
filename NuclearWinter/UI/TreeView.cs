@@ -376,18 +376,26 @@ namespace NuclearWinter.UI
         public Texture2D            Frame;
         public int                  FrameCornerSize;
 
-        public string Text
+        public Texture2D            Icon
         {
-            get { return mLabel.Text; }
+            get { return mImage.Texture; }
             set {
-                mLabel.Text = value;
+                mImage.Texture = value;
+                mLabel.Padding = mImage.Texture != null ? new Box( 10, 10, 10, 0 ) : new Box( 10 );
             }
         }
 
+        public string Text
+        {
+            get { return mLabel.Text; }
+            set { mLabel.Text = value; }
+        }
+
         Label                       mLabel;
+        Image                       mImage;
 
         //----------------------------------------------------------------------
-        public TreeViewIndicator( Screen _screen, string _strText )
+        public TreeViewIndicator( Screen _screen, string _strText, Texture2D _iconTex=null )
         : base( _screen )
         {
             mLabel = new Label( Screen, _strText );
@@ -395,20 +403,30 @@ namespace NuclearWinter.UI
             mLabel.Padding = new Box(5);
             mLabel.Parent = this;
 
+            mImage = new Image( _screen, _iconTex );
+            mImage.Padding = new Box( 0, 0, 0, 10 );
+
             UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
-            ContentWidth = mLabel.ContentWidth;
+            ContentWidth = ( mImage.Texture != null ? mImage.ContentWidth : 0 ) + ( mLabel.Text != "" ? mLabel.ContentWidth : 0 );
         }
 
         protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
-            mLabel.DoLayout( LayoutRect );
+            int iLabelX = 0;
+            if( mImage.Texture != null )
+            {
+                mImage.DoLayout( new Rectangle( _rect.X, _rect.Y, mImage.ContentWidth, _rect.Height ) );
+                iLabelX += mImage.ContentWidth;
+            }
+
+            mLabel.DoLayout( new Rectangle( _rect.X + iLabelX, _rect.Y, _rect.Width - iLabelX, _rect.Height ) );
         }
 
         //----------------------------------------------------------------------
@@ -417,6 +435,11 @@ namespace NuclearWinter.UI
             if( Frame != null )
             {
                 Screen.DrawBox( Frame, LayoutRect, FrameCornerSize, Color.White );
+            }
+
+            if( mImage.Texture != null )
+            {
+                mImage.Draw();
             }
 
             mLabel.Draw();
