@@ -841,7 +841,8 @@ namespace NuclearWinter.UI
             // NOTE: For this to work, you must put [STAThread] before your Main()
 
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
-            string strPastedText = (string)System.Windows.Forms.Clipboard.GetText(); // System.Windows.Forms.TextDataFormat.Html );
+            // GetText( System.Windows.Forms.TextDataFormat.Html );
+            string strPastedText = (string)System.Windows.Forms.Clipboard.GetText().Replace( "\r\n", "\n" );
             if( strPastedText != null )
             {
                 DeleteSelectedText();
