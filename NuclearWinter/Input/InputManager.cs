@@ -100,6 +100,17 @@ namespace NuclearWinter.Input
             {
                 PreviousMouseState = MouseState;
             }
+            else
+            {
+                PreviousMouseState = new MouseState(
+                    PreviousMouseState.X, PreviousMouseState.Y, // Keep old mouse position
+                    MouseState.ScrollWheelValue,
+                    MouseState.LeftButton,
+                    MouseState.MiddleButton,
+                    MouseState.RightButton,
+                    MouseState.XButton1,
+                    MouseState.XButton2 );
+            }
 
             MouseState = Mouse.GetState();
 
@@ -249,6 +260,10 @@ namespace NuclearWinter.Input
                     return MouseState.XButton1      == ButtonState.Pressed;
                 case 4:
                     return MouseState.XButton2      == ButtonState.Pressed;
+                case 5:
+                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) > 0;
+                case 6:
+                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) < 0;
                 default:
                     return false;
             }
@@ -269,6 +284,10 @@ namespace NuclearWinter.Input
                     return MouseState.XButton1      == ButtonState.Pressed && PreviousMouseState.XButton1       == ButtonState.Released;
                 case 4:
                     return MouseState.XButton2      == ButtonState.Pressed && PreviousMouseState.XButton2       == ButtonState.Released;
+                case 5:
+                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) > 0;
+                case 6:
+                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) < 0;
                 default:
                     return false;
             }
