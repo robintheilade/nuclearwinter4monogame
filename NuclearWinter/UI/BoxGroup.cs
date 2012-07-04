@@ -36,6 +36,7 @@ namespace NuclearWinter.UI
         public void AddChild( Widget _widget, int _iIndex, bool _bExpand )
         {
             Debug.Assert( _widget.Parent == null );
+            Debug.Assert( _widget.Screen == Screen );
 
             _widget.Parent = this;
             mlExpandedChildren.Insert( _iIndex, _bExpand );

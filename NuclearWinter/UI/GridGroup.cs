@@ -39,6 +39,7 @@ namespace NuclearWinter.UI
         {
             Debug.Assert( ! maWidgetLocations.ContainsKey( _child ) );
             Debug.Assert( _child.Parent == null );
+            Debug.Assert( _child.Screen == Screen );
 
             _child.Parent = this;
 
