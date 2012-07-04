@@ -278,7 +278,7 @@ namespace NuclearWinter.UI
             get {
                 if( mlWrappedLines == null )
                 {
-                    DoWrap( LayoutRect.Width - Padding.Horizontal );
+                    DoWrap( LayoutRect.Width - Padding.Horizontal - ( DisplayLineNumbers ? miGutterWidth : 0 ) );
                 }
                 return mlWrappedLines; 
             }
@@ -338,7 +338,7 @@ namespace NuclearWinter.UI
 
             if( mbWrapTextNeeded || ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height ) )
             {
-                DoWrap( LayoutRect.Width - Padding.Horizontal );
+                DoWrap( LayoutRect.Width - Padding.Horizontal - ( DisplayLineNumbers ? miGutterWidth : 0 ) );
             }
 
             ContentHeight = Padding.Vertical + LineHeight * WrappedLines.Count + LineHeight / 2;
