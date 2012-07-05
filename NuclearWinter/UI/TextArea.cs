@@ -670,24 +670,59 @@ namespace NuclearWinter.UI
                 case System.Windows.Forms.Keys.Tab:
                     if( ! IsReadOnly )
                     {
-                        int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
-
-                        int iDistance = 0;
-                        if( iLastLineBreak != -1 )
+                        if( Caret.HasSelection )
                         {
-                            iDistance = Caret.StartOffset - iLastLineBreak - 1;
+                            bool bWasForwardSelection = Caret.HasForwardSelection;
+                            int iStartOffset = bWasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
+                            int iEndOffset = bWasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
+
+                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, iStartOffset - 1 ) );
+
+                            string strTab = new String( ' ', TabSpaces );
+
+                            do
+                            {
+                                if( TextInsertedHandler == null || TextInsertedHandler( this, iLastLineBreak + 1, strTab ) )
+                                {
+                                    Text = Text.Insert( iLastLineBreak + 1, strTab );
+
+                                    if( iLastLineBreak + 1 <= iStartOffset )
+                                    {
+                                        Caret.StartOffset += strTab.Length;
+                                    }
+
+                                    iLastLineBreak += strTab.Length;
+                                    iEndOffset += strTab.Length;
+                                }
+
+                                iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
+                            }
+                            while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
+
+                            Caret.StartOffset = bWasForwardSelection ? iStartOffset : iEndOffset;
+                            Caret.EndOffset = bWasForwardSelection ? iEndOffset : iStartOffset;
                         }
-
-                        int iSpaces = TabSpaces - (iDistance % TabSpaces);
-                        if( iSpaces == 0 ) iSpaces = TabSpaces;
-
-                        string strTab = new String( ' ', iSpaces );
-
-                        if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strTab ) )
+                        else
                         {
-                            Text = Text.Insert( Caret.StartOffset, strTab );
-                            Caret.StartOffset += strTab.Length;
-                            mbScrollToCaret = true;
+                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
+
+                            int iDistance = 0;
+                            if( iLastLineBreak != -1 )
+                            {
+                                iDistance = Caret.StartOffset - iLastLineBreak - 1;
+                            }
+
+                            int iSpaces = TabSpaces - (iDistance % TabSpaces);
+                            if( iSpaces == 0 ) iSpaces = TabSpaces;
+
+                            string strTab = new String( ' ', iSpaces );
+
+                            if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strTab ) )
+                            {
+                                Text = Text.Insert( Caret.StartOffset, strTab );
+                                Caret.StartOffset += strTab.Length;
+                                mbScrollToCaret = true;
+                            }
                         }
                     }
                     break;
