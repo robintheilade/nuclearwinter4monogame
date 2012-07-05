@@ -88,8 +88,12 @@ namespace NuclearWinter.UI
             mbIsPressed = true;
             mTooltip.DisplayNow();
 
-            int handleSize = LayoutRect.Height;
-            Value = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - LayoutRect.X - handleSize / 4 ) / ( LayoutRect.Width - handleSize ) );
+            int iWidth = LayoutRect.Width - Screen.Style.SliderHandleSize;
+            int iX = _hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
+            float fProgress = (float)iX / iWidth;
+
+            Value = MinValue + (int)Math.Floor( fProgress * ( MaxValue - MinValue ) / Step + 0.5f ) * Step;
+
             if( ChangeHandler != null ) ChangeHandler();
         }
 
@@ -97,11 +101,13 @@ namespace NuclearWinter.UI
         {
             if( mbIsPressed )
             {
-                int handleSize = LayoutRect.Height;
+                int iWidth = LayoutRect.Width - Screen.Style.SliderHandleSize;
+                int iX = _hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
+                float fProgress = (float)iX / iWidth;
 
-                int iValue = MinValue + (int)( ( MaxValue - MinValue ) * ( _hitPoint.X - LayoutRect.X - handleSize / 4 ) / ( LayoutRect.Width - handleSize ) );
+                int iValue = MinValue + (int)Math.Floor( fProgress * ( MaxValue - MinValue ) / Step + 0.5f ) * Step;
 
-                if( iValue != miValue ) 
+                if( iValue != miValue )
                 {
                     Value = iValue;
                     if( ChangeHandler != null ) ChangeHandler();
