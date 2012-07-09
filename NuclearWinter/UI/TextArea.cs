@@ -685,36 +685,61 @@ namespace NuclearWinter.UI
 
                             int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, iStartOffset - 1 ) );
 
-                            string strTab = new String( ' ', TabSpaces );
-
-                            do
+                            if( ! bShift )
                             {
-                                if( TextInsertedHandler == null || TextInsertedHandler( this, iLastLineBreak + 1, strTab ) )
-                                {
-                                    Text = Text.Insert( iLastLineBreak + 1, strTab );
+                                string strTab = new String( ' ', TabSpaces );
 
-                                    if( iLastLineBreak + 1 <= iStartOffset )
+                                do
+                                {
+                                    if( TextInsertedHandler == null || TextInsertedHandler( this, iLastLineBreak + 1, strTab ) )
                                     {
-                                        Caret.StartOffset += strTab.Length;
+                                        Text = Text.Insert( iLastLineBreak + 1, strTab );
+
+                                        if( iLastLineBreak + 1 <= iStartOffset )
+                                        {
+                                            iStartOffset += strTab.Length;
+                                        }
+
+                                        iEndOffset += strTab.Length;
                                     }
 
-                                    iLastLineBreak += strTab.Length;
-                                    iEndOffset += strTab.Length;
+                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
                                 }
-
-                                iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
+                                while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
                             }
-                            while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
+                            else
+                            {
+                                do
+                                {
+                                    int iSpaces = 0;
+                                    while( iLastLineBreak + 1 + iSpaces < Text.Length && iSpaces < TabSpaces && Text[ iLastLineBreak + 1 + iSpaces ] == ' ' ) iSpaces++;
+
+                                    if( TextRemovedHandler == null || TextRemovedHandler( this, iLastLineBreak + 1, iLastLineBreak + 1 + iSpaces ) )
+                                    {
+                                        Text = Text.Remove( iLastLineBreak + 1, iSpaces );
+
+                                        if( iLastLineBreak + 1 <= iStartOffset )
+                                        {
+                                            iStartOffset = Math.Max( iLastLineBreak + 1, iStartOffset - iSpaces );
+                                        }
+
+                                        iEndOffset -= iSpaces;
+                                    }
+
+                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
+                                }
+                                while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
+                            }
 
                             Caret.StartOffset = bWasForwardSelection ? iStartOffset : iEndOffset;
                             Caret.EndOffset = bWasForwardSelection ? iEndOffset : iStartOffset;
                         }
                         else
                         {
+                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
+
                             if( ! bShift )
                             {
-                                int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
-
                                 int iDistance = 0;
                                 if( iLastLineBreak != -1 )
                                 {
@@ -736,8 +761,6 @@ namespace NuclearWinter.UI
                             else
                             if( Caret.StartOffset > 0 )
                             {
-                                int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
-
                                 int iStartIndex = Caret.StartOffset - iLastLineBreak - 1;
 
                                 int iSpacesToNearestTabStop = ( iStartIndex % TabSpaces );
