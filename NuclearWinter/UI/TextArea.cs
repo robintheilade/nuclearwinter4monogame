@@ -625,7 +625,7 @@ namespace NuclearWinter.UI
                     {
                         int iLineStartIndex = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) ) + 1;
                         int iSpaces = 0;
-                        while( Text[ iLineStartIndex + iSpaces ] == ' ' ) iSpaces++;
+                        while( iLineStartIndex + iSpaces < Text.Length && Text[ iLineStartIndex + iSpaces ] == ' ' ) iSpaces++;
 
                         string strNewLine = "\n" + new String( ' ', iSpaces );
 
