@@ -622,10 +622,16 @@ namespace NuclearWinter.UI
                 case System.Windows.Forms.Keys.Enter:
                     if( ! IsReadOnly )
                     {
-                        if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, "\n" ) )
+                        int iLineStartIndex = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) ) + 1;
+                        int iSpaces = 0;
+                        while( Text[ iLineStartIndex + iSpaces ] == ' ' ) iSpaces++;
+
+                        string strNewLine = "\n" + new String( ' ', iSpaces );
+
+                        if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strNewLine  ) )
                         {
-                            Text = Text.Insert( Caret.StartOffset, "\n" );
-                            Caret.StartOffset++;
+                            Text = Text.Insert( Caret.StartOffset, strNewLine );
+                            Caret.StartOffset += strNewLine.Length;
                             mbScrollToCaret = true;
                         }
                     }
