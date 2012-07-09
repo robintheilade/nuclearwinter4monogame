@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
@@ -710,24 +711,47 @@ namespace NuclearWinter.UI
                         }
                         else
                         {
-                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
-
-                            int iDistance = 0;
-                            if( iLastLineBreak != -1 )
+                            if( ! bShift )
                             {
-                                iDistance = Caret.StartOffset - iLastLineBreak - 1;
+                                int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
+
+                                int iDistance = 0;
+                                if( iLastLineBreak != -1 )
+                                {
+                                    iDistance = Caret.StartOffset - iLastLineBreak - 1;
+                                }
+
+                                int iSpaces = TabSpaces - (iDistance % TabSpaces);
+                                if( iSpaces == 0 ) iSpaces = TabSpaces;
+
+                                string strTab = new String( ' ', iSpaces );
+
+                                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strTab ) )
+                                {
+                                    Text = Text.Insert( Caret.StartOffset, strTab );
+                                    Caret.StartOffset += strTab.Length;
+                                    mbScrollToCaret = true;
+                                }
                             }
-
-                            int iSpaces = TabSpaces - (iDistance % TabSpaces);
-                            if( iSpaces == 0 ) iSpaces = TabSpaces;
-
-                            string strTab = new String( ' ', iSpaces );
-
-                            if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strTab ) )
+                            else
+                            if( Caret.StartOffset > 0 )
                             {
-                                Text = Text.Insert( Caret.StartOffset, strTab );
-                                Caret.StartOffset += strTab.Length;
-                                mbScrollToCaret = true;
+                                int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
+
+                                int iStartIndex = Caret.StartOffset - iLastLineBreak - 1;
+
+                                int iSpacesToNearestTabStop = ( iStartIndex % TabSpaces );
+                                if( iSpacesToNearestTabStop == 0 ) iSpacesToNearestTabStop = TabSpaces;
+
+                                int iSpaces = 0;
+                                while( iLastLineBreak + iStartIndex - iSpaces >= 0 && iSpaces < iSpacesToNearestTabStop && Text[ iLastLineBreak + iStartIndex - iSpaces ] == ' ' ) iSpaces++;
+
+                                if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartOffset - iSpaces, Caret.StartOffset ) )
+                                {
+                                    Text = Text.Remove( Caret.StartOffset - iSpaces, iSpaces );
+                                    Caret.StartOffset -= iSpaces;
+                                    mbScrollToCaret = true;
+                                }
                             }
                         }
                     }
