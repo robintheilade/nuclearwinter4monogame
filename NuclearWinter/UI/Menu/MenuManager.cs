@@ -100,6 +100,7 @@ namespace NuclearWinter.UI
             {
                 PopupScreen.Root.AddChild( mPopupFade );
                 PopupScreen.Root.AddChild( PopupStack.Peek().Panel );
+                PopupScreen.Focus( PopupStack.Peek().Panel );
             }
         }
     }
