@@ -208,7 +208,7 @@ namespace NuclearWinter.UI
         public void PasteFromClipboard()
         {
             // NOTE: For this to work, you must put [STAThread] before your Main()
-            string strPastedText = (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName );
+            string strPastedText = ( (string)System.Windows.Forms.Clipboard.GetData( typeof(string).FullName ) ).Replace( "\r\n", " " ).Replace( "\n", " " ); 
             if( strPastedText != null )
             {
                 DeleteSelectedText();
