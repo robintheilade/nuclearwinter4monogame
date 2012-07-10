@@ -543,6 +543,7 @@ namespace NuclearWinter.UI
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
             // GetText( System.Windows.Forms.TextDataFormat.Html );
             string strPastedText = (string)System.Windows.Forms.Clipboard.GetText().Replace( "\r\n", "\n" );
+            strPastedText = strPastedText.Replace( "\t", new String( ' ', TabSpaces ) );
             if( strPastedText != null )
             {
                 DeleteSelectedText();
