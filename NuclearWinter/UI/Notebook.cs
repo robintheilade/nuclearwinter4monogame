@@ -197,32 +197,53 @@ namespace NuclearWinter.UI
 
         protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
-
-            Screen.Focus( this );
-
-            if( IsClosable )
+            if( _iButton == Screen.Game.InputMgr.PrimaryMouseButton )
             {
-                mNotebook.DraggedTab = this;
-                DragOffset = _hitPoint.X - LayoutRect.X;
+                Screen.Focus( this );
+
+                if( IsClosable )
+                {
+                    mNotebook.DraggedTab = this;
+                    DragOffset = _hitPoint.X - LayoutRect.X;
+                }
+            }
+            else
+            if( _iButton == 1 )
+            {
+                Screen.Focus( this );
             }
         }
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
-
-            if( mNotebook.DraggedTab == this )
+            if( _iButton == Screen.Game.InputMgr.PrimaryMouseButton ) 
             {
-                mNotebook.DropTab();
-                DragOffset = 0;
-            }
-
-            if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.TabHeight /* && IsInTab */ )
-            {
-                if( _hitPoint.X > LayoutRect.X && _hitPoint.X < LayoutRect.Right )
+                if( mNotebook.DraggedTab == this )
                 {
-                    OnActivateUp();
+                    mNotebook.DropTab();
+                    DragOffset = 0;
+                }
+
+                if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.TabHeight /* && IsInTab */ )
+                {
+                    if( _hitPoint.X > LayoutRect.X && _hitPoint.X < LayoutRect.Right )
+                    {
+                        OnActivateUp();
+                    }
+                }
+            }
+            else
+            if( _iButton == 1 )
+            {
+                if( IsClosable && HitBox.Contains( _hitPoint ) )
+                {
+                    Close();
+                    Screen.Focus( mNotebook );
+
+                    if( mNotebook.TabClosedHandler != null )
+                    {
+                        mNotebook.TabClosedHandler( this );
+                    }
                 }
             }
         }
