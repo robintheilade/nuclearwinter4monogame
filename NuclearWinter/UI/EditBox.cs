@@ -251,6 +251,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseEnter( Point _hitPoint )
         {
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
@@ -266,6 +267,7 @@ namespace NuclearWinter.UI
 
         protected internal override void OnMouseOut( Point _hitPoint )
         {
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;
         }
