@@ -200,8 +200,8 @@ namespace NuclearWinter.UI
 
             foreach( TreeViewIndicator indicator in Indicators )
             {
-                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 10;
-                indicator.DoLayout( new Rectangle( LayoutRect.Right - miIndicatorAndActionButtonsWidth, LayoutRect.Y + 10, indicator.ContentWidth, mTreeView.NodeHeight - 20 ) );
+                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 5;
+                indicator.DoLayout( new Rectangle( LayoutRect.Right - miIndicatorAndActionButtonsWidth - 5, LayoutRect.Y + 10, indicator.ContentWidth, mTreeView.NodeHeight - 20 ) );
             }
 
             // Child nodes
@@ -376,35 +376,50 @@ namespace NuclearWinter.UI
         public Texture2D            Frame;
         public int                  FrameCornerSize;
 
+        public object               Tag;
+
         public Texture2D            Icon
         {
             get { return mImage.Texture; }
             set {
                 mImage.Texture = value;
-                mLabel.Padding = mImage.Texture != null ? new Box( 10, 10, 10, 0 ) : new Box( 10 );
+                UpdatePaddings();
             }
         }
 
         public string Text
         {
             get { return mLabel.Text; }
-            set { mLabel.Text = value; }
+            set {
+                mLabel.Text = value;
+                UpdatePaddings();
+            }
         }
 
         Label                       mLabel;
         Image                       mImage;
 
+        void UpdatePaddings()
+        {
+            mImage.Padding = mLabel.Text != "" ? new Box( 0, 0, 0, 10 ) : new Box(0);
+            mLabel.Padding = mImage.Texture != null ? new Box( 5, 5, 5, 0 ) : new Box( 5 );
+
+            UpdateContentSize();
+        }
+
         //----------------------------------------------------------------------
-        public TreeViewIndicator( Screen _screen, string _strText, Texture2D _iconTex=null )
+        public TreeViewIndicator( Screen _screen, string _strText, Texture2D _iconTex=null, object _tag=null )
         : base( _screen )
         {
             mLabel = new Label( Screen, _strText );
             mLabel.Font = Screen.Style.SmallFont;
-            mLabel.Padding = new Box(5);
             mLabel.Parent = this;
 
             mImage = new Image( _screen, _iconTex );
-            mImage.Padding = new Box( 0, 0, 0, 10 );
+
+            UpdatePaddings();
+
+            Tag = _tag;
 
             UpdateContentSize();
         }
