@@ -353,8 +353,11 @@ namespace NuclearWinter.UI
         {
             if( IsOpen )
             {
-                SelectedItemIndex = miHoveredItemIndex;
-                if( ChangeHandler != null ) ChangeHandler( this );
+                if( miHoveredItemIndex != -1 )
+                {
+                    SelectedItemIndex = miHoveredItemIndex;
+                    if( ChangeHandler != null ) ChangeHandler( this );
+                }
 
                 mPressedAnim.SetTime( 1f );
                 IsOpen = false;
