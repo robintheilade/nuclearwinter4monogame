@@ -37,6 +37,13 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             mLabel = new Label( Screen, _strText, Anchor.Start );
+
+            UpdateContentSize();
+        }
+
+        protected internal override void UpdateContentSize()
+        {
+            ContentWidth = LayoutRect.Height + mLabel.ContentWidth;
         }
 
         protected internal override void DoLayout( Rectangle _rect )
@@ -47,6 +54,8 @@ namespace NuclearWinter.UI
             mLabel.DoLayout( new Rectangle( LayoutRect.X + LayoutRect.Height, LayoutRect.Y, LayoutRect.Width - LayoutRect.Height, LayoutRect.Height ) );
             
             HitBox = LayoutRect;
+
+            UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -79,7 +88,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, mCheckBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, mCheckBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
             }
 
             Texture2D tex;
