@@ -37,6 +37,13 @@ namespace NuclearWinter.UI
         Fill
     }
 
+    public static class TextManipulation
+    {
+        // Used for detecting word boundaries
+        public static string WordBoundaries = @",?.;:/\!$(){}[]@=+-*%^`""'~#";
+        //public static char[] WordBoundaries = { ',', '?', '.', ';', ':', '/', '\\', '!', '$', '(', ')', '{', '}', '[', ']', '@', '=', '+', '-', '*', '%', '^', '`', '"', '\'', '~', '#' };
+    }
+
     //--------------------------------------------------------------------------
     // SpriteFont decorator with support for custom vertical offset / line spacing
     // and implicit casting
