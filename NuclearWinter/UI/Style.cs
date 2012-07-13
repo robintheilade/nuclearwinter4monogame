@@ -101,11 +101,13 @@ namespace NuclearWinter.UI
         public Texture2D        TreeViewLine;
 
         public Texture2D        TreeViewCheckBoxFrame;
-        public Texture2D        TreeViewCheckBoxFrameHover;
-        public int              TreeViewCheckBoxFrameCornerSize = 15;
-        public Texture2D        TreeViewCheckBoxChecked;
-        public Texture2D        TreeViewCheckBoxUnchecked;
-        public Texture2D        TreeViewCheckBoxInconsistent;
+        public Texture2D        CheckBoxChecked;
+        public Texture2D        CheckBoxUnchecked;
+        public Texture2D        CheckBoxInconsistent;
+
+        public Texture2D        CheckBoxFrame;
+        public Texture2D        CheckBoxFrameHover;
+        public int              CheckBoxFrameCornerSize = 15;
 
         public Texture2D        VerticalScrollbar;
         public int              VerticalScrollbarCornerSize = 10;

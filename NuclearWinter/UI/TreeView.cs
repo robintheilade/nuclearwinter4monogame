@@ -273,11 +273,11 @@ namespace NuclearWinter.UI
             {
                 Rectangle checkBoxRect = new Rectangle( nodeRect.X + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0 ), nodeRect.Y, nodeRect.Height, nodeRect.Height );
 
-                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.CheckBoxFrameCornerSize, Color.White );
 
                 if( mTreeView.HoveredNode == this && mTreeView.IsHoveringNodeCheckBox() && ! mTreeView.IsDragging )
                 {
-                    Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Screen.DrawBox( Screen.Style.CheckBoxFrameHover, checkBoxRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
                 }
 
                 Texture2D tex;
@@ -285,13 +285,13 @@ namespace NuclearWinter.UI
                 switch( CheckBoxState )
                 {
                     case UI.CheckBoxState.Checked:
-                        tex = Screen.Style.TreeViewCheckBoxChecked;
+                        tex = Screen.Style.CheckBoxChecked;
                         break;
                     case UI.CheckBoxState.Unchecked:
-                        tex = Screen.Style.TreeViewCheckBoxUnchecked;
+                        tex = Screen.Style.CheckBoxUnchecked;
                         break;
                     case UI.CheckBoxState.Inconsistent:
-                        tex = Screen.Style.TreeViewCheckBoxInconsistent;
+                        tex = Screen.Style.CheckBoxInconsistent;
                         break;
                     default:
                         throw new NotSupportedException();

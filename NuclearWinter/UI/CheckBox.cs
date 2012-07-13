@@ -26,7 +26,11 @@ namespace NuclearWinter.UI
         }
 
         public CheckBoxState    CheckState;
+        public Action<CheckBox,CheckBoxState> ChangeHandler;
 
+        public Texture2D        Frame;
+        public int              FrameCornerSize;
+        
         //----------------------------------------------------------------------
         Label                   mLabel;
         bool                    mbIsHovered;
@@ -36,6 +40,9 @@ namespace NuclearWinter.UI
         public CheckBox( Screen _screen, string _strText )
         : base( _screen )
         {
+            Frame = Screen.Style.CheckBoxFrame;
+            FrameCornerSize = Screen.Style.CheckBoxFrameCornerSize;
+
             mLabel = new Label( Screen, _strText, Anchor.Start );
 
             UpdateContentSize();
@@ -75,8 +82,7 @@ namespace NuclearWinter.UI
             if( mbIsHovered )
             {
                 CheckBoxState newState = ( CheckState == CheckBoxState.Checked ) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
-                //CheckStateChangedHandler( newState );
-
+                if( ChangeHandler != null ) ChangeHandler( this, newState );
                 CheckState = newState;
             }
         }
@@ -84,11 +90,11 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void Draw()
         {
-            Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, mCheckBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
+            Screen.DrawBox( Frame, mCheckBoxRect, FrameCornerSize, Color.White );
 
             if( mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrameHover, mCheckBoxRect, Screen.Style.TreeViewCheckBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.CheckBoxFrameHover, mCheckBoxRect, FrameCornerSize, Color.White );
             }
 
             Texture2D tex;
@@ -96,13 +102,13 @@ namespace NuclearWinter.UI
             switch( CheckState )
             {
                 case UI.CheckBoxState.Checked:
-                    tex = Screen.Style.TreeViewCheckBoxChecked;
+                    tex = Screen.Style.CheckBoxChecked;
                     break;
                 case UI.CheckBoxState.Unchecked:
-                    tex = Screen.Style.TreeViewCheckBoxUnchecked;
+                    tex = Screen.Style.CheckBoxUnchecked;
                     break;
                 case UI.CheckBoxState.Inconsistent:
-                    tex = Screen.Style.TreeViewCheckBoxInconsistent;
+                    tex = Screen.Style.CheckBoxInconsistent;
                     break;
                 default:
                     throw new NotSupportedException();
