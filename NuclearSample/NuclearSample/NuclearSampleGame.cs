@@ -153,9 +153,10 @@ namespace NuclearSample
             UIStyle.TreeViewBranchLast          = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranchLast" );
             UIStyle.TreeViewLine                = Content.Load<Texture2D>( "Sprites/UI/TreeViewLine" );
             UIStyle.TreeViewCheckBoxFrame       = Content.Load<Texture2D>( "Sprites/UI/TreeViewCheckBoxFrame" );
-            UIStyle.TreeViewCheckBoxFrameHover  = Content.Load<Texture2D>( "Sprites/UI/TreeViewCheckBoxFrameHover" );
-            UIStyle.TreeViewCheckBoxChecked     = Content.Load<Texture2D>( "Sprites/UI/Checked" );
-            UIStyle.TreeViewCheckBoxUnchecked   = Content.Load<Texture2D>( "Sprites/UI/Unchecked" );
+
+            UIStyle.CheckBoxFrameHover          = Content.Load<Texture2D>( "Sprites/UI/CheckBoxFrameHover" );
+            UIStyle.CheckBoxChecked             = Content.Load<Texture2D>( "Sprites/UI/Checked" );
+            UIStyle.CheckBoxUnchecked           = Content.Load<Texture2D>( "Sprites/UI/Unchecked" );
 
             UIStyle.VerticalScrollbar           = Content.Load<Texture2D>( "Sprites/UI/VerticalScrollbar" );
             UIStyle.VerticalScrollbarCornerSize = 5;

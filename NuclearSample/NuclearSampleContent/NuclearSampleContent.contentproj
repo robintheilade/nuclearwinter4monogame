@@ -291,8 +291,8 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\UI\TreeViewCheckBoxFrameHover.png">
-      <Name>TreeViewCheckBoxFrameHover</Name>
+    <Compile Include="Sprites\UI\CheckBoxFrameHover.png">
+      <Name>CheckBoxFrameHover</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
