@@ -58,7 +58,7 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Input
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         public Input.InputManager                   InputMgr                { get; private set; }
 #endif
 
@@ -151,7 +151,11 @@ namespace NuclearWinter
         /// </summary>
         public void SetWindowTitle( string _strTitle )
         {
+#if !MONOGAME
             SetWindowTextW( Window.Handle, _strTitle );
+#else
+            Window.Title = _strTitle;
+#endif
         }
 
         //----------------------------------------------------------------------
@@ -278,6 +282,7 @@ namespace NuclearWinter
 #endif
 
         //----------------------------------------------------------------------
+#if WINDOWS_PHONE
         protected override void OnActivated(object sender, EventArgs args)
         {
             base.OnActivated(sender, args);
@@ -287,15 +292,18 @@ namespace NuclearWinter
                 GameStateMgr.CurrentState.OnActivated();
             }
         }
+#endif
 
         //----------------------------------------------------------------------
         protected override void OnExiting(object sender, EventArgs args)
         {
+#if WINDOWS || XBOX
             if( NuclearSaveHandler != null )
             {
                 NuclearSaveHandler.SaveGameSettings();
                 NuclearSaveHandler.SaveGameData();
             }
+#endif
 
             if( GameStateMgr != null && GameStateMgr.CurrentState != null )
             {

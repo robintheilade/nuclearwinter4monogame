@@ -152,7 +152,7 @@ namespace NuclearWinter.UI
 
             }
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
             //------------------------------------------------------------------
             // Mouse buttons
             bool bHasMouseEvent = false;

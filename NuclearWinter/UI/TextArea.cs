@@ -388,7 +388,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseEnter( Point _hitPoint )
         {
+#if !MONOGAME
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
+#endif
 
             base.OnMouseEnter( _hitPoint );
         }
@@ -396,7 +398,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseOut( Point _hitPoint )
         {
+#if !MONOGAME
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
 
             base.OnMouseOut( _hitPoint );
         }

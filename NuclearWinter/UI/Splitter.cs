@@ -309,11 +309,15 @@ namespace NuclearWinter.UI
             {
                 case Direction.Left:
                 case Direction.Right:
+#if !MONOGAME
                     Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeWE;
+#endif
                     break;
                 case Direction.Up:
                 case Direction.Down:
+#if !MONOGAME
                     Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeNS;
+#endif
                     break;
             }
         }
@@ -321,7 +325,9 @@ namespace NuclearWinter.UI
         protected internal override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
+#if !MONOGAME
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
         }
 
         protected internal override void OnMouseMove( Point _hitPoint )

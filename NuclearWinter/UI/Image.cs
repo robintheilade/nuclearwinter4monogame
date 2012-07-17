@@ -73,7 +73,9 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
+#if !MONOGAME
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
+#endif
             }
 
             if( MouseEnterHandler != null ) MouseEnterHandler( this );
@@ -83,7 +85,9 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
+#if !MONOGAME
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
             }
 
             if( MouseOutHandler != null ) MouseOutHandler( this );
