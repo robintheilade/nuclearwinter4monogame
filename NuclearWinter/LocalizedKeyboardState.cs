@@ -1,4 +1,4 @@
-﻿#if WINDOWS
+﻿#if WINDOWS || LINUX || MACOSX
 // Based on http://www.luminance.org/gruedorf/2009/08/14/supporting-alternate-keyboard-layouts-in-xna-games
 
 using System;
@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 namespace NuclearWinter
 {
     public struct LocalizedKeyboardState {
+#if WINDOWS
         internal enum MAPVK : uint {
             VK_TO_VSC = 0,
             VSC_TO_VK = 1,
@@ -57,6 +58,7 @@ namespace NuclearWinter
                 }
             }
         }
+#endif
 
         public readonly KeyboardState Native;
 
@@ -90,22 +92,30 @@ namespace NuclearWinter
         //  for that key on the user's keyboard ('O' in dvorak, for example)
         public static Keys USEnglishToLocal( Keys _key )
         {
+#if WINDOWS
             if( _key > Keys.Z ) return _key;
 
             var activeScanCode = MapVirtualKeyEx((uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
             var nativeVirtualCode = MapVirtualKeyEx(activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle);
 
             return (Keys)nativeVirtualCode;
+#else
+            return _key;
+#endif
         }
 
         public static Keys LocalToUSEnglish( Keys _key )
         {
+#if WINDOWS
             if( _key > Keys.Z ) return _key;
 
             var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
             var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
 
             return (Keys)nativeVirtualCode;
+#else
+            return _key;
+#endif
         }
     }
 }

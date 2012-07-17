@@ -196,8 +196,6 @@ namespace NuclearWinter.UI
             }
 
             // Indicators
-            int iIndicatorX = LayoutRect.Right;
-
             foreach( TreeViewIndicator indicator in Indicators )
             {
                 miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 5;
@@ -345,8 +343,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         internal void DrawNode( Point _position, int _iRight )
         {
-            Rectangle nodeRect = new Rectangle( _position.X, _position.Y, LayoutRect.Width, mTreeView.NodeHeight );
-
             int iLabelX = 0;
             if( Children.Count > 0 || DisplayAsContainer )
             {

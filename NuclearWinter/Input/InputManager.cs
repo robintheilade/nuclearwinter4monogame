@@ -19,7 +19,7 @@ namespace NuclearWinter.Input
         public readonly GamePadState[]              GamePadStates;
         public readonly GamePadState[]              PreviousGamePadStates;
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
         public MouseState                           MouseState              { get; private set; }
         public MouseState                           PreviousMouseState      { get; private set; }
 
@@ -69,7 +69,7 @@ namespace NuclearWinter.Input
 
             lButtons                = Utils.GetValues<Buttons>();
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
             EnteredText             = new List<char>();
             JustPressedKeys         = new List<Keys>();
             JustPressedWindowsKeys  = new List<System.Windows.Forms.Keys>();
@@ -95,7 +95,7 @@ namespace NuclearWinter.Input
                 GamePadStates[ i ] = GamePad.GetState( (PlayerIndex)i );
             }
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
             if( ! IsMouseCaptured )
             {
                 PreviousMouseState = MouseState;
@@ -188,7 +188,7 @@ namespace NuclearWinter.Input
                             break;
                     }
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                     if( ! bButtonPressed )
                     {
                         Keys key = GetKeyboardMapping( button );
@@ -208,7 +208,7 @@ namespace NuclearWinter.Input
                 {
                     bool bIsButtonStillDown = GamePadStates[ iGamePad ].IsButtonDown( maLastPressedButtons[ iGamePad ] );
 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                     if( ! bIsButtonStillDown )
                     {
                         Keys key = GetKeyboardMapping( maLastPressedButtons[iGamePad] );
@@ -244,7 +244,7 @@ namespace NuclearWinter.Input
 
         }
         
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
         //----------------------------------------------------------------------
         public bool IsMouseButtonDown( int _iButton )
         {
@@ -417,7 +417,7 @@ namespace NuclearWinter.Input
                     bButtonPressed = ( mabRepeatButtons[ (int)_playerIndex ] && _button == maLastPressedButtons[ (int)_playerIndex ] );
                 }
                 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                 //--------------------------------------------------------------
                 // Keyboard controls
                 Keys key = GetKeyboardMapping( _button );
@@ -493,7 +493,7 @@ namespace NuclearWinter.Input
                         break;
                 }
                 
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                 //--------------------------------------------------------------
                 // Keyboard controls
                 Keys key = GetKeyboardMapping( _button );

@@ -16,7 +16,7 @@ namespace NuclearWinter.Storage
         public readonly UInt32                                  SettingsMagicNumber     = 0xffffffff;
         protected Dictionary<UInt32,Action<BinaryReader>>       ReadSettingsActions;
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         public readonly UInt32                                  DataMagicNumber         = 0xffffffff;
         protected Dictionary<UInt32,Action<BinaryReader>>       ReadDataActions;
 
@@ -25,7 +25,7 @@ namespace NuclearWinter.Storage
 
         //----------------------------------------------------------------------
         protected abstract void WriteSettings( BinaryWriter _output );
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         protected abstract void WriteData( BinaryWriter _output );
 #endif
 
@@ -53,7 +53,7 @@ namespace NuclearWinter.Storage
         {
             try
             {
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                 using( var store = IsolatedStorageFile.GetUserStoreForDomain() )
 #else
                 using( var store = IsolatedStorageFile.GetUserStoreForApplication() )
@@ -94,7 +94,7 @@ namespace NuclearWinter.Storage
 
             try
             {
-#if WINDOWS
+#if WINDOWS || LINUX || MACOSX
                 using( var store = IsolatedStorageFile.GetUserStoreForDomain() )
 #else
                 using( var store = IsolatedStorageFile.GetUserStoreForApplication() )
@@ -143,7 +143,7 @@ namespace NuclearWinter.Storage
             }
         }
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         //----------------------------------------------------------------------
         // Save game data
         public void SaveGameData()

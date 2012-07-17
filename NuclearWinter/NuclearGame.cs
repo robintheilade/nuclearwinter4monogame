@@ -35,13 +35,13 @@ namespace NuclearWinter
         public RasterizerState                      ScissorRasterizerState  { get; private set; }
 
         
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         // Index of the player responsible for menu navigation (or null if none yet)
         public PlayerIndex?                         PlayerInCharge;
 #endif
 
         public Storage.SaveHandler                  NuclearSaveHandler;
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         public StorageDevice                        SaveGameStorageDevice;
         bool                                        mbShouldDisplayStorageSelector;
         Action                                      DeviceSelectedCallback;
@@ -118,7 +118,7 @@ namespace NuclearWinter
             PhoneApplicationService.Current.Closing     += new EventHandler<ClosingEventArgs>( OnClosing );
 #endif
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
             StorageDevice.DeviceChanged                 += new EventHandler<EventArgs>( OnStorageDeviceChange );
 #endif
 
@@ -172,7 +172,7 @@ namespace NuclearWinter
                 Components.Add( GameStateMgr );
             }
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
             InputMgr                = new Input.InputManager( this );
             Components.Add( InputMgr );
 #endif
@@ -185,7 +185,7 @@ namespace NuclearWinter
             base.Initialize();
         }
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         protected override void Update( GameTime _time )
         {
 #if GAMERSERVICES || XBOX
@@ -244,7 +244,7 @@ namespace NuclearWinter
             WhitePixelTex.SetData( new[] { Color.White } );
         }
 
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
         //----------------------------------------------------------------------
         public void ShowDeviceSelector( Action _deviceSelectedCallback )
         {
@@ -297,7 +297,7 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void OnExiting(object sender, EventArgs args)
         {
-#if WINDOWS || XBOX
+#if WINDOWS || LINUX || MACOSX || XBOX
             if( NuclearSaveHandler != null )
             {
                 NuclearSaveHandler.SaveGameSettings();

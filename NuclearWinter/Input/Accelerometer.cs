@@ -29,11 +29,11 @@ namespace NuclearWinter.Input
         // we want to prevent the Accelerometer from being initialized twice.
         private static bool isInitialized = false;
         
+#if WINDOWS_PHONE
         // we need an object for locking because the ReadingChanged event is fired
         // on a different thread than our game
         private static object threadLock = new object();
 
-#if WINDOWS_PHONE
         // we use this to keep the last known value from the accelerometer callback
         private static Vector3 nextValue = new Vector3();
 #endif
