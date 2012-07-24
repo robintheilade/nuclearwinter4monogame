@@ -31,8 +31,10 @@ namespace NuclearWinter.UI
 
         public Widget       FocusedWidget       { get; private set; }
         bool                mbHasActivatedFocusedWidget;
+
         Widget              mClickedWidget;
         int                 miClickedWidgetMouseButton;
+
         public Widget       HoveredWidget       { get; private set; }
         Point               mPreviousMouseHitPoint;
 
@@ -63,6 +65,13 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void HandleInput()
         {
+            //------------------------------------------------------------------
+            // Make sure we don't hold references to orphaned widgets
+            if( FocusedWidget != null && FocusedWidget.IsOrphan ) FocusedWidget = null;
+            if( HoveredWidget != null && HoveredWidget.IsOrphan ) HoveredWidget = null;
+            if( mClickedWidget != null && mClickedWidget.IsOrphan ) mClickedWidget = null;
+
+            //------------------------------------------------------------------
             Point mouseHitPoint = new Point(
                 (int)( Game.InputMgr.MouseState.X / Resolution.ScaleFactor ),
                 (int)( ( Game.InputMgr.MouseState.Y - Game.GraphicsDevice.Viewport.Y ) / Resolution.ScaleFactor )

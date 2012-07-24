@@ -106,6 +106,7 @@ namespace NuclearWinter.UI
             mTooltip        = new Tooltip( Screen, "" );
 
             mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
+            mCloseButton.Parent = this;
             mCloseButton.Padding = new Box(0);
             mCloseButton.ClickHandler = delegate {
                 mNotebook.Tabs.Remove( this );

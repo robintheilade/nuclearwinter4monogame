@@ -47,6 +47,18 @@ namespace NuclearWinter.UI
         public Screen           Screen              { get; private set; }
         public Widget           Parent;
 
+        /// <summary>
+        /// Returns whether the widget is connected to its Screen's root
+        /// </summary>
+        public bool IsOrphan
+        {
+            get {
+                Widget widget = this;
+                while( widget.Parent != null && widget.Parent != Screen.Root ) widget = widget.Parent;
+                return widget.Parent == null;
+            }
+        }
+
         public int              ContentWidth        { get; protected set; }
         public int              ContentHeight       { get; protected set; }
 
