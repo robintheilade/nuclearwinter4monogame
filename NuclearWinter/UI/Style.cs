@@ -105,6 +105,7 @@ namespace NuclearWinter.UI
         public Texture2D        CheckBoxUnchecked;
         public Texture2D        CheckBoxInconsistent;
 
+        public int              CheckBoxSize = 40;
         public Texture2D        CheckBoxFrame;
         public Texture2D        CheckBoxFrameHover;
         public int              CheckBoxFrameCornerSize = 15;

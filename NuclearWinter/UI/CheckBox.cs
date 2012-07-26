@@ -50,15 +50,15 @@ namespace NuclearWinter.UI
 
         protected internal override void UpdateContentSize()
         {
-            ContentWidth = LayoutRect.Height + mLabel.ContentWidth;
+            ContentWidth = Screen.Style.CheckBoxSize + mLabel.ContentWidth;
         }
 
         protected internal override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
-            mCheckBoxRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Height, LayoutRect.Height );
-            mLabel.DoLayout( new Rectangle( LayoutRect.X + LayoutRect.Height, LayoutRect.Y, LayoutRect.Width - LayoutRect.Height, LayoutRect.Height ) );
+            mCheckBoxRect = new Rectangle( LayoutRect.X, LayoutRect.Y, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
+            mLabel.DoLayout( new Rectangle( LayoutRect.X + Screen.Style.CheckBoxSize, LayoutRect.Y, LayoutRect.Width - Screen.Style.CheckBoxSize, LayoutRect.Height ) );
             
             HitBox = LayoutRect;
 
