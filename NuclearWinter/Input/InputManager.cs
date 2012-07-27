@@ -25,12 +25,20 @@ namespace NuclearWinter.Input
 
         public int PrimaryMouseButton
         {
+#if ! MONOMAC
             get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 2 : 0; }
+#else
+            get { return 0; }
+#endif
         }
 
         public int SecondaryMouseButton
         {
+#if ! MONOMAC
             get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 0 : 2; }
+#else
+            get { return 2; }
+#endif
         }
 
         public LocalizedKeyboardState               KeyboardState           { get; private set; }

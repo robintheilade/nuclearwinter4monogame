@@ -52,6 +52,27 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;MACOSX;MONOMAC;MONOGAME</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release OS X|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>MACOSX;MONOMAC;MONOGAME</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
@@ -67,6 +88,12 @@
     </Reference>
     <Reference Include="MonoGame.Framework.Linux" Condition=" '$(Configuration)|$(Platform)' == 'Debug Linux|x86' or '$(Configuration)|$(Platform)' == 'Release Linux|x86'">
       <HintPath>..\MonoGame\MonoGame.Framework.Linux.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.MacOS" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
+      <HintPath>..\MonoGame\MonoGame.Framework.MacOS.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
+      <HintPath>..\MonoGame\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
