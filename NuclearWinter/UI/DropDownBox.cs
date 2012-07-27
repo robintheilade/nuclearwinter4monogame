@@ -303,9 +303,16 @@ namespace NuclearWinter.UI
 
         protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
-            miHoveredItemIndex += iNewScrollOffset - ScrollItemOffset;
-            ScrollItemOffset = iNewScrollOffset;
+            if( IsOpen )
+            {
+                int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
+                miHoveredItemIndex += iNewScrollOffset - ScrollItemOffset;
+                ScrollItemOffset = iNewScrollOffset;
+            }
+            else
+            {
+                base.OnMouseWheel( _hitPoint, _iDelta );
+            }
         }
 
         void UpdateHoveredItem()
