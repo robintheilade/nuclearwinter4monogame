@@ -846,9 +846,10 @@ namespace NuclearWinter.UI
 
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
             // GetText( System.Windows.Forms.TextDataFormat.Html );
-            string strPastedText = (string)System.Windows.Forms.Clipboard.GetText().Replace( "\r\n", "\n" );
+            string strPastedText = System.Windows.Forms.Clipboard.GetText();
             if( strPastedText != null )
             {
+                strPastedText = strPastedText.Replace( "\r\n", "\n" );
                 DeleteSelectedText();
 
                 if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strPastedText ) )
