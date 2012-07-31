@@ -17,7 +17,7 @@ namespace NuclearWinter
         public ApplicationMutex()
         {
             // Get application GUID
-            string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes( typeof(GuidAttribute), false ).GetValue(0)).Value.ToString();
+            string appGuid = ((GuidAttribute)Assembly.GetEntryAssembly().GetCustomAttributes( typeof(GuidAttribute), false ).GetValue(0)).Value.ToString();
 
             // Build mutexId from appGuid
             string mutexId = string.Format( "Global\\{{{0}}}", appGuid );
