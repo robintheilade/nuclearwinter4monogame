@@ -295,7 +295,7 @@ namespace NuclearWinter
 #endif
 
         //----------------------------------------------------------------------
-        protected override void OnExiting(object sender, EventArgs args)
+        protected override void OnExiting( object _sender, EventArgs _args )
         {
 #if WINDOWS || LINUX || MACOSX || XBOX
             if( NuclearSaveHandler != null )
@@ -310,7 +310,7 @@ namespace NuclearWinter
                 GameStateMgr.CurrentState.OnExiting();
             }
 
-            base.OnExiting(sender, args);
+            base.OnExiting( _sender, _args );
         }
 
         //----------------------------------------------------------------------
