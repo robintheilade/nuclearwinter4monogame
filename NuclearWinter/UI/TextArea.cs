@@ -266,7 +266,7 @@ namespace NuclearWinter.UI
                 if( mstrText[i] == '\n' ) iLines++;
             }
 
-            miGutterWidth = (int)Font.MeasureString( iLines.ToString() ).X + Padding.Right;
+            miGutterWidth = (int)Font.MeasureString( ( iLines + 1 ).ToString() ).X + Padding.Right;
         }
 
         int                     miGutterWidth;
