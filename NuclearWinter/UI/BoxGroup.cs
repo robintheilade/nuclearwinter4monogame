@@ -69,6 +69,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
+            if( mlChildren.Count == 0 ) return null;
+
             if( mOrientation == Orientation.Vertical )
             {
                 return mlChildren[0].GetFirstFocusableDescendant( _direction );
