@@ -68,7 +68,14 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             // Make sure we don't hold references to orphaned widgets
             if( FocusedWidget != null && FocusedWidget.IsOrphan ) FocusedWidget = null;
-            if( HoveredWidget != null && HoveredWidget.IsOrphan ) HoveredWidget = null;
+            if( HoveredWidget != null && HoveredWidget.IsOrphan )
+            {
+#if !MONOGAME
+                Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
+                HoveredWidget = null;
+            }
+
             if( mClickedWidget != null && mClickedWidget.IsOrphan ) mClickedWidget = null;
 
             //------------------------------------------------------------------
