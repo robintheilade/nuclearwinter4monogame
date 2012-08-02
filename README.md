@@ -19,4 +19,4 @@ Screenshots
 -----------
 
 ![CraftStudio, made with NuclearWinter](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=465281)
-![NuclearSample](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=465281)
+![NuclearSample](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=465280)
