@@ -21,7 +21,10 @@ namespace NuclearWinter.UI
         public Screen                   PopupScreen             { get; private set; }
         public MessagePopup             MessagePopup            { get; private set; }
 
-        public Stack<IPopup>            PopupStack              { get; private set; }
+        public IEnumerable<IPopup>      PopupStack              { get { return (IEnumerable<IPopup>)mPopupStack; } }
+        public IPopup                   TopMostPopup            { get { return mPopupStack.Count > 0 ? mPopupStack.Peek() : null; } }
+
+        Stack<IPopup>                   mPopupStack;
         NuclearWinter.UI.Image          mPopupFade;
 
         //----------------------------------------------------------------------
@@ -37,7 +40,7 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             // Popup
             PopupScreen         = new NuclearWinter.UI.Screen( _game, _style, _game.GraphicsDevice.Viewport.Width, _game.GraphicsDevice.Viewport.Height );
-            PopupStack          = new Stack<IPopup>();
+            mPopupStack          = new Stack<IPopup>();
             MessagePopup        = new MessagePopup( this );
 
             mPopupFade          = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
@@ -47,17 +50,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public virtual void Update( float _fElapsedTime )
         {
-            MenuScreen.IsActive     = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && PopupStack.Count == 0;
-            PopupScreen.IsActive    = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && PopupStack.Count > 0;
+            MenuScreen.IsActive     = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && mPopupStack.Count == 0;
+            PopupScreen.IsActive    = Game.IsActive && ( Game.GameStateMgr == null || ! Game.GameStateMgr.IsSwitching ) && mPopupStack.Count > 0;
 
             MenuScreen.HandleInput();
-            if( PopupStack.Count > 0 )
+            if( mPopupStack.Count > 0 )
             {
                 PopupScreen.HandleInput();
             }
 
             MenuScreen.Update( _fElapsedTime );
-            if( PopupStack.Count > 0 )
+            if( mPopupStack.Count > 0 )
             {
                 PopupScreen.Update( _fElapsedTime );
             }
@@ -68,7 +71,7 @@ namespace NuclearWinter.UI
         {
             MenuScreen.Draw();
 
-            if( PopupStack.Count > 0 )
+            if( mPopupStack.Count > 0 )
             {
                 PopupScreen.Draw();
             }
@@ -77,9 +80,9 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void PushPopup( IPopup _popup )
         {
-            if( PopupStack.Contains( _popup ) ) throw new InvalidOperationException( "Cannot push same popup twice" );
+            if( mPopupStack.Contains( _popup ) ) throw new InvalidOperationException( "Cannot push same popup twice" );
 
-            PopupStack.Push( _popup );
+            mPopupStack.Push( _popup );
 
             PopupScreen.Root.Clear();
             PopupScreen.Root.AddChild( mPopupFade );
@@ -90,17 +93,17 @@ namespace NuclearWinter.UI
         // NOTE: This method takes the popup to remove to help ensure consistency
         public void PopPopup( IPopup _popup )
         {
-            if( PopupStack.Count == 0 || PopupStack.Peek() != _popup ) throw new InvalidOperationException( "Cannot pop a popup if it isn't at the top of the stack" );
+            if( mPopupStack.Count == 0 || mPopupStack.Peek() != _popup ) throw new InvalidOperationException( "Cannot pop a popup if it isn't at the top of the stack" );
 
-            PopupStack.Pop();
+            mPopupStack.Pop();
 
             PopupScreen.Root.Clear();
 
-            if( PopupStack.Count > 0 )
+            if( mPopupStack.Count > 0 )
             {
                 PopupScreen.Root.AddChild( mPopupFade );
-                PopupScreen.Root.AddChild( PopupStack.Peek().Panel );
-                PopupScreen.Focus( PopupStack.Peek().Panel );
+                PopupScreen.Root.AddChild( mPopupStack.Peek().Panel );
+                PopupScreen.Focus( mPopupStack.Peek().Panel );
             }
         }
     }
