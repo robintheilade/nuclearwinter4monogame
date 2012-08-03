@@ -624,10 +624,10 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnKeyPress( Keys _key )
         {
-            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
 
             NotebookTab activeTab = Tabs[ ActiveTabIndex ];
-            if( bCtrl && _key == Keys.W && activeTab.IsClosable )
+            if( bShortcutKey && _key == Keys.W && activeTab.IsClosable )
             {
                 activeTab.Close();
                 Screen.Focus( this );

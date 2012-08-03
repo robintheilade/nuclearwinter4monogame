@@ -370,31 +370,32 @@ namespace NuclearWinter.UI
         protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
             bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
 
             switch( _key )
             {
                 case System.Windows.Forms.Keys.A:
-                    if( bCtrl )
+                    if( bShortcutKey )
                     {
                         SelectAll();
                     }
                     break;
                 case System.Windows.Forms.Keys.X:
-                    if( bCtrl && mPasswordChar == '\0' )
+                    if( bShortcutKey && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
                 case System.Windows.Forms.Keys.C:
-                    if( bCtrl && mPasswordChar == '\0' )
+                    if( bShortcutKey && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                     }
                     break;
                 case System.Windows.Forms.Keys.V:
-                    if( bCtrl )
+                    if( bShortcutKey )
                     {
                         PasteFromClipboard();
                     }

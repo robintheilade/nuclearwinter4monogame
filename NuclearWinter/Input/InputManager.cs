@@ -11,6 +11,18 @@ using System.Diagnostics;
 
 namespace NuclearWinter.Input
 {
+    [Flags]
+    public enum ShortcutKey {
+        LeftCtrl = 1 << 0,
+        RightCtrl = 1 << 1,
+  
+        LeftAlt = 1 << 2,
+        RightAlt = 1 << 3,
+  
+        LeftWindows = 1 << 4,
+        RightWindows = 1 << 5,
+    }
+
     public class InputManager: GameComponent
     {
         public const int                            siMaxInput              = 4;
@@ -47,6 +59,7 @@ namespace NuclearWinter.Input
         /*Keys                                        mLastKeyPressed;
         bool                                        mbRepeatKey;
         float                                       mfRepeatKeyTimer;*/
+        public ShortcutKey                          ActiveShortcutKey;
 
         public List<char>                           EnteredText             { get; private set; }
         public List<Keys>                           JustPressedKeys         { get; private set; }
@@ -76,6 +89,8 @@ namespace NuclearWinter.Input
             mabRepeatButtons        = new bool[ siMaxInput ];
 
             lButtons                = Utils.GetValues<Buttons>();
+            
+            ActiveShortcutKey       = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
 
 #if WINDOWS || LINUX || MACOSX
             EnteredText             = new List<char>();
@@ -325,6 +340,17 @@ namespace NuclearWinter.Input
         public bool WasMouseJustDoubleClicked()
         {
             return mbDoubleClicked;
+        }
+
+        //----------------------------------------------------------------------
+        public bool IsShortcutKeyDown()
+        {
+            return ( ( ActiveShortcutKey & ShortcutKey.LeftCtrl ) == ShortcutKey.LeftCtrl && KeyboardState.IsKeyDown( Keys.LeftControl ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightCtrl ) == ShortcutKey.RightCtrl && KeyboardState.IsKeyDown( Keys.RightControl ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.LeftAlt ) == ShortcutKey.LeftAlt && KeyboardState.IsKeyDown( Keys.LeftAlt ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightAlt ) == ShortcutKey.RightAlt && KeyboardState.IsKeyDown( Keys.RightAlt ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.LeftWindows ) == ShortcutKey.LeftWindows && KeyboardState.IsKeyDown( Keys.LeftWindows ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightWindows ) == ShortcutKey.RightWindows && KeyboardState.IsKeyDown( Keys.RightWindows ) );
         }
 
         //----------------------------------------------------------------------
