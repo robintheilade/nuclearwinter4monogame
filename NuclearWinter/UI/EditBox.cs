@@ -443,7 +443,7 @@ namespace NuclearWinter.UI
 
                             if( iNewSelectionTarget > 0 )
                             {
-                                iNewSelectionTarget = Text.LastIndexOf( ' ', iNewSelectionTarget - 2, iNewSelectionTarget - 2 ) + 1;
+                                iNewSelectionTarget = Text.LastIndexOf( ' ', Math.Max( iNewSelectionTarget - 2, 0 ) ) + 1;
                             }
 
                             SelectionOffset = iNewSelectionTarget - CaretOffset;
@@ -463,7 +463,7 @@ namespace NuclearWinter.UI
 
                             if( iNewCaretOffset > 0 )
                             {
-                                iNewCaretOffset = Text.LastIndexOf( ' ', iNewCaretOffset - 1, iNewCaretOffset - 1 ) + 1;
+                                iNewCaretOffset = Text.LastIndexOf( ' ', iNewCaretOffset - 1 ) + 1;
                             }
                         }
                         else
