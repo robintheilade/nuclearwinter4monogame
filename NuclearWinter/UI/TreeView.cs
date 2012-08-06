@@ -77,46 +77,8 @@ namespace NuclearWinter.UI
             Indicators = new List<TreeViewIndicator>();
 
             Children    = new ObservableList<TreeViewNode>();
-
-            Children.ListChanged += delegate( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
-            {
-                _args.Item.Parent = _args.Added ? this : null;
-
-                if( _args.Added )
-                {
-                    OnNodeAdded( 1 + _args.Item.ContainedNodeCount );
-                }
-                else
-                {
-                    if( _args.Item == mTreeView.SelectedNode )
-                    {
-                        mTreeView.SelectedNode = null;
-                    }
-
-                    if( _args.Item == mTreeView.HoveredNode )
-                    {
-                        mTreeView.UpdateHoveredNode();
-                    }
-
-                    if( _args.Item == mTreeView.FocusedNode )
-                    {
-                        mTreeView.FocusedNode = null;
-                    }
-
-                    OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
-                }
-
-                UpdateLabel();
-                UpdateContentSize();
-            };
-
-            Children.ListCleared += delegate( object _source, EventArgs _args )
-            {
-                ContainedNodeCount = 0;
-                UncollapsedContainedNodeCount = 0;
-                UpdateLabel();
-                UpdateContentSize();
-            };
+            Children.ListChanged += OnChildrenListChanged;
+            Children.ListCleared += OnChildrenListCleared;
 
             mstrText = _strText;
             mLabel      = new Label( Screen, _strText, Anchor.Start, Screen.Style.DefaultTextColor );
@@ -124,7 +86,6 @@ namespace NuclearWinter.UI
             mImage.Padding = new Box( 0, 5, 0, 10 );
 
             Icon = _icon;
-
             Tag = _tag;
 
             UpdateContentSize();
@@ -137,7 +98,91 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public void ReplaceChildren( List<TreeViewNode> _lChildren )
+        {
+            // Clear previous nodes
+            foreach( TreeViewNode node in Children )
+            {
+                node.Parent = null;
+            }
+
+            Children = new ObservableList<TreeViewNode>( _lChildren );
+            Children.ListChanged += OnChildrenListChanged;
+            Children.ListCleared += OnChildrenListCleared;
+
+            if( Parent is TreeViewNode )
+            {
+                ((TreeViewNode)Parent).OnNodeRemoved( ContainedNodeCount );
+            }
+
+            ContainedNodeCount = Children.Count;
+            foreach( TreeViewNode node in Children )
+            {
+                node.Parent = this;
+                ContainedNodeCount += node.ContainedNodeCount;
+            }
+
+            if( Parent is TreeViewNode )
+            {
+                ((TreeViewNode)Parent).OnNodeAdded( ContainedNodeCount );
+            }
+
+            UpdateLabel();
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        void OnChildrenListChanged( object _source, ObservableList<TreeViewNode>.ListChangedEventArgs _args )
+        {
+            _args.Item.Parent = _args.Added ? this : null;
+
+            if( _args.Added )
+            {
+                OnNodeAdded( 1 + _args.Item.ContainedNodeCount );
+            }
+            else
+            {
+                if( _args.Item == mTreeView.SelectedNode )
+                {
+                    mTreeView.SelectedNode = null;
+                }
+
+                if( _args.Item == mTreeView.HoveredNode )
+                {
+                    mTreeView.UpdateHoveredNode();
+                }
+
+                if( _args.Item == mTreeView.FocusedNode )
+                {
+                    mTreeView.FocusedNode = null;
+                }
+
+                OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
+            }
+
+            if( mTreeView.LayoutSuspended ) return;
+
+            UpdateLabel();
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        void OnChildrenListCleared( object _source, EventArgs _args )
+        {
+            ContainedNodeCount = 0;
+            UncollapsedContainedNodeCount = 0;
+            UpdateLabel();
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
+        {
+            ComputeContentSize();
+            base.UpdateContentSize();
+        }
+
+        void ComputeContentSize()
         {
             ContentHeight = mTreeView.NodeHeight + mTreeView.NodeSpacing;
             if( Children.Count > 0 && ! mbCollapsed )
@@ -156,8 +201,6 @@ namespace NuclearWinter.UI
                     UncollapsedContainedNodeCount += 1 + childNode.UncollapsedContainedNodeCount;
                 }
             }
-
-            base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
@@ -364,6 +407,16 @@ namespace NuclearWinter.UI
             mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX - _iRight, mTreeView.NodeHeight ) );
             mLabel.Draw();
         }
+
+        internal void ResumeLayout()
+        {
+            foreach( var node in Children )
+            {
+                node.ResumeLayout();
+            }
+
+            ComputeContentSize();
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -466,6 +519,22 @@ namespace NuclearWinter.UI
         public int                          NodeHeight      = 40;
         public int                          NodeSpacing     = 0;
         public int                          NodeBranchWidth = 25;
+
+        internal bool                       LayoutSuspended     { get; private set; }
+        public void SuspendLayout()
+        {
+            LayoutSuspended = true;
+        }
+
+        public void ResumeLayout()
+        {
+            LayoutSuspended = false;
+
+            foreach( var node in Nodes )
+            {
+                node.ResumeLayout();
+            }
+        }
 
         //----------------------------------------------------------------------
         public Action<TreeView>             ValidateHandler;
