@@ -27,6 +27,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public Action<Label>    ClickHandler;
+
+        //----------------------------------------------------------------------
         public UIFont Font
         {
             get { return mFont; }
@@ -165,10 +168,53 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return ClickHandler != null ? base.HitTest( _point ) : null;
+        }
+
+        protected internal override void OnMouseEnter( Point _hitPoint )
+        {
+            if( ClickHandler != null )
+            {
+#if !MONOGAME
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
+#endif
+            }
+        }
+
+        protected internal override void OnMouseOut( Point _hitPoint )
+        {
+            if( ClickHandler != null )
+            {
+#if !MONOGAME
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
+            }
+        }
+
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        {
+
+        }
+
+        protected internal override void OnMouseUp(Point _hitPoint, int _iButton)
+        {
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+
+            if( ClickHandler != null )
+            {
+                ClickHandler( this );
+            }
+        }
+
+        //----------------------------------------------------------------------
         protected internal override void DoLayout( Rectangle _rect )
         {
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
+
+            HitBox = LayoutRect;
 
             bool bTextLayoutNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
