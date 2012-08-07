@@ -540,6 +540,7 @@ namespace NuclearWinter.UI
         public Action<TreeView>             ValidateHandler;
         public Action<TreeView>             SelectHandler;
         public Action<TreeView>             HoverHandler;
+        public Action<TreeView>             RemoveHandler;
 
         TreeViewNode                        mSelectedNode = null;
         public TreeViewNode SelectedNode
@@ -1013,6 +1014,12 @@ namespace NuclearWinter.UI
                     break;
                 case Keys.PageDown:
                     Scrollbar.Offset += LayoutRect.Height;
+                    break;
+                case Keys.Delete:
+                    if( RemoveHandler != null )
+                    {
+                        RemoveHandler(this);
+                    }
                     break;
             }
 
