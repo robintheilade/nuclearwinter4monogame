@@ -477,11 +477,6 @@ namespace NuclearWinter.UI
             int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
             Scrollbar.Offset += iScrollChange;
 
-            if( IsDragging )
-            {
-                mMouseDownPoint.Y -= iScrollChange;
-            }
-
             UpdateHoveredRow();
         }
 
@@ -500,7 +495,7 @@ namespace NuclearWinter.UI
             else
             {
                 mbIsMouseDown = true;
-                mMouseDownPoint = _hitPoint;
+                mMouseDownPoint = new Point( _hitPoint.X, _hitPoint.Y - (int)Scrollbar.LerpOffset );
 
                 Screen.Focus( this );
 
@@ -858,7 +853,7 @@ namespace NuclearWinter.UI
                 {
                     ListViewColumn col = Columns[i];
 
-                    FocusedRow.Cells[i].Draw( new Point( LayoutRect.X + 10 + iColX + mMouseDragPoint.X - mMouseDownPoint.X, LayoutRect.Y + mMouseDragPoint.Y - mMouseDownPoint.Y + iRowY ) );
+                    FocusedRow.Cells[i].Draw( new Point( LayoutRect.X + 10 + iColX + mMouseDragPoint.X - mMouseDownPoint.X, LayoutRect.Y + mMouseDragPoint.Y - mMouseDownPoint.Y + (int)Scrollbar.LerpOffset + iRowY ) );
 
                     iColX += col.Width + ColSpacing;
                 }
