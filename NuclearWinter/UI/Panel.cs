@@ -47,7 +47,9 @@ namespace NuclearWinter.UI
             Texture     = _texture;
             CornerSize  = _iCornerSize;
             Padding     = new Box( CornerSize );
-            Scrollbar   = new Scrollbar( this );
+
+            Scrollbar   = new Scrollbar( _screen );
+            Scrollbar.Parent = this;
         }
 
         //----------------------------------------------------------------------
@@ -95,7 +97,7 @@ namespace NuclearWinter.UI
 
         public override Widget HitTest( Point _point )
         {
-            return base.HitTest( _point ) ?? ( HitBox.Contains( _point ) ? this : null );
+            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point ) ?? ( HitBox.Contains( _point ) ? this : null );
         }
 
         //----------------------------------------------------------------------

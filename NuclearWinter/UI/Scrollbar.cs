@@ -6,11 +6,12 @@ using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
 {
-    public class Scrollbar
+    public class Scrollbar: Widget
     {
         //----------------------------------------------------------------------
 
         public int              Offset;
+        int                     mMouseOffset;
 
         public int              Max
         {
@@ -33,18 +34,27 @@ namespace NuclearWinter.UI
         int                     miScrollbarHeight;
         int                     miScrollbarOffset;
 
-        public Widget           Parent;
+        Point                   mMouseDragPoint;
+        Point                   mLastMouseDragPoint;
+
+        bool                    mbIsMouseDown;
+
+        Color                   mScrollbarColor;
 
         public Rectangle        ScrollRect;
 
+        static Color            sDefaultColor = Color.White * 0.5f;
+        static Color            sHoveredColor = Color.White;
+
         //----------------------------------------------------------------------
-        public Scrollbar( Widget _parent )
+        public Scrollbar( Screen _screen )
+        : base( _screen )
         {
-            Parent = _parent;
+            mScrollbarColor = sDefaultColor;
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
+        protected internal override void Update( float _fElapsedTime )
         {
             float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
             LerpOffset = MathHelper.Lerp( LerpOffset, Offset, fLerpAmount );
@@ -55,6 +65,8 @@ namespace NuclearWinter.UI
         public void DoLayout( Rectangle _rect, int _iContentHeight )
         {
             ScrollRect = _rect;
+
+            HitBox = new Rectangle( ScrollRect.Right - 10 - Screen.Style.VerticalScrollbar.Width / 2, ScrollRect.Y, Screen.Style.VerticalScrollbar.Width, ScrollRect.Height );
 
             bool bScrolledToBottom = ScrollToBottom && Offset >= Max;
 
@@ -71,19 +83,68 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Draw()
+        protected internal override void OnMouseEnter( Point _hitPoint )
+        {
+            mScrollbarColor = sHoveredColor;
+        }
+
+        protected internal override void OnMouseOut( Point _hitPoint )
+        {
+            mScrollbarColor = sDefaultColor;
+        }
+
+        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        {
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+
+            mbIsMouseDown = true;
+            mLastMouseDragPoint = _hitPoint;
+
+            int iScrollBarBottom = ScrollRect.Top + miScrollbarOffset + Screen.Style.VerticalScrollbarCornerSize;
+            int iScrollBarTop    = ScrollRect.Top + miScrollbarOffset + miScrollbarHeight + Screen.Style.VerticalScrollbarCornerSize;
+            
+            if( ! ( mLastMouseDragPoint.Y > iScrollBarBottom && mLastMouseDragPoint.Y < iScrollBarTop ) )
+                Offset += ( mLastMouseDragPoint.Y - ( ScrollRect.Top + miScrollbarOffset + ( miScrollbarHeight / 2 )  ) ) * ScrollRect.Height / miScrollbarHeight;
+
+            mMouseOffset = Offset;
+        }
+
+        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        {
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+
+            mbIsMouseDown = false;
+        }
+
+        protected internal override void OnMouseMove( Point _hitPoint )
+        {
+            if( mbIsMouseDown )
+            {
+                mMouseDragPoint = _hitPoint;
+
+                mMouseOffset += (mMouseDragPoint.Y - mLastMouseDragPoint.Y) * ScrollRect.Height / miScrollbarHeight;
+                Offset = mMouseOffset;
+
+
+                mLastMouseDragPoint = mMouseDragPoint;
+            }
+
+        }
+
+        //----------------------------------------------------------------------
+        protected internal override void Draw()
         {
             if( miMax > 0 )
             {
-                Parent.Screen.DrawBox(
-                    Parent.Screen.Style.VerticalScrollbar,
+                Screen.DrawBox(
+                    Screen.Style.VerticalScrollbar,
                     new Rectangle(
-                        ScrollRect.Right - 5 - Parent.Screen.Style.VerticalScrollbar.Width / 2,
+                        ScrollRect.Right - 5 - Screen.Style.VerticalScrollbar.Width / 2,
                         ScrollRect.Y + 10 + miScrollbarOffset,
-                        Parent.Screen.Style.VerticalScrollbar.Width,
+                        Screen.Style.VerticalScrollbar.Width,
                         miScrollbarHeight ),
-                    Parent.Screen.Style.VerticalScrollbarCornerSize,
-                    Color.White );
+                    Screen.Style.VerticalScrollbarCornerSize,
+                    mScrollbarColor );
             }
         }
     }

@@ -632,7 +632,9 @@ namespace NuclearWinter.UI
 
             Padding         = new Box(20);
 
-            Scrollbar       = new Scrollbar( this );
+            Scrollbar       = new Scrollbar( _screen );
+            Scrollbar.Parent = this;
+
             PanelTex        = Screen.Style.ListFrame;
         }
 
@@ -675,6 +677,12 @@ namespace NuclearWinter.UI
             }
 
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point );
         }
 
         //----------------------------------------------------------------------

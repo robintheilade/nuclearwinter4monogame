@@ -285,8 +285,9 @@ namespace NuclearWinter.UI
             Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
             Style.FrameSelectedFocus    = Screen.Style.GridBoxFrameSelectedFocus;
 
-            Scrollbar = new Scrollbar( this );
-
+            Scrollbar = new Scrollbar( _screen );
+            Scrollbar.Parent = this;
+            
             ActionButtons = new List<Button>();
 
             UpdateContentSize();
@@ -374,6 +375,12 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             ContentHeight = Padding.Vertical + 25 + Rows.Count * ( RowHeight + RowSpacing );
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point );
         }
 
         //----------------------------------------------------------------------

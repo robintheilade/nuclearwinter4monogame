@@ -638,7 +638,8 @@ namespace NuclearWinter.UI
                 }
             };
 
-            Scrollbar = new UI.Scrollbar( this );
+            Scrollbar = new UI.Scrollbar( _screen );
+            Scrollbar.Parent = this;
 
             ActionButtons = new List<Button>();
         }
@@ -687,6 +688,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point );
+        }
+
         protected internal override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;

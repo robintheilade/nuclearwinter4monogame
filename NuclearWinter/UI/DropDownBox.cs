@@ -142,7 +142,9 @@ namespace NuclearWinter.UI
             };
 
             SelectedItemIndex = _iInitialValueIndex;
-            mScrollbar = new Scrollbar( this );
+            mScrollbar = new Scrollbar( _screen );
+            mScrollbar.Parent = this;
+
             ScrollItemOffset = Math.Max( 0, Math.Min( SelectedItemIndex, Items.Count - siMaxLineDisplayed ) );
             mScrollbar.LerpOffset = mScrollbar.Offset;
 
@@ -462,17 +464,10 @@ namespace NuclearWinter.UI
         {
             if( HasFocus && IsOpen )
             {
-                return this;
+                return /*mScrollbar.HitTest( _point ) ??*/ this;
             }
 
-            if( HitBox.Contains( _point ) )
-            {
-                return this;
-            }
-            else
-            {
-                return null;
-            }
+            return base.HitTest( _point );
         }
 
         //----------------------------------------------------------------------
