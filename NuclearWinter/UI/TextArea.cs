@@ -394,6 +394,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        public void ScrollToCaret(){
+            mbScrollToCaret = true;
+        }
+
+        //----------------------------------------------------------------------
         protected internal override void OnMouseEnter( Point _hitPoint )
         {
 #if !MONOGAME
