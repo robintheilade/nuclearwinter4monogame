@@ -1247,11 +1247,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void Draw()
         {
-            Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+            if( PanelTex != null )
+            {
+                Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+            }
 
             //------------------------------------------------------------------
             // Text
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + mPadding.Left, LayoutRect.Y + mPadding.Top, LayoutRect.Width - mPadding.Horizontal, LayoutRect.Height - mPadding.Vertical ) );
 
             int iX = LayoutRect.X + Padding.Left;
             int iY = LayoutRect.Y + Padding.Top;
