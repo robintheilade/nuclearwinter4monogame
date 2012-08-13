@@ -705,7 +705,7 @@ namespace NuclearWinter.UI
             if( mbIsMouseDown && FocusedNode != null )
             {
                 IsDragging = DragNDropHandler != null && (
-                        Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
+                        Math.Abs( _hitPoint.Y - ( mMouseDownPoint.Y + (int)Scrollbar.LerpOffset ) ) > siDragTriggerDistance
                     ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
             }
@@ -856,7 +856,7 @@ namespace NuclearWinter.UI
             else
             {
                 mbIsMouseDown = true;
-                mMouseDownPoint = new Point( _hitPoint.X, _hitPoint.Y - (int)Scrollbar.LerpOffset );
+                mMouseDownPoint = new Point( _hitPoint.X, _hitPoint.Y + (int)Scrollbar.LerpOffset );
 
                 Screen.Focus( this );
                 FocusedNode = HoveredNode;
