@@ -128,6 +128,8 @@ namespace NuclearWinter.UI
         public bool             IsReadOnly;
         public int              MaxLength;
 
+        public bool             CanBeEscapeCleared;
+
         public Texture2D        Frame;
         public int              FrameCornerSize;
 
@@ -433,6 +435,13 @@ namespace NuclearWinter.UI
                             if( TextRemovedHandler != null ) TextRemovedHandler( this, CaretOffset, 1 );
                             Text = Text.Remove( CaretOffset, 1 );
                         }
+                    }
+                    break;
+                case System.Windows.Forms.Keys.Escape:
+                    if( ! IsReadOnly && CanBeEscapeCleared && Text.Length > 0 )
+                    {
+                        SelectAll();
+                        DeleteSelectedText();
                     }
                     break;
                 case System.Windows.Forms.Keys.Left:
