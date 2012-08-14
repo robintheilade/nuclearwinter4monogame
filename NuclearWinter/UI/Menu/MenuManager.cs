@@ -21,10 +21,10 @@ namespace NuclearWinter.UI
         public Screen                   PopupScreen             { get; private set; }
         public MessagePopup             MessagePopup            { get; private set; }
 
-        public IEnumerable<IPopup>      PopupStack              { get { return (IEnumerable<IPopup>)mPopupStack; } }
-        public IPopup                   TopMostPopup            { get { return mPopupStack.Count > 0 ? mPopupStack.Peek() : null; } }
+        public IEnumerable<Panel>       PopupStack              { get { return (IEnumerable<Panel>)mPopupStack; } }
+        public Panel                    TopMostPopup            { get { return mPopupStack.Count > 0 ? mPopupStack.Peek() : null; } }
 
-        Stack<IPopup>                   mPopupStack;
+        Stack<Panel>                    mPopupStack;
         NuclearWinter.UI.Image          mPopupFade;
 
         //----------------------------------------------------------------------
@@ -40,7 +40,7 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             // Popup
             PopupScreen         = new NuclearWinter.UI.Screen( _game, _style, _game.GraphicsDevice.Viewport.Width, _game.GraphicsDevice.Viewport.Height );
-            mPopupStack          = new Stack<IPopup>();
+            mPopupStack          = new Stack<Panel>();
             MessagePopup        = new MessagePopup( this );
 
             mPopupFade          = new NuclearWinter.UI.Image( PopupScreen, Game.WhitePixelTex, true );
@@ -78,7 +78,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void PushPopup( IPopup _popup )
+        public void PushPopup( Panel _popup )
         {
             if( mPopupStack.Contains( _popup ) ) throw new InvalidOperationException( "Cannot push same popup twice" );
 
@@ -86,12 +86,12 @@ namespace NuclearWinter.UI
 
             PopupScreen.Root.Clear();
             PopupScreen.Root.AddChild( mPopupFade );
-            PopupScreen.Root.AddChild( _popup.Panel );
+            PopupScreen.Root.AddChild( (Panel)_popup );
         }
 
         //----------------------------------------------------------------------
-        // NOTE: This method takes the popup to remove to help ensure consistency
-        public void PopPopup( IPopup _popup )
+        // NOTE: This method takes the removed popup as an argument to help ensure consistency
+        public void PopPopup( Panel _popup )
         {
             if( mPopupStack.Count == 0 || mPopupStack.Peek() != _popup ) throw new InvalidOperationException( "Cannot pop a popup if it isn't at the top of the stack" );
 
@@ -102,8 +102,10 @@ namespace NuclearWinter.UI
             if( mPopupStack.Count > 0 )
             {
                 PopupScreen.Root.AddChild( mPopupFade );
-                PopupScreen.Root.AddChild( mPopupStack.Peek().Panel );
-                PopupScreen.Focus( mPopupStack.Peek().Panel );
+
+                var panel = (Panel)mPopupStack.Peek();
+                PopupScreen.Root.AddChild( panel );
+                PopupScreen.Focus( panel );
             }
         }
     }

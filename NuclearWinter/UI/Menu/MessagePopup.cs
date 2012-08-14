@@ -22,46 +22,48 @@ namespace NuclearWinter.UI
                 {
                     if( mSpinningWheel.Parent == null )
                     {
-                        Panel.AddChild( mSpinningWheel );
+                        AddChild( mSpinningWheel );
                     }
                 }
                 else
                 {
                     if( mSpinningWheel.Parent != null )
                     {
-                        Panel.RemoveChild( mSpinningWheel );
+                        RemoveChild( mSpinningWheel );
                     }
                 }
             }
         }
 
+        Action                  mCloseCallback;
+
         //----------------------------------------------------------------------
         public MessagePopup( IMenuManager _manager )
         : base( _manager )
         {
-            TitleLabel = new Label( Panel.Screen, "", Anchor.Start );
-            TitleLabel.Font = Panel.Screen.Style.LargeFont;
-            TitleLabel.AnchoredRect = AnchoredRect.CreateTopAnchored( 0, 0, 0, Panel.Screen.Style.DefaultButtonHeight );
-            Panel.AddChild( TitleLabel );
+            TitleLabel = new Label( Screen, "", Anchor.Start );
+            TitleLabel.Font = Screen.Style.LargeFont;
+            TitleLabel.AnchoredRect = AnchoredRect.CreateTopAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
+            AddChild( TitleLabel );
 
             {
-                mSpinningWheel = new SpinningWheel( Panel.Screen, Panel.Screen.Style.SpinningWheel );
+                mSpinningWheel = new SpinningWheel( Screen, Screen.Style.SpinningWheel );
                 mSpinningWheel.AnchoredRect = AnchoredRect.CreateCentered( mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight );
 
                 // Message label
-                MessageLabel = new Label( Panel.Screen, "", Anchor.Start );
+                MessageLabel = new Label( Screen, "", Anchor.Start );
                 MessageLabel.WrapText = true;
-                MessageLabel.AnchoredRect = AnchoredRect.CreateFull( 0, Panel.Screen.Style.DefaultButtonHeight + 10, 0, Panel.Screen.Style.DefaultButtonHeight + 10 );
-                Panel.AddChild( MessageLabel );
+                MessageLabel.AnchoredRect = AnchoredRect.CreateFull( 0, Screen.Style.DefaultButtonHeight + 10, 0, Screen.Style.DefaultButtonHeight + 10 );
+                AddChild( MessageLabel );
 
                 // Actions
-                BoxGroup actionsGroup = new BoxGroup( Panel.Screen, Orientation.Horizontal, 0, Anchor.End );
-                actionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored( 0, 0, 0, Panel.Screen.Style.DefaultButtonHeight );
+                BoxGroup actionsGroup = new BoxGroup( Screen, Orientation.Horizontal, 0, Anchor.End );
+                actionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
 
-                Panel.AddChild( actionsGroup );
+                AddChild( actionsGroup );
 
                 // Close
-                mCloseButton = new Button( Panel.Screen, i18n.Common.Close );
+                mCloseButton = new Button( Screen, i18n.Common.Close );
                 mCloseButton.BindPadButton( Buttons.A );
                 actionsGroup.AddChild( mCloseButton );
             }
@@ -73,28 +75,32 @@ namespace NuclearWinter.UI
             Open( DefaultSize.X, DefaultSize.Y );
         }
 
+        //----------------------------------------------------------------------
         public void Open( int _iWidth, int _iHeight )
         {
-            Panel.AnchoredRect.Width = _iWidth;
-            Panel.AnchoredRect.Height = _iHeight;
+            AnchoredRect.Width = _iWidth;
+            AnchoredRect.Height = _iHeight;
 
             Manager.PushPopup( this );
-            Panel.Screen.Focus( Panel.GetFirstFocusableDescendant( Direction.Down ) );
+            Screen.Focus( GetFirstFocusableDescendant( Direction.Down ) );
 
             mSpinningWheel.Reset();
         }
 
+        //----------------------------------------------------------------------
         public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel, Action _closeCallback=null )
         {
             TitleLabel.Text     = _strTitleText;
             MessageLabel.Text   = _strMessageText;
             mCloseButton.Text    = _strCloseButtonCaption;
-            mCloseButton.ClickHandler = delegate { ( _closeCallback ?? Close )(); };
+            mCloseButton.ClickHandler = delegate { Dismiss(); };
             ShowSpinningWheel   = _bShowSpinningWheel;
+
+            mCloseCallback = _closeCallback;
         }
 
         //----------------------------------------------------------------------
-        public void Close()
+        public override void Close()
         {
             TitleLabel.Text = "";
             MessageLabel.Text = "";
@@ -102,7 +108,17 @@ namespace NuclearWinter.UI
             mCloseButton.Text = "Close";
 
             ShowSpinningWheel = false;
-            Manager.PopPopup( this );
+            mCloseCallback = null;
+
+            base.Close();
+        }
+
+        //----------------------------------------------------------------------
+        protected override void Dismiss()
+        {
+            Action closeCallback = mCloseCallback;
+            base.Dismiss();
+            if( closeCallback != null ) closeCallback();
         }
     }
 }
