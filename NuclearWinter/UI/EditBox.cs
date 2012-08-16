@@ -6,6 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#else
+using OSKey = OpenTK.Input.Key;
+#endif
+
 namespace NuclearWinter.UI
 {
     //--------------------------------------------------------------------------
@@ -369,7 +375,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnOSKeyPress( OSKey _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
             bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
@@ -377,35 +383,35 @@ namespace NuclearWinter.UI
 
             switch( _key )
             {
-                case System.Windows.Forms.Keys.A:
+                case OSKey.A:
                     if( bShortcutKey )
                     {
                         SelectAll();
                     }
                     break;
-                case System.Windows.Forms.Keys.X:
+                case OSKey.X:
                     if( bShortcutKey && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
-                case System.Windows.Forms.Keys.C:
+                case OSKey.C:
                     if( bShortcutKey && mPasswordChar == '\0' )
                     {
                         CopySelectionToClipboard();
                     }
                     break;
-                case System.Windows.Forms.Keys.V:
+                case OSKey.V:
                     if( bShortcutKey )
                     {
                         PasteFromClipboard();
                     }
                     break;
-                case System.Windows.Forms.Keys.Enter:
+                case OSKey.Enter:
                     if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
                     break;
-                case System.Windows.Forms.Keys.Back:
+                case OSKey.Back:
                     if( ! IsReadOnly && Text.Length > 0 )
                     {
                         if( SelectionOffset != 0 )
@@ -422,7 +428,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Delete:
+                case OSKey.Delete:
                     if( ! IsReadOnly && Text.Length > 0 )
                     {
                         if( SelectionOffset != 0 )
@@ -437,14 +443,14 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Escape:
+                case OSKey.Escape:
                     if( ! IsReadOnly && CanBeEscapeCleared && Text.Length > 0 )
                     {
                         SelectAll();
                         DeleteSelectedText();
                     }
                     break;
-                case System.Windows.Forms.Keys.Left:
+                case OSKey.Left:
                     if( bShift )
                     {
                         if( bCtrl )
@@ -485,7 +491,7 @@ namespace NuclearWinter.UI
                         CaretOffset = iNewCaretOffset;
                     }
                     break;
-                case System.Windows.Forms.Keys.Right:
+                case OSKey.Right:
                     if( bShift )
                     {
                         if( bCtrl )
@@ -533,7 +539,7 @@ namespace NuclearWinter.UI
                         CaretOffset = iNewCaretOffset;
                     }
                     break;
-                case System.Windows.Forms.Keys.End:
+                case OSKey.End:
                     if( bShift )
                     {
                         SelectionOffset = Text.Length - CaretOffset;
@@ -543,7 +549,7 @@ namespace NuclearWinter.UI
                         CaretOffset = Text.Length;
                     }
                     break;
-                case System.Windows.Forms.Keys.Home:
+                case OSKey.Home:
                     if( bShift )
                     {
                         SelectionOffset = -CaretOffset;
@@ -553,7 +559,7 @@ namespace NuclearWinter.UI
                         CaretOffset = 0;
                     }
                     break;
-                case System.Windows.Forms.Keys.Tab:
+                case OSKey.Tab:
                     if( LookupHandler != null )
                     {
                         if( CaretOffset > 0 && ( CaretOffset == Text.Length || Text[CaretOffset] == ' ' ) )
@@ -577,11 +583,11 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        base.OnWindowsKeyPress( _key );
+                        base.OnOSKeyPress( _key );
                     }
                     break;
                 default:
-                    base.OnWindowsKeyPress( _key );
+                    base.OnOSKeyPress( _key );
                     break;
             }
         }

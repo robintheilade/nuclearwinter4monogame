@@ -317,9 +317,9 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnKeyPress( key );
                 }
 
-                foreach( System.Windows.Forms.Keys key in Game.InputMgr.JustPressedWindowsKeys )
+                foreach( var key in Game.InputMgr.JustPressedOSKeys )
                 {
-                    FocusedWidget.OnWindowsKeyPress( key );
+                    FocusedWidget.OnOSKeyPress( key );
                 }
 
             }

@@ -6,6 +6,12 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#else
+using OSKey = OpenTK.Input.Key;
+#endif
+
 namespace NuclearWinter.UI
 {
     public struct Box
@@ -226,9 +232,9 @@ namespace NuclearWinter.UI
 
         protected internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
-        protected internal virtual void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal virtual void OnOSKeyPress( OSKey _key )
         {
-            if( _key == System.Windows.Forms.Keys.Tab )
+            if( _key == OSKey.Tab )
             {
                 List<Direction> directions = new List<Direction>();
 
@@ -261,7 +267,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                if( Parent != null ) Parent.OnWindowsKeyPress( _key );
+                if( Parent != null ) Parent.OnOSKeyPress( _key );
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -132,11 +132,6 @@ namespace NuclearWinter.UI
         }
 
         protected internal override void OnPadMove( Direction _direction )
-        {
-            // Nothing
-        }
-
-        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
         {
             // Nothing
         }

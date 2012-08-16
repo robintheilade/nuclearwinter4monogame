@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +6,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#else
+using OSKey = OpenTK.Input.Key;
+#endif
 
 namespace NuclearWinter.UI
 {
@@ -608,7 +614,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnOSKeyPress( OSKey _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
             bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
@@ -616,32 +622,32 @@ namespace NuclearWinter.UI
 
             switch( _key )
             {
-                case System.Windows.Forms.Keys.A:
+                case OSKey.A:
                     if( bShortcutKey )
                     {
                         SelectAll();
                     }
                     break;
-                case System.Windows.Forms.Keys.X:
+                case OSKey.X:
                     if( bShortcutKey )
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
-                case System.Windows.Forms.Keys.C:
+                case OSKey.C:
                     if( bShortcutKey )
                     {
                         CopySelectionToClipboard();
                     }
                     break;
-                case System.Windows.Forms.Keys.V:
+                case OSKey.V:
                     if( bShortcutKey )
                     {
                         PasteFromClipboard();
                     }
                     break;
-                case System.Windows.Forms.Keys.Enter:
+                case OSKey.Enter:
                     if( ! IsReadOnly )
                     {
                         int iLineStartIndex = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) ) + 1;
@@ -658,7 +664,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Back:
+                case OSKey.Back:
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -677,7 +683,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Delete:
+                case OSKey.Delete:
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -695,7 +701,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Tab:
+                case OSKey.Tab:
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -800,7 +806,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-                case System.Windows.Forms.Keys.Left: {
+                case OSKey.Left: {
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
 
                     if( bCtrl )
@@ -876,7 +882,7 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
-                case System.Windows.Forms.Keys.Right: {
+                case OSKey.Right: {
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset );
 
                     if( bCtrl )
@@ -968,30 +974,30 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
-                case System.Windows.Forms.Keys.End:
+                case OSKey.End:
                     Caret.MoveEnd( bShift );
                     mbScrollToCaret = true;
                     break;
-                case System.Windows.Forms.Keys.Home:
+                case OSKey.Home:
                     Caret.MoveStart( bShift );
                     mbScrollToCaret = true;
                     break;
-                case System.Windows.Forms.Keys.Up:
+                case OSKey.Up:
                     Caret.MoveUp( bShift );
                     mbScrollToCaret = true;
                     break;
-                case System.Windows.Forms.Keys.Down:
+                case OSKey.Down:
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;
-                case System.Windows.Forms.Keys.PageUp: {
+                case OSKey.PageUp: {
                     Point target = GetPositionForCaret( Caret.EndOffset );
                     target.Y -= LayoutRect.Height;
                     SetCaretPosition( target, bShift );
                     mbScrollToCaret = true;
                     break;
                 }
-                case System.Windows.Forms.Keys.PageDown: {
+                case OSKey.PageDown: {
                     Point target = GetPositionForCaret( Caret.EndOffset );
                     target.Y += LayoutRect.Height;
                     SetCaretPosition( target, bShift );
@@ -999,7 +1005,7 @@ namespace NuclearWinter.UI
                     break;
                 }
                 default:
-                    base.OnWindowsKeyPress( _key );
+                    base.OnOSKeyPress( _key );
                     break;
             }
         }

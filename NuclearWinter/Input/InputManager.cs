@@ -63,9 +63,15 @@ namespace NuclearWinter.Input
 
         public List<char>                           EnteredText             { get; private set; }
         public List<Keys>                           JustPressedKeys         { get; private set; }
-        public List<System.Windows.Forms.Keys>      JustPressedWindowsKeys  { get; private set; }
 
+#if !MONOGAME
+        public List<System.Windows.Forms.Keys>      JustPressedOSKeys       { get; private set; }
         WindowMessageFilter                         mMessageFilter;
+#else
+        public List<OpenTK.Input.Key>               JustPressedOSKeys       { get; private set; }
+
+        float                                       mfTimeSinceLastClick;
+#endif
         bool                                        mbDoubleClicked;
 #endif
 
@@ -95,15 +101,26 @@ namespace NuclearWinter.Input
 #if WINDOWS || LINUX || MACOSX
             EnteredText             = new List<char>();
             JustPressedKeys         = new List<Keys>();
-            JustPressedWindowsKeys  = new List<System.Windows.Forms.Keys>();
+
+#if !MONOGAME
+            JustPressedOSKeys  = new List<System.Windows.Forms.Keys>();
 
             mMessageFilter              = new WindowMessageFilter( Game.Window.Handle );
             mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
-            mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedWindowsKeys.Add( _key ); };
+            mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedOSKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
+#else
+            JustPressedOSKeys  = new List<OpenTK.Input.Key>();
+
+            System.Reflection.FieldInfo info = typeof(OpenTKGameWindow).GetField( "window", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField );
+            OpenTK.GameWindow window = (OpenTK.GameWindow)info.GetValue( Game.Window );
+            window.Keyboard.KeyRepeat = true;
+            window.KeyPress += delegate( object _sender, OpenTK.KeyPressEventArgs _e ) { EnteredText.Add( _e.KeyChar ); };
+            window.Keyboard.KeyDown  += delegate( object _sender, OpenTK.Input.KeyboardKeyEventArgs  _e ) { JustPressedOSKeys.Add( _e.Key ); };
 
             MouseState = Mouse.GetState();
             PreviousMouseState = MouseState;
+#endif
 #endif
         }
 
@@ -157,7 +174,7 @@ namespace NuclearWinter.Input
             }
 
             EnteredText.Clear();
-            JustPressedWindowsKeys.Clear();
+            JustPressedOSKeys.Clear();
 
             Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
             Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
@@ -165,6 +182,22 @@ namespace NuclearWinter.Input
             JustPressedKeys = currentPressedKeys.Except( previousPressedKeys ).ToList();
 
             mbDoubleClicked = false;
+
+#if MONOGAME
+            if( WasMouseButtonJustPressed( PrimaryMouseButton ) )
+            {
+                if( mfTimeSinceLastClick <= System.Windows.Forms.SystemInformation.DoubleClickTime / 1000f )
+                {
+                    mbDoubleClicked = true;
+                }
+
+                mfTimeSinceLastClick = 0f;
+            }
+            else
+            {
+                mfTimeSinceLastClick += fElapsedTime;
+            }
+#endif
 #endif
 
             for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )

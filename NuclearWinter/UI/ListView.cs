@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,12 @@ using NuclearWinter.Animation;
 using Microsoft.Xna.Framework.Input;
 using NuclearWinter.Collections;
 using System.Diagnostics;
+
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#else
+using OSKey = OpenTK.Input.Key;
+#endif
 
 namespace NuclearWinter.UI
 {
@@ -667,11 +673,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnWindowsKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnOSKeyPress( OSKey _key )
         {
             switch( _key )
             {
-                case System.Windows.Forms.Keys.Enter:
+                case OSKey.Enter:
                     if( SelectedRow != null && ValidateHandler != null ) ValidateHandler( this );
                     break;
             }
