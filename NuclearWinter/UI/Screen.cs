@@ -307,6 +307,11 @@ namespace NuclearWinter.UI
             // Keyboard
             if( FocusedWidget != null )
             {
+                foreach( char character in Game.InputMgr.EnteredText )
+                {
+                    FocusedWidget.OnTextEntered( character );
+                }
+
                 foreach( Keys key in Game.InputMgr.JustPressedKeys )
                 {
                     FocusedWidget.OnKeyPress( key );
@@ -317,10 +322,6 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnWindowsKeyPress( key );
                 }
 
-                foreach( char character in Game.InputMgr.EnteredText )
-                {
-                    FocusedWidget.OnTextEntered( character );
-                }
             }
 #endif
         }
