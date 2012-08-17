@@ -70,7 +70,10 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
 #if WINDOWS
+
+#if !MONOGAME
         public Form                                 Form                    { get; private set; }
+#endif
 
         [DllImport("user32.dll")]
         static extern bool IsWindowUnicode(IntPtr hWnd);
@@ -123,7 +126,10 @@ namespace NuclearWinter
 #endif
 
 #if WINDOWS
+
+#if !MONOGAME
             Form = (Form)Form.FromHandle( Window.Handle );
+#endif
 
             // Is the Game window unicode-aware?
             if( ! IsWindowUnicode( Window.Handle ) )
