@@ -1021,6 +1021,12 @@ namespace NuclearWinter.UI
                 case Keys.PageDown:
                     Scrollbar.Offset += LayoutRect.Height;
                     break;
+                case Keys.Enter:
+                    if( ValidateHandler != null && SelectedNode != null )
+                    {
+                        ValidateHandler( this );
+                    }
+                    break;
                 case Keys.Delete:
                     if( RemoveHandler != null )
                     {
