@@ -501,7 +501,7 @@ namespace NuclearWinter.UI
 
             miUnpinnedTabWidth = MaxUnpinnedTabWidth;
 
-            if( iPinnedTabsWidth + iUnpinnedTabsWidth > iTabBarWidth )
+            if( iPinnedTabsWidth + iUnpinnedTabsWidth > iTabBarWidth && iUnpinnedTabsCount > 0 )
             {
                 miUnpinnedTabWidth = ( iTabBarWidth - iPinnedTabsWidth ) / iUnpinnedTabsCount;
             }
