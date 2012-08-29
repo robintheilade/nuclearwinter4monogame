@@ -257,7 +257,7 @@ namespace NuclearWinter.UI
     }
 
     //--------------------------------------------------------------------------
-    public class RemoteCaret: TextCaret
+    public class RemoteTextCaret: TextCaret
     {
         public Color CaretColor = Color.Black;
 
@@ -269,7 +269,7 @@ namespace NuclearWinter.UI
         float mfLabelAlpha = 0f;
 
         //----------------------------------------------------------------------
-        public RemoteCaret( string _strLabel, TextArea _textArea ): base ( _textArea )
+        public RemoteTextCaret( string _strLabel, TextArea _textArea ): base ( _textArea )
         {
             mstrLabelString = _strLabel;
             
@@ -284,7 +284,7 @@ namespace NuclearWinter.UI
 
             Rectangle hitBox = new Rectangle( caretPos.X - 5, caretPos.Y, 10, iCaretHeight );
 
-            if( hitBox.Contains( _point ) ) // ( _point.X - 5 ) < caretPos.X && ( _point.X + 5 ) > caretPos.X && ( _point.Y - iCaretHeight ) < caretPos.Y && _point.Y  > caretPos.Y )
+            if( hitBox.Contains( _point ) )
             {
                 mfLabelAlpha = 1.0f;
                 mfLabelAlphaTimer = 3.0f;
@@ -392,7 +392,7 @@ namespace NuclearWinter.UI
         public List<int> WrappedLineNumberMappings;
 
         public TextCaret        Caret               { get; private set; }
-        public Dictionary<UInt16,RemoteCaret>
+        public Dictionary<UInt16,RemoteTextCaret>
                                 RemoteCaretsById    { get; private set; }
         public int              TabSpaces   = 4;
 
@@ -427,7 +427,7 @@ namespace NuclearWinter.UI
             Text            = "";
             mbWrapTextNeeded = true;
             Caret           = new TextCaret( this );
-            RemoteCaretsById = new Dictionary<UInt16,RemoteCaret>();
+            RemoteCaretsById = new Dictionary<UInt16,RemoteTextCaret>();
 
             Padding         = new Box(20);
 
