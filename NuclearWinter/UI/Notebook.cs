@@ -19,6 +19,7 @@ namespace NuclearWinter.UI
 
         public bool             IsActive        { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
         public bool             IsUnread;
+        public Action           OnReadHandler;
 
         public bool             IsPinned
         {
@@ -563,7 +564,8 @@ namespace NuclearWinter.UI
             Debug.Assert( Tabs.Contains( _tab ) );
 
             ActiveTabIndex = Tabs.IndexOf( _tab );
-            Tabs[ActiveTabIndex].IsUnread = false;
+            _tab.IsUnread = false;
+            if( _tab.OnReadHandler != null ) _tab.OnReadHandler();
         }
 
         //----------------------------------------------------------------------
