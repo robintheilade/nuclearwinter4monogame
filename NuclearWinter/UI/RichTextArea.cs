@@ -105,7 +105,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal void Update( float _fElapsedTime )
+        internal virtual void Update( float _fElapsedTime )
         {
             Timer = TextArea.HasFocus ? ( Timer + _fElapsedTime ) : 0f;
         }
@@ -190,7 +190,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal void Draw( Rectangle _rect )
+        internal virtual void Draw( Rectangle _rect )
         {
             if( TextArea.TextBlocks.Count == 0 ) return;
 
@@ -479,7 +479,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal virtual void Update( float _fElapsedTime )
+        internal override void Update( float _fElapsedTime )
         {
             if( ! mbIsHovered )
             {
@@ -491,7 +491,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal virtual void Draw( Rectangle _rect )
+        internal override void Draw( Rectangle _rect )
         {
             DrawSelection( _rect, CaretColor * 0.3f );
 
