@@ -48,11 +48,14 @@ namespace NuclearWinter.UI
     abstract public class ListViewCell
     {
         //----------------------------------------------------------------------
-        protected ListView              mListView;
+        protected ListView                      mListView;
 
-        public string                   Text;
-        public Texture2D                Image;
-        public Color                    Color;
+        public string                           Text;
+        public Texture2D                        Image;
+        public Color                            Color;
+
+        public List<ListViewCellIndicator>      Indicators { get; private set; }
+        protected int                           miIndicatorAndActionButtonsWidth;
 
         //----------------------------------------------------------------------
         public ListViewCell( ListView _view, string _strText, Texture2D _image )
@@ -60,10 +63,12 @@ namespace NuclearWinter.UI
             mListView = _view;
             Text    = _strText;
             Image   = _image;
+
+            Indicators = new List<ListViewCellIndicator>();
         }
 
         //----------------------------------------------------------------------
-        protected internal abstract void DoLayout( ListViewColumn _col );
+        protected internal abstract void DoLayout( Rectangle _rect, ListViewColumn _col );
         protected internal abstract void Draw( Point _location );
     }
 
@@ -82,7 +87,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( ListViewColumn _col )
+        protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
         {
             mstrText = Text;
             mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
@@ -110,8 +115,17 @@ namespace NuclearWinter.UI
                     mvTextOffset.X += _col.Width / 2f - mfTextWidth / 2f;
                     break;
                 case Anchor.End:
-                    mvTextOffset.X += _col.Width - mfTextWidth - 10;
+                    mvTextOffset.X += 10 + _col.Width - mfTextWidth;
                     break;
+            }
+
+            miIndicatorAndActionButtonsWidth = 0;
+
+            // Indicators
+            foreach( ListViewCellIndicator indicator in Indicators )
+            {
+                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 5;
+                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorAndActionButtonsWidth - 5, _rect.Top + 10, indicator.ContentWidth, mListView.RowHeight - 20 ) );
             }
         }
 
@@ -123,6 +137,11 @@ namespace NuclearWinter.UI
             vTextPos.Y += mListView.Screen.Style.MediumFont.YOffset;
 
             mListView.Screen.Game.SpriteBatch.DrawString( mListView.Screen.Style.MediumFont, mstrText, vTextPos, Color );
+
+            foreach( ListViewCellIndicator indicator in Indicators )
+            {
+                indicator.Draw();
+            }
         }
     }
 
@@ -139,7 +158,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( ListViewColumn _col )
+        protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
         {
             mvOffset = Vector2.Zero;
             switch( _col.Anchor )
@@ -163,6 +182,97 @@ namespace NuclearWinter.UI
             vImagePos += mvOffset;
 
             mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color );
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    public class ListViewCellIndicator: Widget
+    {
+        public Texture2D            Frame;
+        public int                  FrameCornerSize;
+
+        public object               Tag;
+
+        public Texture2D            Icon
+        {
+            get { return mImage.Texture; }
+            set {
+                mImage.Texture = value;
+                UpdatePaddings();
+            }
+        }
+
+        public string Text
+        {
+            get { return mLabel.Text; }
+            set {
+                mLabel.Text = value;
+                UpdatePaddings();
+            }
+        }
+
+        Label                       mLabel;
+        Image                       mImage;
+
+        void UpdatePaddings()
+        {
+            mImage.Padding = mLabel.Text != "" ? new Box( 0, 0, 0, 10 ) : new Box(0);
+            mLabel.Padding = mImage.Texture != null ? new Box( 5, 5, 5, 0 ) : new Box( 5 );
+
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        public ListViewCellIndicator( Screen _screen, string _strText, Texture2D _iconTex=null, object _tag=null )
+        : base( _screen )
+        {
+            mLabel = new Label( Screen, _strText );
+            mLabel.Font = Screen.Style.SmallFont;
+            mLabel.Parent = this;
+
+            mImage = new Image( _screen, _iconTex );
+
+            UpdatePaddings();
+
+            Tag = _tag;
+
+            UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        protected internal override void UpdateContentSize()
+        {
+            ContentWidth = ( mImage.Texture != null ? mImage.ContentWidth : 0 ) + ( mLabel.Text != "" ? mLabel.ContentWidth : 0 );
+        }
+
+        protected internal override void DoLayout( Rectangle _rect )
+        {
+            base.DoLayout( _rect );
+
+            int iLabelX = 0;
+            if( mImage.Texture != null )
+            {
+                mImage.DoLayout( new Rectangle( _rect.X, _rect.Y, mImage.ContentWidth, _rect.Height ) );
+                iLabelX += mImage.ContentWidth;
+            }
+
+            mLabel.DoLayout( new Rectangle( _rect.X + iLabelX, _rect.Y, _rect.Width - iLabelX, _rect.Height ) );
+        }
+
+        //----------------------------------------------------------------------
+        protected internal override void Draw()
+        {
+            if( Frame != null )
+            {
+                Screen.DrawBox( Frame, LayoutRect, FrameCornerSize, Color.White );
+            }
+
+            if( mImage.Texture != null )
+            {
+                mImage.Draw();
+            }
+
+            mLabel.Draw();
         }
     }
 
@@ -351,15 +461,18 @@ namespace NuclearWinter.UI
                     col.Image.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
                 }
 
-
-                iColX += col.Width + ColSpacing;
-
+                int iRowIndex = 0;
                 foreach( ListViewRow row in Rows )
                 {
-                    row.Cells[ iColIndex ].DoLayout( col );
+                    int iRowY = GetRowY( iRowIndex );
+                    row.Cells[ iColIndex ].DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10 + iRowY, col.Width, RowHeight ), col );
+
+                    iRowIndex++;
                 }
 
                 iColIndex++;
+
+                iColX += col.Width + ColSpacing;
             }
 
             //------------------------------------------------------------------
@@ -609,6 +722,17 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        protected internal override void OnFocus()
+        {
+            base.OnFocus();
+
+            if( FocusedRow == null )
+            {
+                FocusedRow = SelectedRow;
+            }
+        }
+
+        //----------------------------------------------------------------------
         void SelectRowAt( Point _hitPoint )
         {
             UpdateHoveredRow();
@@ -670,6 +794,8 @@ namespace NuclearWinter.UI
             {
                 base.OnPadMove( _direction );
             }
+
+            if( SelectHandler != null ) SelectHandler( this );
         }
 
         //----------------------------------------------------------------------
