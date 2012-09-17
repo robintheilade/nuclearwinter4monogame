@@ -1431,7 +1431,7 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        CurrentListIndex = lListIndices.Pop() + 1;
+                        CurrentListIndex = ( lListIndices.Count > 0 ? lListIndices.Pop() : 0 ) + 1;
                     }
                 }
                 else
