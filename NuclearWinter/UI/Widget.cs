@@ -8,8 +8,10 @@ using System.Diagnostics;
 
 #if !MONOGAME
 using OSKey = System.Windows.Forms.Keys;
-#else
+#elif !MONOMAC
 using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI

@@ -95,6 +95,7 @@
     <Reference Include="MonoMac" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
       <HintPath>..\MonoGame\MonoMac.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AABB.cs" />

@@ -9,6 +9,11 @@ using System.Linq;
 using System.Collections;
 using System.Diagnostics;
 
+#if MONOMAC
+using MonoMac.AppKit;
+using MonoMac.OpenGL;
+#endif
+
 namespace NuclearWinter.Input
 {
     [Flags]
@@ -22,6 +27,127 @@ namespace NuclearWinter.Input
         LeftWindows = 1 << 4,
         RightWindows = 1 << 5,
     }
+
+#if MONOMAC
+    // Our responder class is going to derive from NSTextView. This is insanely hackish, but this
+    // is the only way for us to get the OS to call ˝InsertText˝. Normally, under a plain normal
+    // Objective-C piece of code, one could implement a class that derives from NSResponder, and
+    // implements the NSTextInputClient protocol, which is the one getting the ˝insertText˝ event.
+    // But it looks like MonoMac's implementation doesn't describe NSTextInputClient at all,
+    // (not even as an interface, as it should be) and the only class that has that event is
+    // NSTextView. Oh well, this works.
+    public class KeyboardResponder : NSTextView {
+        public delegate void EnterTextDelegate(char c);
+        public delegate void JustPressedKeyDelegate(NSKey key);
+
+        public KeyboardResponder(
+            EnterTextDelegate enterText,
+            JustPressedKeyDelegate justPressedKey,
+            MonoMacGameView gameView)
+                // Our rectangle has to match that of the containing view, if we want to be able
+                // to properly get all the mouse events.
+                : base (gameView.Window.ContentView.Frame)
+        {
+            EnterText = enterText;
+            JustPressedKey = justPressedKey;
+            GameView = gameView;
+
+            // For all the events we don't care about, the GameView will get them. There might not
+            // be that many though, as we should cover all the bases there, but one never knows.
+            NextResponder = GameView;
+            // We authorize the parent's view to automatically change our width and height in case
+            // of a window resize.
+            AutoresizingMask = NSViewResizingMask.WidthSizable | NSViewResizingMask.HeightSizable;
+            // We force ourselves to be the first responder to be called, and we will never resign
+            // that duty. That will enable us to get all of the key events, but will also prevent
+            // the GameView to get the mouse events. We'll have to forward them.
+            GameView.Window.MakeFirstResponder(this);
+            // We need to ˝display˝ ourselves if we want to get any mouse events.
+            GameView.Window.ContentView.AddSubview(this);
+            // Just in case...
+            GameView.Window.ContentView.AutoresizesSubviews = true;
+        }
+
+        // We won't resign our duty as first responder.
+        public override bool ResignFirstResponder() { return false; }
+        // And we accept the duty to be first responder.
+        public override bool BecomeFirstResponder() { return true; }
+        // Also, we accept any mouse event.
+        public override bool AcceptsFirstMouse(NSEvent theEvent) { return true; }
+
+        // We're not going to let the NSTextView have any of these events. It can heavily mess
+        // with the state of the mouse and keyboard. Moreover, as the NSTextView is on the front
+        // it hides the mouse hits. So we have to forward all the events to the GameView.
+        public override void MouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
+        public override void MouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
+        public override void MouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
+        
+        public override void RightMouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
+        public override void RightMouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
+        public override void RightMouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
+        
+        public override void OtherMouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
+        public override void OtherMouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
+        public override void OtherMouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
+        
+        public override void KeyUp(NSEvent theEvent) { GameView.KeyUp(theEvent); }
+
+        // This method override is the crux of that whole hack. We snoop on the KeyDown events,
+        // in order to fill the JustPressedOSKeys array, and to feed the events to the NSTextView's
+        // ˝InterpretKeyEvents˝, which will call our InsertText as a result. We still want the
+        // GameView to get these events though, so to properly process the state of the keyboard
+        // inside MonoGame.
+        public override void KeyDown(NSEvent theEvent)
+        {
+            NSKey theKey = (NSKey)Enum.ToObject(typeof(NSKey), theEvent.KeyCode);
+            // Under MacOS, the backspace key is called ˝Delete˝, and the delete key is called ForwardDelete.
+            // Well, this unfortunately collides with the XNA's ˝Delete˝ definition of the normal delete key.
+            // So, we swap the notion of ˝Delete˝ and ˝ForwardDelete˝ there. This is kind of hackish, but
+            // this will prevent any potential bug where a new programmer may implement a widget that do
+            // actions based on the ˝Delete˝ key and forgets the MacOS case where it's called ForwardDelete.
+            switch (theKey) {
+                case NSKey.Delete: theKey = NSKey.ForwardDelete; break;
+                case NSKey.ForwardDelete: theKey = NSKey.Delete; break;
+            }
+            // Seems some keys are weirdly mapped. Let's re-assign them properly.
+            switch (theEvent.KeyCode) {
+                case 115: theKey = NSKey.Home; break;
+                case 116: theKey = NSKey.PageUp; break;
+                case 119: theKey = NSKey.End; break;
+                case 121: theKey = NSKey.PageDown; break;
+                case 123: theKey = NSKey.LeftArrow; break;
+                case 124: theKey = NSKey.RightArrow; break;
+                case 125: theKey = NSKey.DownArrow; break;
+                case 126: theKey = NSKey.UpArrow; break;
+            }
+            // Signalling NuclearWinter of the ˝OS˝ key that has been pushed.
+            JustPressedKey(theKey);
+            // Passing down the event to the OS, to get a nice interpretation.
+            InterpretKeyEvents(new NSEvent[] { theEvent} );
+            GameView.KeyDown(theEvent);
+        }
+
+        // This may get called as a result of InterpretKeyEvents, by giving us a string the
+        // OS interpreted from the events. For example, Shift+o will get the string ˝O˝.
+        public override void InsertText(MonoMac.Foundation.NSObject insertString)
+        {
+            string str = insertString.ToString();
+            foreach (char c in str)
+                EnterText(c);
+        }
+
+        // We need to de-reference the GameView so that the pool can collect it properly.
+        protected override void Dispose(bool dispose)
+        {
+            if (dispose)
+                GameView = null;
+        }
+
+        private EnterTextDelegate EnterText;
+        private JustPressedKeyDelegate JustPressedKey;
+        private MonoMacGameView GameView;
+    }
+#endif
 
     public class InputManager: GameComponent
     {
@@ -64,12 +190,20 @@ namespace NuclearWinter.Input
         public List<char>                           EnteredText             { get; private set; }
         public List<Keys>                           JustPressedKeys         { get; private set; }
 
+#if MONOMAC
+        public KeyboardResponder                    OurResponder;
+#endif
+
 #if !MONOGAME
         public List<System.Windows.Forms.Keys>      JustPressedOSKeys       { get; private set; }
         WindowMessageFilter                         mMessageFilter;
-#else
-        public List<OpenTK.Input.Key>               JustPressedOSKeys       { get; private set; }
 
+#else
+#if !MONOMAC
+        public List<OpenTK.Input.Key>               JustPressedOSKeys       { get; private set; }
+#else
+        public List<NSKey>                          JustPressedOSKeys       { get; private set; }
+#endif
         float                                       mfTimeSinceLastClick;
 #endif
         bool                                        mbDoubleClicked;
@@ -110,13 +244,21 @@ namespace NuclearWinter.Input
             mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedOSKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #else
-            JustPressedOSKeys  = new List<OpenTK.Input.Key>();
 
+#if !MONOMAC
+            JustPressedOSKeys  = new List<OpenTK.Input.Key>();
             System.Reflection.FieldInfo info = typeof(OpenTKGameWindow).GetField( "window", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField );
             OpenTK.GameWindow window = (OpenTK.GameWindow)info.GetValue( Game.Window );
             window.Keyboard.KeyRepeat = true;
             window.KeyPress += delegate( object _sender, OpenTK.KeyPressEventArgs _e ) { EnteredText.Add( _e.KeyChar ); };
             window.Keyboard.KeyDown  += delegate( object _sender, OpenTK.Input.KeyboardKeyEventArgs  _e ) { JustPressedOSKeys.Add( _e.Key ); };
+#else
+            JustPressedOSKeys  = new List<NSKey>();
+            OurResponder = new KeyboardResponder(
+                delegate(char c) { EnteredText.Add(c); },
+                delegate(NSKey k) { JustPressedOSKeys.Add(k); },
+                Game.Window);
+#endif
 
             MouseState = Mouse.GetState();
             PreviousMouseState = MouseState;

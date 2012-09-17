@@ -8,8 +8,10 @@ using Microsoft.Xna.Framework.Input;
 
 #if !MONOGAME
 using OSKey = System.Windows.Forms.Keys;
-#else
+#elif !MONOMAC
 using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -408,10 +410,18 @@ namespace NuclearWinter.UI
                         PasteFromClipboard();
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Enter:
+#else
+                case OSKey.Return:
+#endif
                     if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
                     break;
+#if !MONOMAC
                 case OSKey.Back:
+#else
+                case OSKey.ForwardDelete:
+#endif
                     if( ! IsReadOnly && Text.Length > 0 )
                     {
                         if( SelectionOffset != 0 )
@@ -450,7 +460,11 @@ namespace NuclearWinter.UI
                         DeleteSelectedText();
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Left:
+#else
+                case OSKey.LeftArrow:
+#endif
                     if( bShift )
                     {
                         if( bCtrl )
@@ -491,7 +505,11 @@ namespace NuclearWinter.UI
                         CaretOffset = iNewCaretOffset;
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Right:
+#else
+                case OSKey.RightArrow:
+#endif
                     if( bShift )
                     {
                         if( bCtrl )

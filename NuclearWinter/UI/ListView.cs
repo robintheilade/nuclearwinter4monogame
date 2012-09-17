@@ -11,8 +11,10 @@ using System.Diagnostics;
 
 #if !MONOGAME
 using OSKey = System.Windows.Forms.Keys;
-#else
+#elif !MONOMAC
 using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -813,7 +815,11 @@ namespace NuclearWinter.UI
         {
             switch( _key )
             {
+#if !MONOMAC
                 case OSKey.Enter:
+#else
+                case OSKey.Return:
+#endif
                     if( SelectedRow != null && ValidateHandler != null ) ValidateHandler( this );
                     break;
             }

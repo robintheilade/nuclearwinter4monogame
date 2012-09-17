@@ -8,8 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 #if !MONOGAME
 using OSKey = System.Windows.Forms.Keys;
-#else
+#elif !MONOMAC
 using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -1057,7 +1059,11 @@ namespace NuclearWinter.UI
                         PasteFromClipboard();
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Enter:
+#else
+                case OSKey.Return:
+#endif
                     if( ! IsReadOnly )
                     {
                         TextBlock textBlock = TextBlocks[ Caret.StartTextBlockIndex ];
@@ -1131,7 +1137,11 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Back:
+#else
+                case OSKey.ForwardDelete:
+#endif
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -1215,7 +1225,11 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
+#if !MONOMAC
                 case OSKey.Left: {
+#else
+                case OSKey.LeftArrow: {
+#endif
                     int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
 
@@ -1258,7 +1272,11 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
+#if !MONOMAC
                 case OSKey.Right: {
+#else
+                case OSKey.RightArrow: {
+#endif
                     int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) + 1;
 
@@ -1316,11 +1334,19 @@ namespace NuclearWinter.UI
                     Caret.MoveStart( bShift );
                     mbScrollToCaret = true;
                     break;
+#if !MONOMAC
                 case OSKey.Up:
+#else
+                case OSKey.UpArrow:
+#endif
                     Caret.MoveUp( bShift );
                     mbScrollToCaret = true;
                     break;
+#if !MONOMAC
                 case OSKey.Down:
+#else
+                case OSKey.DownArrow:
+#endif
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;
