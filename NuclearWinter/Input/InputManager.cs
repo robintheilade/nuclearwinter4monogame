@@ -112,7 +112,7 @@ namespace NuclearWinter.Input
 #else
             JustPressedOSKeys  = new List<OpenTK.Input.Key>();
 
-            System.Reflection.FieldInfo info = typeof(OpenTK.GameWindow).GetField( "window", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField );
+            System.Reflection.FieldInfo info = typeof(OpenTKGameWindow).GetField( "window", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField );
             OpenTK.GameWindow window = (OpenTK.GameWindow)info.GetValue( Game.Window );
             window.Keyboard.KeyRepeat = true;
             window.KeyPress += delegate( object _sender, OpenTK.KeyPressEventArgs _e ) { EnteredText.Add( _e.KeyChar ); };
