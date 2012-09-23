@@ -24,12 +24,14 @@ namespace NuclearWinter.UI
         }
 
         string mstrText = "";
+        bool mbIsLabelDirty = false;
+
         public string               Text
         {
             get { return mstrText; }
             set {
                 mstrText = value;
-                UpdateLabel();
+                mbIsLabelDirty = true;
             }
         }
 
@@ -51,7 +53,7 @@ namespace NuclearWinter.UI
             get { return mbCollapsed; }
             set {
                 mbCollapsed = value;
-                UpdateLabel();
+                mbIsLabelDirty = true;
                 UpdateContentSize();
             }
         }
@@ -127,7 +129,7 @@ namespace NuclearWinter.UI
                 ((TreeViewNode)Parent).OnNodeAdded( ContainedNodeCount );
             }
 
-            UpdateLabel();
+            mbIsLabelDirty = true;
             UpdateContentSize();
         }
 
@@ -160,9 +162,10 @@ namespace NuclearWinter.UI
                 OnNodeRemoved( 1 + _args.Item.ContainedNodeCount );
             }
 
+            mbIsLabelDirty = true;
+
             if( mTreeView.LayoutSuspended ) return;
 
-            UpdateLabel();
             UpdateContentSize();
         }
 
@@ -171,7 +174,8 @@ namespace NuclearWinter.UI
         {
             ContainedNodeCount = 0;
             UncollapsedContainedNodeCount = 0;
-            UpdateLabel();
+
+            mbIsLabelDirty = true;
             UpdateContentSize();
         }
 
@@ -232,6 +236,12 @@ namespace NuclearWinter.UI
             HitBox = LayoutRect;
 
             miIndicatorAndActionButtonsWidth = 0;
+
+            if( mbIsLabelDirty )
+            {
+                UpdateLabel();
+                mbIsLabelDirty = false;
+            }
 
             if( mTreeView.HoveredNode == this && ! mTreeView.IsDragging )
             {
