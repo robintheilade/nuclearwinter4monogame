@@ -78,7 +78,7 @@ namespace NuclearWinter.UI
                 Offset = Max;
             }
 
-            miScrollbarHeight = (int)( ( ScrollRect.Height - 20 ) / ( (float)_iContentHeight / ( ScrollRect.Height - 20 ) ) );
+            miScrollbarHeight = Math.Max( 10,  (int)( ( ScrollRect.Height - 20 ) / ( (float)_iContentHeight / ( ScrollRect.Height - 20 ) ) ) );
             miScrollbarOffset = (int)( (float)LerpOffset / Max * (float)( ScrollRect.Height - 20 - miScrollbarHeight ) );
         }
 
