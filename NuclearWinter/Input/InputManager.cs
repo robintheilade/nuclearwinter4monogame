@@ -52,20 +52,30 @@ namespace NuclearWinter.Input
             JustPressedKey = justPressedKey;
             GameView = gameView;
 
-            // For all the events we don't care about, the GameView will get them. There might not
-            // be that many though, as we should cover all the bases there, but one never knows.
-            NextResponder = GameView;
             // We authorize the parent's view to automatically change our width and height in case
             // of a window resize.
             AutoresizingMask = NSViewResizingMask.WidthSizable | NSViewResizingMask.HeightSizable;
-            // We force ourselves to be the first responder to be called, and we will never resign
-            // that duty. That will enable us to get all of the key events, but will also prevent
-            // the GameView to get the mouse events. We'll have to forward them.
-            GameView.Window.MakeFirstResponder(this);
             // We need to ˝display˝ ourselves if we want to get any mouse events.
             GameView.Window.ContentView.AddSubview(this);
             // Just in case...
             GameView.Window.ContentView.AutoresizesSubviews = true;
+            GameView.AutoresizesSubviews = true;
+
+            // For all the events we don't care about, the GameView will get them. There might not
+            // be that many though, as we should cover all the bases there, but one never knows.
+            NextResponder = GameView;
+            // We force ourselves to be the first responder to be called, and we will never resign
+            // that duty. That will enable us to get all of the key events, but will also prevent
+            // the GameView to get the mouse events. We'll have to forward them.
+            GameView.Window.MakeFirstResponder(this);
+
+            Selectable = false;
+        }
+
+        public override void ResizeWithOldSuperviewSize(System.Drawing.SizeF oldSize)
+        {
+            base.ResizeWithOldSuperviewSize(oldSize);
+            Frame = Superview.Bounds;
         }
 
         // We won't resign our duty as first responder.
