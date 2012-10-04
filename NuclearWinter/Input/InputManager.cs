@@ -88,17 +88,17 @@ namespace NuclearWinter.Input
         // We're not going to let the NSTextView have any of these events. It can heavily mess
         // with the state of the mouse and keyboard. Moreover, as the NSTextView is on the front
         // it hides the mouse hits. So we have to forward all the events to the GameView.
-        public override void MouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
         public override void MouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
+        public override void MouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
         public override void MouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
+
+        public override void RightMouseUp(NSEvent theEvent) { GameView.RightMouseUp(theEvent); }
+        public override void RightMouseDown(NSEvent theEvent) { GameView.RightMouseDown(theEvent); }
+        public override void RightMouseDragged(NSEvent theEvent) { GameView.RightMouseDragged(theEvent); }
         
-        public override void RightMouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
-        public override void RightMouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
-        public override void RightMouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
-        
-        public override void OtherMouseUp(NSEvent theEvent) { GameView.MouseUp(theEvent); }
-        public override void OtherMouseDown(NSEvent theEvent) { GameView.MouseDown(theEvent); }
-        public override void OtherMouseDragged(NSEvent theEvent) { GameView.MouseDragged(theEvent); }
+        public override void OtherMouseUp(NSEvent theEvent) { GameView.OtherMouseUp(theEvent); }
+        public override void OtherMouseDown(NSEvent theEvent) { GameView.OtherMouseDown(theEvent); }
+        public override void OtherMouseDragged(NSEvent theEvent) { GameView.OtherMouseDragged(theEvent); }
         
         public override void KeyUp(NSEvent theEvent) { GameView.KeyUp(theEvent); }
 
