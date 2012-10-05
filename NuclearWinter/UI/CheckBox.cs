@@ -44,6 +44,7 @@ namespace NuclearWinter.UI
             FrameCornerSize = Screen.Style.CheckBoxFrameCornerSize;
 
             mLabel = new Label( Screen, _strText, Anchor.Start );
+            mLabel.Padding = new Box( 10, 10, 10, 0 );
 
             UpdateContentSize();
         }
