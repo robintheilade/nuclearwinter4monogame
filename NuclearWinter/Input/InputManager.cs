@@ -29,14 +29,9 @@ namespace NuclearWinter.Input
     }
 
 #if MONOMAC
-    // Our responder class is going to derive from NSTextView. This is insanely hackish, but this
-    // is the only way for us to get the OS to call ˝InsertText˝. Normally, under a plain normal
-    // Objective-C piece of code, one could implement a class that derives from NSResponder, and
-    // implements the NSTextInputClient protocol, which is the one getting the ˝insertText˝ event.
-    // But it looks like MonoMac's implementation doesn't describe NSTextInputClient at all,
-    // (not even as an interface, as it should be) and the only class that has that event is
-    // NSTextView. Oh well, this works.
-    public class KeyboardResponder : NSTextView {
+    // KeyboardResponder has to be an NSView rather than a bare NSResponder to be able to track
+    // mouse events and pass them along to MonoGame's game view
+    public class KeyboardResponder : NSView {
         public delegate void EnterTextDelegate(char c);
         public delegate void JustPressedKeyDelegate(NSKey key);
 
@@ -68,8 +63,6 @@ namespace NuclearWinter.Input
             // that duty. That will enable us to get all of the key events, but will also prevent
             // the GameView to get the mouse events. We'll have to forward them.
             GameView.Window.MakeFirstResponder(this);
-
-            Selectable = false;
         }
 
         public override void ResizeWithOldSuperviewSize(System.Drawing.SizeF oldSize)
@@ -139,11 +132,20 @@ namespace NuclearWinter.Input
 
         // This may get called as a result of InterpretKeyEvents, by giving us a string the
         // OS interpreted from the events. For example, Shift+o will get the string ˝O˝.
-        public override void InsertText(MonoMac.Foundation.NSObject insertString)
+        [MonoMac.Foundation.Export("insertText:")]
+        public void InsertText(MonoMac.Foundation.NSObject insertString)
         {
             string str = insertString.ToString();
             foreach (char c in str)
                 EnterText(c);
+        }
+
+        // This may get called as a result of InterpretKeyEvents. Exporting this method
+        // is required, otherwise we'd get a system beep instead
+        [MonoMac.Foundation.Export("doCommandBySelector:")]
+        public void DoCommandBySelector( MonoMac.ObjCRuntime.Selector aSelector)
+        {
+            // Ignore command
         }
 
         // We need to de-reference the GameView so that the pool can collect it properly.
