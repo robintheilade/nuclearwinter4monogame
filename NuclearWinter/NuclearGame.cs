@@ -17,6 +17,10 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 #endif
 
+#if MONOMAC
+using MonoMac.Foundation;
+#endif
+
 #if WINDOWS_PHONE
 using Microsoft.Phone.Shell;
 #endif
@@ -39,6 +43,8 @@ namespace NuclearWinter
         // Index of the player responsible for menu navigation (or null if none yet)
         public PlayerIndex?                         PlayerInCharge;
 #endif
+
+        public static readonly string               ApplicationDataFolderPath;
 
         public Storage.SaveHandler                  NuclearSaveHandler;
 #if WINDOWS || LINUX || MACOSX || XBOX
@@ -112,6 +118,16 @@ namespace NuclearWinter
              GWL_ID =           (-12)
         }
 #endif
+
+        static NuclearGame()
+        {
+#if !MONOMAC
+            ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
+#else
+            NSError error;
+            ApplicationDataFolderPath = NSFileManager.DefaultManager.GetUrl( NSSearchPathDirectory.LibraryDirectory, NSSearchPathDomain.User, new NSUrl(), true, out error ).Path;
+#endif
+        }
 
         //----------------------------------------------------------------------
         public NuclearGame( bool _bUseGameStateManager=true )
