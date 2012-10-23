@@ -242,7 +242,11 @@ namespace NuclearWinter.Input
 
             lButtons                = Utils.GetValues<Buttons>();
             
+#if !MACOSX
             ActiveShortcutKey       = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
+#else
+            ActiveShortcutKey       = ShortcutKey.LeftWindows | ShortcutKey.RightWindows;
+#endif
 
 #if WINDOWS || LINUX || MACOSX
             EnteredText             = new List<char>();
