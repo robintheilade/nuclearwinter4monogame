@@ -316,6 +316,16 @@ namespace NuclearWinter
         }
 #endif
 
+
+#if MACOSX
+        //----------------------------------------------------------------------
+        public void DoExiting()
+        {
+            OnExiting(this, EventArgs.Empty);
+            UnloadContent();
+        }
+#endif
+
         //----------------------------------------------------------------------
         protected override void OnExiting( object _sender, EventArgs _args )
         {
