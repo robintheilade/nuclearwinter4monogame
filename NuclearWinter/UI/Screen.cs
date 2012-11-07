@@ -438,13 +438,15 @@ namespace NuclearWinter.UI
             Debug.Assert( mlScissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles" );
         }
 
-        internal void SuspendBatch()
+        //----------------------------------------------------------------------
+        public void SuspendBatch()
         {
             Game.SpriteBatch.End();
             Game.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         }
 
-        internal void ResumeBatch()
+        //----------------------------------------------------------------------
+        public void ResumeBatch()
         {
             Game.GraphicsDevice.RasterizerState = Game.ScissorRasterizerState;
 
