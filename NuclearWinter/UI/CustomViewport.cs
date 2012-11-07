@@ -24,12 +24,6 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected Point TransformPointScreenToViewport( Point _point )
-        {
-            return new Point( _point.X - LayoutRect.X, _point.Y - LayoutRect.Y );
-        }
-
-        //----------------------------------------------------------------------
         Viewport mPreviousViewport;
 
         protected internal virtual void BeginDraw()

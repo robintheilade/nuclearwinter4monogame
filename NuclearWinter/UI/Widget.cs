@@ -128,6 +128,7 @@ namespace NuclearWinter.UI
         {
         }
 
+        //----------------------------------------------------------------------
         protected internal virtual void DoLayout( Rectangle _rect )
         {
             Rectangle childRectangle;
@@ -210,6 +211,13 @@ namespace NuclearWinter.UI
             }
         }
 
+        //----------------------------------------------------------------------
+        protected Point TransformPointScreenToWidget( Point _point )
+        {
+            return new Point( _point.X - LayoutRect.X, _point.Y - LayoutRect.Y );
+        }
+
+        //----------------------------------------------------------------------
         protected internal virtual void Update( float _fElapsedTime ) {}
 
         protected internal virtual void UpdateContentSize()
