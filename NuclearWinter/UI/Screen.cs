@@ -450,12 +450,10 @@ namespace NuclearWinter.UI
 
             if( mlScissorRects.Count > 0 )
             {
-                try
+                var rect = mlScissorRects.Peek();
+                if( rect.Width > 0 && rect.Height > 0 )
                 {
-                    Game.GraphicsDevice.ScissorRectangle = mlScissorRects.Peek();
-                }
-                catch
-                {
+                    Game.GraphicsDevice.ScissorRectangle = rect;
                 }
 
                 Game.SpriteBatch.Begin( SpriteSortMode.Deferred, null, null, null, Game.ScissorRasterizerState, null, Game.SpriteMatrix );
