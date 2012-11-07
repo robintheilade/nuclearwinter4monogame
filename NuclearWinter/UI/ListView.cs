@@ -712,28 +712,6 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnKeyPress( Keys _key )
-        {
-            switch( _key )
-            {
-                case Keys.Home:
-                    Scrollbar.Offset = 0;
-                    break;
-                case Keys.End:
-                    Scrollbar.Offset = Scrollbar.Max;
-                    break;
-                case Keys.PageUp:
-                    Scrollbar.Offset -= LayoutRect.Height;
-                    break;
-                case Keys.PageDown:
-                    Scrollbar.Offset += LayoutRect.Height;
-                    break;
-            }
-
-            base.OnKeyPress( _key );
-        }
-
-        //----------------------------------------------------------------------
         protected internal override void OnFocus()
         {
             base.OnFocus();
@@ -815,6 +793,18 @@ namespace NuclearWinter.UI
         {
             switch( _key )
             {
+                case OSKey.Home:
+                    Scrollbar.Offset = 0;
+                    break;
+                case OSKey.End:
+                    Scrollbar.Offset = Scrollbar.Max;
+                    break;
+                case OSKey.PageUp:
+                    Scrollbar.Offset -= LayoutRect.Height;
+                    break;
+                case OSKey.PageDown:
+                    Scrollbar.Offset += LayoutRect.Height;
+                    break;
 #if !MONOMAC
                 case OSKey.Enter:
 #else

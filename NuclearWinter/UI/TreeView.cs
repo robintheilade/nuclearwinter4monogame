@@ -8,6 +8,14 @@ using NuclearWinter.Collections;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
 
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#elif !MONOMAC
+using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
+#endif
+
 namespace NuclearWinter.UI
 {
     //--------------------------------------------------------------------------
@@ -1032,37 +1040,35 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnKeyPress( Keys _key )
+        protected internal override void OnOSKeyPress( OSKey _key )
         {
             switch( _key )
             {
-                case Keys.Home:
+                case OSKey.Home:
                     Scrollbar.Offset = 0;
                     break;
-                case Keys.End:
+                case OSKey.End:
                     Scrollbar.Offset = Scrollbar.Max;
                     break;
-                case Keys.PageUp:
+                case OSKey.PageUp:
                     Scrollbar.Offset -= LayoutRect.Height;
                     break;
-                case Keys.PageDown:
+                case OSKey.PageDown:
                     Scrollbar.Offset += LayoutRect.Height;
                     break;
-                case Keys.Enter:
+                case OSKey.Enter:
                     if( ValidateHandler != null && SelectedNode != null )
                     {
                         ValidateHandler( this );
                     }
                     break;
-                case Keys.Delete:
+                case OSKey.Delete:
                     if( RemoveHandler != null )
                     {
                         RemoveHandler(this);
                     }
                     break;
             }
-
-            base.OnKeyPress( _key );
         }
 
         //----------------------------------------------------------------------
