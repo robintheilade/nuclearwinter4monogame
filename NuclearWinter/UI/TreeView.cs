@@ -238,7 +238,7 @@ namespace NuclearWinter.UI
 
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -280,7 +280,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             if( ! LayoutRect.Intersects( Screen.ScissorRectangle ) ) return;
 
@@ -497,7 +497,7 @@ namespace NuclearWinter.UI
             ContentWidth = ( mImage.Texture != null ? mImage.ContentWidth : 0 ) + ( mLabel.Text != "" ? mLabel.ContentWidth : 0 );
         }
 
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
@@ -512,7 +512,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             if( Frame != null )
             {
@@ -672,7 +672,7 @@ namespace NuclearWinter.UI
         }
         
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
@@ -1252,7 +1252,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Screen.DrawBox( Screen.Style.ListFrame, LayoutRect, 30, Color.White );
 

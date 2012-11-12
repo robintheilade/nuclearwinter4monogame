@@ -129,7 +129,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal virtual void DoLayout( Rectangle _rect )
+        public virtual void DoLayout( Rectangle _rect )
         {
             Rectangle childRectangle;
 
@@ -309,8 +309,8 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal abstract void  Draw();
-        protected internal virtual void   DrawFocused() {}
-        protected internal virtual void   DrawHovered() {}
+        public abstract void                Draw();
+        protected internal virtual void     DrawFocused() {}
+        protected internal virtual void     DrawHovered() {}
     }
 }

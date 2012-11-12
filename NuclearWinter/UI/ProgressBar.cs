@@ -45,7 +45,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Screen.DrawBox( Screen.Style.ProgressBarFrame, LayoutRect, Screen.Style.ProgressBarFrameCornerSize, Color.White );
 

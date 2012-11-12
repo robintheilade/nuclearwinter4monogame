@@ -60,7 +60,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             if( mfTooltipTimer < sfTooltipDelay || string.IsNullOrEmpty( Text ) ) return;
 

@@ -61,7 +61,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -150,7 +150,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
 

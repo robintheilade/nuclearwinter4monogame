@@ -167,7 +167,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
         }

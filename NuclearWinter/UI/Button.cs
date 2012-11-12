@@ -207,7 +207,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -347,7 +347,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.FrameDown;
 

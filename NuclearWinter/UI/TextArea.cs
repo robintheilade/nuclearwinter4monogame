@@ -440,7 +440,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle  _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
@@ -1160,7 +1160,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
             if( DisplayLineNumbers )

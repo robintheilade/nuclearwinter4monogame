@@ -180,7 +180,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
             HitBox = LayoutRect;
@@ -430,7 +430,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Draw()
+        public override void Draw()
         {
             Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
 
