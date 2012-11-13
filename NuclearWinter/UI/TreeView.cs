@@ -618,7 +618,6 @@ namespace NuclearWinter.UI
         internal bool                       IsDragging { get; private set; }
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
-        const int                           siDragTriggerDistance   = 10;
 
         //----------------------------------------------------------------------
         public TreeView( Screen _screen )
@@ -723,8 +722,8 @@ namespace NuclearWinter.UI
             if( mbIsMouseDown && FocusedNode != null )
             {
                 IsDragging = DragNDropHandler != null && (
-                        Math.Abs( _hitPoint.Y - ( mMouseDownPoint.Y + (int)Scrollbar.LerpOffset ) ) > siDragTriggerDistance
-                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
+                        Math.Abs( _hitPoint.Y - ( mMouseDownPoint.Y + (int)Scrollbar.LerpOffset ) ) > MouseDragTriggerDistance
+                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > MouseDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
             }
 

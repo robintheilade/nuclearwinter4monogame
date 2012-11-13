@@ -242,6 +242,8 @@ namespace NuclearWinter.UI
 
         protected internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
+        public const int                    MouseDragTriggerDistance   = 10;
+
         protected internal virtual void OnOSKeyPress( OSKey _key )
         {
             if( _key == OSKey.Tab )

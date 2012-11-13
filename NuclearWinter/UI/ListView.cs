@@ -351,7 +351,6 @@ namespace NuclearWinter.UI
         internal bool                       IsDragging { get; private set; }
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
-        const int                           siDragTriggerDistance   = 10;
         bool                                mbInsertAfter;
 
         //----------------------------------------------------------------------
@@ -516,8 +515,8 @@ namespace NuclearWinter.UI
             if( mbIsMouseDown && FocusedRow != null )
             {
                 IsDragging = DragNDropHandler != null && (
-                        Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > siDragTriggerDistance
-                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > siDragTriggerDistance );
+                        Math.Abs( _hitPoint.Y - mMouseDownPoint.Y ) > MouseDragTriggerDistance
+                    ||  Math.Abs( _hitPoint.X - mMouseDownPoint.X ) > MouseDragTriggerDistance );
                 mMouseDragPoint = _hitPoint;
             }
 
