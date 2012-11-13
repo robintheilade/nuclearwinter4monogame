@@ -633,7 +633,7 @@ namespace NuclearWinter.UI
             else
             {
                 mbIsMouseDown = true;
-                mMouseDownPoint = new Point( _hitPoint.X, _hitPoint.Y - (int)Scrollbar.LerpOffset );
+                mMouseDownPoint = new Point( _hitPoint.X, _hitPoint.Y + (int)Scrollbar.LerpOffset );
 
                 Screen.Focus( this );
 
