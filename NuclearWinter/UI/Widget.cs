@@ -232,8 +232,13 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         // Events
-        protected internal virtual void       OnMouseDown ( Point _hitPoint, int _iButton ) {}
+
+        // Called when a mouse button was pressed. Widget should return true if event was consumed
+        // Otherwise it will bubble up to its parent
+        protected internal virtual bool       OnMouseDown ( Point _hitPoint, int _iButton ) { return true; }
         protected internal virtual void       OnMouseUp   ( Point _hitPoint, int _iButton ) {}
+
+
         protected internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
 
         protected internal virtual void       OnMouseEnter( Point _hitPoint ) {}

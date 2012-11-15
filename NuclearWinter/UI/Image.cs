@@ -93,9 +93,15 @@ namespace NuclearWinter.UI
             if( MouseOutHandler != null ) MouseOutHandler( this );
         }
 
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( MouseDownHandler != null ) MouseDownHandler( this );
+            if( MouseDownHandler != null )
+            {
+                MouseDownHandler( this );
+                return true;
+            }
+
+            return false;
         }
 
         protected internal override void OnMouseUp(Point _hitPoint, int _iButton)

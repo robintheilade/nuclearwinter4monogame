@@ -185,20 +185,24 @@ namespace NuclearWinter.UI
                         {
                             miClickedWidgetMouseButton = iButton;
 
+                            Widget hitWidget = null;
+
                             if( FocusedWidget != null )
                             {
-                                mClickedWidget = FocusedWidget.HitTest( mouseHitPoint );
+                                hitWidget = FocusedWidget.HitTest( mouseHitPoint );
                             }
 
-                            if( mClickedWidget == null )
+                            if( hitWidget == null )
                             {
-                                mClickedWidget = Root.HitTest( mouseHitPoint );
+                                hitWidget = Root.HitTest( mouseHitPoint );
                             }
 
-                            if( mClickedWidget != null )
+                            while( hitWidget != null && ! hitWidget.OnMouseDown( mouseHitPoint, iButton ) )
                             {
-                                mClickedWidget.OnMouseDown( mouseHitPoint, iButton );
+                                hitWidget = hitWidget.Parent;
                             }
+
+                            mClickedWidget = hitWidget;
                         }
                     }
                 }

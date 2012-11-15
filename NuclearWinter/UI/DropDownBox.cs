@@ -228,9 +228,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             Screen.Focus( this );
             
@@ -256,6 +256,8 @@ namespace NuclearWinter.UI
                 IsOpen = ! IsOpen;
                 mPressedAnim.SetTime( 0f );
             }
+
+            return true;
         }
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )

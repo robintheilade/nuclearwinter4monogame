@@ -588,9 +588,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             mbIsDragging = true;
 
@@ -598,6 +598,8 @@ namespace NuclearWinter.UI
             SetCaretPosition( _hitPoint, bShift );
 
             Screen.Focus( this );
+
+            return true;
         }
 
         //----------------------------------------------------------------------

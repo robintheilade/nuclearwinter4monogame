@@ -878,9 +878,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             if( mHoveredActionButton != null )
             {
@@ -895,6 +895,8 @@ namespace NuclearWinter.UI
                 Screen.Focus( this );
                 FocusedNode = HoveredNode;
             }
+
+            return true;
         }
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )

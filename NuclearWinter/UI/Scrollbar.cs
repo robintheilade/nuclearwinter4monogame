@@ -93,9 +93,9 @@ namespace NuclearWinter.UI
             mScrollbarColor = sDefaultColor;
         }
 
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             mbIsMouseDown = true;
             mLastMouseDragPoint = _hitPoint;
@@ -107,6 +107,8 @@ namespace NuclearWinter.UI
                 Offset += ( mLastMouseDragPoint.Y - ( ScrollRect.Top + miScrollbarOffset + ( miScrollbarHeight / 2 )  ) ) * ScrollRect.Height / miScrollbarHeight;
 
             mMouseOffset = Offset;
+
+            return true;
         }
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )

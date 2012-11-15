@@ -80,9 +80,9 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             Screen.Focus( this );
             mbIsPressed = true;
@@ -95,6 +95,8 @@ namespace NuclearWinter.UI
             Value = MinValue + (int)Math.Floor( fProgress * ( MaxValue - MinValue ) / Step + 0.5f ) * Step;
 
             if( ChangeHandler != null ) ChangeHandler();
+
+            return true;
         }
 
         protected internal override void OnMouseMove( Point _hitPoint )
