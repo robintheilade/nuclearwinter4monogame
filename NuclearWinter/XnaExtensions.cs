@@ -32,5 +32,10 @@ namespace NuclearWinter.Xna
 
             return rect;
         }
+
+        public static Vector2 ToVector2( this Point _point )
+        {
+            return new Vector2( _point.X, _point.Y );
+        }
     }
 }
