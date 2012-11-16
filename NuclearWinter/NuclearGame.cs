@@ -348,17 +348,34 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         public void DrawLine( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1f )
         {
-           float fAngle     = (float)Math.Atan2( _vTo.Y - _vFrom.Y, _vTo.X - _vFrom.X );
-           float fLength    = Vector2.Distance( _vFrom, _vTo );
+            float fAngle     = (float)Math.Atan2( _vTo.Y - _vFrom.Y, _vTo.X - _vFrom.X );
+            float fLength    = Vector2.Distance( _vFrom, _vTo );
  
-           SpriteBatch.Draw( WhitePixelTex, _vFrom, null, _color, fAngle, Vector2.Zero, new Vector2( fLength, _fWidth ), SpriteEffects.None, 0 );
+            Vector2 vOrigin = new Vector2( fLength / 2f, _fWidth / 2f );
+
+            SpriteBatch.Draw( WhitePixelTex, ( _vFrom + _vTo ) / 2f, null, _color, fAngle, new Vector2( 0.5f ), new Vector2( fLength + _fWidth, _fWidth ), SpriteEffects.None, 0 );
         }
 
         public void DrawRect( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1 )
         {
+            if( _vFrom.X > _vTo.X )
+            {
+                float x = _vFrom.X;
+                _vFrom.X = _vTo.X;
+                _vTo.X = x;
+            }
+
+            if( _vFrom.Y > _vTo.Y )
+            {
+                float y = _vFrom.Y;
+                _vFrom.Y = _vTo.Y;
+                _vTo.Y = y;
+            }
+
+            DrawLine( _vFrom + new Vector2( _fWidth / 2f, 0f ), new Vector2( _vTo.X - _fWidth, _vFrom.Y ), _color, _fWidth );
+            DrawLine( new Vector2( _vFrom.X + _fWidth / 2f, _vTo.Y ), _vTo - new Vector2( _fWidth, 0f ), _color, _fWidth );
+
             DrawLine( _vFrom, new Vector2( _vFrom.X, _vTo.Y ), _color, _fWidth );
-            DrawLine( _vFrom, new Vector2( _vTo.X, _vFrom.Y ), _color, _fWidth );
-            DrawLine( new Vector2( _vFrom.X, _vTo.Y ), _vTo, _color, _fWidth );
             DrawLine( new Vector2( _vTo.X, _vFrom.Y ), _vTo, _color, _fWidth );
         }
 
