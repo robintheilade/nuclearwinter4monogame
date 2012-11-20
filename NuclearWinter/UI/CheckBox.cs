@@ -52,6 +52,8 @@ namespace NuclearWinter.UI
         protected internal override void UpdateContentSize()
         {
             ContentWidth = Screen.Style.CheckBoxSize + mLabel.ContentWidth;
+
+            base.UpdateContentSize();
         }
 
         public override void DoLayout( Rectangle _rect )

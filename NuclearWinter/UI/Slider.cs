@@ -58,6 +58,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
+            // No content size
         }
 
         //----------------------------------------------------------------------

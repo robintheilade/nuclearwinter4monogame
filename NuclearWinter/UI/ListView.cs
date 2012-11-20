@@ -245,6 +245,8 @@ namespace NuclearWinter.UI
         protected internal override void UpdateContentSize()
         {
             ContentWidth = ( mImage.Texture != null ? mImage.ContentWidth : 0 ) + ( mLabel.Text != "" ? mLabel.ContentWidth : 0 );
+
+            // Not calling base.UpdateContentSize();
         }
 
         public override void DoLayout( Rectangle _rect )
