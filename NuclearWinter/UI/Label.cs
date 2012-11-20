@@ -253,22 +253,28 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
+            DrawWithOffset( Point.Zero );
+        }
+
+        //----------------------------------------------------------------------
+        public void DrawWithOffset( Point _pOffset )
+        {
             if( WrapText )
             {
                 for( int i = 0; i < mlWrappedText.Count; i++ )
                 {
-                    float fX = mpTextPosition.X;
+                    float fX = mpTextPosition.X + _pOffset.X;
                     if( Anchor == UI.Anchor.Center )
                     {
                         fX += ContentWidth / 2 - Padding.Left - mFont.MeasureString( mlWrappedText[i].Item1 ).X / 2f;
                     }
 
-                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset ), Color, OutlineColor );
+                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
                 }
             }
             else
             {
-                Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X, mpTextPosition.Y + Font.YOffset ), Color, OutlineColor );
+                Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X + _pOffset.X, mpTextPosition.Y + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
             }
         }
     }

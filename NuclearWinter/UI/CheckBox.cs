@@ -93,11 +93,19 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Frame, mCheckBoxRect, FrameCornerSize, Color.White );
+            DrawWithOffset( Point.Zero );
+        }
+
+        //----------------------------------------------------------------------
+        public void DrawWithOffset( Point _pOffset )
+        {
+            var rect = mCheckBoxRect;
+            rect.Offset( _pOffset );
+            Screen.DrawBox( Frame, rect, FrameCornerSize, Color.White );
 
             if( mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.CheckBoxFrameHover, mCheckBoxRect, FrameCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.CheckBoxFrameHover, rect, FrameCornerSize, Color.White );
             }
 
             Texture2D tex;
@@ -117,9 +125,9 @@ namespace NuclearWinter.UI
                     throw new NotSupportedException();
             }
 
-            Screen.Game.SpriteBatch.Draw( tex, new Vector2( mCheckBoxRect.Center.X, mCheckBoxRect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
+            Screen.Game.SpriteBatch.Draw( tex, new Vector2( rect.Center.X, rect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
 
-            mLabel.Draw();
+            mLabel.DrawWithOffset( _pOffset );
         }
     }
 }
