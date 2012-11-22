@@ -46,7 +46,7 @@ namespace NuclearWinter.UI
             }
         }
         int     miCaretX;
-        int     miCaretWidth = 2;
+        public const int     CaretWidth = 2;
 
         int     miSelectionOffset;
         public int     SelectionOffset {
@@ -71,9 +71,9 @@ namespace NuclearWinter.UI
 
             int iScrollStep = LayoutRect.Width / 3;
 
-            if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - miCaretWidth )
+            if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - CaretWidth )
             {
-                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth ) + iScrollStep );
+                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ) + iScrollStep );
             }
             else
             if( iTarget < miScrollOffset )
@@ -113,10 +113,12 @@ namespace NuclearWinter.UI
         string                  mstrDisplayedText;
         int                     miScrollOffset;
 
-        int                     miTextWidth;
+        public Color            TextColor = Color.White;
+
+        public int              TextWidth { get; private set; }
         int                     miMaxScrollOffset {
             get {
-                return (int)Math.Max( 0, miTextWidth - ( LayoutRect.Width - Padding.Horizontal ) + miCaretWidth );
+                return (int)Math.Max( 0, TextWidth - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth );
             }
         }
 
@@ -241,7 +243,7 @@ namespace NuclearWinter.UI
         {
             mstrDisplayedText = ( mPasswordChar == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordChar );
 
-            miTextWidth = (int)Font.MeasureString( mstrDisplayedText ).X;
+            TextWidth = (int)Font.MeasureString( mstrDisplayedText ).X;
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
@@ -651,20 +653,32 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Frame, LayoutRect, FrameCornerSize, Color.White );
+            DrawWithOffset( Point.Zero );
+        }
+
+        //----------------------------------------------------------------------
+        public void DrawWithOffset( Point _pOffset )
+        {
+            var rect = LayoutRect;
+            rect.Offset( _pOffset );
+
+            if( Frame != null )
+            {
+                Screen.DrawBox( Frame, rect, FrameCornerSize, Color.White );
+            }
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonPress, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonPress, rect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
+            Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y, rect.Width - Padding.Horizontal, rect.Height ) );
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), Color.White );
+            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor );
 
             Screen.PopScissorRectangle();
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ) );
+            Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y + Padding.Top, rect.Width - Padding.Horizontal, rect.Height - Padding.Vertical ) );
 
             const float fBlinkInterval = 0.3f;
 
@@ -673,19 +687,19 @@ namespace NuclearWinter.UI
                 Rectangle selectionRectangle;
                 if( SelectionOffset > 0 )
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miSelectionX - miCaretX, LayoutRect.Height - Padding.Vertical );
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, miSelectionX - miCaretX, rect.Height - Padding.Vertical );
                 }
                 else
                 {
-                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretX - miSelectionX, LayoutRect.Height - Padding.Vertical );
+                    selectionRectangle = new Rectangle( mpTextPosition.X + miSelectionX - miScrollOffset, rect.Y + Padding.Top, miCaretX - miSelectionX, rect.Height - Padding.Vertical );
                 }
 
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f );
             }
             else
             if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, LayoutRect.Y + Padding.Top, miCaretWidth, LayoutRect.Height - Padding.Vertical ), Color.White );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, CaretWidth, rect.Height - Padding.Vertical ), TextColor );
             }
 
             Screen.PopScissorRectangle();
