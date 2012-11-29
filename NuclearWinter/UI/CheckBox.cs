@@ -49,6 +49,7 @@ namespace NuclearWinter.UI
             UpdateContentSize();
         }
 
+        //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
             ContentWidth = Screen.Style.CheckBoxSize + mLabel.ContentWidth;
@@ -56,16 +57,21 @@ namespace NuclearWinter.UI
             base.UpdateContentSize();
         }
 
+        //----------------------------------------------------------------------
         public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
 
-            mCheckBoxRect = new Rectangle( LayoutRect.X, LayoutRect.Y, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
+            mCheckBoxRect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
             mLabel.DoLayout( new Rectangle( LayoutRect.X + Screen.Style.CheckBoxSize, LayoutRect.Y, LayoutRect.Width - Screen.Style.CheckBoxSize, LayoutRect.Height ) );
             
-            HitBox = LayoutRect;
-
             UpdateContentSize();
+        }
+
+        //----------------------------------------------------------------------
+        public override Widget HitTest( Point _point )
+        {
+            return ( mCheckBoxRect.Contains( _point ) || mLabel.HitBox.Contains( _point ) ) ? this : null;
         }
 
         //----------------------------------------------------------------------

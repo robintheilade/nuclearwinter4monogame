@@ -214,8 +214,6 @@ namespace NuclearWinter.UI
             Rectangle previousLayoutRect = LayoutRect;
             base.DoLayout( _rect );
 
-            HitBox = LayoutRect;
-
             bool bTextLayoutNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
             if( bTextLayoutNeeded )
@@ -225,29 +223,29 @@ namespace NuclearWinter.UI
 
             Point pCenter = LayoutRect.Center;
 
-            int iTop = WrapText ? ( LayoutRect.Y + Padding.Top ) : ( pCenter.Y - ContentHeight / 2 + Padding.Top );
+            int iTop = WrapText ? ( LayoutRect.Y ) : ( pCenter.Y - ContentHeight / 2 );
+            int iLeft;
+            int iActualWidth = ( ContentWidth > LayoutRect.Width ? miEllipsizedTextWidth : ContentWidth );
 
             switch( Anchor )
             {
                 case UI.Anchor.Start:
-                    mpTextPosition = new Point(
-                        LayoutRect.X + Padding.Left,
-                        iTop
-                    );
+                    iLeft = LayoutRect.X;
+                    mpTextPosition = new Point( iLeft + Padding.Left, iTop + Padding.Top );
                     break;
                 case UI.Anchor.Center:
-                    mpTextPosition = new Point(
-                        pCenter.X - ( ContentWidth > LayoutRect.Width ? miEllipsizedTextWidth : ContentWidth ) / 2 + Padding.Left,
-                        iTop
-                    );
+                    iLeft = pCenter.X - iActualWidth / 2;
+                    mpTextPosition = new Point( iLeft + Padding.Left, iTop + Padding.Top );
                     break;
                 case UI.Anchor.End:
-                    mpTextPosition = new Point(
-                        LayoutRect.Right + Padding.Right - ( ContentWidth > LayoutRect.Width ? miEllipsizedTextWidth : ContentWidth ),
-                        iTop
-                    );
+                    iLeft = LayoutRect.Right - iActualWidth;
+                    mpTextPosition = new Point( iLeft + Padding.Left, iTop + Padding.Top );
                     break;
+                default:
+                    throw new NotSupportedException();
             }
+
+            HitBox = new Rectangle( iLeft, iTop, iActualWidth, ContentHeight );
         }
 
         //----------------------------------------------------------------------
