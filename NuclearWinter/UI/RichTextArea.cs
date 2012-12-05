@@ -1401,7 +1401,7 @@ namespace NuclearWinter.UI
 
             //------------------------------------------------------------------
             // Text
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + mPadding.Left, LayoutRect.Y + mPadding.Top, LayoutRect.Width - mPadding.Horizontal, LayoutRect.Height - mPadding.Vertical ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
 
             int iX = LayoutRect.X + Padding.Left;
             int iY = LayoutRect.Y + Padding.Top;
