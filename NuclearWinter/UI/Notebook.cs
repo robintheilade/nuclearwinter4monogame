@@ -364,7 +364,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Close()
+        public void Close( bool _bTriggerCloseHandler=false )
         {
             mNotebook.Tabs.Remove( this );
 
@@ -372,6 +372,12 @@ namespace NuclearWinter.UI
             {
                 Screen.Focus( mNotebook );
             }
+
+            if( _bTriggerCloseHandler && mNotebook.TabClosedHandler != null )
+            {
+                mNotebook.TabClosedHandler( this );
+            }
+
         }
     }
 
