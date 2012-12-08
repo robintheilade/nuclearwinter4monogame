@@ -71,14 +71,17 @@ namespace NuclearWinter.UI
 
             int iScrollStep = LayoutRect.Width / 3;
 
-            if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - CaretWidth )
+            if( EnableScrolling )
             {
-                miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ) + iScrollStep );
-            }
-            else
-            if( iTarget < miScrollOffset )
-            {
-                miScrollOffset = Math.Max( 0, iTarget - iScrollStep );
+                if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - CaretWidth )
+                {
+                    miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ) + iScrollStep );
+                }
+                else
+                if( iTarget < miScrollOffset )
+                {
+                    miScrollOffset = Math.Max( 0, iTarget - iScrollStep );
+                }
             }
         }
 
@@ -111,6 +114,8 @@ namespace NuclearWinter.UI
         }
 
         string                  mstrDisplayedText;
+
+        public bool             EnableScrolling = true;
         int                     miScrollOffset;
 
         public Color            TextColor = Color.White;
@@ -678,8 +683,6 @@ namespace NuclearWinter.UI
 
             Screen.PopScissorRectangle();
 
-            Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y + Padding.Top, rect.Width - Padding.Horizontal, rect.Height - Padding.Vertical ) );
-
             const float fBlinkInterval = 0.3f;
 
             if( SelectionOffset != 0 )
@@ -701,8 +704,6 @@ namespace NuclearWinter.UI
             {
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, CaretWidth, rect.Height - Padding.Vertical ), TextColor );
             }
-
-            Screen.PopScissorRectangle();
         }
     }
 }
