@@ -434,27 +434,38 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame  : ButtonFrameDown, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
+            DrawWithOffset( Point.Zero );
+        }
+
+        public void DrawWithOffset( Point _pOffset )
+        {
+            Rectangle rect = LayoutRect;
+            rect.Offset( _pOffset );
+
+            if( ButtonFrame != null )
+            {
+                Screen.DrawBox( (!IsOpen && !mbIsPressed) ? ButtonFrame : ButtonFrameDown, rect, Screen.Style.ButtonCornerSize, Color.White );
+            }
 
             if( mbIsHovered && ! IsOpen && mPressedAnim.IsOver )
             {
                 if( Screen.IsActive )
                 {
-                    Screen.DrawBox( ButtonFrameHover,      LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
+                    Screen.DrawBox( ButtonFrameHover, rect, Screen.Style.ButtonCornerSize, Color.White );
                 }
             }
             else
             {
-                Screen.DrawBox( ButtonFramePressed,    LayoutRect, Screen.Style.ButtonCornerSize, Color.White * mPressedAnim.CurrentValue );
+                Screen.DrawBox( ButtonFramePressed, rect, Screen.Style.ButtonCornerSize, Color.White * mPressedAnim.CurrentValue );
             }
 
             if( Screen.IsActive && HasFocus && ! IsOpen )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocus, rect, Screen.Style.ButtonCornerSize, Color.White );
             }
 
             Screen.Game.SpriteBatch.Draw( Screen.Style.DropDownArrow,
-                new Vector2( LayoutRect.Right - Padding.Right - TextPadding.Right - Screen.Style.DropDownArrow.Width, LayoutRect.Center.Y - Screen.Style.DropDownArrow.Height / 2 ),
+                new Vector2( rect.Right - Padding.Right - TextPadding.Right - Screen.Style.DropDownArrow.Width, rect.Center.Y - Screen.Style.DropDownArrow.Height / 2 ),
                 Color.White
             );
 
