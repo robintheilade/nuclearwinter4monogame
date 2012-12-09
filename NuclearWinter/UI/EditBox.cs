@@ -700,6 +700,8 @@ namespace NuclearWinter.UI
 
             if( SelectionOffset != 0 )
             {
+                Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y + Padding.Top, rect.Width - Padding.Horizontal, rect.Height - Padding.Vertical ) );
+
                 Rectangle selectionRectangle;
                 if( SelectionOffset > 0 )
                 {
@@ -711,6 +713,8 @@ namespace NuclearWinter.UI
                 }
 
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f );
+
+                Screen.PopScissorRectangle();
             }
             else
             if( Screen.IsActive && HasFocus && mfCaretTimer % (fBlinkInterval * 2) < fBlinkInterval )
