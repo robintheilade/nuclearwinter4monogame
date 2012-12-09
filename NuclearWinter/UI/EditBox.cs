@@ -20,7 +20,6 @@ namespace NuclearWinter.UI
     // An EditBox to enter some text
     public class EditBox: Widget
     {
-        UIFont mFont;
         public UIFont       Font
         {
             get { return mFont; }
@@ -32,23 +31,17 @@ namespace NuclearWinter.UI
             }
         }
 
-        string  mstrText;
-        Point   mpTextPosition;
-
-        int     miCaretOffset;
         public int     CaretOffset {
             get { return miCaretOffset; }
             set {
                 miCaretOffset = (int)MathHelper.Clamp( value, 0, mstrText.Length );
                 miSelectionOffset = 0;
                 ComputeCaretAndSelectionX();
-                mfTimer = 0f;
+                mfCaretTimer = 0f;
             }
         }
-        int     miCaretX;
         public const int     CaretWidth = 2;
 
-        int     miSelectionOffset;
         public int     SelectionOffset {
             get { return miSelectionOffset; }
             set {
@@ -56,7 +49,6 @@ namespace NuclearWinter.UI
                 ComputeCaretAndSelectionX();
             }
         }
-        int     miSelectionX;
 
         void ComputeCaretAndSelectionX()
         {
@@ -85,13 +77,8 @@ namespace NuclearWinter.UI
             }
         }
 
-        bool    mbIsDragging;
-        bool    mbIsHovered;
-        float   mfTimer;
-
         public const char DefaultPasswordChar = '●';
 
-        char mPasswordChar = '\0';
         public char PasswordChar {
             get { return mPasswordChar; }
             set { mPasswordChar = value; UpdateContentSize(); }
@@ -113,40 +100,60 @@ namespace NuclearWinter.UI
             }
         }
 
-        string                  mstrDisplayedText;
 
-        public bool             EnableScrolling = true;
-        int                     miScrollOffset;
+        public bool                         EnableScrolling = true;
 
-        public Color            TextColor = Color.White;
+        public Color                        TextColor = Color.White;
+        public int                          TextWidth { get; private set; }
 
-        public int              TextWidth { get; private set; }
-        int                     miMaxScrollOffset {
-            get {
-                return (int)Math.Max( 0, TextWidth - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth );
-            }
-        }
+        public Func<char,bool>              TextEnteredHandler;
+        public Func<string,string>          LookupHandler;
 
-        public Func<char,bool>      TextEnteredHandler;
-        public Func<string,string>  LookupHandler;
+        public static bool                  IntegerValidator( char _char )   { return ( _char >= '0' && _char <= '9' ) || _char == '-'; }
+        public static bool                  FloatValidator( char _char )     { return ( _char >= '0' && _char <= '9' ) || _char == '.' || _char == '-'; }
 
-        public static bool IntegerValidator( char _char )   { return ( _char >= '0' && _char <= '9' ) || _char == '-'; }
-        public static bool FloatValidator( char _char )     { return ( _char >= '0' && _char <= '9' ) || _char == '.' || _char == '-'; }
-
-        public Action<EditBox>  ValidateHandler;
-        public Action<EditBox>  FocusHandler;
-        public Action<EditBox>  BlurHandler;
+        public Action<EditBox>              ValidateHandler;
+        public Action<EditBox>              FocusHandler;
+        public Action<EditBox>              BlurHandler;
 
         public Action<EditBox,int,string>   TextInsertedHandler;
         public Action<EditBox,int,int>      TextRemovedHandler;
 
-        public bool             IsReadOnly;
-        public int              MaxLength;
+        public bool                         IsReadOnly;
+        public int                          MaxLength;
 
-        public bool             CanBeEscapeCleared;
+        public string                       PlaceholderText
+        {
+            get { return mstrPlaceholderText; }
+            set { mstrPlaceholderText = value; UpdateContentSize(); }
+        }
 
-        public Texture2D        Frame;
-        public int              FrameCornerSize;
+        public bool                         CanBeEscapeCleared;
+
+        public Texture2D                    Frame;
+        public int                          FrameCornerSize;
+
+        //----------------------------------------------------------------------
+        UIFont                  mFont;
+        string                  mstrText;
+        string                  mstrDisplayedText;
+
+        Point                   mpTextPosition;
+
+        int                     miCaretX;
+        int                     miSelectionOffset;
+        int                     miSelectionX;
+        int                     miCaretOffset;
+        float                   mfCaretTimer;
+
+        char                    mPasswordChar = '\0';
+        string                  mstrPlaceholderText = "";
+
+        int                     miScrollOffset;
+        int                     miMaxScrollOffset { get { return (int)Math.Max( 0, TextWidth - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ); } }
+
+        bool                    mbIsDragging;
+        bool                    mbIsHovered;
 
         //----------------------------------------------------------------------
         public EditBox( Screen _screen, string _strText = "", Func<char,bool> _textEnteredHandler = null )
@@ -159,7 +166,6 @@ namespace NuclearWinter.UI
 
             Frame               = Screen.Style.EditBoxFrame;
             FrameCornerSize     = Screen.Style.EditBoxCornerSize;
-
 
             UpdateContentSize();
         }
@@ -248,7 +254,7 @@ namespace NuclearWinter.UI
         {
             mstrDisplayedText = ( mPasswordChar == '\0' ) ? Text : "".PadLeft( Text.Length, mPasswordChar );
 
-            TextWidth = (int)Font.MeasureString( mstrDisplayedText ).X;
+            TextWidth = mstrDisplayedText != "" ? (int)Font.MeasureString( mstrDisplayedText ).X : (int)Font.MeasureString( PlaceholderText ).X;
             ContentWidth = 0; //(int)Font.MeasureString( mstrDisplayedText ).X + Padding.Left + Padding.Right;
             ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
 
@@ -647,11 +653,11 @@ namespace NuclearWinter.UI
         {
             if( ! HasFocus )
             {
-                mfTimer = 0f;
+                mfCaretTimer = 0f;
             }
             else
             {
-                mfTimer += _fElapsedTime;
+                mfCaretTimer += _fElapsedTime;
             }
         }
 
@@ -679,7 +685,14 @@ namespace NuclearWinter.UI
 
             Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y, rect.Width - Padding.Horizontal, rect.Height ) );
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor );
+            if( mstrDisplayedText != "" )
+            {
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor );
+            }
+            else
+            {
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, PlaceholderText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor * 0.5f );
+            }
 
             Screen.PopScissorRectangle();
 
@@ -700,7 +713,7 @@ namespace NuclearWinter.UI
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f );
             }
             else
-            if( Screen.IsActive && HasFocus && mfTimer % (fBlinkInterval * 2) < fBlinkInterval )
+            if( Screen.IsActive && HasFocus && mfCaretTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
                 Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, CaretWidth, rect.Height - Padding.Vertical ), TextColor );
             }
