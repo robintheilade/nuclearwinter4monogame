@@ -687,11 +687,11 @@ namespace NuclearWinter.UI
 
             if( mstrDisplayedText != "" )
             {
-                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor );
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X - miScrollOffset + _pOffset.X, mpTextPosition.Y + mFont.YOffset + _pOffset.Y ), TextColor );
             }
             else
             {
-                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, PlaceholderText, new Vector2( mpTextPosition.X - miScrollOffset, mpTextPosition.Y + mFont.YOffset ), TextColor * 0.5f );
+                Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, PlaceholderText, new Vector2( mpTextPosition.X - miScrollOffset + _pOffset.X, mpTextPosition.Y + mFont.YOffset + _pOffset.Y ), TextColor * 0.5f );
             }
 
             Screen.PopScissorRectangle();

@@ -469,7 +469,7 @@ namespace NuclearWinter.UI
                 Color.White
             );
 
-            mCurrentItemLabel.Draw();
+            mCurrentItemLabel.DrawWithOffset( _pOffset );
         }
 
         //----------------------------------------------------------------------
