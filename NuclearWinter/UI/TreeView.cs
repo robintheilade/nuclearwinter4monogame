@@ -1059,7 +1059,11 @@ namespace NuclearWinter.UI
                 case OSKey.PageDown:
                     Scrollbar.Offset += LayoutRect.Height;
                     break;
+#if !MONOMAC
                 case OSKey.Enter:
+#else
+                case OSKey.Return:
+#endif
                     if( ValidateHandler != null && SelectedNode != null )
                     {
                         ValidateHandler( this );
