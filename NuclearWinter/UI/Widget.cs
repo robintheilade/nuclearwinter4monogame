@@ -201,14 +201,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public virtual Widget HitTest( Point _point )
         {
-            if( HitBox.Contains( _point ) )
-            {
-                return this;
-            }
-            else
-            {
-                return null;
-            }
+            return HitBox.Contains( _point ) ? this : null;
         }
 
         //----------------------------------------------------------------------

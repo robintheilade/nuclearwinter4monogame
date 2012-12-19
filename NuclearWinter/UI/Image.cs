@@ -101,7 +101,7 @@ namespace NuclearWinter.UI
                 return true;
             }
 
-            return false;
+            return ClickHandler != null;
         }
 
         protected internal override void OnMouseUp(Point _hitPoint, int _iButton)
