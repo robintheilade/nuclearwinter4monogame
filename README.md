@@ -1,7 +1,7 @@
 NuclearWinter
 =============
 
-_NuclearWinter_ is a set of libraries to develop games and applications using XNA.
+_NuclearWinter_ is a set of libraries to develop games and applications using XNA and [MonoGame](http://github.com/mono/monogame).
 
 This repository contains the core of NuclearWinter, featuring game state management, screen resolution handling, an input manager and an user interface library.
 
