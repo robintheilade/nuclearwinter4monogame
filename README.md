@@ -7,7 +7,7 @@ This repository contains the core of NuclearWinter, featuring game state managem
 
 NuclearWinter used to contain the VectorLevel library for rendering 2D levels based on SVG files edited with [Inkscape](http://inksape.org/), but it has been removed for now as it is currently unmaintained. You can still find it in older revisions. It might be ressurected as a separate repository at some point in the future.
 
-Feel free to use it in your own projects! Contributions are welcome too.
+NuclearWinter is distributed under the MIT license (see LICENSE.txt). Feel free to use it in your own projects! Contributions are welcome too.
 
 Development
 -----------
