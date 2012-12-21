@@ -64,6 +64,12 @@ namespace NuclearWinter.UI
         public bool     InvertDrawOrder;
 
         public bool     Collapsable;
+
+        public void ToggleCollapse()
+        {
+            if( Collapsable ) mbCollapsed = ! mbCollapsed;
+        }
+
         bool            mbCollapsed;
         Animation.AnimatedValue mCollapseAnim;
         bool            mbDisplayFirstPane;
