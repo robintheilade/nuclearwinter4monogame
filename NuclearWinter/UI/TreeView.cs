@@ -712,14 +712,14 @@ namespace NuclearWinter.UI
             return Scrollbar.HitTest( _point ) ?? base.HitTest( _point );
         }
 
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
             mHoverPoint = _hitPoint;
             UpdateHoveredNode();
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsMouseDown && FocusedNode != null )
             {
@@ -735,7 +735,7 @@ namespace NuclearWinter.UI
             UpdateHoveredNode();
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
             UpdateHoveredNode();
@@ -1142,7 +1142,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
             {

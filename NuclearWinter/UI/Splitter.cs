@@ -94,7 +94,7 @@ namespace NuclearWinter.UI
             mCollapseAnim = new Animation.SmoothValue( 0f, 1f, 0.2f );
         }
 
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             if( mbCollapsed )
             {
@@ -307,7 +307,7 @@ namespace NuclearWinter.UI
             return null;
         }
 
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
 
@@ -328,7 +328,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
 #if !MONOGAME
@@ -336,7 +336,7 @@ namespace NuclearWinter.UI
 #endif
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( ! Collapsable && mbIsDragging )
             {

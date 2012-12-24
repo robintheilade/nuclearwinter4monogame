@@ -69,12 +69,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mbIsHovered = true;
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
             mTooltip.EnableDisplayTimer = false;
@@ -100,7 +100,7 @@ namespace NuclearWinter.UI
             return true;
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsPressed )
             {
@@ -146,7 +146,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             mTooltip.EnableDisplayTimer = mbIsHovered;
             mTooltip.Update( _fElapsedTime );

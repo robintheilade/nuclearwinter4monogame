@@ -173,7 +173,7 @@ namespace NuclearWinter.UI
             return ClickHandler != null ? base.HitTest( _point ) : null;
         }
 
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             if( ClickHandler != null )
             {
@@ -183,7 +183,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             if( ClickHandler != null )
             {

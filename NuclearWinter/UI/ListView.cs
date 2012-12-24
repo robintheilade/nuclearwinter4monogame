@@ -433,7 +433,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             foreach( Button actionButton in ActionButtons )
             {
@@ -506,13 +506,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mHoverPoint = _hitPoint;
             UpdateHoveredRow();
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsMouseDown && FocusedRow != null )
             {
@@ -589,7 +589,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             HoveredRow = null;
 

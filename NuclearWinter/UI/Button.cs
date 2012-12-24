@@ -245,7 +245,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             if( ! mPressedAnim.IsOver )
             {
@@ -257,13 +257,13 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             mbIsHovered = true;
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
             mbIsHovered = false;

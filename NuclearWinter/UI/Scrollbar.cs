@@ -54,7 +54,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
             LerpOffset = MathHelper.Lerp( LerpOffset, Offset, fLerpAmount );
@@ -83,12 +83,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mScrollbarColor = sHoveredColor;
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             mScrollbarColor = sDefaultColor;
         }
@@ -118,7 +118,7 @@ namespace NuclearWinter.UI
             mbIsMouseDown = false;
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsMouseDown )
             {

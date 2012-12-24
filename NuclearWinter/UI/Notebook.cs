@@ -149,7 +149,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             mCloseButton.Update( _fElapsedTime );
             PageGroup.Update( _fElapsedTime );
@@ -252,12 +252,12 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             mNotebook.HoveredTab = this;
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             if( mNotebook.HoveredTab == this )
             {
@@ -267,7 +267,7 @@ namespace NuclearWinter.UI
             mTooltip.EnableDisplayTimer = false;
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mNotebook.DraggedTab == this )
             {
@@ -655,7 +655,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             foreach( NotebookTab tab in Tabs )
             {

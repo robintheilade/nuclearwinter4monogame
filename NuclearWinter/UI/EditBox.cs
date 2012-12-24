@@ -274,7 +274,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
 #if !MONOGAME
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -283,7 +283,7 @@ namespace NuclearWinter.UI
             mbIsHovered = true;
         }
 
-        protected internal override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove( Point _hitPoint )
         {
             if( mbIsDragging )
             {
@@ -292,7 +292,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
 #if !MONOGAME
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
@@ -649,7 +649,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             if( ! HasFocus )
             {

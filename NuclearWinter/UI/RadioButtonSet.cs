@@ -318,7 +318,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override void Update( float _fElapsedTime )
+        public override void Update( float _fElapsedTime )
         {
             foreach( Button button in mlButtons )
             {
@@ -327,7 +327,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point _hitPoint )
         {
             base.OnMouseEnter( _hitPoint );
             UpdateHoveredButton( _hitPoint );
@@ -335,14 +335,14 @@ namespace NuclearWinter.UI
             mlButtons[miHoveredButton].OnMouseEnter( _hitPoint );
         }
 
-        protected internal override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point _hitPoint )
         {
             base.OnMouseOut( _hitPoint );
 
             mlButtons[miHoveredButton].OnMouseOut( _hitPoint );
         }
 
-        protected internal override void OnMouseMove(Point _hitPoint)
+        public override void OnMouseMove(Point _hitPoint)
         {
             base.OnMouseMove(_hitPoint);
 

@@ -211,7 +211,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal virtual void Update( float _fElapsedTime ) {}
+        public virtual void Update( float _fElapsedTime ) {}
 
         protected internal virtual void UpdateContentSize()
         {
@@ -234,11 +234,11 @@ namespace NuclearWinter.UI
 
         protected internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
 
-        protected internal virtual void       OnMouseEnter( Point _hitPoint ) {}
-        protected internal virtual void       OnMouseOut  ( Point _hitPoint ) {}
-        protected internal virtual void       OnMouseMove ( Point _hitPoint ) {}
-
-        protected internal virtual void       OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
+        public virtual void                 OnMouseEnter( Point _hitPoint ) {}
+        public virtual void                 OnMouseOut  ( Point _hitPoint ) {}
+        public virtual void                 OnMouseMove ( Point _hitPoint ) {}
+        
+        protected internal virtual void     OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
 
         public const int                    MouseDragTriggerDistance   = 10;
 
