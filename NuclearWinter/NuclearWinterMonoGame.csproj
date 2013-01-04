@@ -83,14 +83,14 @@
     <Reference Include="OpenTK">
       <HintPath>..\MonoGame\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.Windows" Condition=" '$(Configuration)|$(Platform)' == 'Debug Windows|x86' or '$(Configuration)|$(Platform)' == 'Release Windows|x86'">
-      <HintPath>..\MonoGame\MonoGame.Framework.Windows.dll</HintPath>
+    <Reference Include="MonoGame.Framework" Condition=" '$(Configuration)|$(Platform)' == 'Debug Windows|x86' or '$(Configuration)|$(Platform)' == 'Release Windows|x86'">
+      <HintPath>..\MonoGame\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.Linux" Condition=" '$(Configuration)|$(Platform)' == 'Debug Linux|x86' or '$(Configuration)|$(Platform)' == 'Release Linux|x86'">
-      <HintPath>..\MonoGame\MonoGame.Framework.Linux.dll</HintPath>
+    <Reference Include="MonoGame.Framework" Condition=" '$(Configuration)|$(Platform)' == 'Debug Linux|x86' or '$(Configuration)|$(Platform)' == 'Release Linux|x86'">
+      <HintPath>..\MonoGame\Linux\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.MacOS" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
-      <HintPath>..\MonoGame\MonoGame.Framework.MacOS.dll</HintPath>
+    <Reference Include="MonoGame.Framework" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
+      <HintPath>..\MonoGame\MacOS\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="MonoMac" Condition=" '$(Configuration)|$(Platform)' == 'Debug OS X|x86' or '$(Configuration)|$(Platform)' == 'Release OS X|x86'">
       <HintPath>..\MonoGame\MonoMac.dll</HintPath>
