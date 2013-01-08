@@ -95,7 +95,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel, Action _closeCallback=null )
+        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel=false, Action _closeCallback=null )
         {
             TitleLabel.Text     = _strTitleText;
 
