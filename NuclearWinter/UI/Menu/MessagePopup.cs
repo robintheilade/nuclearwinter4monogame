@@ -11,7 +11,15 @@ namespace NuclearWinter.UI
         public Label                TitleLabel      { get; private set; }
         public Label                MessageLabel    { get; private set; }
 
+        public Group                ContentGroup    { get; private set; }
+
+        BoxGroup                    mActionsGroup;
+
         Button                      mCloseButton;
+        Button                      mConfirmButton;
+
+        Action                      mCloseCallback;
+        Action<bool>                mConfirmCallback;
 
         SpinningWheel               mSpinningWheel;
 
@@ -35,8 +43,6 @@ namespace NuclearWinter.UI
             }
         }
 
-        Action                  mCloseCallback;
-
         //----------------------------------------------------------------------
         public MessagePopup( IMenuManager _manager )
         : base( _manager )
@@ -51,28 +57,29 @@ namespace NuclearWinter.UI
                 mSpinningWheel.AnchoredRect = AnchoredRect.CreateCentered( mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight );
 
                 // Message label
+                ContentGroup = new Group( Screen );
+                ContentGroup.AnchoredRect = AnchoredRect.CreateFull( 0, 60, 0, 80 );
+                AddChild( ContentGroup );
+
                 MessageLabel = new Label( Screen, "", Anchor.Start );
                 MessageLabel.WrapText = true;
-                MessageLabel.AnchoredRect = AnchoredRect.CreateFull( 0, Screen.Style.DefaultButtonHeight + 10, 0, Screen.Style.DefaultButtonHeight + 10 );
-                AddChild( MessageLabel );
 
                 // Actions
-                BoxGroup actionsGroup = new BoxGroup( Screen, Orientation.Horizontal, 0, Anchor.End );
-                actionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
+                mActionsGroup = new BoxGroup( Screen, Orientation.Horizontal, 0, Anchor.End );
+                mActionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
 
-                AddChild( actionsGroup );
+                AddChild( mActionsGroup );
 
-                // Close
+                // Close / Cancel
                 mCloseButton = new Button( Screen, i18n.Common.Close );
+                mCloseButton.ClickHandler = delegate { Dismiss(); };
                 mCloseButton.BindPadButton( Buttons.A );
-                actionsGroup.AddChild( mCloseButton );
-            }
-        }
 
-        //----------------------------------------------------------------------
-        public void Open()
-        {
-            Open( DefaultSize.X, DefaultSize.Y );
+                // Confirm
+                mConfirmButton = new Button( Screen, i18n.Common.Confirm );
+                mConfirmButton.ClickHandler = delegate { Confirm(); };
+                mActionsGroup.AddChild( mConfirmButton );
+            }
         }
 
         //----------------------------------------------------------------------
@@ -91,12 +98,42 @@ namespace NuclearWinter.UI
         public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel, Action _closeCallback=null )
         {
             TitleLabel.Text     = _strTitleText;
-            MessageLabel.Text   = _strMessageText;
-            mCloseButton.Text    = _strCloseButtonCaption;
-            mCloseButton.ClickHandler = delegate { Dismiss(); };
+
+            if( _strMessageText != null )
+            {
+                MessageLabel.Text   = _strMessageText;
+                ContentGroup.Clear();
+                ContentGroup.AddChild( MessageLabel );
+            }
+
+            mCloseButton.Text   = _strCloseButtonCaption;
             ShowSpinningWheel   = _bShowSpinningWheel;
 
+            mActionsGroup.Clear();
+            mActionsGroup.AddChild( mCloseButton );
             mCloseCallback = _closeCallback;
+        }
+
+        //----------------------------------------------------------------------
+        public void Setup( string _strTitleText, string _strMessageText, string _strConfirmButtonCaption, string _strCloseButtonCaption, Action<bool> _confirmCallback=null )
+        {
+            TitleLabel.Text     = _strTitleText;
+
+            if( _strMessageText != null )
+            {
+                MessageLabel.Text   = _strMessageText;
+                ContentGroup.Clear();
+                ContentGroup.AddChild( MessageLabel );
+            }
+
+            mConfirmButton.Text = _strConfirmButtonCaption;
+            mCloseButton.Text   = _strCloseButtonCaption;
+
+            mActionsGroup.Clear();
+            mActionsGroup.AddChild( mConfirmButton );
+            mActionsGroup.AddChild( mCloseButton );
+
+            mConfirmCallback = _confirmCallback;
         }
 
         //----------------------------------------------------------------------
@@ -104,11 +141,14 @@ namespace NuclearWinter.UI
         {
             TitleLabel.Text = "";
             MessageLabel.Text = "";
-            mCloseButton.ClickHandler = null;
-            mCloseButton.Text = "Close";
+            mConfirmButton.Text = i18n.Common.Confirm;
+            mCloseButton.Text = i18n.Common.Close;
 
             ShowSpinningWheel = false;
             mCloseCallback = null;
+            mConfirmCallback = null;
+
+            ContentGroup.Clear();
 
             base.Close();
         }
@@ -116,9 +156,19 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected override void Dismiss()
         {
-            Action closeCallback = mCloseCallback;
+            var closeCallback = mCloseCallback;
+            var confirmCallback = mConfirmCallback;
             base.Dismiss();
             if( closeCallback != null ) closeCallback();
+            if( confirmCallback != null ) confirmCallback( false );
+        }
+
+        //----------------------------------------------------------------------
+        protected void Confirm()
+        {
+            var confirmCallback = mConfirmCallback;
+            Close();
+            confirmCallback( true );
         }
     }
 }
