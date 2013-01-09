@@ -209,7 +209,6 @@ namespace NuclearWinter.Input
 #if !MONOGAME
         public List<System.Windows.Forms.Keys>      JustPressedOSKeys       { get; private set; }
         WindowMessageFilter                         mMessageFilter;
-
 #else
 #if !MONOMAC
         public List<OpenTK.Input.Key>               JustPressedOSKeys       { get; private set; }
@@ -217,6 +216,7 @@ namespace NuclearWinter.Input
         public List<NSKey>                          JustPressedOSKeys       { get; private set; }
 #endif
         float                                       mfTimeSinceLastClick;
+        Point                                       mLastPrimaryClickPosition;
 #endif
         bool                                        mbDoubleClicked;
 #endif
@@ -346,9 +346,14 @@ namespace NuclearWinter.Input
             {
                 if( mfTimeSinceLastClick <= System.Windows.Forms.SystemInformation.DoubleClickTime / 1000f )
                 {
-                    mbDoubleClicked = true;
+                    if( Math.Abs( MouseState.X - mLastPrimaryClickPosition.X ) <= System.Windows.Forms.SystemInformation.DoubleClickSize.Width
+                       && Math.Abs( MouseState.Y - mLastPrimaryClickPosition.Y ) <=  System.Windows.Forms.SystemInformation.DoubleClickSize.Height )
+                    {
+                        mbDoubleClicked = true;
+                    }
                 }
 
+                mLastPrimaryClickPosition = new Point( MouseState.X, MouseState.Y );
                 mfTimeSinceLastClick = 0f;
             }
             else
