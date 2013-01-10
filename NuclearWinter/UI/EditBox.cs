@@ -223,15 +223,26 @@ namespace NuclearWinter.UI
                     strText = Text.Substring( CaretOffset + SelectionOffset, -SelectionOffset );
                 }
 
+#if !MONOMAC
                 // NOTE: For this to work, you must put [STAThread] before your Main()
                 System.Windows.Forms.Clipboard.SetText( strText );
+#else
+                var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
+                pasteBoard.ClearContents();
+                pasteBoard.SetStringForType( strText, MonoMac.AppKit.NSPasteboard.NSStringType );
+#endif
             }
         }
 
         public void PasteFromClipboard()
         {
+#if !MONOMAC
             // NOTE: For this to work, you must put [STAThread] before your Main()
             string strPastedText = System.Windows.Forms.Clipboard.GetText();
+#else
+            var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
+            string strPastedText = pasteBoard.GetStringForType( MonoMac.AppKit.NSPasteboard.NSStringType );
+#endif
             if( strPastedText != null )
             {
                 strPastedText = strPastedText.Replace( "\r\n", " " ).Replace( "\n", " " ); 
