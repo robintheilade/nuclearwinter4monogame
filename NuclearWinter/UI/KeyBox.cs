@@ -138,6 +138,13 @@ namespace NuclearWinter.UI
             // Nothing
         }
 
+        protected internal override void OnOSKeyPress( System.Windows.Forms.Keys _key )
+        {
+            if( _key == System.Windows.Forms.Keys.Tab ) return;
+
+            base.OnOSKeyPress( _key );
+        }
+
         //----------------------------------------------------------------------
         protected internal override void OnKeyPress( Keys _key )
         {
