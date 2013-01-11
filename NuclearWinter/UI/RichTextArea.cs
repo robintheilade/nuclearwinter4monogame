@@ -22,7 +22,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public int StartTextBlockIndex
         {
-            get { return miStartTextBlockIndex; }
+            get { return Math.Min( TextArea.TextBlocks.Count - 1, miStartTextBlockIndex ); }
             set
             {
                 miStartTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
@@ -32,7 +32,7 @@ namespace NuclearWinter.UI
 
         public int StartOffset
         {
-            get { return miStartOffset; }
+            get { return (int)MathHelper.Clamp( miStartOffset, 0, TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length ); }
             set 
             {
                 miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length );
@@ -45,7 +45,7 @@ namespace NuclearWinter.UI
 
         public int EndTextBlockIndex
         {
-            get { return miEndTextBlockIndex; }
+            get { return Math.Min( TextArea.TextBlocks.Count - 1, miEndTextBlockIndex ); }
             set
             {
                 miEndTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
@@ -60,7 +60,7 @@ namespace NuclearWinter.UI
 
         public int EndOffset
         {
-            get { return miEndOffset; }
+            get { return (int)MathHelper.Clamp( miEndOffset, 0, TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length ); }
             set 
             {
                 miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length );
