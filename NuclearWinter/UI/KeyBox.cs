@@ -5,6 +5,14 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#elif !MONOMAC
+using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
+#endif
+
 namespace NuclearWinter.UI
 {
     public class KeyBox: Widget
@@ -138,9 +146,9 @@ namespace NuclearWinter.UI
             // Nothing
         }
 
-        protected internal override void OnOSKeyPress( System.Windows.Forms.Keys _key )
+        protected internal override void OnOSKeyPress( OSKey _key )
         {
-            if( _key == System.Windows.Forms.Keys.Tab ) return;
+            if( _key == OSKey.Tab ) return;
 
             base.OnOSKeyPress( _key );
         }
