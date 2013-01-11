@@ -367,11 +367,11 @@ namespace NuclearWinter.UI
 
             float fPreviousX = 0f;
 
-            while( iIndex < Text.Length )
+            while( iIndex < mstrDisplayedText.Length )
             {
                 iIndex++;
 
-                float fX = Font.MeasureString( Text.Substring( 0, iIndex ) ).X;
+                float fX = Font.MeasureString( mstrDisplayedText.Substring( 0, iIndex ) ).X;
                 if( fX > _x )
                 {
                     bool bAfter = ( fX - _x ) < ( ( fX - fPreviousX ) / 2f );
