@@ -47,7 +47,7 @@ namespace NuclearWinter
         public static readonly string               ApplicationDataFolderPath;
 
         public Storage.SaveHandler                  NuclearSaveHandler;
-#if WINDOWS || LINUX || MACOSX || XBOX
+#if XBOX
         public StorageDevice                        SaveGameStorageDevice;
         bool                                        mbShouldDisplayStorageSelector;
         Action                                      DeviceSelectedCallback;
@@ -137,7 +137,7 @@ namespace NuclearWinter
             PhoneApplicationService.Current.Closing     += new EventHandler<ClosingEventArgs>( OnClosing );
 #endif
 
-#if WINDOWS || LINUX || MACOSX || XBOX
+#if XBOX
             StorageDevice.DeviceChanged                 += new EventHandler<EventArgs>( OnStorageDeviceChange );
 #endif
 
@@ -207,7 +207,7 @@ namespace NuclearWinter
             base.Initialize();
         }
 
-#if WINDOWS || LINUX || MACOSX || XBOX
+#if XBOX
         protected override void Update( GameTime _time )
         {
 #if GAMERSERVICES || XBOX
@@ -266,7 +266,7 @@ namespace NuclearWinter
             WhitePixelTex.SetData( new[] { Color.White } );
         }
 
-#if WINDOWS || LINUX || MACOSX || XBOX
+#if XBOX
         //----------------------------------------------------------------------
         public void ShowDeviceSelector( Action _deviceSelectedCallback )
         {
@@ -329,13 +329,15 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void OnExiting( object _sender, EventArgs _args )
         {
-#if WINDOWS || LINUX || MACOSX || XBOX
             if( NuclearSaveHandler != null )
             {
+#if WINDOWS || LINUX || MACOSX || XBOX
                 NuclearSaveHandler.SaveGameSettings();
-                NuclearSaveHandler.SaveGameData();
-            }
 #endif
+#if XBOX
+                NuclearSaveHandler.SaveGameData();
+#endif
+            }
 
             if( GameStateMgr != null && GameStateMgr.CurrentState != null )
             {

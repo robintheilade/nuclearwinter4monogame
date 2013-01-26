@@ -143,7 +143,7 @@ namespace NuclearWinter.Storage
             }
         }
 
-#if WINDOWS || LINUX || MACOSX || XBOX
+#if XBOX
         //----------------------------------------------------------------------
         // Save game data
         public void SaveGameData()
