@@ -631,6 +631,16 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
+        protected internal override bool OnMouseDoubleClick( Point _hitPoint )
+        {
+            SetCaretPosition( _hitPoint, true );
+            Caret.StartOffset = GetPreviousCaretStop( Caret.StartOffset );
+            Caret.EndOffset = GetNextCaretStop( Caret.StartOffset, false );
+
+            return true;
+        }
+
+        //----------------------------------------------------------------------
         public void DeleteSelectedText()
         {
             if( ! Caret.HasSelection || IsReadOnly ) return;
@@ -942,51 +952,7 @@ namespace NuclearWinter.UI
 
                     if( bCtrl )
                     {
-                        if( iNewOffset > 0 && Text[ iNewOffset ] != '\n' )
-                        {
-                            int iPreviousWordOffset = iNewOffset;
-                            char startChar = Text[ iPreviousWordOffset ];
-
-                            bool bStartInWhitespace = startChar == ' ';
-                            bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
-
-                            while( iPreviousWordOffset > 0 )
-                            {
-                                bool bIsLineBreak = Text[ iPreviousWordOffset - 1 ] == '\n';
-                                bool bIsWhiteSpace = Text[ iPreviousWordOffset - 1 ] == ' ' || bIsLineBreak;
-                                bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( Text[ iPreviousWordOffset - 1 ] ) == -1;
-
-                                if( bStartInWord )
-                                {
-                                    if( ! bIsInWord || bIsWhiteSpace )
-                                    {
-                                        break;
-                                    }
-                                }
-                                else
-                                if( bStartInWhitespace )
-                                {
-                                    if( bIsLineBreak )
-                                    {
-                                        break;
-                                    }
-
-                                    if( ! bIsWhiteSpace )
-                                    {
-                                        bStartInWhitespace = false;
-                                        bStartInWord = bIsInWord;
-                                    }
-                                }
-                                else
-                                {
-                                    if( bIsInWord || bIsWhiteSpace ) break;
-                                }
-
-                                iPreviousWordOffset--;
-                            }
-
-                            iNewOffset = iPreviousWordOffset;
-                        }
+                        iNewOffset = GetPreviousCaretStop( iNewOffset );
                     }
                     else
                     if( ! bShift && Caret.HasSelection )
@@ -1022,63 +988,7 @@ namespace NuclearWinter.UI
 
                     if( bCtrl )
                     {
-                        // FIXME: This needs to be improved, the behavior isn't exactly right
-                        string strText = Text;
-
-                        if( iNewOffset < strText.Length )
-                        {
-                            char startChar = Text[ iNewOffset ];
-
-                            iNewOffset++;
-
-                            if( startChar != '\n' )
-                            {
-                                bool bStartInWhitespace = startChar == ' ';
-                                bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
-                                
-                                while( iNewOffset < strText.Length )
-                                {
-                                    bool bIsLineBreak = Text[ iNewOffset ] == '\n';
-                                    bool bIsWhiteSpace = Text[ iNewOffset ] == ' ' || bIsLineBreak;
-                                    bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( Text[ iNewOffset ] ) == -1;
-
-                                    if( bIsLineBreak ) break;
-
-                                    if( bStartInWord )
-                                    {
-                                        if( bIsWhiteSpace )
-                                        {
-                                            bStartInWhitespace = true;
-                                            bStartInWord = false;
-                                        }
-                                        else
-                                        if( ! bIsInWord )
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    else
-                                    if( bStartInWhitespace )
-                                    {
-                                        if( bIsLineBreak )
-                                        {
-                                            break;
-                                        }
-
-                                        if( ! bIsWhiteSpace )
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if( bIsInWord || bIsWhiteSpace ) break;
-                                    }
-
-                                    iNewOffset++;
-                                }
-                            }
-                        }
+                        iNewOffset = GetNextCaretStop( iNewOffset );
                     }
                     else
                     if( ! bShift && Caret.HasSelection )
@@ -1151,6 +1061,119 @@ namespace NuclearWinter.UI
                     base.OnOSKeyPress( _key );
                     break;
             }
+        }
+
+        //----------------------------------------------------------------------
+        int GetPreviousCaretStop( int _iOffset )
+        {
+            if( _iOffset > 0 && mstrText[ _iOffset ] != '\n' )
+            {
+                int iPreviousWordOffset = _iOffset;
+                char startChar = mstrText[ iPreviousWordOffset ];
+
+                bool bStartInWhitespace = startChar == ' ';
+                bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
+
+                while( iPreviousWordOffset > 0 )
+                {
+                    bool bIsLineBreak = mstrText[ iPreviousWordOffset - 1 ] == '\n';
+                    bool bIsWhiteSpace = mstrText[ iPreviousWordOffset - 1 ] == ' ' || bIsLineBreak;
+                    bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( mstrText[ iPreviousWordOffset - 1 ] ) == -1;
+
+                    if( bStartInWord )
+                    {
+                        if( ! bIsInWord || bIsWhiteSpace )
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    if( bStartInWhitespace )
+                    {
+                        if( bIsLineBreak )
+                        {
+                            break;
+                        }
+
+                        if( ! bIsWhiteSpace )
+                        {
+                            bStartInWhitespace = false;
+                            bStartInWord = bIsInWord;
+                        }
+                    }
+                    else
+                    {
+                        if( bIsInWord || bIsWhiteSpace ) break;
+                    }
+
+                    iPreviousWordOffset--;
+                }
+
+                _iOffset = iPreviousWordOffset;
+            }
+
+            return _iOffset;
+        }
+
+        //----------------------------------------------------------------------
+        int GetNextCaretStop( int _iOffset, bool _bGrabNextWhiteSpace=true )
+        {
+            if( _iOffset < mstrText.Length )
+            {
+                char startChar = Text[ _iOffset ];
+
+                _iOffset++;
+
+                if( startChar != '\n' )
+                {
+                    bool bStartInWhitespace = startChar == ' ';
+                    bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
+                                
+                    while( _iOffset < mstrText.Length )
+                    {
+                        bool bIsLineBreak = mstrText[ _iOffset ] == '\n';
+                        bool bIsWhiteSpace = mstrText[ _iOffset ] == ' ' || bIsLineBreak;
+                        bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( mstrText[ _iOffset ] ) == -1;
+
+                        if( bIsLineBreak || ( bIsWhiteSpace && ! bStartInWhitespace && ! _bGrabNextWhiteSpace ) ) break;
+
+                        if( bStartInWord )
+                        {
+                            if( bIsWhiteSpace )
+                            {
+                                bStartInWhitespace = true;
+                                bStartInWord = false;
+                            }
+                            else
+                            if( ! bIsInWord )
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        if( bStartInWhitespace )
+                        {
+                            if( bIsLineBreak )
+                            {
+                                break;
+                            }
+
+                            if( ! bIsWhiteSpace )
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if( bIsInWord || bIsWhiteSpace ) break;
+                        }
+
+                        _iOffset++;
+                    }
+                }
+            }
+
+            return _iOffset;
         }
 
         //----------------------------------------------------------------------
