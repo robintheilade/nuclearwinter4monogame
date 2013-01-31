@@ -20,10 +20,10 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             public int              CornerSize;
             public Texture2D        Frame;
-            public Texture2D        FrameDown;
-            public Texture2D        FrameHover;
-            public Texture2D        FramePressed;
-            public Texture2D        FrameFocus;
+            public Texture2D        DownFrame;
+            public Texture2D        HoverOverlay;
+            public Texture2D        DownOverlay;
+            public Texture2D        FocusOverlay;
             public int              VerticalPadding;
             public int              HorizontalPadding;
 
@@ -41,10 +41,10 @@ namespace NuclearWinter.UI
             {
                 CornerSize      = _iCornerSize;
                 Frame           = _buttonFrame;
-                FrameDown       = _buttonFrameDown;
-                FrameHover      = _buttonFrameHover;
-                FramePressed    = _buttonFramePressed;
-                FrameFocus      = _buttonFrameFocused;
+                DownFrame       = _buttonFrameDown;
+                HoverOverlay    = _buttonFrameHover;
+                DownOverlay     = _buttonFramePressed;
+                FocusOverlay    = _buttonFrameFocused;
 
                 VerticalPadding     = _iVerticalPadding;
                 HorizontalPadding   = _iHorizontalPadding;
@@ -187,10 +187,10 @@ namespace NuclearWinter.UI
         : this( _screen, new ButtonStyle(
                 _screen.Style.ButtonCornerSize,
                 _screen.Style.ButtonFrame,
-                _screen.Style.ButtonFrameDown,
-                _screen.Style.ButtonHover,
-                _screen.Style.ButtonPress,
-                _screen.Style.ButtonFocus,
+                _screen.Style.ButtonDownFrame,
+                _screen.Style.ButtonHoverOverlay,
+                _screen.Style.ButtonDownOverlay,
+                _screen.Style.ButtonFocusOverlay,
                 _screen.Style.ButtonVerticalPadding,
                 _screen.Style.ButtonHorizontalPadding
             ), _strText, _iconTex, _anchor, _strTooltipText, _tag )
@@ -351,7 +351,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.FrameDown;
+            Texture2D frame = (!mbIsPressed) ? Style.Frame : Style.DownFrame;
 
             if( frame != null )
             {
@@ -362,25 +362,25 @@ namespace NuclearWinter.UI
 
             if( mbIsHovered && ! mbIsPressed && mPressedAnim.IsOver )
             {
-                if( Screen.IsActive && Style.FrameHover != null )
+                if( Screen.IsActive && Style.HoverOverlay != null )
                 {
-                    Screen.DrawBox( Style.FrameHover, marginRect, Style.CornerSize, Color.White );
+                    Screen.DrawBox( Style.HoverOverlay, marginRect, Style.CornerSize, Color.White );
                 }
             }
             else
             if( mPressedAnim.CurrentValue > 0f )
             {
-                if( Style.FramePressed != null )
+                if( Style.DownOverlay != null )
                 {
-                    Screen.DrawBox( Style.FramePressed, marginRect, Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
+                    Screen.DrawBox( Style.DownOverlay, marginRect, Style.CornerSize, Color.White * mPressedAnim.CurrentValue );
                 }
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                if( Style.FrameFocus != null )
+                if( Style.FocusOverlay != null )
                 {
-                    Screen.DrawBox( Style.FrameFocus, marginRect, Style.CornerSize, Color.White );
+                    Screen.DrawBox( Style.FocusOverlay, marginRect, Style.CornerSize, Color.White );
                 }
             }
 

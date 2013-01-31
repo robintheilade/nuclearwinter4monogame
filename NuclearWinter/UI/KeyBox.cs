@@ -171,7 +171,7 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonPress, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonDownOverlay, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
             Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );

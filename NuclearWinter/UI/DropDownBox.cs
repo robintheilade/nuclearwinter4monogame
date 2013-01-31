@@ -155,9 +155,9 @@ namespace NuclearWinter.UI
             mPressedAnim.SetTime( mPressedAnim.Duration );
 
             ButtonFrame         = Screen.Style.ButtonFrame;
-            ButtonFrameDown     = Screen.Style.ButtonFrameDown;
-            ButtonFrameHover    = Screen.Style.ButtonHover;
-            ButtonFramePressed  = Screen.Style.ButtonPress;
+            ButtonFrameDown     = Screen.Style.ButtonDownFrame;
+            ButtonFrameHover    = Screen.Style.ButtonHoverOverlay;
+            ButtonFramePressed  = Screen.Style.ButtonDownOverlay;
 
             UpdateContentSize();
         }
@@ -461,7 +461,7 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && HasFocus && ! IsOpen )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, rect, Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocusOverlay, rect, Screen.Style.ButtonCornerSize, Color.White );
             }
 
             Screen.Game.SpriteBatch.Draw( Screen.Style.DropDownArrow,

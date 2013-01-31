@@ -83,18 +83,18 @@ namespace NuclearWinter.UI
                     button.Padding = new Box( 0, mStyle.FrameOffset );
                     button.Margin = new Box( 0, -mStyle.FrameOffset );
 
-                    button.Style.FrameDown  = Style.ButtonFrameMiddleDown;
+                    button.Style.DownFrame  = Style.ButtonFrameMiddleDown;
                     button.ClickHandler     = ButtonClicked;
 
                     i++;
                 }
 
                 Button firstButton = mlButtons.First();
-                firstButton.Style.FrameDown = Style.ButtonFrameLeftDown;
+                firstButton.Style.DownFrame = Style.ButtonFrameLeftDown;
                 firstButton.Margin = new Box( 0, -mStyle.FrameOffset, 0, 0 );
 
                 Button lastButton = mlButtons.Last();
-                lastButton.Style.FrameDown = Style.ButtonFrameRightDown;
+                lastButton.Style.DownFrame = Style.ButtonFrameRightDown;
                 lastButton.Margin = new Box( 0, 0, 0, -mStyle.FrameOffset );
             }
         }

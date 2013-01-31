@@ -23,21 +23,18 @@ namespace NuclearWinter.UI
         public int              DefaultButtonHeight = 80;
         public Color            DefaultTextColor = Color.White;
         public Texture2D        ButtonFrame;
+        public Texture2D        ButtonDownFrame;
+        public Texture2D        ButtonHoverOverlay;
+        public Texture2D        ButtonFocusOverlay;
+        public Texture2D        ButtonDownOverlay;
+        public Texture2D        ButtonDownFocusOverlay;
+
+        public int              ButtonVerticalPadding = 10;
+        public int              ButtonHorizontalPadding = 20;
 
         public int              TooltipCornerSize   = 10;
         public Texture2D        TooltipFrame;
         public Color            TooltipTextColor = Color.White;
-
-        public Texture2D        ButtonHover;
-
-        public Texture2D        ButtonFrameDown;
-        public Texture2D        ButtonPress;
-
-        public Texture2D        ButtonFocus;
-        public Texture2D        ButtonDownFocus;
-
-        public int              ButtonVerticalPadding = 10;
-        public int              ButtonHorizontalPadding = 20;
 
         public int              RadioButtonCornerSize = 30;
         public int              RadioButtonFrameOffset = 10;

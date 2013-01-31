@@ -323,7 +323,7 @@ namespace NuclearWinter.UI
             {
                 if( Screen.IsActive )
                 {
-                    Screen.DrawBox( Screen.Style.ButtonHover, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
+                    Screen.DrawBox( Screen.Style.ButtonHoverOverlay, LayoutRect, mNotebook.Style.TabCornerSize, Color.White );
                 }
             }
 

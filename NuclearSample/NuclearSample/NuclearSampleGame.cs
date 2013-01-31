@@ -84,19 +84,17 @@ namespace NuclearSample
             UIStyle.MediumFont  = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/MediumFont" ), 18, -2 );
             UIStyle.LargeFont   = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/LargeFont" ), 24, 0 );
 
-            UIStyle.BlurRadius = 0;
             UIStyle.SpinningWheel               = Content.Load<Texture2D>( "Sprites/UI/SpinningWheel" );
 
             UIStyle.DefaultTextColor            = new Color( 224, 224, 224 );
             UIStyle.DefaultButtonHeight         = 60;
 
             UIStyle.ButtonFrame                 = Content.Load<Texture2D>( "Sprites/UI/ButtonFrame" );
-            UIStyle.ButtonHover                 = Content.Load<Texture2D>( "Sprites/UI/ButtonHover" );
-            UIStyle.ButtonFocus                 = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
-
-            UIStyle.ButtonFrameDown             = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameDown" );
-            UIStyle.ButtonPress                 = Content.Load<Texture2D>( "Sprites/UI/ButtonPress" );
-            UIStyle.ButtonDownFocus             = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
+            UIStyle.ButtonDownFrame             = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameDown" );
+            UIStyle.ButtonHoverOverlay          = Content.Load<Texture2D>( "Sprites/UI/ButtonHover" );
+            UIStyle.ButtonFocusOverlay          = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
+            UIStyle.ButtonDownOverlay           = Content.Load<Texture2D>( "Sprites/UI/ButtonPress" );
+            UIStyle.ButtonDownFocusOverlay      = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
 
             UIStyle.TooltipFrame                = Content.Load<Texture2D>( "Sprites/UI/TooltipFrame" );
 

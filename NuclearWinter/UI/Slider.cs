@@ -161,15 +161,15 @@ namespace NuclearWinter.UI
 
             int handleX = rect.X + (int)( ( rect.Width - Screen.Style.SliderHandleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
 
-            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonFrameDown, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonDownFrame, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonHover, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonHoverOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocus, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.ButtonFocusOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
         }
 
