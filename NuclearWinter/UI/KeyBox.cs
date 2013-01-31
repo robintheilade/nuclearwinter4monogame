@@ -176,7 +176,7 @@ namespace NuclearWinter.UI
 
             Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
 
-            Screen.Game.DrawBlurredText( Screen.Style.BlurRadius, mFont, DisplayedKey, new Vector2( mpTextPosition.X , mpTextPosition.Y + mFont.YOffset ), Color.White );
+            Screen.Game.SpriteBatch.DrawString( mFont, DisplayedKey, new Vector2( mpTextPosition.X , mpTextPosition.Y + mFont.YOffset ), Color.White );
 
             Screen.PopScissorRectangle();
 

@@ -87,7 +87,7 @@ namespace NuclearWinter.UI
             mAnchor             = _anchor;
 
             Color               = _color;
-            OutlineRadius       = Screen.Style.BlurRadius;
+            OutlineRadius       = 0;
             OutlineColor        = _color * 0.5f;
 
             UpdateContentSize();
