@@ -12,8 +12,7 @@ namespace NuclearWinter.UI
     public class Splitter: Widget
     {
         //-----------------------------------------------------------------------
-        Widget mFirstPane;
-        public Widget           FirstPane
+        public Widget FirstPane
         {
             get { return mFirstPane; }
             set {
@@ -35,8 +34,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        Widget mSecondPane;
-        public Widget           SecondPane
+        public Widget SecondPane
         {
             get { return mSecondPane; }
             set {
@@ -58,42 +56,59 @@ namespace NuclearWinter.UI
             }
         }
 
-        public int      FirstPaneMinSize = 100;
-        public int      SecondPaneMinSize = 100;
+        public int              FirstPaneMinSize = 100;
+        public int              SecondPaneMinSize = 100;
 
-        public bool     InvertDrawOrder;
+        public int              SplitterOffset;
+        public bool             Collapsable;
 
-        public bool     Collapsable;
+        public bool             InvertDrawOrder;
 
+        public Texture2D        SplitterFrame;
+        public int              SplitterFrameCornerSize;
+        public int              SplitterSize;
+
+        public Texture2D        HandleTex;
+
+        //-----------------------------------------------------------------------
+        Widget                  mFirstPane;
+        Widget                  mSecondPane;
+
+        bool                    mbCollapsed;
+        Animation.AnimatedValue mCollapseAnim;
+        bool                    mbDisplayFirstPane;
+        bool                    mbDisplaySecondPane;
+
+        // NOTE: Splitter is using a Direction instead of an Orientation so
+        // it know from which side the offset is computed
+        Direction               mDirection;
+
+        bool                    mbIsDragging;
+        int                     miDragOffset;
+        bool                    mbIsHovered;
+
+        //-----------------------------------------------------------------------
+        public Splitter( Screen _screen, Direction _direction, bool _bCollapsable )
+        : base( _screen )
+        {
+            mDirection = _direction;
+
+            SplitterFrame = Screen.Style.SplitterFrame;
+            SplitterFrameCornerSize = Screen.Style.SplitterFrameCornerSize;
+            SplitterSize = Screen.Style.SplitterSize;
+
+            Collapsable = _bCollapsable;
+            HandleTex = Collapsable ? Screen.Style.SplitterCollapseArrow : Screen.Style.SplitterDragHandle;
+            mCollapseAnim = new Animation.SmoothValue( 0f, 1f, 0.2f );
+        }
+
+        //-----------------------------------------------------------------------
         public void ToggleCollapse()
         {
             if( Collapsable ) mbCollapsed = ! mbCollapsed;
         }
 
-        bool            mbCollapsed;
-        Animation.AnimatedValue mCollapseAnim;
-        bool            mbDisplayFirstPane;
-        bool            mbDisplaySecondPane;
-
-        Direction       mDirection;
-        public int      SplitterOffset;
-        int             SplitterSize { get { return Screen.Style.SplitterSize; } }
-
-        bool            mbIsDragging;
-        int             miDragOffset;
-        bool            mbIsHovered;
-
         //-----------------------------------------------------------------------
-        // NOTE: Splitter is using a Direction instead of an Orientation so
-        // it know from which side the offset is computed
-        public Splitter( Screen _screen, Direction _direction )
-        : base( _screen )
-        {
-            mDirection = _direction;
-
-            mCollapseAnim = new Animation.SmoothValue( 0f, 1f, 0.2f );
-        }
-
         public override void Update( float _fElapsedTime )
         {
             if( mbCollapsed )
@@ -409,8 +424,8 @@ namespace NuclearWinter.UI
             {
                 Color handleColor = Color.White * ( mbIsDragging ? 1f : 0.8f );
 
-                Screen.DrawBox( Screen.Style.SplitterFrame, HitBox, Screen.Style.SplitterFrameCornerSize, handleColor );
-                Texture2D handleTex = Collapsable ? Screen.Style.SplitterCollapseArrow : Screen.Style.SplitterDragHandle;
+                Screen.DrawBox( SplitterFrame, HitBox, SplitterFrameCornerSize, handleColor );
+                
                 float fHandleAngle;
                 switch( mDirection )
                 {
@@ -430,7 +445,7 @@ namespace NuclearWinter.UI
                         throw new NotSupportedException();
                 }
 
-                Screen.Game.SpriteBatch.Draw( handleTex, new Vector2( HitBox.Center.X, HitBox.Center.Y ), null, handleColor, fHandleAngle, new Vector2( handleTex.Width / 2f, handleTex.Height / 2f ), 1f, SpriteEffects.None, 0f );
+                Screen.Game.SpriteBatch.Draw( HandleTex, new Vector2( HitBox.Center.X, HitBox.Center.Y ), null, handleColor, fHandleAngle, new Vector2( HandleTex.Width / 2f, HandleTex.Height / 2f ), 1f, SpriteEffects.None, 0f );
             }
 
 
