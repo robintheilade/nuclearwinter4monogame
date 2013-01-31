@@ -88,7 +88,7 @@ namespace NuclearWinter.UI
         bool                    mbIsHovered;
 
         //-----------------------------------------------------------------------
-        public Splitter( Screen _screen, Direction _direction, bool _bCollapsable )
+        public Splitter( Screen _screen, Direction _direction, bool _bCollapsable=false )
         : base( _screen )
         {
             mDirection = _direction;
