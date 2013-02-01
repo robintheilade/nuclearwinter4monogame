@@ -40,7 +40,6 @@ namespace NuclearWinter.UI
                 mfCaretTimer = 0f;
             }
         }
-        public const int     CaretWidth = 1;
 
         public int     SelectionOffset {
             get { return miSelectionOffset; }
@@ -65,9 +64,9 @@ namespace NuclearWinter.UI
 
             if( EnableScrolling )
             {
-                if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - CaretWidth )
+                if( LayoutRect.Width != 0 && iTarget > miScrollOffset + ( LayoutRect.Width - Padding.Horizontal ) - Screen.Style.CaretWidth )
                 {
-                    miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ) + iScrollStep );
+                    miScrollOffset = Math.Min( miMaxScrollOffset, ( iTarget - ( LayoutRect.Width - Padding.Horizontal ) + Screen.Style.CaretWidth ) + iScrollStep );
                 }
                 else
                 if( iTarget < miScrollOffset )
@@ -103,7 +102,7 @@ namespace NuclearWinter.UI
 
         public bool                         EnableScrolling = true;
 
-        public Color                        TextColor = Color.White;
+        public Color                        TextColor;
         public int                          TextWidth { get; private set; }
 
         public Func<char,bool>              TextEnteredHandler;
@@ -150,7 +149,7 @@ namespace NuclearWinter.UI
         string                  mstrPlaceholderText = "";
 
         int                     miScrollOffset;
-        int                     miMaxScrollOffset { get { return (int)Math.Max( 0, TextWidth - ( LayoutRect.Width - Padding.Horizontal ) + CaretWidth ); } }
+        int                     miMaxScrollOffset { get { return (int)Math.Max( 0, TextWidth - ( LayoutRect.Width - Padding.Horizontal ) + Screen.Style.CaretWidth ); } }
 
         bool                    mbIsDragging;
         bool                    mbIsHovered;
@@ -159,6 +158,8 @@ namespace NuclearWinter.UI
         public EditBox( Screen _screen, string _strText = "", Func<char,bool> _textEnteredHandler = null )
         : base( _screen )
         {
+            TextColor = Screen.Style.EditBoxTextColor;
+            
             mstrText    = _strText;
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 15 );
@@ -691,7 +692,7 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonDownOverlay, rect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.EditBoxHoverOverlay, rect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
             Screen.PushScissorRectangle( new Rectangle( rect.X + Padding.Left, rect.Y, rect.Width - Padding.Horizontal, rect.Height ) );
@@ -730,7 +731,7 @@ namespace NuclearWinter.UI
             else
             if( Screen.IsActive && HasFocus && mfCaretTimer % (fBlinkInterval * 2) < fBlinkInterval )
             {
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, CaretWidth, rect.Height - Padding.Vertical ), TextColor );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, new Rectangle( mpTextPosition.X + miCaretX - miScrollOffset, rect.Y + Padding.Top, Screen.Style.CaretWidth, rect.Height - Padding.Vertical ), TextColor );
             }
         }
     }

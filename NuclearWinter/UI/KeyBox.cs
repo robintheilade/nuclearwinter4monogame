@@ -50,6 +50,8 @@ namespace NuclearWinter.UI
             }
         }
 
+        public Color                TextColor;
+
         Point                       mpTextPosition;
         int                         miTextWidth;
 
@@ -66,6 +68,8 @@ namespace NuclearWinter.UI
             mKey        = _key;
             mFont       = _screen.Style.MediumFont;
             mPadding    = new Box( 15 );
+
+            TextColor = Screen.Style.EditBoxTextColor;
 
             UpdateContentSize();
         }
@@ -171,12 +175,12 @@ namespace NuclearWinter.UI
 
             if( Screen.IsActive && mbIsHovered )
             {
-                Screen.DrawBox( Screen.Style.ButtonDownOverlay, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox( Screen.Style.EditBoxHoverOverlay, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
             }
 
             Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
 
-            Screen.Game.SpriteBatch.DrawString( mFont, DisplayedKey, new Vector2( mpTextPosition.X , mpTextPosition.Y + mFont.YOffset ), Color.White );
+            Screen.Game.SpriteBatch.DrawString( mFont, DisplayedKey, new Vector2( mpTextPosition.X , mpTextPosition.Y + mFont.YOffset ), TextColor );
 
             Screen.PopScissorRectangle();
 

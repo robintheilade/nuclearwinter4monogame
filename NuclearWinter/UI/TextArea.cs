@@ -141,14 +141,13 @@ namespace NuclearWinter.UI
             if( TextArea.Screen.IsActive && TextArea.HasFocus )
             {
                 const float fBlinkInterval = 0.3f;
-                const int iCaretWidth = 2;
 
                 if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
                 {
                     Point caretPos = TextArea.GetPositionForCaret( EndOffset );
                     int iCaretHeight = TextArea.LineHeight;
 
-                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
+                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
                 }
             }
         }
@@ -315,13 +314,11 @@ namespace NuclearWinter.UI
         {
             DrawSelection( _rect, CaretColor * 0.3f );
 
-            const int iCaretWidth = 2;
-
             Point caretPos = TextArea.GetPositionForCaret( EndOffset );
             int iCaretHeight = TextArea.LineHeight;
 
             // Caret
-            TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, iCaretWidth, iCaretHeight ), CaretColor );
+            TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight ), CaretColor );
 
             // Label
             TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X - 4, caretPos.Y - (int)mvLabelSize.Y, (int)mvLabelSize.X + 6, (int)mvLabelSize.Y ), CaretColor * mfLabelAlpha );

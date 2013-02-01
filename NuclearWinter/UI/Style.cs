@@ -45,7 +45,11 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameRightDown;
 
         public Texture2D        EditBoxFrame;
+        public Texture2D        EditBoxHoverOverlay;
         public int              EditBoxCornerSize = 30;
+        public Color            EditBoxTextColor = Color.White;
+
+        public int              CaretWidth = 1;
 
         public Texture2D        DropDownArrow;
 
