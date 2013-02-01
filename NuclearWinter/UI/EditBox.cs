@@ -40,7 +40,7 @@ namespace NuclearWinter.UI
                 mfCaretTimer = 0f;
             }
         }
-        public const int     CaretWidth = 2;
+        public const int     CaretWidth = 1;
 
         public int     SelectionOffset {
             get { return miSelectionOffset; }
