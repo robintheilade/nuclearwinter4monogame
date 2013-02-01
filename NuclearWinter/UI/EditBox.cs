@@ -162,7 +162,7 @@ namespace NuclearWinter.UI
             
             mstrText    = _strText;
             mFont       = _screen.Style.MediumFont;
-            mPadding    = new Box( 15 );
+            mPadding    = _screen.Style.EditBoxPadding;
             TextEnteredHandler = _textEnteredHandler;
 
             Frame               = Screen.Style.EditBoxFrame;

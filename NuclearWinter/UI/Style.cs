@@ -48,6 +48,7 @@ namespace NuclearWinter.UI
         public Texture2D        EditBoxHoverOverlay;
         public int              EditBoxCornerSize = 30;
         public Color            EditBoxTextColor = Color.White;
+        public Box              EditBoxPadding = new Box(15);
 
         public int              CaretWidth = 1;
 

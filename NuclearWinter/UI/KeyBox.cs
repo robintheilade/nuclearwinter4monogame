@@ -67,7 +67,7 @@ namespace NuclearWinter.UI
         {
             mKey        = _key;
             mFont       = _screen.Style.MediumFont;
-            mPadding    = new Box( 15 );
+            mPadding    = _screen.Style.EditBoxPadding;
 
             TextColor = Screen.Style.EditBoxTextColor;
 
@@ -187,7 +187,7 @@ namespace NuclearWinter.UI
             if( HasFocus )
             {
                 Rectangle selectionRectangle = new Rectangle( mpTextPosition.X, LayoutRect.Y + Padding.Top, miTextWidth, LayoutRect.Height - Padding.Vertical );
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, Color.White * 0.3f );
+                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f );
             }
         }
     }
