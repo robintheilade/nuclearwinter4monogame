@@ -38,11 +38,11 @@ namespace NuclearWinter.UI
         public int              RadioButtonCornerSize = 30;
         public int              RadioButtonFrameOffset = 10;
         public Texture2D        ButtonFrameLeft;
-        public Texture2D        ButtonFrameLeftDown;
+        public Texture2D        ButtonDownFrameLeft;
         public Texture2D        ButtonFrameMiddle;
-        public Texture2D        ButtonFrameMiddleDown;
+        public Texture2D        ButtonDownFrameMiddle;
         public Texture2D        ButtonFrameRight;
-        public Texture2D        ButtonFrameRightDown;
+        public Texture2D        ButtonDownFrameRight;
 
         public Texture2D        EditBoxFrame;
         public Texture2D        EditBoxHoverOverlay;

@@ -24,9 +24,9 @@ namespace NuclearWinter.UI
             public Texture2D                ButtonFrameMiddle;
             public Texture2D                ButtonFrameRight;
 
-            public Texture2D                ButtonFrameLeftDown;
-            public Texture2D                ButtonFrameMiddleDown;
-            public Texture2D                ButtonFrameRightDown;
+            public Texture2D                ButtonDownFrameLeft;
+            public Texture2D                ButtonDownFrameMiddle;
+            public Texture2D                ButtonDownFrameRight;
 
             //------------------------------------------------------------------
             public RadioButtonSetStyle(
@@ -40,9 +40,9 @@ namespace NuclearWinter.UI
                 Texture2D   _buttonFrameMiddle,
                 Texture2D   _buttonFrameRight,
 
-                Texture2D   _buttonFrameLeftDown,
-                Texture2D   _buttonFrameMiddleDown,
-                Texture2D   _buttonFrameRightDown
+                Texture2D   _ButtonDownFrameLeft,
+                Texture2D   _ButtonDownFrameMiddle,
+                Texture2D   _ButtonDownFrameRight
             )
             {
                 CornerSize              = _iCornerSize;
@@ -55,9 +55,9 @@ namespace NuclearWinter.UI
                 ButtonFrameMiddle       = _buttonFrameMiddle;
                 ButtonFrameRight        = _buttonFrameRight;
 
-                ButtonFrameLeftDown     = _buttonFrameLeftDown;
-                ButtonFrameMiddleDown   = _buttonFrameMiddleDown;
-                ButtonFrameRightDown    = _buttonFrameRightDown;
+                ButtonDownFrameLeft     = _ButtonDownFrameLeft;
+                ButtonDownFrameMiddle   = _ButtonDownFrameMiddle;
+                ButtonDownFrameRight    = _ButtonDownFrameRight;
            }
         }
 
@@ -83,18 +83,18 @@ namespace NuclearWinter.UI
                     button.Padding = new Box( 0, mStyle.FrameOffset );
                     button.Margin = new Box( 0, -mStyle.FrameOffset );
 
-                    button.Style.DownFrame  = Style.ButtonFrameMiddleDown;
+                    button.Style.DownFrame  = Style.ButtonDownFrameMiddle;
                     button.ClickHandler     = ButtonClicked;
 
                     i++;
                 }
 
                 Button firstButton = mlButtons.First();
-                firstButton.Style.DownFrame = Style.ButtonFrameLeftDown;
+                firstButton.Style.DownFrame = Style.ButtonDownFrameLeft;
                 firstButton.Margin = new Box( 0, -mStyle.FrameOffset, 0, 0 );
 
                 Button lastButton = mlButtons.Last();
-                lastButton.Style.DownFrame = Style.ButtonFrameRightDown;
+                lastButton.Style.DownFrame = Style.ButtonDownFrameRight;
                 lastButton.Margin = new Box( 0, 0, 0, -mStyle.FrameOffset );
             }
         }
@@ -123,16 +123,16 @@ namespace NuclearWinter.UI
                         button.TextColor            = mStyle.TextDownColor;
                         if( iButton == 0 )
                         {
-                            button.Style.Frame          = Style.ButtonFrameLeftDown;
+                            button.Style.Frame          = Style.ButtonDownFrameLeft;
                         }
                         else
                         if( iButton == mlButtons.Count - 1 )
                         {
-                            button.Style.Frame          = Style.ButtonFrameRightDown;
+                            button.Style.Frame          = Style.ButtonDownFrameRight;
                         }
                         else
                         {
-                            button.Style.Frame          = Style.ButtonFrameMiddleDown;
+                            button.Style.Frame          = Style.ButtonDownFrameMiddle;
                         }
                     }
                     else
@@ -214,9 +214,9 @@ namespace NuclearWinter.UI
                 Screen.Style.ButtonFrameMiddle,
                 Screen.Style.ButtonFrameRight,
 
-                Screen.Style.ButtonFrameLeftDown,
-                Screen.Style.ButtonFrameMiddleDown,
-                Screen.Style.ButtonFrameRightDown
+                Screen.Style.ButtonDownFrameLeft,
+                Screen.Style.ButtonDownFrameMiddle,
+                Screen.Style.ButtonDownFrameRight
             );
 
             SelectedButtonIndex = _iInitialButtonIndex;

@@ -105,13 +105,13 @@ namespace NuclearSample
             UIStyle.RadioButtonCornerSize       = UIStyle.ButtonCornerSize;
             UIStyle.RadioButtonFrameOffset      = 7;
             UIStyle.ButtonFrameLeft             = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameLeft" );
-            UIStyle.ButtonFrameLeftDown         = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameLeftDown" );
+            UIStyle.ButtonDownFrameLeft         = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameLeftDown" );
 
             UIStyle.ButtonFrameMiddle           = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameMiddle" );
-            UIStyle.ButtonFrameMiddleDown       = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameMiddleDown" );
+            UIStyle.ButtonDownFrameMiddle       = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameMiddleDown" );
 
             UIStyle.ButtonFrameRight            = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameRight" );
-            UIStyle.ButtonFrameRightDown        = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameRightDown" );
+            UIStyle.ButtonDownFrameRight        = Content.Load<Texture2D>( "Sprites/UI/ButtonFrameRightDown" );
 
             UIStyle.EditBoxFrame                = Content.Load<Texture2D>( "Sprites/UI/EditBoxFrame" );
             UIStyle.EditBoxCornerSize           = 20;
