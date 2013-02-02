@@ -148,8 +148,8 @@ namespace NuclearWinter.UI
             ScrollItemOffset = Math.Max( 0, Math.Min( SelectedItemIndex, Items.Count - siMaxLineDisplayed ) );
             mScrollbar.LerpOffset = mScrollbar.Offset;
 
-            Padding = new Box( 10 );
-            TextPadding = new Box( 5 );
+            Padding = Screen.Style.DropDownBoxPadding;
+            TextPadding = Screen.Style.DropDownBoxTextPadding;
 
             mPressedAnim    = new SmoothValue( 1f, 0f, 0.2f );
             mPressedAnim.SetTime( mPressedAnim.Duration );

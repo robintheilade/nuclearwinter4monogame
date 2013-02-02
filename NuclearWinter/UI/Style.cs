@@ -52,6 +52,8 @@ namespace NuclearWinter.UI
 
         public int              CaretWidth = 1;
 
+        public Box              DropDownBoxPadding = new Box(10);
+        public Box              DropDownBoxTextPadding = new Box(5);
         public Texture2D        DropDownArrow;
 
         public Texture2D        ListFrame;
