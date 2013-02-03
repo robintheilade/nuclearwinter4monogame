@@ -428,7 +428,7 @@ namespace NuclearWinter.UI
             Caret           = new TextCaret( this );
             RemoteCaretsById = new Dictionary<UInt16,RemoteTextCaret>();
 
-            Padding         = new Box(20);
+            Padding         = Screen.Style.TextAreaPadding;
 
             Scrollbar       = new Scrollbar( _screen );
             Scrollbar.Parent = this;

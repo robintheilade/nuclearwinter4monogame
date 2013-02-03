@@ -119,7 +119,10 @@ namespace NuclearWinter.UI
 
         public int              SliderHandleSize = 30;
 
+        public Box              TextAreaPadding = new Box(20);
         public Texture2D        TextAreaGutterFrame;
         public int              TextAreaGutterCornerSize = 15;
+
+        public Box              RichTextAreaPadding = new Box(20);
     }
 }

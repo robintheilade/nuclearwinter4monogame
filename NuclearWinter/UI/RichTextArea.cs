@@ -746,7 +746,7 @@ namespace NuclearWinter.UI
 
             RemoteCaretsById = new Dictionary<UInt16,RemoteRichTextCaret>();
 
-            Padding         = new Box(20);
+            Padding         = Screen.Style.RichTextAreaPadding;
 
             Scrollbar       = new Scrollbar( _screen );
             Scrollbar.Parent = this;
