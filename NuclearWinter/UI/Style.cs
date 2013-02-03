@@ -76,16 +76,7 @@ namespace NuclearWinter.UI
         public Texture2D        Panel;
         public int              PanelCornerSize = 10;
 
-        public int              NotebookTabCornerSize = 10;
-        public Texture2D        NotebookTab;
-        public Texture2D        NotebookActiveTab;
-        public Texture2D        NotebookTabFocus;
-        public Texture2D        NotebookActiveTabFocus;
-
-        public Texture2D        NotebookTabClose;
-        public Texture2D        NotebookTabCloseHover;
-        public Texture2D        NotebookTabCloseDown;
-        public Texture2D        NotebookUnreadTabMarker;
+        public Notebook.NotebookStyle NotebookStyle = new Notebook.NotebookStyle( 10, 50 );
         
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;

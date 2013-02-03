@@ -83,14 +83,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         void UpdatePaddings()
         {
+            int iHorizontal = mNotebook.Style.HorizontalTabPadding;
+            int iVertical = mNotebook.Style.VerticalTabPadding;
+
             if( mIcon.Texture != null )
             {
-                mIcon.Padding = mLabel.Text != "" ? new Box( 10, 0, 10, 10 ) : new Box( 10, 0, 10, 20 );
-                mLabel.Padding = mLabel.Text != "" ? new Box( 10, 10, 10, 10 ) : new Box( 10, 20, 10, 0 );
+                mIcon.Padding = mLabel.Text != "" ? new Box( iVertical, 0, iVertical, iHorizontal / 2 ) : new Box( iVertical, 0, iVertical, iHorizontal );
+                mLabel.Padding = mLabel.Text != "" ? new Box( iVertical, iHorizontal / 2, iVertical, iHorizontal / 2 ) : new Box( iVertical, iHorizontal, iVertical, 0 );
             }
             else
             {
-                mLabel.Padding = new Box( 10, 20 );
+                mLabel.Padding = new Box( iVertical, iHorizontal );
             }
         }
 
@@ -106,7 +109,7 @@ namespace NuclearWinter.UI
 
             mTooltip        = new Tooltip( Screen, "" );
 
-            mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, Screen.Style.NotebookTabCloseHover, Screen.Style.NotebookTabCloseDown, null, 0, 0 ), "", Screen.Style.NotebookTabClose, Anchor.Center );
+            mCloseButton    = new Button( Screen, new Button.ButtonStyle( 5, null, null, mNotebook.Style.TabCloseHover, mNotebook.Style.TabCloseDown, null, 0, 0 ), "", mNotebook.Style.TabClose, Anchor.Center );
             mCloseButton.Parent = this;
             mCloseButton.Padding = new Box(0);
             mCloseButton.ClickHandler = delegate {
@@ -185,7 +188,7 @@ namespace NuclearWinter.UI
             {
                 mCloseButton.DoLayout( new Rectangle(
                     LayoutRect.Right - 10 - mCloseButton.ContentWidth,
-                    pCenter.Y - Screen.Style.NotebookTabClose.Height / 2,
+                    pCenter.Y - mNotebook.Style.TabClose.Height / 2,
                     mCloseButton.ContentWidth, mCloseButton.ContentHeight )
                 );
             }
@@ -228,7 +231,7 @@ namespace NuclearWinter.UI
                     DragOffset = 0;
                 }
 
-                if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.TabHeight /* && IsInTab */ )
+                if( _hitPoint.Y < mNotebook.LayoutRect.Y + mNotebook.Style.TabHeight /* && IsInTab */ )
                 {
                     if( _hitPoint.X > LayoutRect.X && _hitPoint.X < LayoutRect.Right )
                     {
@@ -387,28 +390,48 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public struct NotebookStyle
         {
-            public NotebookStyle( int _iTabCornerSize, Texture2D _tab, Texture2D _tabFocus, Texture2D _activeTab, Texture2D _activeTabFocus, Texture2D _unreadTabMarker )
+            public NotebookStyle(
+                int _iTabCornerSize, int _iTabHeight,
+                Texture2D _tab=null, Texture2D _tabFocus=null, Texture2D _activeTab=null, Texture2D _activeTabFocus=null, Texture2D _unreadTabMarker=null,
+                int _iHorizontalTabPadding=20,
+                int _iVerticalTabPadding=10,
+                Texture2D _tabClose=null, Texture2D _tabCloseHover=null, Texture2D _tabCloseDown=null )
             {
                 TabCornerSize   = _iTabCornerSize;
+                TabHeight       = _iTabHeight;
                 Tab             = _tab;
                 TabFocus        = _tabFocus;
                 ActiveTab       = _activeTab;
                 ActiveTabFocus  = _activeTabFocus;
                 UnreadTabMarker = _unreadTabMarker;
+
+                HorizontalTabPadding = _iHorizontalTabPadding;
+                VerticalTabPadding = _iVerticalTabPadding;
+
+                TabClose        = _tabClose;
+                TabCloseHover   = _tabCloseHover;
+                TabCloseDown    = _tabCloseDown;
             }
 
             public int              TabCornerSize;
+            public int              TabHeight;
 
             public Texture2D        Tab;
             public Texture2D        TabFocus;
             public Texture2D        ActiveTab;
             public Texture2D        ActiveTabFocus;
             public Texture2D        UnreadTabMarker;
+
+            public int              HorizontalTabPadding;
+            public int              VerticalTabPadding;
+
+            public Texture2D        TabClose;
+            public Texture2D        TabCloseHover;
+            public Texture2D        TabCloseDown;
         }
 
         //----------------------------------------------------------------------
         public NotebookStyle                        Style;
-        public int                                  TabHeight           = 50;
         public int                                  MaxUnpinnedTabWidth = 250;
         public int                                  TabBarLeftOffset    = 0;
         public int                                  TabBarRightOffset   = 0;
@@ -448,14 +471,7 @@ namespace NuclearWinter.UI
         public Notebook( Screen _screen )
         : base( _screen )
         {
-            Style = new NotebookStyle(
-                Screen.Style.NotebookTabCornerSize,
-                Screen.Style.NotebookTab,
-                Screen.Style.NotebookTabFocus,
-                Screen.Style.NotebookActiveTab,
-                Screen.Style.NotebookActiveTabFocus,
-                Screen.Style.NotebookUnreadTabMarker
-            );
+            Style = Screen.Style.NotebookStyle;
 
             mPanel = new Panel( Screen, Screen.Style.Panel, Screen.Style.PanelCornerSize );
 
@@ -495,7 +511,7 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
             HitBox = LayoutRect;
 
-            Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( TabHeight - 10 ), LayoutRect.Width, LayoutRect.Height - ( TabHeight - 10 ) );
+            Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( Style.TabHeight - 10 ), LayoutRect.Width, LayoutRect.Height - ( Style.TabHeight - 10 ) );
 
             mPanel.DoLayout( contentRect );
 
@@ -543,7 +559,7 @@ namespace NuclearWinter.UI
                     iTabBarStartX + iTabX,
                     LayoutRect.Y,
                     iTabWidth,
-                    TabHeight
+                    Style.TabHeight
                     );
 
                 tab.DoLayout( tabRect );
@@ -558,7 +574,7 @@ namespace NuclearWinter.UI
                     iDraggedTabX,
                     LayoutRect.Y,
                     miUnpinnedTabWidth,
-                    TabHeight
+                    Style.TabHeight
                     );
 
                 DraggedTab.DoLayout( tabRect );
@@ -597,7 +613,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget HitTest( Point _point )
         {
-            if( _point.Y < LayoutRect.Y + TabHeight )
+            if( _point.Y < LayoutRect.Y + Style.TabHeight )
             {
                 int iTabBarStartX = LayoutRect.Left + 20 + TabBarLeftOffset;
 
