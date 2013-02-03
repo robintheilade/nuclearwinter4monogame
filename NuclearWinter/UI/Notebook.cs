@@ -395,6 +395,9 @@ namespace NuclearWinter.UI
                 Texture2D _tab=null, Texture2D _tabFocus=null, Texture2D _activeTab=null, Texture2D _activeTabFocus=null, Texture2D _unreadTabMarker=null,
                 int _iHorizontalTabPadding=20,
                 int _iVerticalTabPadding=10,
+                int _iTabBarLeftOffset=20,
+                int _iTabBarRightOffset=20,
+                int _iUnpinnedTabWidth=250,
                 Texture2D _tabClose=null, Texture2D _tabCloseHover=null, Texture2D _tabCloseDown=null )
             {
                 TabCornerSize   = _iTabCornerSize;
@@ -407,6 +410,10 @@ namespace NuclearWinter.UI
 
                 HorizontalTabPadding = _iHorizontalTabPadding;
                 VerticalTabPadding = _iVerticalTabPadding;
+
+                TabBarLeftOffset = _iTabBarLeftOffset;
+                TabBarRightOffset = _iTabBarRightOffset;
+                UnpinnedTabWidth = _iUnpinnedTabWidth;
 
                 TabClose        = _tabClose;
                 TabCloseHover   = _tabCloseHover;
@@ -425,6 +432,10 @@ namespace NuclearWinter.UI
             public int              HorizontalTabPadding;
             public int              VerticalTabPadding;
 
+            public int              TabBarLeftOffset;
+            public int              TabBarRightOffset;
+            public int              UnpinnedTabWidth;
+
             public Texture2D        TabClose;
             public Texture2D        TabCloseHover;
             public Texture2D        TabCloseDown;
@@ -432,9 +443,6 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public NotebookStyle                        Style;
-        public int                                  MaxUnpinnedTabWidth = 250;
-        public int                                  TabBarLeftOffset    = 0;
-        public int                                  TabBarRightOffset   = 0;
 
         public ObservableList<NotebookTab>          Tabs                { get; private set; }
 
@@ -515,17 +523,17 @@ namespace NuclearWinter.UI
 
             mPanel.DoLayout( contentRect );
 
-            int iTabBarStartX = LayoutRect.Left + 20 + TabBarLeftOffset;
-            int iTabBarEndX = LayoutRect.Right - 20 - TabBarRightOffset;
+            int iTabBarStartX = LayoutRect.Left + Style.TabBarLeftOffset;
+            int iTabBarEndX = LayoutRect.Right - Style.TabBarRightOffset;
 
             int iTabBarWidth = iTabBarEndX - iTabBarStartX;
 
             int iUnpinnedTabsCount = Tabs.Count( tab => ! tab.IsPinned );
 
             int iPinnedTabsWidth = Tabs.Sum( tab => tab.IsPinned ? tab.ContentWidth : 0 );
-            int iUnpinnedTabsWidth = MaxUnpinnedTabWidth * iUnpinnedTabsCount;
+            int iUnpinnedTabsWidth = Style.UnpinnedTabWidth * iUnpinnedTabsCount;
 
-            miUnpinnedTabWidth = MaxUnpinnedTabWidth;
+            miUnpinnedTabWidth = Style.UnpinnedTabWidth;
 
             if( iPinnedTabsWidth + iUnpinnedTabsWidth > iTabBarWidth && iUnpinnedTabsCount > 0 )
             {
@@ -615,7 +623,7 @@ namespace NuclearWinter.UI
         {
             if( _point.Y < LayoutRect.Y + Style.TabHeight )
             {
-                int iTabBarStartX = LayoutRect.Left + 20 + TabBarLeftOffset;
+                int iTabBarStartX = LayoutRect.Left + 20 + Style.TabBarLeftOffset;
 
                 if( _point.X < iTabBarStartX ) return null;
 
