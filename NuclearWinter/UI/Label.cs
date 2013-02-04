@@ -83,7 +83,7 @@ namespace NuclearWinter.UI
             mstrText            = _strText;
             mstrDisplayedText   = mstrText;
             mFont               = _screen.Style.MediumFont;
-            mPadding            = new Box( 10 );
+            mPadding            = Screen.Style.LabelPadding;
             mAnchor             = _anchor;
 
             Color               = _color;

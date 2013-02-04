@@ -17,7 +17,7 @@ namespace NuclearWinter.UI
         public UIFont           LargeFont;
         public UIFont           ExtraLargeFont;
 
-        public Texture2D        SpinningWheel;
+        public Box              LabelPadding = new Box(10);
 
         public int              ButtonCornerSize = 30;
         public int              DefaultButtonHeight = 80;
@@ -116,6 +116,8 @@ namespace NuclearWinter.UI
 
         public Texture2D        ProgressBar;
         public int              ProgressBarCornerSize;
+
+        public Texture2D        SpinningWheel;
 
         public int              SliderHandleSize = 30;
 
