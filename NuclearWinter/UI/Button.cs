@@ -157,7 +157,7 @@ namespace NuclearWinter.UI
         {
             Style = _style;
 
-            mPadding    = new Box(5, 0);
+            mPadding    = new Box(0);
             mMargin     = new Box(0);
 
             mLabel          = new Label( _screen );
