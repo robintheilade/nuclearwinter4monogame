@@ -58,7 +58,7 @@ namespace NuclearWinter.UI
 
                 // Message label
                 ContentGroup = new Group( Screen );
-                ContentGroup.AnchoredRect = AnchoredRect.CreateFull( 0, 60, 0, 80 );
+                ContentGroup.AnchoredRect = AnchoredRect.CreateFull( 0, Screen.Style.DefaultButtonHeight + 10, 0, Screen.Style.DefaultButtonHeight + 10 );
                 AddChild( ContentGroup );
 
                 MessageLabel = new Label( Screen, "", Anchor.Start );
