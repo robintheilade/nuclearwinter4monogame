@@ -196,7 +196,7 @@ namespace NuclearWinter.UI
 
         void ComputeContentSize()
         {
-            ContentHeight = mTreeView.NodeHeight + mTreeView.NodeSpacing;
+            ContentHeight = mTreeView.Style.NodeHeight + mTreeView.Style.NodeSpacing;
             if( Children.Count > 0 && ! mbCollapsed )
             {
                 foreach( TreeViewNode child in Children )
@@ -260,15 +260,15 @@ namespace NuclearWinter.UI
             foreach( TreeViewIndicator indicator in Indicators )
             {
                 miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 5;
-                indicator.DoLayout( new Rectangle( LayoutRect.Right - miIndicatorAndActionButtonsWidth - 5, LayoutRect.Y + 10, indicator.ContentWidth, mTreeView.NodeHeight - 20 ) );
+                indicator.DoLayout( new Rectangle( LayoutRect.Right - miIndicatorAndActionButtonsWidth - 5, LayoutRect.Y + 10, indicator.ContentWidth, mTreeView.Style.NodeHeight - 20 ) );
             }
 
             // Child nodes
             int iX = LayoutRect.X;
-            int iY = LayoutRect.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing;
+            int iY = LayoutRect.Y + mTreeView.Style.NodeHeight + mTreeView.Style.NodeSpacing;
             foreach( TreeViewNode child in Children )
             {
-                child.DoLayout( new Rectangle( iX + mTreeView.NodeBranchWidth, iY, LayoutRect.Width - mTreeView.NodeBranchWidth, child.ContentHeight ) );
+                child.DoLayout( new Rectangle( iX + mTreeView.Style.NodeBranchWidth, iY, LayoutRect.Width - mTreeView.Style.NodeBranchWidth, child.ContentHeight ) );
                 iY += child.ContentHeight;
             }
 
@@ -288,16 +288,16 @@ namespace NuclearWinter.UI
             {
                 if( ! mbIsLast )
                 {
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranch, new Vector2( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y ), Color.White );
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewLine, new Rectangle( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y + mTreeView.NodeHeight + mTreeView.NodeSpacing, Screen.Style.TreeViewBranch.Width, ContentHeight - (mTreeView.NodeHeight + mTreeView.NodeSpacing) ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( mTreeView.Style.Branch, new Vector2( LayoutRect.X - mTreeView.Style.NodeBranchWidth, LayoutRect.Y ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( mTreeView.Style.Line, new Rectangle( LayoutRect.X - mTreeView.Style.NodeBranchWidth, LayoutRect.Y + mTreeView.Style.NodeHeight + mTreeView.Style.NodeSpacing, mTreeView.Style.Branch.Width, ContentHeight - (mTreeView.Style.NodeHeight + mTreeView.Style.NodeSpacing) ), Color.White );
                 }
                 else
                 {
-                    Screen.Game.SpriteBatch.Draw( Screen.Style.TreeViewBranchLast, new Vector2( LayoutRect.X - mTreeView.NodeBranchWidth, LayoutRect.Y ), Color.White );
+                    Screen.Game.SpriteBatch.Draw( mTreeView.Style.BranchLast, new Vector2( LayoutRect.X - mTreeView.Style.NodeBranchWidth, LayoutRect.Y ), Color.White );
                 }
             }
 
-            Rectangle nodeRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Width, mTreeView.NodeHeight );
+            Rectangle nodeRect = new Rectangle( LayoutRect.X, LayoutRect.Y, LayoutRect.Width, mTreeView.Style.NodeHeight );
 
             Texture2D frameTex;
 
@@ -307,7 +307,7 @@ namespace NuclearWinter.UI
             }
             else
             {
-                frameTex = mTreeView.SelectedNode == this ? Screen.Style.TreeViewContainerFrameSelected : Screen.Style.TreeViewContainerFrame;
+                frameTex = mTreeView.SelectedNode == this ? mTreeView.Style.ContainerFrameSelected : mTreeView.Style.ContainerFrame;
             }
 
             if( frameTex != null )
@@ -317,11 +317,11 @@ namespace NuclearWinter.UI
 
             if( Children.Count != 0 || DisplayAsContainer )
             {
-                Texture2D tex = Children.Count == 0 ? Screen.Style.TreeViewBranchOpenEmpty : Screen.Style.TreeViewBranchOpen;
+                Texture2D tex = Children.Count == 0 ? mTreeView.Style.BranchOpenEmpty : mTreeView.Style.BranchOpen;
 
                 if( Collapsed )
                 {
-                    tex = Screen.Style.TreeViewBranchClosed;
+                    tex = mTreeView.Style.BranchClosed;
                 }
 
                 Screen.Game.SpriteBatch.Draw( tex, new Vector2( LayoutRect.X, LayoutRect.Y ), Color.White );
@@ -330,9 +330,9 @@ namespace NuclearWinter.UI
 
             if( mTreeView.HasCheckBoxes )
             {
-                Rectangle checkBoxRect = new Rectangle( nodeRect.X + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.NodeBranchWidth : 0 ), nodeRect.Y, nodeRect.Height, nodeRect.Height );
+                Rectangle checkBoxRect = new Rectangle( nodeRect.X + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.Style.NodeBranchWidth : 0 ), nodeRect.Y, nodeRect.Height, nodeRect.Height );
 
-                Screen.DrawBox( Screen.Style.TreeViewCheckBoxFrame, checkBoxRect, Screen.Style.CheckBoxFrameCornerSize, Color.White );
+                Screen.DrawBox( mTreeView.Style.CheckBoxFrame, checkBoxRect, Screen.Style.CheckBoxFrameCornerSize, Color.White );
 
                 if( mTreeView.HoveredNode == this && mTreeView.IsHoveringNodeCheckBox() && ! mTreeView.IsDragging )
                 {
@@ -407,22 +407,22 @@ namespace NuclearWinter.UI
             int iLabelX = 0;
             if( Children.Count > 0 || DisplayAsContainer )
             {
-                iLabelX += mTreeView.NodeBranchWidth;
+                iLabelX += mTreeView.Style.NodeBranchWidth;
             }
             
             if( mTreeView.HasCheckBoxes )
             {
-                iLabelX += mTreeView.NodeHeight + mTreeView.NodeSpacing;
+                iLabelX += mTreeView.Style.NodeHeight + mTreeView.Style.NodeSpacing;
             }
 
             if( mImage.Texture != null )
             {
-                mImage.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, mImage.ContentWidth, mTreeView.NodeHeight ) );
+                mImage.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, mImage.ContentWidth, mTreeView.Style.NodeHeight ) );
                 mImage.Draw();
                 iLabelX += mImage.ContentWidth;
             }
 
-            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX - _iRight, mTreeView.NodeHeight ) );
+            mLabel.DoLayout( new Rectangle( _position.X + iLabelX, _position.Y, LayoutRect.Width - iLabelX - _iRight, mTreeView.Style.NodeHeight ) );
             mLabel.Draw();
         }
 
@@ -534,11 +534,59 @@ namespace NuclearWinter.UI
     public class TreeView: Widget
     {
         //----------------------------------------------------------------------
-        public ObservableList<TreeViewNode> Nodes               { get; private set; }
+        public struct TreeViewStyle
+        {
+            public TreeViewStyle(
+                int _iNodeHeight, int _iNodeSpacing, int _iNodeBranchWidth,
+            
+                Texture2D _containerFrame=null,
+                Texture2D _containerFrameSelected=null,
+            
+                Texture2D _branchClosed=null,
+                Texture2D _branchOpen=null,
+                Texture2D _branchOpenEmpty=null,
+                Texture2D _branch=null,
+                Texture2D _branchLast=null,
+                Texture2D _line=null,
+                Texture2D _checkBoxFrame=null
+                )
+            {
+                NodeHeight = _iNodeHeight;
+                NodeSpacing = _iNodeSpacing;
+                NodeBranchWidth = _iNodeBranchWidth;
 
-        public int                          NodeHeight      = 40;
-        public int                          NodeSpacing     = 0;
-        public int                          NodeBranchWidth = 25;
+                ContainerFrame = _containerFrame;
+                ContainerFrameSelected = _containerFrameSelected;
+
+                BranchClosed = _branchClosed;
+                BranchOpen = _branchOpen;
+                BranchOpenEmpty = _branchOpenEmpty;
+                Branch = _branch;
+                BranchLast = _branchLast;
+                Line = _line;
+                CheckBoxFrame = _checkBoxFrame;
+            }
+
+            public int              NodeHeight;
+            public int              NodeSpacing;
+            public int              NodeBranchWidth;
+
+            public Texture2D        ContainerFrame;
+            public Texture2D        ContainerFrameSelected;
+
+            public Texture2D        BranchClosed;
+            public Texture2D        BranchOpen;
+            public Texture2D        BranchOpenEmpty;
+            public Texture2D        Branch;
+            public Texture2D        BranchLast;
+            public Texture2D        Line;
+            public Texture2D        CheckBoxFrame;
+        }
+
+        public TreeViewStyle                Style;
+
+        //----------------------------------------------------------------------
+        public ObservableList<TreeViewNode> Nodes               { get; private set; }
 
         internal bool                       LayoutSuspended     { get; private set; }
         public void SuspendLayout()
@@ -625,6 +673,8 @@ namespace NuclearWinter.UI
         public TreeView( Screen _screen )
         : base( _screen )
         {
+            Style = Screen.Style.TreeViewStyle;
+
             Nodes = new ObservableList<TreeViewNode>();
 
             Nodes.ListCleared += delegate {
@@ -666,8 +716,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
-            ContentWidth    = Padding.Left + Padding.Right;
-            ContentHeight   = Padding.Top + Padding.Bottom;
+            ContentWidth    = Padding.Horizontal;
+            ContentHeight   = Padding.Vertical;
 
             base.UpdateContentSize();
         }
@@ -694,7 +744,7 @@ namespace NuclearWinter.UI
                 {
                     button.DoLayout( new Rectangle(
                         LayoutRect.Right - 20 - iButtonX - button.ContentWidth,
-                        HoveredNode.LayoutRect.Y + NodeHeight / 2 - button.ContentHeight / 2,
+                        HoveredNode.LayoutRect.Y + Style.NodeHeight / 2 - button.ContentHeight / 2,
                         button.ContentWidth, button.ContentHeight )
                     );
 
@@ -750,14 +800,14 @@ namespace NuclearWinter.UI
             {
                 int iNodeY = ( mHoverPoint.Y - ( LayoutRect.Y + 10 ) + (int)Scrollbar.LerpOffset );
 
-                int iOffset = iNodeY % ( NodeHeight + NodeSpacing );
+                int iOffset = iNodeY % ( Style.NodeHeight + Style.NodeSpacing );
 
-                if( iOffset < ( NodeHeight + NodeSpacing ) / 4 )
+                if( iOffset < ( Style.NodeHeight + Style.NodeSpacing ) / 4 )
                 {
                     InsertMode = NodeInsertMode.Before;
                 }
                 else
-                if( iOffset > ( NodeHeight + NodeSpacing ) * 3 / 4 )
+                if( iOffset > ( Style.NodeHeight + Style.NodeSpacing ) * 3 / 4 )
                 {
                     InsertMode = NodeInsertMode.After;
                 }
@@ -766,13 +816,13 @@ namespace NuclearWinter.UI
                     InsertMode = NodeInsertMode.Over;
                 }
 
-                int iNodeIndex = iNodeY / ( NodeHeight + NodeSpacing );
+                int iNodeIndex = iNodeY / ( Style.NodeHeight + Style.NodeSpacing );
 
                 HoveredNode = FindHoveredNode( Nodes, iNodeIndex, 0 );
 
                 if( HoveredNode == null )
                 {
-                    InsertMode = iNodeY < ( NodeHeight + NodeSpacing ) / 4 ? NodeInsertMode.Before : NodeInsertMode.After;
+                    InsertMode = iNodeY < ( Style.NodeHeight + Style.NodeSpacing ) / 4 ? NodeInsertMode.Before : NodeInsertMode.After;
                 }
                 else
                 if( HoverHandler != null && oldHoveredNode != HoveredNode )
@@ -1082,8 +1132,8 @@ namespace NuclearWinter.UI
         internal bool IsHoveringNodeCheckBox()
         {
             bool bBranch = ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 );
-            int x = HoveredNode.LayoutRect.X + ( bBranch ? NodeBranchWidth : 0 );
-            return HasCheckBoxes && mHoverPoint.X >= x && mHoverPoint.X < x + NodeHeight + NodeSpacing;
+            int x = HoveredNode.LayoutRect.X + ( bBranch ? Style.NodeBranchWidth : 0 );
+            return HasCheckBoxes && mHoverPoint.X >= x && mHoverPoint.X < x + Style.NodeHeight + Style.NodeSpacing;
         }
 
         void SelectHoveredNode( bool _bDoCollapse )
@@ -1102,7 +1152,7 @@ namespace NuclearWinter.UI
                 }
                 else
                 {
-                    if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + NodeBranchWidth )
+                    if( bBranch && mHoverPoint.X < HoveredNode.LayoutRect.X + Style.NodeBranchWidth )
                     {
                         if( _bDoCollapse )
                         {
@@ -1129,7 +1179,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            DoScroll( -_iDelta / 120 * 3 * ( NodeHeight + NodeSpacing ) );
+            DoScroll( -_iDelta / 120 * 3 * ( Style.NodeHeight + Style.NodeSpacing ) );
         }
 
         //----------------------------------------------------------------------
@@ -1157,12 +1207,12 @@ namespace NuclearWinter.UI
 
                     if( mMouseDragPoint.Y > LayoutRect.Bottom - 20 )
                     {
-                        DoScroll( NodeHeight + NodeSpacing );
+                        DoScroll( Style.NodeHeight + Style.NodeSpacing );
                     }
                     else
                     if( mMouseDragPoint.Y < LayoutRect.Y + 20 )
                     {
-                        DoScroll( -( NodeHeight + NodeSpacing ) );
+                        DoScroll( -( Style.NodeHeight + Style.NodeSpacing ) );
                     }
                     else
                     {
@@ -1287,12 +1337,12 @@ namespace NuclearWinter.UI
                     {
                         int iX = HoveredNode.LayoutRect.X;
                         int iWidth = HoveredNode.LayoutRect.Width;
-                        int iY = HoveredNode.LayoutRect.Y - ( NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? NodeHeight + NodeSpacing : 0 );
+                        int iY = HoveredNode.LayoutRect.Y - ( Style.NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? Style.NodeHeight + Style.NodeSpacing : 0 );
 
                         if( InsertMode == NodeInsertMode.After && ( HoveredNode.DisplayAsContainer || HoveredNode.Children.Count > 0 ) && ! HoveredNode.Collapsed )
                         {
-                            iX += NodeBranchWidth;
-                            iWidth -= NodeBranchWidth;
+                            iX += Style.NodeBranchWidth;
+                            iWidth -= Style.NodeBranchWidth;
                         }
 
                         Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
@@ -1304,7 +1354,7 @@ namespace NuclearWinter.UI
                 {
                     int iX = paddedRect.X;
                     int iWidth = paddedRect.Width;
-                    int iY = paddedRect.Y - ( NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? ( ContentHeight - (int)Scrollbar.LerpOffset ) : 0 );
+                    int iY = paddedRect.Y - ( Style.NodeSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2 + ( InsertMode == NodeInsertMode.After ? ( ContentHeight - (int)Scrollbar.LerpOffset ) : 0 );
 
                     Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
                     Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );

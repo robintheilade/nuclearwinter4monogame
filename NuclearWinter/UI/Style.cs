@@ -82,17 +82,8 @@ namespace NuclearWinter.UI
         public Texture2D        PopupFrame;
         public Color            PopupBackgroundFadeColor = Color.Black * 0.2f;
 
-        public Texture2D        TreeViewContainerFrame;
-        public Texture2D        TreeViewContainerFrameSelected;
+        public TreeView.TreeViewStyle TreeViewStyle = new TreeView.TreeViewStyle( 40, 0, 25 );
 
-        public Texture2D        TreeViewBranchClosed;
-        public Texture2D        TreeViewBranchOpen;
-        public Texture2D        TreeViewBranchOpenEmpty;
-        public Texture2D        TreeViewBranch;
-        public Texture2D        TreeViewBranchLast;
-        public Texture2D        TreeViewLine;
-
-        public Texture2D        TreeViewCheckBoxFrame;
         public Texture2D        CheckBoxChecked;
         public Texture2D        CheckBoxUnchecked;
         public Texture2D        CheckBoxInconsistent;
