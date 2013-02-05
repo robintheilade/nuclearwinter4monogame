@@ -76,7 +76,7 @@ namespace NuclearWinter.UI
         public Texture2D        Panel;
         public int              PanelCornerSize = 10;
 
-        public Notebook.NotebookStyle NotebookStyle = new Notebook.NotebookStyle( 10, 50 );
+        public Notebook.NotebookStyle NotebookStyle = new Notebook.NotebookStyle( 10, 50, 10 );
         
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;

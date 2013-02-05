@@ -391,7 +391,7 @@ namespace NuclearWinter.UI
         public struct NotebookStyle
         {
             public NotebookStyle(
-                int _iTabCornerSize, int _iTabHeight,
+                int _iTabCornerSize, int _iTabHeight, int _iTabBarPanelVerticalOffset,
                 Texture2D _tab=null, Texture2D _tabFocus=null, Texture2D _activeTab=null, Texture2D _activeTabFocus=null, Texture2D _unreadTabMarker=null,
                 int _iHorizontalTabPadding=20,
                 int _iVerticalTabPadding=10,
@@ -402,6 +402,8 @@ namespace NuclearWinter.UI
             {
                 TabCornerSize   = _iTabCornerSize;
                 TabHeight       = _iTabHeight;
+                TabBarPanelVerticalOffset = _iTabBarPanelVerticalOffset;
+
                 Tab             = _tab;
                 TabFocus        = _tabFocus;
                 ActiveTab       = _activeTab;
@@ -422,6 +424,7 @@ namespace NuclearWinter.UI
 
             public int              TabCornerSize;
             public int              TabHeight;
+            public int              TabBarPanelVerticalOffset;
 
             public Texture2D        Tab;
             public Texture2D        TabFocus;
@@ -519,7 +522,7 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
             HitBox = LayoutRect;
 
-            Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( Style.TabHeight - 10 ), LayoutRect.Width, LayoutRect.Height - ( Style.TabHeight - 10 ) );
+            Rectangle contentRect = new Rectangle( LayoutRect.X, LayoutRect.Y + ( Style.TabHeight - Style.TabBarPanelVerticalOffset ), LayoutRect.Width, LayoutRect.Height - ( Style.TabHeight - Style.TabBarPanelVerticalOffset ) );
 
             mPanel.DoLayout( contentRect );
 
@@ -623,7 +626,7 @@ namespace NuclearWinter.UI
         {
             if( _point.Y < LayoutRect.Y + Style.TabHeight )
             {
-                int iTabBarStartX = LayoutRect.Left + 20 + Style.TabBarLeftOffset;
+                int iTabBarStartX = LayoutRect.Left + Style.TabBarLeftOffset;
 
                 if( _point.X < iTabBarStartX ) return null;
 
