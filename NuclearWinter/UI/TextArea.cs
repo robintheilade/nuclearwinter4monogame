@@ -433,7 +433,7 @@ namespace NuclearWinter.UI
             Scrollbar       = new Scrollbar( _screen );
             Scrollbar.Parent = this;
 
-            PanelTex        = Screen.Style.ListFrame;
+            PanelTex        = Screen.Style.TextAreaFrame;
         }
 
         //----------------------------------------------------------------------
@@ -1195,7 +1195,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+            Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.TextAreaFrameCornerSize, Color.White );
             if( DisplayLineNumbers )
             {
                 Screen.DrawBox( Screen.Style.TextAreaGutterFrame, new Rectangle( LayoutRect.X, LayoutRect.Y, miGutterWidth + Padding.Left, LayoutRect.Height ), Screen.Style.TextAreaGutterCornerSize, Color.White );

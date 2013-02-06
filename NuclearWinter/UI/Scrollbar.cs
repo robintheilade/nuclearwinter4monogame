@@ -9,7 +9,6 @@ namespace NuclearWinter.UI
     public class Scrollbar: Widget
     {
         //----------------------------------------------------------------------
-
         public int              Offset;
         int                     mMouseOffset;
 

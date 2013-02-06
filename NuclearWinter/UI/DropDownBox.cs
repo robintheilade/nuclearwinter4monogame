@@ -490,14 +490,15 @@ namespace NuclearWinter.UI
             {
                 int iLinesDisplayed = Math.Min( siMaxLineDisplayed, Items.Count );
 
-                Screen.DrawBox( Screen.Style.ListFrame, new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, iLinesDisplayed * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical ), Screen.Style.ButtonCornerSize, Color.White );
+                var rect = new Rectangle( LayoutRect.X, LayoutRect.Bottom, LayoutRect.Width, iLinesDisplayed * ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) + Padding.Vertical );
+                Screen.DrawBox( Screen.Style.ListViewStyle.ListViewFrame, rect, Screen.Style.ListViewStyle.ListViewFrameCornerSize, Color.White );
 
                 int iMaxIndex = Math.Min( Items.Count - 1, ScrollItemOffset + iLinesDisplayed - 1 );
                 for( int iIndex = ScrollItemOffset; iIndex <= iMaxIndex; iIndex++ )
                 {
                     if( Screen.IsActive && miHoveredItemIndex == iIndex )
                     {
-                        Screen.DrawBox( Screen.Style.GridBoxFrameHover, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
+                        Screen.DrawBox( Screen.Style.DropDownBoxEntryHoverOverlay, new Rectangle( LayoutRect.X + TextPadding.Left, LayoutRect.Bottom + ( Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical ) * ( iIndex - ScrollItemOffset ) + TextPadding.Top, LayoutRect.Width - TextPadding.Horizontal, Screen.Style.MediumFont.LineSpacing + TextPadding.Vertical + 10 ), 10, Color.White );
                     }
 
                     Items[iIndex].Draw();

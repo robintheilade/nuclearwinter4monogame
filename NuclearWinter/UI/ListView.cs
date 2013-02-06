@@ -92,8 +92,8 @@ namespace NuclearWinter.UI
         protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
         {
             mstrText = Text;
-            mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
-            if( mstrText != "" && mfTextWidth > _col.Width )
+            mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
+            if( mstrText != "" && mfTextWidth + mListView.Style.CellHorizontalPadding * 2 > _col.Width )
             {
                 int iOffset = mstrText.Length;
 
@@ -103,7 +103,7 @@ namespace NuclearWinter.UI
                     mstrText = Text.Substring( 0, iOffset ) + "…";
                     if( iOffset == 0 ) break;
 
-                    mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X + 20 + mListView.ColSpacing;
+                    mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
                 }
             }
 
@@ -111,13 +111,13 @@ namespace NuclearWinter.UI
             switch( _col.Anchor )
             {
                 case Anchor.Start:
-                    mvTextOffset.X += 10;
+                    mvTextOffset.X += mListView.Style.CellHorizontalPadding;
                     break;
                 case Anchor.Center:
                     mvTextOffset.X += _col.Width / 2f - mfTextWidth / 2f;
                     break;
                 case Anchor.End:
-                    mvTextOffset.X += 10 + _col.Width - mfTextWidth;
+                    mvTextOffset.X += _col.Width - mListView.Style.CellHorizontalPadding - mfTextWidth;
                     break;
             }
 
@@ -126,15 +126,15 @@ namespace NuclearWinter.UI
             // Indicators
             foreach( ListViewCellIndicator indicator in Indicators )
             {
-                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + 5;
-                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorAndActionButtonsWidth - 5, _rect.Top + 10, indicator.ContentWidth, mListView.RowHeight - 20 ) );
+                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + mListView.Style.CellHorizontalPadding;
+                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorAndActionButtonsWidth - mListView.Style.CellHorizontalPadding, _rect.Top, indicator.ContentWidth, mListView.Style.RowHeight ) );
             }
         }
 
         //----------------------------------------------------------------------
         protected internal override void Draw( Point _location )
         {
-            Vector2 vTextPos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - ( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f ) / 2f );
+            Vector2 vTextPos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2f - mListView.Screen.Style.MediumFont.LineSpacing / 2f );
             vTextPos += mvTextOffset;
             vTextPos.Y += mListView.Screen.Style.MediumFont.YOffset;
 
@@ -180,7 +180,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void Draw( Point _location )
         {
-            Vector2 vImagePos = new Vector2( _location.X, _location.Y + 10 + mListView.RowHeight / 2 - Image.Height / 2f );
+            Vector2 vImagePos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2 - Image.Height / 2f );
             vImagePos += mvOffset;
 
             mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color );
@@ -307,10 +307,65 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public struct ListViewStyle
         {
-            public Texture2D        ListFrame;
-            public Texture2D        FrameSelected;
-            public Texture2D        FrameSelectedHover;
-            public Texture2D        FrameSelectedFocus;
+            public ListViewStyle(
+                int _iRowHeight,
+                int _iRowSpacing,
+                int _iCellHorizontalPadding,
+
+                int _iListViewFrameCornerSize=10,
+                Texture2D _listViewFrame=null,
+
+                int _iColumnHeaderCornerSize=10,
+                Texture2D _columnHeaderFrame=null,
+
+                int _iCellCornerSize=10,
+                Texture2D _cellFrame=null,
+                Texture2D _cellHoverOverlay=null,
+                Texture2D _cellFocusOverlay=null,
+                Texture2D _selectedCellFrame=null,
+                Texture2D _selectedCellHoverOverlay=null,
+                Texture2D _selectedCellFocusOverlay=null
+                )
+            {
+                RowHeight = _iRowHeight;
+                RowSpacing = _iRowSpacing;
+                CellHorizontalPadding = _iCellHorizontalPadding;
+
+                ListViewFrameCornerSize = _iListViewFrameCornerSize;
+                ListViewFrame           = _listViewFrame;
+
+                ColumnHeaderCornerSize  = _iColumnHeaderCornerSize;
+                ColumnHeaderFrame       = _columnHeaderFrame;
+
+                CellCornerSize              = _iCellCornerSize;
+                CellFrame                   = _cellFrame;
+                CellHoverOverlay            = _cellHoverOverlay;
+                CellFocusOverlay            = _cellFocusOverlay;
+                SelectedCellFrame           = _selectedCellFrame;
+                SelectedCellHoverOverlay    = _selectedCellHoverOverlay;
+                SelectedCellFocusOverlay    = _selectedCellFocusOverlay;
+            }
+
+            public int              RowHeight;
+            public int              RowSpacing;
+            public int              CellHorizontalPadding;
+
+            public Texture2D        ListViewFrame;
+            public int              ListViewFrameCornerSize;
+
+            // Column Header
+            public int              ColumnHeaderCornerSize;
+            public Texture2D        ColumnHeaderFrame;
+
+            // Cell / Row
+            public int              CellCornerSize;
+            public Texture2D        CellFrame;
+            public Texture2D        CellHoverOverlay;
+            public Texture2D        CellFocusOverlay;
+
+            public Texture2D        SelectedCellFrame;
+            public Texture2D        SelectedCellHoverOverlay;
+            public Texture2D        SelectedCellFocusOverlay;
         }
 
         //----------------------------------------------------------------------
@@ -321,8 +376,6 @@ namespace NuclearWinter.UI
 
         public ObservableList<ListViewRow>
                                     Rows                { get; private set; }
-        public int                  RowHeight   = 60;
-        public int                  RowSpacing  = 0;
         public int                  ColSpacing  = 0;
 
         public ListViewRow          SelectedRow;
@@ -399,10 +452,8 @@ namespace NuclearWinter.UI
             HoveredRow      = null;
             TextColor = Screen.Style.DefaultTextColor;
 
-            Style.ListFrame             = Screen.Style.ListFrame;
-            Style.FrameSelected         = Screen.Style.GridBoxFrameSelected;
-            Style.FrameSelectedHover    = Screen.Style.GridBoxFrameSelectedHover;
-            Style.FrameSelectedFocus    = Screen.Style.GridBoxFrameSelectedFocus;
+            Padding = Screen.Style.ListViewPadding;
+            Style = Screen.Style.ListViewStyle;
 
             Scrollbar = new Scrollbar( _screen );
             Scrollbar.Parent = this;
@@ -449,7 +500,7 @@ namespace NuclearWinter.UI
         public override void DoLayout( Rectangle _rect )
         {
             base.DoLayout( _rect );
-            HitBox = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 );
+            HitBox = new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical );
             
             int iColX = 0;
             int iColIndex = 0;
@@ -457,18 +508,18 @@ namespace NuclearWinter.UI
             {
                 if( col.Label != null )
                 {
-                    col.Label.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
+                    col.Label.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top, col.Width, Style.RowHeight ) );
                 }
                 else
                 {
-                    col.Image.DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ) );
+                    col.Image.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top, col.Width, Style.RowHeight ) );
                 }
 
                 int iRowIndex = 0;
                 foreach( ListViewRow row in Rows )
                 {
                     int iRowY = GetRowY( iRowIndex );
-                    row.Cells[ iColIndex ].DoLayout( new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10 + iRowY, col.Width, RowHeight ), col );
+                    row.Cells[ iColIndex ].DoLayout( new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY, col.Width, Style.RowHeight + Style.RowSpacing ), col );
 
                     iRowIndex++;
                 }
@@ -485,17 +536,17 @@ namespace NuclearWinter.UI
                 foreach( Button button in ActionButtons.Reverse<Button>() )
                 {
                     button.DoLayout( new Rectangle(
-                        LayoutRect.Right - 20 - iButtonX - button.ContentWidth,
-                        LayoutRect.Y + 10 + GetRowY( Rows.IndexOf( HoveredRow ) ) + RowHeight / 2 - button.ContentHeight / 2,
+                        LayoutRect.Right - Padding.Right - Style.CellHorizontalPadding - iButtonX - button.ContentWidth,
+                        LayoutRect.Y + Padding.Top + GetRowY( Rows.IndexOf( HoveredRow ) ) + Style.RowHeight / 2 - button.ContentHeight / 2,
                         button.ContentWidth, button.ContentHeight )
                     );
 
-                    iButtonX += button.ContentWidth;
+                    iButtonX += button.ContentWidth + Style.CellHorizontalPadding;
                 }
             }
 
             //------------------------------------------------------------------
-            ContentHeight = Padding.Vertical + 25 + Rows.Count * ( RowHeight + RowSpacing );
+            ContentHeight = Padding.Vertical + Rows.Count * ( Style.RowHeight + Style.RowSpacing ) - Style.RowSpacing;
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
         }
 
@@ -528,13 +579,13 @@ namespace NuclearWinter.UI
 
         void UpdateHoveredRow()
         {
-            int iRowY = ( mHoverPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) );
-            int iHoveredRowIndex = Math.Max( -1, iRowY / ( RowHeight + RowSpacing ) );
+            int iRowY = ( mHoverPoint.Y - ( LayoutRect.Y + Padding.Top + ( DisplayColumnHeaders ? Style.RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) );
+            int iHoveredRowIndex = Math.Max( -1, iRowY / ( Style.RowHeight + Style.RowSpacing ) );
 
             HoveredRow = null;
 
-            int iOffset = iRowY % ( RowHeight + RowSpacing );
-            mbInsertAfter = iOffset >= ( RowHeight + RowSpacing ) / 2;
+            int iOffset = iRowY % ( Style.RowHeight + Style.RowSpacing );
+            mbInsertAfter = iOffset >= ( Style.RowHeight + Style.RowSpacing ) / 2;
 
             if( iHoveredRowIndex >= Rows.Count )
             {
@@ -607,7 +658,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            DoScroll( -_iDelta / 120 * 3 * ( RowHeight + RowSpacing ) );
+            DoScroll( -_iDelta / 120 * 3 * ( Style.RowHeight + Style.RowSpacing ) );
         }
 
         //----------------------------------------------------------------------
@@ -638,7 +689,7 @@ namespace NuclearWinter.UI
 
                 Screen.Focus( this );
 
-                int iFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ) ) + (int)Scrollbar.LerpOffset ) / ( RowHeight + RowSpacing ) );
+                int iFocusedRowIndex = Math.Max( 0, ( _hitPoint.Y - ( LayoutRect.Y + Padding.Top + ( DisplayColumnHeaders ? Style.RowHeight : 0 ) ) + (int)Scrollbar.LerpOffset ) / ( Style.RowHeight + Style.RowSpacing ) );
 
                 if( iFocusedRowIndex > Rows.Count - 1 )
                 {
@@ -826,20 +877,20 @@ namespace NuclearWinter.UI
 
         int GetRowY( int _iRowIndex )
         {
-            return ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( RowHeight + RowSpacing ) - (int)Scrollbar.LerpOffset;
+            return ( ( DisplayColumnHeaders ? 1 : 0 ) + _iRowIndex ) * ( Style.RowHeight + Style.RowSpacing ) - (int)Scrollbar.LerpOffset;
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Style.ListFrame, LayoutRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+            Screen.DrawBox( Style.ListViewFrame, LayoutRect, Style.ListViewFrameCornerSize, Color.White );
 
             if( DisplayColumnHeaders )
             {
                 int iColX = 0;
                 foreach( ListViewColumn col in Columns )
                 {
-                    Screen.DrawBox( Screen.Style.GridHeaderFrame, new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10, col.Width, RowHeight ), Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Screen.DrawBox( Style.ColumnHeaderFrame, new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top, col.Width, Style.RowHeight ), Style.ColumnHeaderCornerSize, Color.White );
 
                     if( col.Label != null )
                     {
@@ -853,13 +904,13 @@ namespace NuclearWinter.UI
                 }
             }
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + ( DisplayColumnHeaders ? RowHeight : 0 ), LayoutRect.Width - 20, LayoutRect.Height - 20 - ( DisplayColumnHeaders ? RowHeight : 0 ) ) );
+            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top + ( DisplayColumnHeaders ? Style.RowHeight : 0 ), LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical - ( DisplayColumnHeaders ? Style.RowHeight : 0 ) ) );
 
             int iRowIndex = 0;
             foreach( ListViewRow row in Rows )
             {
                 int iRowY = GetRowY( iRowIndex );
-                if( ( iRowY + RowHeight + RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - 20 ) )
+                if( ( iRowY + Style.RowHeight + Style.RowSpacing < 0 ) || ( iRowY > LayoutRect.Height - Padding.Vertical ) )
                 {
                     iRowIndex++;
                     continue;
@@ -867,20 +918,20 @@ namespace NuclearWinter.UI
 
                 if( MergeColumns )
                 {
-                    Rectangle rowRect = new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10 + iRowY, LayoutRect.Width - 20, RowHeight );
+                    Rectangle rowRect = new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top + iRowY, LayoutRect.Width - Padding.Horizontal, Style.RowHeight );
 
-                    Screen.DrawBox( SelectedRow == row ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                    Screen.DrawBox( SelectedRow == row ? Style.SelectedCellFrame : Style.CellFrame, rowRect, Style.CellCornerSize, Color.White );
 
                     if( HasFocus && FocusedRow == row )
                     {
                         if( SelectedRow != row )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.CellFocusOverlay, rowRect, Style.CellCornerSize, Color.White );
                         }
                         else
-                        if( Style.FrameSelectedFocus != null )
+                        if( Style.SelectedCellFocusOverlay != null )
                         {
-                            Screen.DrawBox( Style.FrameSelectedFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.SelectedCellFocusOverlay, rowRect, Style.CellCornerSize, Color.White );
                         }
                     }
 
@@ -888,12 +939,12 @@ namespace NuclearWinter.UI
                     {
                         if( SelectedRow != row )
                         {
-                            Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.CellHoverOverlay, rowRect, Style.CellCornerSize, Color.White );
                         }
                         else
-                        if( Style.FrameSelectedHover != null )
+                        if( Style.SelectedCellHoverOverlay != null )
                         {
-                            Screen.DrawBox( Style.FrameSelectedHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                            Screen.DrawBox( Style.SelectedCellHoverOverlay, rowRect, Style.CellCornerSize, Color.White );
                         }
                     }
                 }
@@ -903,22 +954,22 @@ namespace NuclearWinter.UI
                 {
                     ListViewColumn col = Columns[i];
 
-                    Rectangle rowRect = new Rectangle( LayoutRect.X + 10 + iColX, LayoutRect.Y + 10 + iRowY, col.Width, RowHeight );
+                    Rectangle rowRect = new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY, col.Width, Style.RowHeight );
 
                     if( ! MergeColumns )
                     {
-                        Screen.DrawBox( SelectedRow == row ? Style.FrameSelected : Screen.Style.GridBoxFrame, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                        Screen.DrawBox( SelectedRow == row ? Style.SelectedCellFrame : Style.CellFrame, rowRect, Style.CellCornerSize, Color.White );
 
                         if( HasFocus && FocusedRow == row )
                         {
                             if( SelectedRow != row )
                             {
-                                Screen.DrawBox( Screen.Style.GridBoxFrameFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.CellFocusOverlay, rowRect, Style.CellCornerSize, Color.White );
                             }
                             else
-                            if( Style.FrameSelectedFocus != null )
+                            if( Style.SelectedCellFocusOverlay != null )
                             {
-                                Screen.DrawBox( Style.FrameSelectedFocus, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.SelectedCellFocusOverlay, rowRect, Style.CellCornerSize, Color.White );
                             }
                         }
 
@@ -926,17 +977,17 @@ namespace NuclearWinter.UI
                         {
                             if( SelectedRow != row )
                             {
-                                Screen.DrawBox( Screen.Style.GridBoxFrameHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.CellHoverOverlay, rowRect, Style.CellCornerSize, Color.White );
                             }
                             else
-                            if( Style.FrameSelectedHover != null )
+                            if( Style.SelectedCellHoverOverlay != null )
                             {
-                                Screen.DrawBox( Style.FrameSelectedHover, rowRect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+                                Screen.DrawBox( Style.SelectedCellHoverOverlay, rowRect, Style.CellCornerSize, Color.White );
                             }
                         }
                     }
 
-                    row.Cells[i].Draw( new Point( LayoutRect.X + 10 + iColX, LayoutRect.Y + iRowY ) );
+                    row.Cells[i].Draw( new Point( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY ) );
 
                     iColX += col.Width + ColSpacing;
                 }
@@ -954,12 +1005,12 @@ namespace NuclearWinter.UI
 
             if( IsDragging && HitBox.Contains( mHoverPoint ) )
             {
-                int iX = LayoutRect.X + 10;
-                int iWidth = LayoutRect.Width - 20;
+                int iX = LayoutRect.X + Padding.Left;
+                int iWidth = LayoutRect.Width - Padding.Horizontal;
 
                 if( HoveredRow != null )
                 {
-                    int iY = LayoutRect.Y + 10 + GetRowY( Rows.IndexOf( HoveredRow ) + ( mbInsertAfter ? 1 : 0 ) ) - ( RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
+                    int iY = LayoutRect.Y + Padding.Top + GetRowY( Rows.IndexOf( HoveredRow ) + ( mbInsertAfter ? 1 : 0 ) ) - ( Style.RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
 
                     Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
                     Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );
@@ -967,7 +1018,7 @@ namespace NuclearWinter.UI
                 else
                 if( IsHovered )
                 {
-                    int iY = LayoutRect.Y + 10 + ( mbInsertAfter ? GetRowY( Rows.Count ) : 0 ) - ( RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
+                    int iY = LayoutRect.Y + Padding.Top + ( mbInsertAfter ? GetRowY( Rows.Count ) : 0 ) - ( Style.RowSpacing + Screen.Style.ListRowInsertMarker.Height ) / 2;
 
                     Rectangle markerRect = new Rectangle( iX, iY, iWidth, Screen.Style.ListRowInsertMarker.Height );
                     Screen.DrawBox( Screen.Style.ListRowInsertMarker, markerRect, Screen.Style.ListRowInsertMarkerCornerSize, Color.White );

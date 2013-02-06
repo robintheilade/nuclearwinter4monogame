@@ -751,7 +751,7 @@ namespace NuclearWinter.UI
             Scrollbar       = new Scrollbar( _screen );
             Scrollbar.Parent = this;
 
-            PanelTex        = Screen.Style.ListFrame;
+            PanelTex        = Screen.Style.RichTextAreaFrame;
         }
 
         //----------------------------------------------------------------------
@@ -1405,7 +1405,7 @@ namespace NuclearWinter.UI
         {
             if( PanelTex != null )
             {
-                Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.PanelCornerSize, Color.White );
+                Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.RichTextAreaFrameCornerSize, Color.White );
             }
 
             //------------------------------------------------------------------

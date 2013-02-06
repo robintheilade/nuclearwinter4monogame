@@ -157,7 +157,7 @@ namespace NuclearWinter.UI
         {
             Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
 
-            Screen.DrawBox( Screen.Style.ListFrame, rect, Screen.Style.GridBoxFrameCornerSize, Color.White );
+            Screen.DrawBox( Screen.Style.SliderFrame, rect, Screen.Style.SliderFrameCornerSize, Color.White );
 
             int handleX = rect.X + (int)( ( rect.Width - Screen.Style.SliderHandleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
 

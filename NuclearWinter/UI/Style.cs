@@ -12,16 +12,24 @@ namespace NuclearWinter.UI
      */
     public class Style
     {
+        // Global
         public UIFont           SmallFont;
         public UIFont           MediumFont;
         public UIFont           LargeFont;
         public UIFont           ExtraLargeFont;
 
+        public Color            DefaultTextColor = Color.White;
+        public int              DefaultButtonHeight = 80; // FIXME: Rename to DefaultWidgetHeight?
+
+        // Panel
+        public Texture2D        Panel;
+        public int              PanelCornerSize = 10;
+
+        // Label
         public Box              LabelPadding = new Box(10);
 
+        // Button
         public int              ButtonCornerSize = 30;
-        public int              DefaultButtonHeight = 80;
-        public Color            DefaultTextColor = Color.White;
         public Texture2D        ButtonFrame;
         public Texture2D        ButtonDownFrame;
         public Texture2D        ButtonHoverOverlay;
@@ -31,10 +39,7 @@ namespace NuclearWinter.UI
         public int              ButtonVerticalPadding = 10;
         public int              ButtonHorizontalPadding = 20;
 
-        public int              TooltipCornerSize   = 10;
-        public Texture2D        TooltipFrame;
-        public Color            TooltipTextColor = Color.White;
-
+        // Radio buttons
         public int              RadioButtonCornerSize = 30;
         public int              RadioButtonFrameOffset = 10;
         public Texture2D        ButtonFrameLeft;
@@ -44,6 +49,7 @@ namespace NuclearWinter.UI
         public Texture2D        ButtonFrameRight;
         public Texture2D        ButtonDownFrameRight;
 
+        // Edit box
         public Texture2D        EditBoxFrame;
         public Texture2D        EditBoxHoverOverlay;
         public int              EditBoxCornerSize = 30;
@@ -52,38 +58,38 @@ namespace NuclearWinter.UI
 
         public int              CaretWidth = 1;
 
+        // Tooltip
+        public int              TooltipCornerSize   = 10;
+        public Texture2D        TooltipFrame;
+        public Color            TooltipTextColor = Color.White;
+
+        // Drop-down box
         public Box              DropDownBoxPadding = new Box(10);
         public Box              DropDownBoxTextPadding = new Box(5);
         public Texture2D        DropDownArrow;
 
-        public Texture2D        ListFrame;
+        public Texture2D        DropDownBoxEntryHoverOverlay;
 
+        // List view
         public Texture2D        ListRowInsertMarker;
         public int              ListRowInsertMarkerCornerSize = 10;
 
-        public Texture2D        GridHeaderFrame;
+        public ListView.ListViewStyle ListViewStyle = new ListView.ListViewStyle( 40, 0, 10 );
+        public Box              ListViewPadding = new Box(10);
 
-        public int              GridBoxFrameCornerSize = 30;
+        // Tree view
+        public TreeView.TreeViewStyle TreeViewStyle = new TreeView.TreeViewStyle( 40 );
+        public Box              TreeViewPadding = new Box(10);
 
-        public Texture2D        GridBoxFrame;
-        public Texture2D        GridBoxFrameHover;
-        public Texture2D        GridBoxFrameFocus;
-
-        public Texture2D        GridBoxFrameSelected;
-        public Texture2D        GridBoxFrameSelectedFocus;
-        public Texture2D        GridBoxFrameSelectedHover;
-
-        public Texture2D        Panel;
-        public int              PanelCornerSize = 10;
-
+        // Notebook
         public Notebook.NotebookStyle NotebookStyle = new Notebook.NotebookStyle( 10, 50, 10 );
         
+        // Popup
         public int              PopupFrameCornerSize;
         public Texture2D        PopupFrame;
         public Color            PopupBackgroundFadeColor = Color.Black * 0.2f;
 
-        public TreeView.TreeViewStyle TreeViewStyle = new TreeView.TreeViewStyle( 40, 0, 25 );
-
+        // Check box
         public Texture2D        CheckBoxChecked;
         public Texture2D        CheckBoxUnchecked;
         public Texture2D        CheckBoxInconsistent;
@@ -93,29 +99,42 @@ namespace NuclearWinter.UI
         public Texture2D        CheckBoxFrameHover;
         public int              CheckBoxFrameCornerSize = 15;
 
+        // Scroll bar
         public Texture2D        VerticalScrollbar;
         public int              VerticalScrollbarCornerSize = 10;
 
+        // Splitter
         public int              SplitterSize                = 10;
         public int              SplitterFrameCornerSize     = 5;
         public Texture2D        SplitterFrame;
         public Texture2D        SplitterDragHandle;
         public Texture2D        SplitterCollapseArrow;
 
+        // Progress bar
         public Texture2D        ProgressBarFrame;
         public int              ProgressBarFrameCornerSize;
 
         public Texture2D        ProgressBar;
         public int              ProgressBarCornerSize;
 
+        // Spinning wheel
         public Texture2D        SpinningWheel;
 
+        // Slider
+        public int              SliderFrameCornerSize = 10;
+        public Texture2D        SliderFrame;
         public int              SliderHandleSize = 30;
 
+        // Text area
+        public int              TextAreaFrameCornerSize = 10;
+        public Texture2D        TextAreaFrame;
         public Box              TextAreaPadding = new Box(20);
         public Texture2D        TextAreaGutterFrame;
         public int              TextAreaGutterCornerSize = 15;
 
+        // Rich text area
+        public int              RichTextAreaFrameCornerSize = 10;
+        public Texture2D        RichTextAreaFrame;
         public Box              RichTextAreaPadding = new Box(20);
     }
 }
