@@ -134,7 +134,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void Draw( Point _location )
         {
-            Vector2 vTextPos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2f - mListView.Screen.Style.MediumFont.LineSpacing / 2f );
+            Vector2 vTextPos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2f - (int)( mListView.Screen.Style.MediumFont.LineSpacing * 0.9f / 2f ) );
             vTextPos += mvTextOffset;
             vTextPos.Y += mListView.Screen.Style.MediumFont.YOffset;
 
