@@ -276,7 +276,7 @@ namespace NuclearWinter.UI
                 iOffset += caretBlock.WrappedLines[ iLine ].Item1.Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * RichTextArea.IndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ].Item1, caretBlock.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * TextArea.Screen.Style.RichTextAreaIndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ].Item1, caretBlock.Font );
             iOffset += iOffsetInLine;
             if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Item1.Length )
             {
@@ -627,13 +627,13 @@ namespace NuclearWinter.UI
 
         public void DoWrap( int _iWidth )
         {
-            int iActualWidth = _iWidth - EffectiveIndentLevel * RichTextArea.IndentOffset;
+            int iActualWidth = _iWidth - EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset;
             mlWrappedLines = mTextArea.Screen.Game.WrapText( Font, Text, iActualWidth );
         }
 
         public void Draw( int _iX, int _iY, int _iWidth )
         {
-            int iIndentedX = _iX + EffectiveIndentLevel * RichTextArea.IndentOffset;
+            int iIndentedX = _iX + EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset;
 
             switch( BlockType )
             {
@@ -680,7 +680,7 @@ namespace NuclearWinter.UI
                 {
                     iLine++;
                     _iLine = iLine;
-                    return new Point( EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
+                    return new Point( EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset, iLine * LineHeight );
                 }
 
                 if( iOffset + line.Item1.Length < _iCaretOffset )
@@ -690,7 +690,7 @@ namespace NuclearWinter.UI
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( line.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * RichTextArea.IndentOffset, iLine * LineHeight );
+                    return new Point( (int)Font.MeasureString( line.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -710,8 +710,6 @@ namespace NuclearWinter.UI
         public RichTextCaret    Caret               { get; private set; }
         public Dictionary<UInt16,RemoteRichTextCaret>
                                 RemoteCaretsById    { get; private set; }
-
-        public const int        IndentOffset        = 30;
 
         public bool             IsReadOnly;
 

@@ -136,5 +136,7 @@ namespace NuclearWinter.UI
         public int              RichTextAreaFrameCornerSize = 10;
         public Texture2D        RichTextAreaFrame;
         public Box              RichTextAreaPadding = new Box(20);
+        public int              RichTextAreaIndentOffset    = 30;
+
     }
 }
