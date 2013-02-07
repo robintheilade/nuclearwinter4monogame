@@ -44,7 +44,9 @@ namespace NuclearWinter.UI
             FrameCornerSize = Screen.Style.CheckBoxFrameCornerSize;
 
             mLabel = new Label( Screen, _strText, Anchor.Start );
-            mLabel.Padding = new Box( 10, 10, 10, 0 );
+            mLabel.Padding = new Box( 0, 0, 0, Screen.Style.CheckBoxLabelSpacing );
+
+            Padding = Screen.Style.CheckBoxPadding;
 
             UpdateContentSize();
         }
@@ -52,7 +54,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
-            ContentWidth = Screen.Style.CheckBoxSize + mLabel.ContentWidth;
+            ContentWidth = Padding.Horizontal + Screen.Style.CheckBoxSize + mLabel.ContentWidth;
 
             base.UpdateContentSize();
         }
@@ -62,8 +64,8 @@ namespace NuclearWinter.UI
         {
             base.DoLayout( _rect );
 
-            mCheckBoxRect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
-            mLabel.DoLayout( new Rectangle( LayoutRect.X + Screen.Style.CheckBoxSize, LayoutRect.Y, LayoutRect.Width - Screen.Style.CheckBoxSize, LayoutRect.Height ) );
+            mCheckBoxRect = new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
+            mLabel.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Screen.Style.CheckBoxSize, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
             
             UpdateContentSize();
         }

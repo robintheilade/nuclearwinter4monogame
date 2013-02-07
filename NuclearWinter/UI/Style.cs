@@ -100,6 +100,9 @@ namespace NuclearWinter.UI
         public Texture2D        CheckBoxFrameHover;
         public int              CheckBoxFrameCornerSize = 15;
 
+        public Box              CheckBoxPadding = new Box(10);
+        public int              CheckBoxLabelSpacing = 10;
+
         // Scroll bar
         public Texture2D        VerticalScrollbar;
         public int              VerticalScrollbarCornerSize = 10;
