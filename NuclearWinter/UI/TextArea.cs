@@ -422,7 +422,7 @@ namespace NuclearWinter.UI
         public TextArea( Screen _screen )
         : base( _screen )
         {
-            Font            = Screen.Style.MediumFont;
+            Font            = Screen.Style.ParagraphFont;
             Text            = "";
             mbWrapTextNeeded = true;
             Caret           = new TextCaret( this );

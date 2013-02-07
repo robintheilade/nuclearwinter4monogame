@@ -562,7 +562,7 @@ namespace NuclearWinter.UI
                     case TextBlockType.Paragraph:
                     case TextBlockType.OrderedListItem:
                     case TextBlockType.UnorderedListItem:
-                        Font = mTextArea.Screen.Style.MediumFont;
+                        Font = mTextArea.Screen.Style.ParagraphFont;
                         break;
                     default:
                         throw new NotSupportedException();

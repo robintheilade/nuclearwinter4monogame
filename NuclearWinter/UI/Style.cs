@@ -15,6 +15,7 @@ namespace NuclearWinter.UI
         // Global
         public UIFont           SmallFont;
         public UIFont           MediumFont;
+        public UIFont           ParagraphFont;
         public UIFont           LargeFont;
         public UIFont           ExtraLargeFont;
 
