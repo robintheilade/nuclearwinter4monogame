@@ -1203,7 +1203,8 @@ namespace NuclearWinter.UI
 
             //------------------------------------------------------------------
             // Text
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + 10, LayoutRect.Y + 10, LayoutRect.Width - 20, LayoutRect.Height - 20 ) );
+            var rect = LayoutRect; rect.Inflate( -Screen.Style.TextAreaScissorOffset, -Screen.Style.TextAreaScissorOffset );
+            Screen.PushScissorRectangle( rect );
 
             int iX = LayoutRect.X + Padding.Left + miGutterWidth;
             int iY = LayoutRect.Y + Padding.Top;

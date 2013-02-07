@@ -135,12 +135,13 @@ namespace NuclearWinter.UI
         public Box              TextAreaPadding = new Box(20);
         public Texture2D        TextAreaGutterFrame;
         public int              TextAreaGutterCornerSize = 15;
+        public int              TextAreaScissorOffset = 10;
 
         // Rich text area
         public int              RichTextAreaFrameCornerSize = 10;
         public Texture2D        RichTextAreaFrame;
         public Box              RichTextAreaPadding = new Box(20);
         public int              RichTextAreaIndentOffset    = 30;
-
+        public int              RichTextAreaScissorOffset = 10;
     }
 }
