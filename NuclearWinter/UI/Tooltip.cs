@@ -35,6 +35,7 @@ namespace NuclearWinter.UI
         : base( _screen )
         {
             Text = _strText;
+            Padding = Screen.Style.TooltipPadding;
         }
 
         //----------------------------------------------------------------------
@@ -66,18 +67,16 @@ namespace NuclearWinter.UI
 
             UIFont font = Screen.Style.MediumFont;
 
-            Box padding = new Box( 10, 10 );
-
             Vector2 vSize = font.MeasureString( Text );
             int iWidth  = (int)vSize.X;
             int iHeight = (int)vSize.Y;
 
             Point topLeft = new Point(
-                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - padding.Horizontal ),
-                Math.Min( Screen.Game.InputMgr.MouseState.Y + 20, Screen.Height - iHeight - padding.Vertical ) );
+                Math.Min( Screen.Game.InputMgr.MouseState.X, Screen.Width - iWidth - Padding.Horizontal ),
+                Math.Min( Screen.Game.InputMgr.MouseState.Y + 20, Screen.Height - iHeight - Padding.Vertical ) );
 
-            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + padding.Horizontal, iHeight + padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
-            Screen.Game.SpriteBatch.DrawString( font, Text, new Vector2( topLeft.X + padding.Left, topLeft.Y + padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
+            Screen.DrawBox( Screen.Style.TooltipFrame, new Rectangle( topLeft.X, topLeft.Y, iWidth + Padding.Horizontal, iHeight + Padding.Vertical ), Screen.Style.TooltipCornerSize, Color.White );
+            Screen.Game.SpriteBatch.DrawString( font, Text, new Vector2( topLeft.X + Padding.Left, topLeft.Y + Padding.Top + font.YOffset ), Screen.Style.TooltipTextColor );
         }
 
         //----------------------------------------------------------------------

@@ -63,6 +63,7 @@ namespace NuclearWinter.UI
         public int              TooltipCornerSize   = 10;
         public Texture2D        TooltipFrame;
         public Color            TooltipTextColor = Color.White;
+        public Box              TooltipPadding = new Box(10);
 
         // Drop-down box
         public Box              DropDownBoxPadding = new Box(10);
