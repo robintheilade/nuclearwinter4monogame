@@ -51,7 +51,7 @@ namespace NuclearWinter.UI
 
             if( Value > 0 )
             {
-                Rectangle progressRect = new Rectangle( LayoutRect.X, LayoutRect.Y, (int)( LayoutRect.Width * mfLerpValue / Max ), LayoutRect.Height );
+                Rectangle progressRect = new Rectangle( LayoutRect.X, LayoutRect.Y, Screen.Style.ProgressBar.Width / 2 + (int)( ( LayoutRect.Width - Screen.Style.ProgressBar.Width / 2 ) * mfLerpValue / Max ), LayoutRect.Height );
                 Screen.DrawBox( Screen.Style.ProgressBar, progressRect, Screen.Style.ProgressBarCornerSize, Color.White );
             }
         }
