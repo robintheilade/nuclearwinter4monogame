@@ -1011,7 +1011,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void SelectAll()
         {
-            Caret.SetSelection( 0, TextBlocks[ Caret.EndTextBlockIndex ].Text.Length, 0, TextBlocks.Count - 1 );
+            Caret.SetSelection( 0, TextBlocks[ TextBlocks.Count - 1 ].Text.Length, 0, TextBlocks.Count - 1 );
 
             mbIsDragging = false;
         }
