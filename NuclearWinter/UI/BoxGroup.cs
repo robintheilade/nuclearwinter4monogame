@@ -190,15 +190,12 @@ namespace NuclearWinter.UI
                 }
             }
 
+            iUnexpandedSize += ( mlChildren.Count - 1 ) * miSpacing;
+
             float fExpandedWidgetSize = 0f;
             if( iExpandedChildrenCount > 0 )
             {
                 fExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - iUnexpandedSize ) / (float)iExpandedChildrenCount;
-            }
-
-            if( mlChildren.Count > 1 )
-            {
-                iUnexpandedSize += ( mlChildren.Count - 1 ) * miSpacing;
             }
 
             int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) : iUnexpandedSize;
@@ -259,11 +256,11 @@ namespace NuclearWinter.UI
                     {
                         iWidgetSize = (int)( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - Math.Floor( fOffset ) );
                     }
-                    fOffset += fExpandedWidgetSize;
+                    fOffset += fExpandedWidgetSize + miSpacing;
                 }
                 else
                 {
-                    fOffset += iWidgetSize;
+                    fOffset += iWidgetSize + miSpacing;
                 }
 
                 widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : LayoutRect.Width, mOrientation == Orientation.Horizontal ? LayoutRect.Height : iWidgetSize ) );
