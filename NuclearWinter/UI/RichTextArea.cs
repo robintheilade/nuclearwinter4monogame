@@ -771,6 +771,11 @@ namespace NuclearWinter.UI
                 }
                 ContentHeight += textBlock.TotalHeight;
             }
+            
+            if( TextBlocks.Count > 0 )
+            {
+                ContentHeight -= TextBlocks[ TextBlocks.Count - 1 ].LineHeight / 2;
+            }
 
             if( mbScrollToCaret )
             {
