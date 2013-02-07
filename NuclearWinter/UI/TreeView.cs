@@ -330,7 +330,11 @@ namespace NuclearWinter.UI
 
             if( mTreeView.HasCheckBoxes )
             {
-                Rectangle checkBoxRect = new Rectangle( nodeRect.X + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.Style.NodeBranchWidth : 0 ), nodeRect.Y, nodeRect.Height, nodeRect.Height );
+                Rectangle checkBoxRect = new Rectangle(
+                    nodeRect.X + Screen.Style.CheckBoxPadding.Left + ( ( Children.Count > 0 || DisplayAsContainer ) ? mTreeView.Style.NodeBranchWidth : 0 ),
+                    nodeRect.Y + Screen.Style.CheckBoxPadding.Top,
+                    nodeRect.Height - Screen.Style.CheckBoxPadding.Horizontal,
+                    nodeRect.Height - Screen.Style.CheckBoxPadding.Vertical );
 
                 Screen.DrawBox( Screen.Style.CheckBoxFrame, checkBoxRect, Screen.Style.CheckBoxFrameCornerSize, Color.White );
 
