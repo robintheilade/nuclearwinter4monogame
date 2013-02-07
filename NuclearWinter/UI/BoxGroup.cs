@@ -174,6 +174,9 @@ namespace NuclearWinter.UI
 
         protected override void LayoutChildren()
         {
+            int iWidth = LayoutRect.Width - Padding.Horizontal;
+            int iHeight = LayoutRect.Height - Padding.Vertical;
+
             int iUnexpandedSize = 0;
             int iExpandedChildrenCount = 0;
             for( int iIndex = 0; iIndex < mlChildren.Count; iIndex++ )
@@ -195,10 +198,10 @@ namespace NuclearWinter.UI
             float fExpandedWidgetSize = 0f;
             if( iExpandedChildrenCount > 0 )
             {
-                fExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - iUnexpandedSize ) / (float)iExpandedChildrenCount;
+                fExpandedWidgetSize = ( ( ( mOrientation == Orientation.Horizontal ) ? iWidth : iHeight ) - iUnexpandedSize ) / (float)iExpandedChildrenCount;
             }
 
-            int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) : iUnexpandedSize;
+            int iActualSize = iExpandedChildrenCount > 0 ? ( ( mOrientation == Orientation.Horizontal ) ? iWidth : iHeight ) : iUnexpandedSize;
 
             Point pWidgetPosition;
             
@@ -208,13 +211,13 @@ namespace NuclearWinter.UI
                     switch( mContentAnchor )
                     {
                         case Anchor.Start:
-                            pWidgetPosition = LayoutRect.Location;
+                            pWidgetPosition = new Point( LayoutRect.Left + Padding.Left, LayoutRect.Top + Padding.Top );
                             break;
                         case Anchor.Center:
-                            pWidgetPosition = new Point( LayoutRect.Center.X - iActualSize / 2, LayoutRect.Y );
+                            pWidgetPosition = new Point( LayoutRect.Center.X - iActualSize / 2, LayoutRect.Top + Padding.Top );
                             break;
                         case Anchor.End:
-                            pWidgetPosition = new Point( LayoutRect.Right - iActualSize, LayoutRect.Y );
+                            pWidgetPosition = new Point( LayoutRect.Right - Padding.Right - iActualSize, LayoutRect.Top + Padding.Top );
                             break;
                         default:
                             throw new NotSupportedException();
@@ -224,13 +227,13 @@ namespace NuclearWinter.UI
                     switch( mContentAnchor )
                     {
                         case Anchor.Start:
-                            pWidgetPosition = LayoutRect.Location;
+                            pWidgetPosition = new Point( LayoutRect.Left + Padding.Left, LayoutRect.Top + Padding.Top );
                             break;
                         case Anchor.Center:
-                            pWidgetPosition = new Point( LayoutRect.X, LayoutRect.Center.Y - iActualSize / 2 );
+                            pWidgetPosition = new Point( LayoutRect.X + Padding.Left, LayoutRect.Center.Y - iActualSize / 2 );
                             break;
                         case Anchor.End:
-                            pWidgetPosition = new Point( LayoutRect.X, LayoutRect.Bottom - iActualSize );
+                            pWidgetPosition = new Point( LayoutRect.X + Padding.Left, LayoutRect.Bottom - Padding.Bottom - iActualSize );
                             break;
                         default:
                             throw new NotSupportedException();
@@ -254,7 +257,7 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        iWidgetSize = (int)( ( ( mOrientation == Orientation.Horizontal ) ? LayoutRect.Width : LayoutRect.Height ) - Math.Floor( fOffset ) );
+                        iWidgetSize = (int)( ( ( mOrientation == Orientation.Horizontal ) ? iWidth : iHeight ) - Math.Floor( fOffset ) );
                     }
                     fOffset += fExpandedWidgetSize + miSpacing;
                 }
@@ -263,7 +266,7 @@ namespace NuclearWinter.UI
                     fOffset += iWidgetSize + miSpacing;
                 }
 
-                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : LayoutRect.Width, mOrientation == Orientation.Horizontal ? LayoutRect.Height : iWidgetSize ) );
+                widget.DoLayout( new Rectangle( pWidgetPosition.X, pWidgetPosition.Y, mOrientation == Orientation.Horizontal ? iWidgetSize : iWidth, mOrientation == Orientation.Horizontal ? iHeight : iWidgetSize ) );
                 
                 switch( mOrientation )
                 {

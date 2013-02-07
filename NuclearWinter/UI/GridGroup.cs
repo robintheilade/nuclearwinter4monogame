@@ -194,14 +194,14 @@ namespace NuclearWinter.UI
                 int iRowCount       = maTiles.GetLength(1);
 
                 Point widgetSize = new Point(
-                    LayoutRect.Width / iColumnCount,
-                    LayoutRect.Height / iRowCount );
+                    ( LayoutRect.Width - Padding.Horizontal ) / iColumnCount,
+                    ( LayoutRect.Height - Padding.Vertical ) / iRowCount );
 
                 foreach( KeyValuePair<Widget,Point> kvpChild in maWidgetLocations  )
                 {
                     Point widgetPosition = new Point(
-                        LayoutRect.X + widgetSize.X * kvpChild.Value.X,
-                        LayoutRect.Y + widgetSize.Y * kvpChild.Value.Y );
+                        LayoutRect.X + Padding.Left + widgetSize.X * kvpChild.Value.X,
+                        LayoutRect.Y + Padding.Top + widgetSize.Y * kvpChild.Value.Y );
 
                     kvpChild.Key.DoLayout( new Rectangle( widgetPosition.X, widgetPosition.Y, widgetSize.X, widgetSize.Y ) );
                 }
