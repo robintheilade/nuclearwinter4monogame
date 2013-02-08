@@ -48,7 +48,7 @@ namespace NuclearWinter.UI
         : base( _manager )
         {
             TitleLabel = new Label( Screen, "", Anchor.Start );
-            TitleLabel.Font = Screen.Style.LargeFont;
+            TitleLabel.Font = Screen.Style.ExtraLargeFont;
             TitleLabel.AnchoredRect = AnchoredRect.CreateTopAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
             AddChild( TitleLabel );
 
