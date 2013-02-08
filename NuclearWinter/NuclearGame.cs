@@ -403,7 +403,7 @@ namespace NuclearWinter
                         if( bFirst ) bFirst = false;
                         else strLine += " ";
 
-                        if( strLine != "" && _font.MeasureString(strLine + strWord).Length() > _fLineWidth )
+                        if( strLine != "" && _font.MeasureString(strLine + strWord).X > _fLineWidth )
                         {
                             lText.Add( new Tuple<string,bool>( strLine, false ) );
                             strLine = string.Empty;
