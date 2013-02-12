@@ -1407,6 +1407,11 @@ namespace NuclearWinter.UI
 
             var insidePoint = new Point( _point.X - ( LayoutRect.X + Padding.Left ), _point.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset );
 
+            if( insidePoint.Y < 0 )
+            {
+                return null;
+            }
+
             int iTextBlock      = 0;
             int iBlockY         = 0;
 
