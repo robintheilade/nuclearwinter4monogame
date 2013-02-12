@@ -20,6 +20,7 @@ namespace NuclearWinter.UI
         public UIFont           ExtraLargeFont;
 
         public Color            DefaultTextColor = Color.White;
+        public Color            DefaultLinkColor = Color.Blue;
         public int              DefaultButtonHeight = 80; // FIXME: Rename to DefaultWidgetHeight?
 
         // Panel

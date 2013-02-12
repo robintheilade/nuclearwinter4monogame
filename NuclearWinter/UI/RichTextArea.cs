@@ -32,10 +32,10 @@ namespace NuclearWinter.UI
 
         public int StartOffset
         {
-            get { return (int)MathHelper.Clamp( miStartOffset, 0, TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length ); }
+            get { return (int)MathHelper.Clamp( miStartOffset, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength ); }
             set 
             {
-                miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length );
+                miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength );
 
                 EndTextBlockIndex   = StartTextBlockIndex;
                 EndOffset           = StartOffset;
@@ -60,10 +60,10 @@ namespace NuclearWinter.UI
 
         public int EndOffset
         {
-            get { return (int)MathHelper.Clamp( miEndOffset, 0, TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length ); }
+            get { return (int)MathHelper.Clamp( miEndOffset, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength ); }
             set 
             {
-                miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length );
+                miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength );
             }
         }
 
@@ -251,12 +251,12 @@ namespace NuclearWinter.UI
                 if( _bSelect )
                 {
                     EndTextBlockIndex = TextArea.TextBlocks.Count - 1;
-                    EndOffset = TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length;
+                    EndOffset = TextArea.TextBlocks[ EndTextBlockIndex ].TextLength;
                 }
                 else
                 {
                     StartTextBlockIndex = TextArea.TextBlocks.Count - 1;
-                    StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length;
+                    StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].TextLength;
                 }
                 return;
             }
@@ -269,16 +269,16 @@ namespace NuclearWinter.UI
             TextBlock caretBlock = TextArea.TextBlocks[ _bSelect ? EndTextBlockIndex : StartTextBlockIndex ];
 
             int iOffset = 0;
-            int iBlockLineIndex = Math.Max( 0, Math.Min( caretBlock.WrappedLines.Count - 1, _iLine ) );
+            int iBlockLineIndex = Math.Max( 0, Math.Min( caretBlock.WrappedTextSpanLines.Count - 1, _iLine ) );
 
             for( int iLine = 0; iLine < iBlockLineIndex; iLine++ )
             {
-                iOffset += caretBlock.WrappedLines[ iLine ].Item1.Length;
+                iOffset += caretBlock.WrappedTextSpanLines[ iLine ].Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * TextArea.Screen.Style.RichTextAreaIndentOffset, caretBlock.WrappedLines[ iBlockLineIndex ].Item1, caretBlock.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX - caretBlock.EffectiveIndentLevel * TextArea.Screen.Style.RichTextAreaIndentOffset, caretBlock.WrappedTextSpanLines[ iBlockLineIndex ].SimpleText, caretBlock.Font );
             iOffset += iOffsetInLine;
-            if( _iLine < caretBlock.WrappedLines.Count - 1 && iOffsetInLine == caretBlock.WrappedLines[ iBlockLineIndex ].Item1.Length )
+            if( _iLine < caretBlock.WrappedTextSpanLines.Count - 1 && iOffsetInLine == caretBlock.WrappedTextSpanLines[ iBlockLineIndex ].Length )
             {
                 iOffset--;
             }
@@ -312,6 +312,99 @@ namespace NuclearWinter.UI
             MoveInsideBlock( int.MaxValue, iLine, _bSelect );
         }
 
+        internal void MoveLeft( bool _bSelect, bool _bWord )
+        {
+            // Left
+            int iNewTextBlockIndex  = _bSelect || _bWord ? EndTextBlockIndex : StartTextBlockIndex;
+            int iNewOffset          = ( _bSelect || _bWord ? EndOffset : StartOffset ) - 1;
+
+            if( _bWord )
+            {
+                if( iNewOffset > 0 )
+                {
+                    iNewOffset = TextArea.TextBlocks[ iNewTextBlockIndex ].Content.SimpleText.LastIndexOf( ' ', iNewOffset - 1, iNewOffset - 1 ) + 1;
+                }
+            }
+            else
+            if( ! _bSelect && HasSelection )
+            {
+                if( HasBackwardSelection )
+                {
+                    iNewOffset = EndOffset;
+                    iNewTextBlockIndex = EndTextBlockIndex;
+                }
+                else
+                {
+                    iNewOffset++;
+                }
+            }
+
+            if( iNewOffset < 0 && iNewTextBlockIndex > 0 )
+            {
+                iNewTextBlockIndex--;
+                iNewOffset = TextArea.TextBlocks[ iNewTextBlockIndex ].TextLength;
+            }
+
+            if( _bSelect )
+            {
+                SetSelection( StartOffset, iNewOffset, _iEndTextBlockIndex: iNewTextBlockIndex );
+            }
+            else
+            {
+                SetSelection( iNewOffset, _iStartTextBlockIndex: iNewTextBlockIndex );
+            }
+        }
+
+        internal void MoveRight( bool _bSelect, bool _bWord )
+        {
+            // Right
+            int iNewTextBlockIndex  = _bSelect || _bWord ? EndTextBlockIndex : StartTextBlockIndex;
+            int iNewOffset          = ( _bSelect || _bWord ? EndOffset : StartOffset ) + 1;
+
+            if( _bWord )
+            {
+                string strText = TextArea.TextBlocks[ iNewTextBlockIndex ].Content.SimpleText;
+
+                if( iNewOffset < strText.Length )
+                {
+                    iNewOffset = strText.IndexOf( ' ', iNewOffset, strText.Length - iNewOffset ) + 1;
+
+                    if( iNewOffset == 0 )
+                    {
+                        iNewOffset = strText.Length;
+                    }
+                }
+            }
+            else
+            if( ! _bSelect && HasSelection )
+            {
+                if( HasForwardSelection )
+                {
+                    iNewOffset = EndOffset;
+                    iNewTextBlockIndex = EndTextBlockIndex;
+                }
+                else
+                {
+                    iNewOffset--;
+                }
+            }
+
+            if( iNewOffset > TextArea.TextBlocks[ iNewTextBlockIndex ].TextLength && iNewTextBlockIndex < TextArea.TextBlocks.Count - 1 )
+            {
+                iNewTextBlockIndex++;
+                iNewOffset = 0;
+            }
+
+            if( _bSelect )
+            {
+                SetSelection( StartOffset, iNewOffset, _iEndTextBlockIndex: iNewTextBlockIndex );
+            }
+            else
+            {
+                SetSelection( iNewOffset, _iStartTextBlockIndex: iNewTextBlockIndex );
+            }
+        }
+
         internal void MoveUp( bool _bSelect )
         {
             int iLine;
@@ -328,7 +421,7 @@ namespace NuclearWinter.UI
                     if( EndTextBlockIndex > 0 )
                     {
                         EndTextBlockIndex--;
-                        MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ EndTextBlockIndex ].WrappedLines.Count - 1, _bSelect );
+                        MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ EndTextBlockIndex ].WrappedTextSpanLines.Count - 1, _bSelect );
                     }
                     else
                     {
@@ -340,7 +433,7 @@ namespace NuclearWinter.UI
                     if( StartTextBlockIndex > 0 )
                     {
                         StartTextBlockIndex--;
-                        MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ StartTextBlockIndex ].WrappedLines.Count - 1, _bSelect );
+                        MoveInsideBlock( caretPos.X, TextArea.TextBlocks[ StartTextBlockIndex ].WrappedTextSpanLines.Count - 1, _bSelect );
                     }
                     else
                     {
@@ -355,7 +448,7 @@ namespace NuclearWinter.UI
             int iLine;
             Point caretPos = TextArea.TextBlocks[ EndTextBlockIndex ].GetXYForCaretOffset( EndOffset, out iLine );
 
-            if( iLine < TextArea.TextBlocks[ _bSelect ? EndTextBlockIndex : StartTextBlockIndex ].WrappedLines.Count - 1 )
+            if( iLine < TextArea.TextBlocks[ _bSelect ? EndTextBlockIndex : StartTextBlockIndex ].WrappedTextSpanLines.Count - 1 )
             {
                 MoveInsideBlock( caretPos.X, iLine + 1, _bSelect );
             }
@@ -370,7 +463,7 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        EndOffset = TextArea.TextBlocks[ EndTextBlockIndex ].Text.Length;
+                        EndOffset = TextArea.TextBlocks[ EndTextBlockIndex ].TextLength;
                     }
                 }
                 else
@@ -382,7 +475,7 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].Text.Length;
+                        StartOffset = TextArea.TextBlocks[ StartTextBlockIndex ].TextLength;
                     }
                 }
             }
@@ -390,7 +483,6 @@ namespace NuclearWinter.UI
 
         public void SetSelection( int _iStartOffset, int? _iEndOffset=null, int? _iStartTextBlockIndex=null, int? _iEndTextBlockIndex=null )
         {
-            
             if( _iStartTextBlockIndex.HasValue )
             {
                 StartTextBlockIndex = _iStartTextBlockIndex.Value;
@@ -509,6 +601,42 @@ namespace NuclearWinter.UI
 
     }
 
+    public enum TextSpanType
+    {
+        Default,
+        Link
+    }
+
+    //--------------------------------------------------------------------------
+    public class TextSpan
+    {
+        public string       Text;
+        public TextSpanType SpanType;
+
+        public string       LinkTarget;
+
+        public TextSpan( string _strText, TextSpanType _type=TextSpanType.Default )
+        {
+            Text = _strText;
+            SpanType = _type;
+        }
+
+        public TextSpan( string _strText, string _strLinkTarget )
+        {
+            Text = _strText;
+            SpanType = UI.TextSpanType.Link;
+            LinkTarget = _strLinkTarget;
+        }
+    
+        internal static TextSpan FromTextSpan( TextSpan textSpan, string _strText )
+        {
+ 	        var newTextSpan = new TextSpan( _strText, textSpan.SpanType );
+            newTextSpan.LinkTarget = textSpan.LinkTarget;
+
+            return newTextSpan;
+        }
+    }
+
     //--------------------------------------------------------------------------
     public enum TextBlockType
     {
@@ -522,20 +650,304 @@ namespace NuclearWinter.UI
     }
 
     //--------------------------------------------------------------------------
-    public enum SectionStyle
+    public class TextSoup
     {
-        Normal,
-        Bold,
-        Italics,
-        Underlined
+        //----------------------------------------------------------------------
+        public int Length {
+            get {
+                if( mbDirty ) UpdateCache();
+                return miCachedLength;
+            }
+        }
+
+        public string SimpleText
+        {
+            get {
+                if( mbDirty ) UpdateCache();
+                return mstrCachedText;
+            }
+        }
+
+        public List<TextSpan> Spans { get { return mlSpans; } }
+
+        //----------------------------------------------------------------------
+        List<TextSpan>      mlSpans;
+
+        string              mstrCachedText;
+        int                 miCachedLength;
+        bool                mbDirty;
+
+        //----------------------------------------------------------------------
+        public TextSoup( List<TextSpan> _lTextSpans )
+        {
+            mlSpans = _lTextSpans;
+            if( mlSpans.Count == 0 )
+            {
+                mlSpans.Add( new TextSpan( "" ) );
+            }
+
+            mbDirty = true;
+        }
+
+        public TextSoup()
+        {
+            mlSpans = new List<TextSpan>();
+            mbDirty = true;
+        }
+
+        //----------------------------------------------------------------------
+        void MarkDirty()
+        {
+            mbDirty = true;
+        }
+
+        void UpdateCache()
+        {
+            miCachedLength = mlSpans.Sum( x => x.Text.Length );
+            mstrCachedText = string.Join( "", mlSpans.Select( x => x.Text ) );
+            mbDirty = false;
+        }
+
+        //----------------------------------------------------------------------
+        public List<TextSoup> Wrap( int _iWidth, SpriteFont _font )
+        {
+            var lLines = new List<TextSoup>();
+            var currentLine = new TextSoup();
+
+            float fLineOffset = 0f;
+            foreach( var textSpan in mlSpans )
+            {
+                var newTextSpan = TextSpan.FromTextSpan( textSpan, "" );
+
+                foreach( var chunk in textSpan.Text.Split( '\n' ) )
+                {
+                    string newTextSpanContent = "";
+
+                    if( chunk != "" )
+                    {
+                        var words = chunk.Split( ' ' );
+
+                        bool bFirst = true;
+                        foreach( var word in words )
+                        {
+                            if( bFirst ) bFirst = false;
+                            else newTextSpanContent += " ";
+
+                            if( newTextSpanContent != "" && fLineOffset + _font.MeasureString( newTextSpanContent + word ).X > _iWidth )
+                            {
+                                newTextSpan.Text = newTextSpanContent;
+                                currentLine.mlSpans.Add( newTextSpan );
+
+                                fLineOffset = 0f;
+                                newTextSpanContent = "";
+                                newTextSpan = TextSpan.FromTextSpan( textSpan, "" );
+
+                                lLines.Add( currentLine );
+                                currentLine = new TextSoup();
+                            }
+
+                            newTextSpanContent += word;
+                        }
+                    }
+
+                    newTextSpan.Text = newTextSpanContent;
+                    fLineOffset += _font.MeasureString( newTextSpanContent ).X;
+                    currentLine.mlSpans.Add( newTextSpan );
+                }
+            }
+
+            lLines.Add( currentLine );
+
+            return lLines;
+        }
+
+        //----------------------------------------------------------------------
+        public List<TextSpan> GetSubset( int _iStartOffset, int _iLength )
+        {
+            if( _iLength == 0 ) return new List<TextSpan>();
+            if( _iLength < 0 ) _iLength = Length - _iStartOffset;
+            int iEndOffset = _iStartOffset + _iLength;
+
+            var lSpans = new List<TextSpan>();
+
+            int iOffset = 0;
+            foreach( var span in mlSpans )
+            {
+                int iCutStart = 0;
+                int iCutEnd = span.Text.Length;
+
+                if( _iStartOffset > iOffset )
+                {
+                    iCutStart = _iStartOffset - iOffset;
+                }
+
+                if( iEndOffset < iOffset + span.Text.Length )
+                {
+                    iCutEnd = iEndOffset - iOffset;
+                }
+
+                if( iCutStart < iCutEnd )
+                {
+                    lSpans.Add( TextSpan.FromTextSpan( span, span.Text.Substring( iCutStart, iCutEnd - iCutStart ) ) );
+                }
+
+                iOffset += span.Text.Length;
+            }
+
+            return lSpans;
+        }
+
+        //----------------------------------------------------------------------
+        internal List<TextSpan> CopySpans()
+        {
+            var spans = new List<TextSpan>();
+
+            foreach( var span in mlSpans )
+            {
+                spans.Add( TextSpan.FromTextSpan( span, span.Text ) );
+            }
+
+            return spans;
+        }
+
+        //----------------------------------------------------------------------
+        internal void Insert(int _iOffset, string _strText)
+        {
+            if( mlSpans.Count == 0 ) throw new InvalidOperationException();
+
+            int iPos = 0;
+            foreach( var span in mlSpans )
+            {
+                if( _iOffset <= iPos + span.Text.Length )
+                {
+                    span.Text = span.Text.Insert( _iOffset - iPos, _strText );
+                    break;
+                }
+
+                iPos += span.Text.Length;
+            }
+
+            MarkDirty();
+        }
+
+        //----------------------------------------------------------------------
+        internal void Remove( int _iStartOffset, int _iLength )
+        {
+            if( _iLength == 0 ) return;
+            if( _iLength < 0 ) _iLength = Length - _iStartOffset;
+            int iEndOffset = _iStartOffset + _iLength;
+
+            var lSpans = new List<TextSpan>();
+
+            int iOffset = 0;
+            foreach( var span in mlSpans )
+            {
+                int iCutStart = 0;
+                int iCutEnd = span.Text.Length;
+
+                if( _iStartOffset > iOffset )
+                {
+                    iCutStart = _iStartOffset - iOffset;
+                }
+
+                if( iEndOffset < iOffset + span.Text.Length )
+                {
+                    iCutEnd = iEndOffset - iOffset;
+                }
+
+                if( iCutStart < iCutEnd )
+                {
+                    span.Text = span.Text.Remove( iCutStart, iCutEnd - iCutStart );
+                }
+
+                iOffset += span.Text.Length;
+            }
+
+            MarkDirty();
+        }
+
+        //----------------------------------------------------------------------
+        public void Append( List<TextSpan> _lSpans )
+        {
+            mlSpans.AddRange( _lSpans );
+            MarkDirty();
+        }
+
+        //----------------------------------------------------------------------
+        internal float MeasureSubset( UIFont _font, int _iStartOffset, int _iLength )
+        {
+            float fWidth = 0f;
+
+            int iEndOffset = _iStartOffset + _iLength;
+
+            int iOffset = 0;
+            foreach( var span in mlSpans )
+            {
+                if( iOffset >= _iStartOffset )
+                {
+                    if( iOffset + span.Text.Length < iEndOffset )
+                    {
+                        // Fully included
+                        fWidth += _font.MeasureString( span.Text ).X;
+                    }
+                    else
+                    {
+                        // Partially included
+                        fWidth += _font.MeasureString( span.Text.Substring( 0, iEndOffset - iOffset ) ).X;
+                        break;
+                    }
+                }
+                else
+                {
+                    // Excluded
+                }
+
+                iOffset += span.Text.Length;
+            }
+
+            return fWidth;
+        }
+
+        //----------------------------------------------------------------------
+        internal void Draw( Screen _screen, UIFont _font, Vector2 _vPosition, Color _color )
+        {
+            foreach( var span in mlSpans )
+            {
+                if( span.SpanType == TextSpanType.Link )
+                {
+                    _screen.Game.SpriteBatch.DrawString( _font, span.Text, _vPosition, _screen.Style.DefaultLinkColor );
+                    _screen.Game.DrawLine( _vPosition + new Vector2( 0, _font.LineSpacing ), _vPosition + new Vector2( _font.MeasureString( span.Text ).X, _font.LineSpacing ), _screen.Style.DefaultLinkColor );
+                }
+                else
+                {
+                    _screen.Game.SpriteBatch.DrawString( _font, span.Text, _vPosition, _color );
+                }
+
+                _vPosition.X += _font.MeasureString( span.Text ).X;
+            }
+        }
     }
 
     //--------------------------------------------------------------------------
-    public class BlockSection
+    public class TextBlockData
     {
-        public int              Start;
-        public int              End;
-        public SectionStyle     Style;
+        public TextBlockType        BlockType;
+        public int                  IndentLevel;
+        public TextSoup             Content;
+
+        public TextBlockData( string _strText, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        {
+            Content = new TextSoup( new List<TextSpan> { new TextSpan( _strText ) } );
+            BlockType   = _lineType;
+            IndentLevel = _iIndentLevel;
+        }
+
+        public TextBlockData( List<TextSpan> _lTextSpans, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        {
+            Content = new TextSoup( _lTextSpans );
+            BlockType   = _lineType;
+            IndentLevel = _iIndentLevel;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -568,7 +980,7 @@ namespace NuclearWinter.UI
                         throw new NotSupportedException();
                 }
 
-                mlWrappedLines = null;
+                mlWrappedTextSpans = null;
             }
         }
 
@@ -578,43 +990,52 @@ namespace NuclearWinter.UI
             get { return IndentLevel + ( ( BlockType == TextBlockType.OrderedListItem || BlockType == TextBlockType.UnorderedListItem ) ? 1 : 0 ); }
         }
 
-        string                      mstrText;
+        TextSoup mContent;
+        public TextSoup Content { get { return mContent; } }
 
-        public string               Text
-        {
-            get { return mstrText; }
-            set {
-                mstrText = value;
-                mlWrappedLines = null;
-            }
-        }
-
-        List<Tuple<string,bool>> mlWrappedLines;
-        public List<Tuple<string,bool>> WrappedLines
+        List<TextSoup> mlWrappedTextSpans = null;
+        public List<TextSoup> WrappedTextSpanLines
         {
             get {
-                if( mlWrappedLines == null )
+                if( mlWrappedTextSpans == null )
                 {
                     DoWrap( mTextArea.LayoutRect.Width - mTextArea.Padding.Horizontal );
                 }
-                return mlWrappedLines; 
-            }
-            private set {
-                mlWrappedLines = value;
+                return mlWrappedTextSpans;
             }
         }
 
         public UIFont               Font        { get; private set; }
         public int                  LineHeight  { get { return Font.LineSpacing; } }
-        public int                  TotalHeight { get { return LineHeight * WrappedLines.Count + LineHeight / 2; } }
+        public int                  TotalHeight { get { return LineHeight * WrappedTextSpanLines.Count + LineHeight / 2; } }
         public Color                Color;
 
         RichTextArea                mTextArea;
 
+        public int                  TextLength
+        {
+            get { return mContent.Length; }
+        }
+
+        //----------------------------------------------------------------------
+        public TextBlock( RichTextArea _textArea, List<TextSpan> _lTextSpans, Color _color, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        {
+            mTextArea   = _textArea;
+            mContent = new TextSoup( _lTextSpans );
+            BlockType   = _lineType;
+            IndentLevel = _iIndentLevel;
+            Color       = _color;
+        }
+
+        public TextBlock( RichTextArea _textArea, List<TextSpan> _lTextSpans, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
+        : this( _textArea, _lTextSpans, _textArea.Screen.Style.DefaultTextColor, _lineType, _iIndentLevel )
+        {
+        }
+
         public TextBlock( RichTextArea _textArea, string _strText, Color _color, TextBlockType _lineType=TextBlockType.Paragraph, int _iIndentLevel=0 )
         {
             mTextArea   = _textArea;
-            Text        = _strText;
+            mContent = new TextSoup( new List<TextSpan> { new TextSpan( _strText ) } );
             BlockType   = _lineType;
             IndentLevel = _iIndentLevel;
             Color       = _color;
@@ -625,11 +1046,13 @@ namespace NuclearWinter.UI
         {
         }
 
+        //----------------------------------------------------------------------
         public void DoWrap( int _iWidth )
         {
             int iActualWidth = _iWidth - EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset;
-            mlWrappedLines = mTextArea.Screen.Game.WrapText( Font, Text, iActualWidth );
+            mlWrappedTextSpans = mContent.Wrap( iActualWidth, Font );
         }
+
 
         public void Draw( int _iX, int _iY, int _iWidth )
         {
@@ -655,14 +1078,12 @@ namespace NuclearWinter.UI
             }
 
             int iTextY = _iY;
-            foreach( Tuple<string,bool> line in WrappedLines )
+            foreach( var line in WrappedTextSpanLines )
             {
-                mTextArea.Screen.Game.SpriteBatch.DrawString( Font, line.Item1, new Vector2( iIndentedX, iTextY + Font.YOffset ), Color );
+                line.Draw( mTextArea.Screen, Font, new Vector2( iIndentedX, iTextY + Font.YOffset ), Color );
                 iTextY += Font.LineSpacing;
             }
         }
-
-        public List<BlockSection>    Sections;
 
         internal Point GetXYForCaretOffset( int _iCaretOffset )
         {
@@ -674,23 +1095,23 @@ namespace NuclearWinter.UI
         {
             int iOffset = 0;
             int iLine = 0;
-            foreach( Tuple<string,bool> line in WrappedLines )
+            foreach( var line in WrappedTextSpanLines )
             {
-                if( iOffset + line.Item1.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
+                if( iOffset + line.Length == _iCaretOffset && iLine < WrappedTextSpanLines.Count - 1 )
                 {
                     iLine++;
                     _iLine = iLine;
                     return new Point( EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset, iLine * LineHeight );
                 }
 
-                if( iOffset + line.Item1.Length < _iCaretOffset )
+                if( iOffset + line.Length < _iCaretOffset )
                 {
-                    iOffset += line.Item1.Length;
+                    iOffset += line.Length;
                 }
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( line.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X + EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset, iLine * LineHeight );
+                    return new Point( (int)line.MeasureSubset( Font, 0, _iCaretOffset - iOffset ) + EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -700,6 +1121,39 @@ namespace NuclearWinter.UI
             return Point.Zero;
         }
 
+        internal List<TextSpan> GetSubSpans( int _iStartOffset, int _iLength=-1 )
+        {
+            return mContent.GetSubset( _iStartOffset, _iLength );
+        }
+
+        internal List<TextSpan> CopySpans()
+        {
+            return mContent.CopySpans();
+        }
+
+        internal void SetSpans( List<TextSpan> _lSpans )
+        {
+            mContent = new TextSoup( _lSpans );
+            mlWrappedTextSpans = null;
+        }
+
+        internal void InsertText( int _iOffset, string _strText )
+        {
+            mContent.Insert( _iOffset, _strText );
+            mlWrappedTextSpans = null;
+        }
+
+        internal void RemoveText( int _iStartOffset, int _iLength=-1 )
+        {
+            mContent.Remove( _iStartOffset, _iLength );
+            mlWrappedTextSpans = null;
+        }
+
+        internal void Append( List<TextSpan> _spans )
+        {
+            mContent.Append( _spans );
+            mlWrappedTextSpans = null;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -782,14 +1236,14 @@ namespace NuclearWinter.UI
                 Point caretPos = GetPositionForCaret( Caret.EndTextBlockIndex, Caret.EndOffset );
                 int iCaretHeight = TextBlocks[ Caret.EndTextBlockIndex ].LineHeight;
 
-                if( caretPos.Y < LayoutRect.Top + 20 )
+                if( caretPos.Y < LayoutRect.Top + Padding.Top )
                 {
-                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Top + 20 );
+                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Top + Padding.Top );
                 }
                 else
-                if( caretPos.Y > LayoutRect.Bottom - 20 - iCaretHeight )
+                if( caretPos.Y > LayoutRect.Bottom - Padding.Bottom - iCaretHeight )
                 {
-                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Bottom - 20 - iCaretHeight );
+                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Bottom - Padding.Bottom - iCaretHeight );
                 }
 
                 mbScrollToCaret = false;
@@ -921,9 +1375,9 @@ namespace NuclearWinter.UI
             if( TextRemovedHandler == null || TextRemovedHandler( this, iStartBlockIndex, iStartOffset, iEndBlockIndex, iEndOffset ) )
             {
                 // Merge start and end block
-                TextBlocks[ iStartBlockIndex ].Text =
-                    ( iStartOffset < TextBlocks[ iStartBlockIndex ].Text.Length ? TextBlocks[ iStartBlockIndex ].Text.Remove( iStartOffset ) : TextBlocks[ iStartBlockIndex ].Text )
-                    + TextBlocks[ iEndBlockIndex ].Text.Substring( iEndOffset );
+                var spans = ( iStartOffset < TextBlocks[ iStartBlockIndex ].TextLength ? TextBlocks[ iStartBlockIndex ].GetSubSpans( 0, iStartOffset ) : TextBlocks[ iStartBlockIndex ].CopySpans() );
+                spans.AddRange( TextBlocks[ iEndBlockIndex ].GetSubSpans( iEndOffset ) );
+                TextBlocks[ iStartBlockIndex ].SetSpans( spans );
 
                 // Delete blocks in between
                 for( int i = iEndBlockIndex; i > iStartBlockIndex; i-- )
@@ -952,20 +1406,19 @@ namespace NuclearWinter.UI
 
                 if( iStartBlockIndex != iEndBlockIndex )
                 {
-                    strText += TextBlocks[ iStartBlockIndex ].Text.Substring( iStartOffset ) + "\n\n";
+                    strText += TextBlocks[ iStartBlockIndex ].Content.SimpleText.Substring( iStartOffset ) + "\n\n";
 
                     for( int i = iStartBlockIndex + 1; i < iEndBlockIndex; i++ )
                     {
-                        strText += TextBlocks[ i ].Text + "\n\n";
+                        strText += TextBlocks[ i ].Content.SimpleText + "\n\n";
                     }
 
-                    strText += TextBlocks[ iEndBlockIndex ].Text.Substring( 0, iEndOffset );
+                    strText += TextBlocks[ iEndBlockIndex ].Content.SimpleText.Substring( 0, iEndOffset );
                 }
                 else
                 {
-                    strText += TextBlocks[ iStartBlockIndex ].Text.Substring( iStartOffset, iEndOffset - iStartOffset );
+                    strText += TextBlocks[ iStartBlockIndex ].Content.SimpleText.Substring( iStartOffset, iEndOffset - iStartOffset );
                 }
-
 #if !MONOMAC
                 // NOTE: For this to work, you must put [STAThread] before your Main()
                 
@@ -1001,7 +1454,7 @@ namespace NuclearWinter.UI
 
                 if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strPastedText ) )
                 {
-                    TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Insert( Caret.StartOffset, strPastedText );
+                    TextBlocks[ Caret.StartTextBlockIndex ].InsertText( Caret.StartOffset, strPastedText );
                     Caret.SetSelection( Caret.StartOffset + strPastedText.Length );
                     mbScrollToCaret = true;
                 }
@@ -1011,7 +1464,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void SelectAll()
         {
-            Caret.SetSelection( 0, TextBlocks[ TextBlocks.Count - 1 ].Text.Length, 0, TextBlocks.Count - 1 );
+            Caret.SetSelection( 0, TextBlocks[ TextBlocks.Count - 1 ].TextLength, 0, TextBlocks.Count - 1 );
 
             mbIsDragging = false;
         }
@@ -1032,7 +1485,7 @@ namespace NuclearWinter.UI
                 if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, strAddedText ) )
                 {
                     TextBlock textBlock = TextBlocks[ Caret.StartTextBlockIndex ];
-                    textBlock.Text = textBlock.Text.Insert( Caret.StartOffset, strAddedText );
+                    textBlock.InsertText( Caret.StartOffset, strAddedText );
                     Caret.SetSelection( Caret.StartOffset + 1 );
 
                     mbScrollToCaret = true;
@@ -1086,14 +1539,14 @@ namespace NuclearWinter.UI
                         {
                             if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, "\n" ) )
                             {
-                                textBlock.Text = textBlock.Text.Insert( Caret.StartOffset, "\n" );
+                                textBlock.InsertText( Caret.StartOffset, "\n" );
                                 Caret.SetSelection( Caret.StartOffset + 1 );
                                 mbScrollToCaret = true;
                             }
                         }
                         else
                         {
-                            if( textBlock.Text.Length == 0 && textBlock.BlockType != TextBlockType.Paragraph )
+                            if( textBlock.TextLength == 0 && textBlock.BlockType != TextBlockType.Paragraph )
                             {
                                 if( BlockTypeChangedHandler == null || BlockTypeChangedHandler( this, Caret.StartTextBlockIndex, TextBlockType.Paragraph ) )
                                 {
@@ -1111,7 +1564,7 @@ namespace NuclearWinter.UI
                             TextBlockType newBlockType  = TextBlockType.Paragraph;
                             int iNewBlockIndentLevel    = 0;
 
-                            if( textBlock.Text.Length != 0 )
+                            if( textBlock.TextLength != 0 )
                             {
                                 switch( textBlock.BlockType )
                                 {
@@ -1126,22 +1579,21 @@ namespace NuclearWinter.UI
 
                             if( BlockStartInsertedHandler == null || BlockStartInsertedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, newBlockType, iNewBlockIndentLevel ) )
                             {
-                                if( Caret.StartOffset == 0 && textBlock.Text.Length > 0 )
+                                if( Caret.StartOffset == 0 && textBlock.TextLength > 0 )
                                 {
                                     TextBlocks.Insert( Caret.StartTextBlockIndex, new TextBlock( this, "", newBlockType, iNewBlockIndentLevel ) );
-
                                     Caret.Timer = 0f;
                                 }
                                 else
                                 {
-                                    string strNewBlockText = "";
-                                    if( Caret.StartOffset < textBlock.Text.Length )
+                                    var newSpans = new List<TextSpan>();
+                                    if( Caret.StartOffset < textBlock.TextLength )
                                     {
-                                        strNewBlockText = textBlock.Text.Substring( Caret.StartOffset, textBlock.Text.Length - Caret.StartOffset );
-                                        textBlock.Text = textBlock.Text.Remove( Caret.StartOffset );
+                                        newSpans = textBlock.GetSubSpans( Caret.StartOffset );
+                                        textBlock.RemoveText( Caret.StartOffset );
                                     }
 
-                                    TextBlocks.Insert( Caret.StartTextBlockIndex + 1, new TextBlock( this, strNewBlockText, newBlockType, iNewBlockIndentLevel ) );
+                                    TextBlocks.Insert( Caret.StartTextBlockIndex + 1, new TextBlock( this, newSpans, newBlockType, iNewBlockIndentLevel ) );
                                     Caret.SetSelection( 0 );
                                 }
 
@@ -1168,30 +1620,30 @@ namespace NuclearWinter.UI
                             if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset - 1, Caret.StartTextBlockIndex, Caret.StartOffset ) )
                             {
                                 Caret.SetSelection( Caret.StartOffset - 1 );
-                                TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( Caret.StartOffset, 1 );
+                                TextBlocks[ Caret.StartTextBlockIndex ].RemoveText( Caret.StartOffset, 1 );
                                 mbScrollToCaret = true;
                             }
                         }
                         else
                         if( Caret.StartTextBlockIndex > 0 )
                         {
-                            int iNewCaretOffset = TextBlocks[ Caret.StartTextBlockIndex - 1 ].Text.Length;
+                            int iNewCaretOffset = TextBlocks[ Caret.StartTextBlockIndex - 1 ].TextLength;
 
                             if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.StartTextBlockIndex ) )
                             {
+                                Caret.SetSelection( iNewCaretOffset, _iStartTextBlockIndex: Caret.StartTextBlockIndex - 1 );
+
                                 if( iNewCaretOffset > 0 )
                                 {
-                                    Caret.SetSelection( Caret.StartOffset, _iStartTextBlockIndex: Caret.StartTextBlockIndex - 1 );
-                                    TextBlocks[ Caret.StartTextBlockIndex ].Text += TextBlocks[ Caret.StartTextBlockIndex + 1 ].Text;
+                                    // NOTE: Stealing the old block's spans without copying since the block will be discarded
+                                    TextBlocks[ Caret.StartTextBlockIndex ].Append( TextBlocks[ Caret.StartTextBlockIndex + 1 ].Content.Spans );
                                     TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
                                 }
                                 else
                                 {
-                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex - 1 );
-                                    Caret.SetSelection( Caret.StartOffset, _iStartTextBlockIndex: Caret.StartTextBlockIndex - 1 );
+                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex );
                                 }
 
-                                Caret.SetSelection( iNewCaretOffset );
                                 mbScrollToCaret = true;
                             }
                         }
@@ -1205,11 +1657,11 @@ namespace NuclearWinter.UI
                             DeleteSelectedText();
                         }
                         else
-                        if( Caret.StartOffset < TextBlocks[ Caret.StartTextBlockIndex ].Text.Length )
+                        if( Caret.StartOffset < TextBlocks[ Caret.StartTextBlockIndex ].TextLength )
                         {
                             if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartTextBlockIndex, Caret.StartOffset, Caret.StartTextBlockIndex, Caret.StartOffset + 1 ) )
                             {
-                                TextBlocks[ Caret.StartTextBlockIndex ].Text = TextBlocks[ Caret.StartTextBlockIndex ].Text.Remove( Caret.StartOffset, 1 );
+                                TextBlocks[ Caret.StartTextBlockIndex ].RemoveText( Caret.StartOffset, 1 );
                                 mbScrollToCaret = true;
                             }
                         }
@@ -1218,8 +1670,16 @@ namespace NuclearWinter.UI
                         {
                             if( BlockStartRemovedHandler == null || BlockStartRemovedHandler( this, Caret.StartTextBlockIndex + 1 ) )
                             {
-                                TextBlocks[ Caret.StartTextBlockIndex ].Text += TextBlocks[ Caret.StartTextBlockIndex + 1 ].Text;
-                                TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
+                                if( Caret.StartOffset == 0 && TextBlocks[ Caret.StartTextBlockIndex ].TextLength == 0 )
+                                {
+                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex );
+                                }
+                                else
+                                {
+                                    // NOTE: Stealing the old block's spans without copying since the block will be discarded
+                                    TextBlocks[ Caret.StartTextBlockIndex ].Append( TextBlocks[ Caret.StartTextBlockIndex + 1 ].Content.Spans );
+                                    TextBlocks.RemoveAt( Caret.StartTextBlockIndex + 1 );
+                                }
 
                                 Caret.Timer = 0f;
                                 mbScrollToCaret = true;
@@ -1244,45 +1704,7 @@ namespace NuclearWinter.UI
 #else
                 case OSKey.LeftArrow: {
 #endif
-                    int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
-                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
-
-                    if( bCtrl )
-                    {
-                        if( iNewOffset > 0 )
-                        {
-                            iNewOffset = TextBlocks[ iNewTextBlockIndex ].Text.LastIndexOf( ' ', iNewOffset - 1, iNewOffset - 1 ) + 1;
-                        }
-                    }
-                    else
-                    if( ! bShift && Caret.HasSelection )
-                    {
-                        if( Caret.HasBackwardSelection )
-                        {
-                            iNewOffset = Caret.EndOffset;
-                            iNewTextBlockIndex = Caret.EndTextBlockIndex;
-                        }
-                        else
-                        {
-                            iNewOffset++;
-                        }
-                    }
-
-                    if( iNewOffset < 0 && iNewTextBlockIndex > 0 )
-                    {
-                        iNewTextBlockIndex--;
-                        iNewOffset = TextBlocks[ iNewTextBlockIndex ].Text.Length;
-                    }
-
-                    if( bShift )
-                    {
-                        Caret.SetSelection( Caret.StartOffset, iNewOffset, _iEndTextBlockIndex: iNewTextBlockIndex );
-                    }
-                    else
-                    {
-                        Caret.SetSelection( iNewOffset, _iStartTextBlockIndex: iNewTextBlockIndex );
-                    }
-
+                    Caret.MoveLeft( bShift, bCtrl );
                     mbScrollToCaret = true;
                     break;
                 }
@@ -1291,52 +1713,7 @@ namespace NuclearWinter.UI
 #else
                 case OSKey.RightArrow: {
 #endif
-                    int iNewTextBlockIndex  = bShift || bCtrl ? Caret.EndTextBlockIndex : Caret.StartTextBlockIndex;
-                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) + 1;
-
-                    if( bCtrl )
-                    {
-                        string strText = TextBlocks[ iNewTextBlockIndex ].Text;
-
-                        if( iNewOffset < strText.Length )
-                        {
-                            iNewOffset = strText.IndexOf( ' ', iNewOffset, strText.Length - iNewOffset ) + 1;
-
-                            if( iNewOffset == 0 )
-                            {
-                                iNewOffset = strText.Length;
-                            }
-                        }
-                    }
-                    else
-                    if( ! bShift && Caret.HasSelection )
-                    {
-                        if( Caret.HasForwardSelection )
-                        {
-                            iNewOffset = Caret.EndOffset;
-                            iNewTextBlockIndex = Caret.EndTextBlockIndex;
-                        }
-                        else
-                        {
-                            iNewOffset--;
-                        }
-                    }
-
-                    if( iNewOffset > TextBlocks[ iNewTextBlockIndex ].Text.Length && iNewTextBlockIndex < TextBlocks.Count - 1 )
-                    {
-                        iNewTextBlockIndex++;
-                        iNewOffset = 0;
-                    }
-
-                    if( bShift )
-                    {
-                        Caret.SetSelection( Caret.StartOffset, iNewOffset, _iEndTextBlockIndex: iNewTextBlockIndex );
-                    }
-                    else
-                    {
-                        Caret.SetSelection( iNewOffset, _iStartTextBlockIndex: iNewTextBlockIndex );
-                    }
-
+                    Caret.MoveRight( bShift, bCtrl );
                     mbScrollToCaret = true;
                     break;
                 }
@@ -1475,15 +1852,15 @@ namespace NuclearWinter.UI
 
         public void ReplaceContent( List<TextBlock> _blocks )
         {
-            TextBlocks = _blocks;
-
-            // Make sure caret is valid
             int iStartBlockIndex    = Caret.StartTextBlockIndex;
             int iStartOffset        = Caret.StartOffset;
 
             int iEndBlockIndex      = Caret.EndTextBlockIndex;
             int iEndOffset          = Caret.EndOffset;
 
+            TextBlocks = _blocks;
+
+            // Make sure caret is valid
             Caret.StartTextBlockIndex   = iStartBlockIndex;
             Caret.StartOffset           = iStartOffset;
             Caret.EndTextBlockIndex     = iEndBlockIndex;
