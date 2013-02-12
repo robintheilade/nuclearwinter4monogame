@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 #if !MONOGAME
 using OSKey = System.Windows.Forms.Keys;
@@ -1008,6 +1009,7 @@ namespace NuclearWinter.UI
         public UIFont               Font        { get; private set; }
         public int                  LineHeight  { get { return Font.LineSpacing; } }
         public int                  TotalHeight { get { return LineHeight * WrappedTextSpanLines.Count + LineHeight / 2; } }
+        public int                  TotalHeightWithoutBottomPadding { get { return LineHeight * WrappedTextSpanLines.Count; } }
         public Color                Color;
 
         RichTextArea                mTextArea;
@@ -1119,6 +1121,29 @@ namespace NuclearWinter.UI
 
             _iLine = iLine;
             return Point.Zero;
+        }
+
+        internal TextSpan GetTextSpanAtXY( Point _point )
+        {
+            int iLine = _point.Y / LineHeight;
+
+            float fOffset = EffectiveIndentLevel * mTextArea.Screen.Style.RichTextAreaIndentOffset;
+
+            if( _point.X < fOffset ) return null;
+
+            foreach( var span in WrappedTextSpanLines[iLine].Spans )
+            {
+                float fSpanWidth = (float)Font.MeasureString( span.Text ).X;
+
+                if( _point.X < fOffset + fSpanWidth )
+                {
+                    return span;
+                }
+
+                fOffset += fSpanWidth;
+            }
+
+            return null;
         }
 
         internal List<TextSpan> GetSubSpans( int _iStartOffset, int _iLength=-1 )
@@ -1325,10 +1350,20 @@ namespace NuclearWinter.UI
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
-            mbIsDragging = true;
-
+            bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
             bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
-            SetCaretPosition( _hitPoint, bShift );
+
+            TextSpan span = ! bShortcutKey ? GetTextSpanAtPosition( _hitPoint ) : null;
+
+            if( span != null && span.SpanType == TextSpanType.Link )
+            {
+                Process.Start( span.LinkTarget );
+            }
+            else
+            {
+                mbIsDragging = true;
+                SetCaretPosition( _hitPoint, bShift );
+            }
 
             Screen.Focus( this );
 
@@ -1343,11 +1378,57 @@ namespace NuclearWinter.UI
             }
             else
             {
+                bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
+
+                var textSpan = ! bShortcutKey ? GetTextSpanAtPosition( _hitPoint ) : null;
+                if( textSpan != null && textSpan.SpanType == TextSpanType.Link )
+                {
+#if !MONOGAME
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
+#endif
+                }
+                else
+                {
+#if !MONOGAME
+            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
+#endif
+                }
+
                 foreach( var remoteCaret in RemoteCaretsById.Values )
                 {
                     remoteCaret.OnMouseMove( _hitPoint );
                 }
             }
+        }
+
+        TextSpan GetTextSpanAtPosition( Point _point )
+        {
+            if( TextBlocks.Count == 0 ) return null;
+
+            var insidePoint = new Point( _point.X - ( LayoutRect.X + Padding.Left ), _point.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset );
+
+            int iTextBlock      = 0;
+            int iBlockY         = 0;
+
+            while( iTextBlock < TextBlocks.Count )
+            {
+                var block = TextBlocks[ iTextBlock ];
+
+                if( insidePoint.Y < iBlockY + block.TotalHeightWithoutBottomPadding )
+                {
+                    break;
+                }
+
+                iBlockY += block.TotalHeight;
+                iTextBlock++;
+            }
+
+            if( iTextBlock == TextBlocks.Count )
+            {
+                return null;
+            }
+
+            return TextBlocks[ iTextBlock ].GetTextSpanAtXY( new Point( insidePoint.X, insidePoint.Y - iBlockY ) );
         }
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
