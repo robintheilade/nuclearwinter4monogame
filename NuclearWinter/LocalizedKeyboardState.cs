@@ -77,7 +77,7 @@ namespace NuclearWinter
             if (!isLocalKey)
                 key = USEnglishToLocal(key);
 
-            return Native.IsKeyDown(key);
+            return Native.IsKeyUp(key);
         }
 
         public bool IsKeyDown (Keys key) {
@@ -85,7 +85,7 @@ namespace NuclearWinter
         }
 
         public bool IsKeyUp (Keys key) {
-            return IsKeyDown(key, false);
+            return IsKeyUp(key, false);
         }
 
         // Maps a localized character like 'S' to the virtual scan code
