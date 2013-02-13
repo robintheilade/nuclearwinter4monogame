@@ -4,11 +4,43 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using Microsoft.Xna.Framework;
+using System.Globalization;
 
 namespace NuclearWinter
 {
     public class Utils
     {
+        //----------------------------------------------------------------------
+        // Source: http://thedeadpixelsociety.com/2012/01/hex-colors-in-xna/
+        public static Color ColorFromHex( string _str )
+        {
+            if( _str.StartsWith("#") ) _str = _str.Substring( 1 );
+
+            uint hex = uint.Parse( _str, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture );
+
+            Color color = Color.White;
+            if( _str.Length == 8 )
+            {
+                color.A = (byte)(hex >> 24);
+                color.R = (byte)(hex >> 16);
+                color.G = (byte)(hex >> 8);
+                color.B = (byte)(hex);
+            }
+            else
+            if( _str.Length == 6 )
+            {
+                color.R = (byte)(hex >> 16);
+                color.G = (byte)(hex >> 8);
+                color.B = (byte)(hex);
+            }
+            else
+            {
+                throw new InvalidOperationException("Invald hex representation of an ARGB or RGB color value.");
+            }
+
+            return color;
+        }
+
         //----------------------------------------------------------------------
         // There is no Enum.GetValues() on the Xbox 360
         // See http://forums.xna.com/forums/p/1610/157478.aspx
