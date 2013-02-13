@@ -67,7 +67,12 @@ namespace NuclearWinter.UI
         {
             //------------------------------------------------------------------
             // Make sure we don't hold references to orphaned widgets
-            if( FocusedWidget != null && FocusedWidget.IsOrphan ) FocusedWidget = null;
+            if( FocusedWidget != null && FocusedWidget.IsOrphan )
+            {
+                FocusedWidget = null;
+                mbHasActivatedFocusedWidget = false;
+            }
+
             if( HoveredWidget != null && HoveredWidget.IsOrphan )
             {
 #if !MONOGAME
@@ -101,71 +106,35 @@ namespace NuclearWinter.UI
                 return;
             }
 
-            foreach( Buttons button in Enum.GetValues(typeof(Buttons)) )
+            if( Game.InputMgr.WasKeyJustReleased( Keys.Space ) )
             {
-                PlayerIndex playerIndex;
+                Console.WriteLine( "YAY" );
+            }
 
-                bool bPressed;
+            if( Game.InputMgr.WasKeyJustPressed( Keys.Enter ) || Game.InputMgr.WasKeyJustPressed( Keys.Space ) )
+            {
+                if( FocusedWidget != null )
+                {
+                    FocusedWidget.OnActivateDown();
+                    mbHasActivatedFocusedWidget = true;
+                }
+            }
+            else
+            if( Game.InputMgr.WasKeyJustReleased( Keys.Enter ) || Game.InputMgr.WasKeyJustReleased( Keys.Space ) )
+            {
+                if( FocusedWidget != null && mbHasActivatedFocusedWidget )
+                {
+                    FocusedWidget.OnActivateUp();
+                    mbHasActivatedFocusedWidget = false;
+                }
+            }
 
-                if( Game.InputMgr.WasButtonJustPressed( button, Game.PlayerInCharge, out playerIndex, true ) )
-                {
-                    bPressed = true;
-                }
-                else
-                if( Game.InputMgr.WasButtonJustReleased( button, Game.PlayerInCharge, out playerIndex ) )
-                {
-                    bPressed = false;
-                }
-                else
-                {
-                    continue;
-                }
-
-                switch( button )
-                {
-                    case Buttons.A:
-                        if( FocusedWidget != null )
-                        {
-                            if( bPressed )
-                            {
-                                FocusedWidget.OnActivateDown();
-                                mbHasActivatedFocusedWidget = true;
-                            }
-                            else
-                            if( mbHasActivatedFocusedWidget )
-                            {
-                                FocusedWidget.OnActivateUp();
-                                mbHasActivatedFocusedWidget = false;
-                            }
-                        }
-                        break;
-                    case Buttons.B:
-                        if( FocusedWidget == null || ! FocusedWidget.OnCancel( bPressed ) )
-                        {
-                            Root.OnPadButton( button, bPressed );
-                        }
-                        break;
-                    case Buttons.LeftThumbstickLeft:
-                    case Buttons.DPadLeft:
-                        if( bPressed && FocusedWidget != null ) FocusedWidget.OnPadMove( UI.Direction.Left );
-                        break;
-                    case Buttons.LeftThumbstickRight:
-                    case Buttons.DPadRight:
-                        if( bPressed && FocusedWidget != null ) FocusedWidget.OnPadMove( UI.Direction.Right );
-                        break;
-                    case Buttons.LeftThumbstickUp:
-                    case Buttons.DPadUp:
-                        if( bPressed && FocusedWidget != null ) FocusedWidget.OnPadMove( UI.Direction.Up );
-                        break;
-                    case Buttons.LeftThumbstickDown:
-                    case Buttons.DPadDown:
-                        if( bPressed && FocusedWidget != null ) FocusedWidget.OnPadMove( UI.Direction.Down );
-                        break;
-                    default:
-                        Root.OnPadButton( button, bPressed );
-                        break;
-                }
-
+            if( FocusedWidget != null )
+            {
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Left ) )  FocusedWidget.OnPadMove( UI.Direction.Left );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Right ) ) FocusedWidget.OnPadMove( UI.Direction.Right );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Up ) )    FocusedWidget.OnPadMove( UI.Direction.Up );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Down ) )  FocusedWidget.OnPadMove( UI.Direction.Down );
             }
 
 #if WINDOWS || LINUX || MACOSX
