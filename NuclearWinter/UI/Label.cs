@@ -60,6 +60,8 @@ namespace NuclearWinter.UI
         public Color    OutlineColor;
         public float    OutlineRadius;
 
+        public bool     Underline;
+
         public bool     HasEllipsis { get { return mstrDisplayedText != mstrText; } }
 
         //----------------------------------------------------------------------
@@ -108,7 +110,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
-            return null;
+            return ClickHandler != null ? this : null;
         }
 
         //----------------------------------------------------------------------
@@ -202,6 +204,12 @@ namespace NuclearWinter.UI
         {
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
+            OnActivateUp();
+        }
+
+        //----------------------------------------------------------------------
+        protected internal override void OnActivateUp()
+        {
             if( ClickHandler != null )
             {
                 ClickHandler( this );
@@ -262,17 +270,38 @@ namespace NuclearWinter.UI
                 for( int i = 0; i < mlWrappedText.Count; i++ )
                 {
                     float fX = mpTextPosition.X + _pOffset.X;
+                    float fTextWidth = mFont.MeasureString( mlWrappedText[i].Item1 ).X;
                     if( Anchor == UI.Anchor.Center )
                     {
-                        fX += ContentWidth / 2 - Padding.Left - mFont.MeasureString( mlWrappedText[i].Item1 ).X / 2f;
+                        fX += ContentWidth / 2 - Padding.Left - fTextWidth / 2f;
                     }
 
                     Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
+
+                    if( Underline )
+                    {
+                        var vBottomLeft = new Vector2( fX, mpTextPosition.Y + (int)( Font.LineSpacing * (i+1) ) + Font.YOffset + _pOffset.Y );
+                        Screen.Game.DrawLine( vBottomLeft, vBottomLeft + new Vector2( fTextWidth, 0 ), Color );
+                    }
                 }
             }
             else
             {
                 Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X + _pOffset.X, mpTextPosition.Y + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
+
+                if( Underline )
+                {
+                    var vBottomLeft = new Vector2( mpTextPosition.X + _pOffset.X, mpTextPosition.Y + Font.YOffset + _pOffset.Y + Font.LineSpacing );
+                    Screen.Game.DrawLine( vBottomLeft, vBottomLeft + new Vector2( miEllipsizedTextWidth - Padding.Horizontal, 0 ), Color );
+                }
+            }
+        }
+
+        protected internal override void DrawFocused()
+        {
+            if( ClickHandler != null )
+            {
+                Screen.DrawBox( Screen.Style.ButtonFocusOverlay, LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
             }
         }
     }

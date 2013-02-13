@@ -119,7 +119,6 @@ namespace NuclearWinter.UI
             if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
 
             Screen.Focus( this );
-            OnActivateDown();
 
             return true;
         }

@@ -332,7 +332,6 @@ namespace NuclearWinter.UI
             }
 
             Screen.Focus( this );
-            OnActivateDown();
 
             return true;
         }

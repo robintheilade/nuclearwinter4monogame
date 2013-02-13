@@ -65,7 +65,7 @@ namespace NuclearWinter.UI
             base.DoLayout( _rect );
 
             mCheckBoxRect = new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
-            mLabel.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Screen.Style.CheckBoxSize, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
+            mLabel.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Screen.Style.CheckBoxSize, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - Screen.Style.CheckBoxSize, LayoutRect.Height - Padding.Vertical ) );
             
             UpdateContentSize();
         }
@@ -136,6 +136,11 @@ namespace NuclearWinter.UI
             Screen.Game.SpriteBatch.Draw( tex, new Vector2( rect.Center.X, rect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
 
             mLabel.DrawWithOffset( _pOffset );
+        }
+
+        protected internal override void DrawFocused()
+        {
+            Screen.DrawBox( Screen.Style.ButtonFocusOverlay, mLabel.LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
         }
     }
 }
