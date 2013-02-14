@@ -718,10 +718,20 @@ namespace NuclearWinter.UI
             float fLineOffset = 0f;
             foreach( var textSpan in mlSpans )
             {
-                var newTextSpan = TextSpan.FromTextSpan( textSpan, "" );
+                int iChunkIndex = 0;
 
                 foreach( var chunk in textSpan.Text.Split( '\n' ) )
                 {
+                    if( iChunkIndex > 0 )
+                    {
+                        // There was a line break
+                        fLineOffset = 0;
+                        lLines.Add( currentLine );
+                        currentLine.Spans[ currentLine.Spans.Count - 1 ].Text += " ";
+                        currentLine = new TextSoup();
+                    }
+
+                    var newTextSpan = TextSpan.FromTextSpan( textSpan, "" );
                     string newTextSpanContent = "";
 
                     if( chunk != "" )
@@ -754,6 +764,8 @@ namespace NuclearWinter.UI
                     newTextSpan.Text = newTextSpanContent;
                     fLineOffset += _font.MeasureString( newTextSpanContent ).X;
                     currentLine.mlSpans.Add( newTextSpan );
+
+                    iChunkIndex++;
                 }
             }
 
