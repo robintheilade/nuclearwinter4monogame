@@ -34,10 +34,12 @@ namespace NuclearWinter.Input
     public class KeyboardResponder : NSView {
         public delegate void EnterTextDelegate(char c);
         public delegate void JustPressedKeyDelegate(NSKey key);
+        public delegate void JustReleasedKeyDelegate(NSKey key);
 
         public KeyboardResponder(
             EnterTextDelegate enterText,
             JustPressedKeyDelegate justPressedKey,
+            JustReleasedKeyDelegate justReleasedKey,
             MonoMacGameView gameView)
                 // Our rectangle has to match that of the containing view, if we want to be able
                 // to properly get all the mouse events.
@@ -45,6 +47,7 @@ namespace NuclearWinter.Input
         {
             EnterText = enterText;
             JustPressedKey = justPressedKey;
+            JustReleasedKey = justReleasedKey;
             GameView = gameView;
 
             // We authorize the parent's view to automatically change our width and height in case
@@ -93,7 +96,28 @@ namespace NuclearWinter.Input
         public override void OtherMouseDown(NSEvent theEvent) { GameView.OtherMouseDown(theEvent); }
         public override void OtherMouseDragged(NSEvent theEvent) { GameView.OtherMouseDragged(theEvent); }
         
-        public override void KeyUp(NSEvent theEvent) { GameView.KeyUp(theEvent); }
+        public override void KeyUp(NSEvent theEvent)
+        {
+            NSKey theKey = (NSKey)Enum.ToObject(typeof(NSKey), theEvent.KeyCode);
+            switch (theKey) {
+                case NSKey.Delete: theKey = NSKey.ForwardDelete; break;
+                case NSKey.ForwardDelete: theKey = NSKey.Delete; break;
+            }
+            // Seems some keys are weirdly mapped. Let's re-assign them properly.
+            switch (theEvent.KeyCode) {
+                case 115: theKey = NSKey.Home; break;
+                case 116: theKey = NSKey.PageUp; break;
+                case 119: theKey = NSKey.End; break;
+                case 121: theKey = NSKey.PageDown; break;
+                case 123: theKey = NSKey.LeftArrow; break;
+                case 124: theKey = NSKey.RightArrow; break;
+                case 125: theKey = NSKey.DownArrow; break;
+                case 126: theKey = NSKey.UpArrow; break;
+            }
+            // Signalling NuclearWinter of the ˝OS˝ key that has been pushed.
+            JustReleasedKey(theKey);
+            GameView.KeyUp(theEvent);
+        }
 
         // This method override is the crux of that whole hack. We snoop on the KeyDown events,
         // in order to fill the JustPressedOSKeys array, and to feed the events to the NSTextView's
@@ -208,12 +232,15 @@ namespace NuclearWinter.Input
 
 #if !MONOGAME
         public List<System.Windows.Forms.Keys>      JustPressedOSKeys       { get; private set; }
+        public List<System.Windows.Forms.Keys>      JustReleasedOSKeys      { get; private set; }
         WindowMessageFilter                         mMessageFilter;
 #else
 #if !MONOMAC
         public List<OpenTK.Input.Key>               JustPressedOSKeys       { get; private set; }
+        public List<OpenTK.Input.Key>               JustReleasedOSKeys      { get; private set; }
 #else
         public List<NSKey>                          JustPressedOSKeys       { get; private set; }
+        public List<NSKey>                          JustReleasedOSKeys      { get; private set; }
 #endif
         float                                       mfTimeSinceLastClick;
         Point                                       mLastPrimaryClickPosition;
@@ -253,26 +280,32 @@ namespace NuclearWinter.Input
             JustPressedKeys         = new List<Keys>();
 
 #if !MONOGAME
-            JustPressedOSKeys  = new List<System.Windows.Forms.Keys>();
+            JustPressedOSKeys   = new List<System.Windows.Forms.Keys>();
+            JustReleasedOSKeys  = new List<System.Windows.Forms.Keys>();
 
             mMessageFilter              = new WindowMessageFilter( Game.Window.Handle );
             mMessageFilter.CharacterHandler = delegate( char _char ) { EnteredText.Add( _char ); };
             mMessageFilter.KeyDownHandler   = delegate( System.Windows.Forms.Keys _key ) { JustPressedOSKeys.Add( _key ); };
+            mMessageFilter.KeyUpHandler     = delegate( System.Windows.Forms.Keys _key ) { JustReleasedOSKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #else
 
 #if !MONOMAC
-            JustPressedOSKeys  = new List<OpenTK.Input.Key>();
+            JustPressedOSKeys   = new List<OpenTK.Input.Key>();
+            JustReleasedOSKeys  = new List<OpenTK.Input.Key>();
             System.Reflection.FieldInfo info = typeof(OpenTKGameWindow).GetField( "window", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField );
             OpenTK.GameWindow window = (OpenTK.GameWindow)info.GetValue( Game.Window );
             window.Keyboard.KeyRepeat = true;
             window.KeyPress += delegate( object _sender, OpenTK.KeyPressEventArgs _e ) { EnteredText.Add( _e.KeyChar ); };
-            window.Keyboard.KeyDown  += delegate( object _sender, OpenTK.Input.KeyboardKeyEventArgs  _e ) { JustPressedOSKeys.Add( _e.Key ); };
+            window.Keyboard.KeyDown += delegate( object _sender, OpenTK.Input.KeyboardKeyEventArgs  _e ) { JustPressedOSKeys.Add( _e.Key ); };
+            window.Keyboard.KeyUp += delegate( object _sender, OpenTK.Input.KeyboardKeyEventArgs  _e ) { JustReleasedOSKeys.Add( _e.Key ); };
 #else
             JustPressedOSKeys  = new List<NSKey>();
+            JustReleasedOSKeys = new List<NSKey>();
             OurResponder = new KeyboardResponder(
                 delegate(char c) { EnteredText.Add(c); },
                 delegate(NSKey k) { JustPressedOSKeys.Add(k); },
+                delegate(NSKey k) { JustReleasedOSKeys.Add(k); },
                 Game.Window);
 #endif
 
@@ -317,7 +350,6 @@ namespace NuclearWinter.Input
                 Mouse.SetPosition( PreviousMouseState.X, PreviousMouseState.Y );
             }
 
-
             PreviousKeyboardState = KeyboardState;
             KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
 
@@ -333,6 +365,7 @@ namespace NuclearWinter.Input
 
             EnteredText.Clear();
             JustPressedOSKeys.Clear();
+            JustReleasedOSKeys.Clear();
 
             Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
             Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
@@ -573,9 +606,16 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
-        public bool WasKeyJustReleased( Keys _key )
+        public bool WasKeyJustReleased( Keys _key, bool _bNative )
         {
-            return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+            if( ! _bNative )
+            {
+                return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+            }
+            else
+            {
+                return KeyboardState.Native.IsKeyUp(_key) && ! PreviousKeyboardState.Native.IsKeyUp(_key);
+            }
         }
 
 

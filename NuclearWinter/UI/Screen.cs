@@ -9,6 +9,14 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using NuclearWinter.Xna;
 
+#if !MONOGAME
+using OSKey = System.Windows.Forms.Keys;
+#elif !MONOMAC
+using OSKey = OpenTK.Input.Key;
+#else
+using OSKey = MonoMac.AppKit.NSKey;
+#endif
+
 namespace NuclearWinter.UI
 {
     /*
@@ -104,37 +112,6 @@ namespace NuclearWinter.UI
                 }
 
                 return;
-            }
-
-            if( Game.InputMgr.WasKeyJustReleased( Keys.Space ) )
-            {
-                Console.WriteLine( "YAY" );
-            }
-
-            if( Game.InputMgr.WasKeyJustPressed( Keys.Enter ) || Game.InputMgr.WasKeyJustPressed( Keys.Space ) )
-            {
-                if( FocusedWidget != null )
-                {
-                    FocusedWidget.OnActivateDown();
-                    mbHasActivatedFocusedWidget = true;
-                }
-            }
-            else
-            if( Game.InputMgr.WasKeyJustReleased( Keys.Enter ) || Game.InputMgr.WasKeyJustReleased( Keys.Space ) )
-            {
-                if( FocusedWidget != null && mbHasActivatedFocusedWidget )
-                {
-                    FocusedWidget.OnActivateUp();
-                    mbHasActivatedFocusedWidget = false;
-                }
-            }
-
-            if( FocusedWidget != null )
-            {
-                if( Game.InputMgr.WasKeyJustPressed( Keys.Left ) )  FocusedWidget.OnPadMove( UI.Direction.Left );
-                if( Game.InputMgr.WasKeyJustPressed( Keys.Right ) ) FocusedWidget.OnPadMove( UI.Direction.Right );
-                if( Game.InputMgr.WasKeyJustPressed( Keys.Up ) )    FocusedWidget.OnPadMove( UI.Direction.Up );
-                if( Game.InputMgr.WasKeyJustPressed( Keys.Down ) )  FocusedWidget.OnPadMove( UI.Direction.Down );
             }
 
 #if WINDOWS || LINUX || MACOSX
@@ -285,6 +262,28 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnTextEntered( character );
                 }
 
+                if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
+                {
+                    if( FocusedWidget.OnActivateDown() )
+                    {
+                        mbHasActivatedFocusedWidget = true;
+                    }
+                }
+                else
+                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
+                {
+                    if( mbHasActivatedFocusedWidget )
+                    {
+                        FocusedWidget.OnActivateUp();
+                        mbHasActivatedFocusedWidget = false;
+                    }
+                }
+
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Left ) )  FocusedWidget.OnPadMove( UI.Direction.Left );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Right ) ) FocusedWidget.OnPadMove( UI.Direction.Right );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Up ) )    FocusedWidget.OnPadMove( UI.Direction.Up );
+                if( Game.InputMgr.WasKeyJustPressed( Keys.Down ) )  FocusedWidget.OnPadMove( UI.Direction.Down );
+
                 foreach( Keys key in Game.InputMgr.JustPressedKeys )
                 {
                     FocusedWidget.OnKeyPress( key );
@@ -294,7 +293,6 @@ namespace NuclearWinter.UI
                 {
                     FocusedWidget.OnOSKeyPress( key );
                 }
-
             }
 #endif
         }

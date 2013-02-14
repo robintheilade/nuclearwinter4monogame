@@ -403,6 +403,17 @@ namespace NuclearWinter.UI
             }
         }
 
+        protected internal override bool OnActivateDown()
+        {
+            // Ignore if Space was pressed
+            return ! Screen.Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space );
+        }
+
+        protected internal override void OnActivateUp()
+        {
+            if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
+        }
+
         protected internal override void OnOSKeyPress( OSKey _key )
         {
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
@@ -435,13 +446,6 @@ namespace NuclearWinter.UI
                     {
                         PasteFromClipboard();
                     }
-                    break;
-#if !MONOMAC
-                case OSKey.Enter:
-#else
-                case OSKey.Return:
-#endif
-                    if( ! IsReadOnly && ValidateHandler != null ) ValidateHandler( this );
                     break;
 #if !MONOMAC
                 case OSKey.Back:

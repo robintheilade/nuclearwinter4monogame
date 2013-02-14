@@ -59,7 +59,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         Label                   mLabel;
         Image                   mIcon;
-        Buttons                 mBoundPadButton;
 
         bool                    mbIsHovered;
 
@@ -296,37 +295,11 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void BindPadButton( Buttons _button )
-        {
-            mBoundPadButton = _button;
-        }
-
-        //----------------------------------------------------------------------
-        protected internal override bool OnPadButton( Buttons _button, bool _bIsDown )
-        {
-            if( _button == mBoundPadButton )
-            {
-                if( _bIsDown )
-                {
-                    Screen.Focus( this );
-                    OnActivateDown();
-                }
-                else
-                {
-                    OnActivateUp();
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        //----------------------------------------------------------------------
-        protected internal override void OnActivateDown()
+        protected internal override bool OnActivateDown()
         {
             mbIsPressed = true;
             mPressedAnim.SetTime( 0f );
+            return true;
         }
 
         protected internal override void OnActivateUp()

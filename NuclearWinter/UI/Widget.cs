@@ -285,7 +285,7 @@ namespace NuclearWinter.UI
 
         protected internal virtual void       OnTextEntered( char _char ) {}
 
-        protected internal virtual void       OnActivateDown() {}
+        protected internal virtual bool       OnActivateDown() { return false; }
         protected internal virtual void       OnActivateUp() {}
         protected internal virtual bool       OnCancel( bool _bPressed ) { return false; } // return true to consume the event
 

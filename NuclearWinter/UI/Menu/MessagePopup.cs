@@ -73,7 +73,6 @@ namespace NuclearWinter.UI
                 // Close / Cancel
                 mCloseButton = new Button( Screen, i18n.Common.Close );
                 mCloseButton.ClickHandler = delegate { Dismiss(); };
-                mCloseButton.BindPadButton( Buttons.A );
 
                 // Confirm
                 mConfirmButton = new Button( Screen, i18n.Common.Confirm );

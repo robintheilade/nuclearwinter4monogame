@@ -336,7 +336,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnActivateDown()
+        protected internal override bool OnActivateDown()
         {
             if( IsOpen )
             {
@@ -358,6 +358,8 @@ namespace NuclearWinter.UI
                 mbIsPressed = true;
                 mPressedAnim.SetTime( 0f );
             }
+
+            return true;
         }
 
         protected internal override void OnActivateUp()
