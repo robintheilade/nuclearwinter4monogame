@@ -80,9 +80,10 @@ namespace NuclearSample
             // UI Style
             UIStyle = new NuclearUI.Style();
 
-            UIStyle.SmallFont   = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/SmallFont" ), 14, 0 );
-            UIStyle.MediumFont  = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/MediumFont" ), 18, -2 );
-            UIStyle.LargeFont   = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/LargeFont" ), 24, 0 );
+            UIStyle.SmallFont       = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/SmallFont" ), 14, 0 );
+            UIStyle.MediumFont      = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/MediumFont" ), 18, -2 );
+            UIStyle.LargeFont       = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/LargeFont" ), 24, 0 );
+            UIStyle.ExtraLargeFont  = new NuclearUI.UIFont( Content.Load<SpriteFont>( "Fonts/LargeFont" ), 24, 0 );
 
             UIStyle.SpinningWheel               = Content.Load<Texture2D>( "Sprites/UI/SpinningWheel" );
 
@@ -94,7 +95,6 @@ namespace NuclearSample
             UIStyle.ButtonHoverOverlay          = Content.Load<Texture2D>( "Sprites/UI/ButtonHover" );
             UIStyle.ButtonFocusOverlay          = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
             UIStyle.ButtonDownOverlay           = Content.Load<Texture2D>( "Sprites/UI/ButtonPress" );
-            UIStyle.ButtonDownFocusOverlay      = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
 
             UIStyle.TooltipFrame                = Content.Load<Texture2D>( "Sprites/UI/TooltipFrame" );
 
@@ -119,47 +119,42 @@ namespace NuclearSample
             UIStyle.Panel                       = Content.Load<Texture2D>( "Sprites/UI/Panel01" );
             UIStyle.PanelCornerSize             = 15;
 
-            UIStyle.NotebookTabCornerSize       = 15;
-            UIStyle.NotebookTab                 = Content.Load<Texture2D>( "Sprites/UI/Tab" );
-            UIStyle.NotebookTabFocus            = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
-            UIStyle.NotebookActiveTab           = Content.Load<Texture2D>( "Sprites/UI/ActiveTab" );
-            UIStyle.NotebookActiveTabFocus      = Content.Load<Texture2D>( "Sprites/UI/ActiveTabFocused" );
-            UIStyle.NotebookTabClose            = Content.Load<Texture2D>( "Sprites/UI/TabClose" );
-            UIStyle.NotebookTabCloseHover       = Content.Load<Texture2D>( "Sprites/UI/TabCloseHover" );
-            UIStyle.NotebookTabCloseDown        = Content.Load<Texture2D>( "Sprites/UI/TabCloseDown" );
-            UIStyle.NotebookUnreadTabMarker     = Content.Load<Texture2D>( "Sprites/UI/UnreadTabMarker" );
+            UIStyle.NotebookStyle.TabCornerSize = 15;
+            UIStyle.NotebookStyle.Tab                 = Content.Load<Texture2D>( "Sprites/UI/Tab" );
+            UIStyle.NotebookStyle.TabFocus            = Content.Load<Texture2D>( "Sprites/UI/ButtonFocus" );
+            UIStyle.NotebookStyle.ActiveTab           = Content.Load<Texture2D>( "Sprites/UI/ActiveTab" );
+            UIStyle.NotebookStyle.ActiveTabFocus      = Content.Load<Texture2D>( "Sprites/UI/ActiveTabFocused" );
+            UIStyle.NotebookStyle.TabClose            = Content.Load<Texture2D>( "Sprites/UI/TabClose" );
+            UIStyle.NotebookStyle.TabCloseHover       = Content.Load<Texture2D>( "Sprites/UI/TabCloseHover" );
+            UIStyle.NotebookStyle.TabCloseDown        = Content.Load<Texture2D>( "Sprites/UI/TabCloseDown" );
+            UIStyle.NotebookStyle.UnreadTabMarker     = Content.Load<Texture2D>( "Sprites/UI/UnreadTabMarker" );
 
-            UIStyle.ListFrame                   = Content.Load<Texture2D>( "Sprites/UI/ListFrame" );
-            UIStyle.ListRowInsertMarker         = Content.Load<Texture2D>( "Sprites/UI/ListRowInsertMarker" );
+            UIStyle.ListViewStyle.ListViewFrame             = Content.Load<Texture2D>( "Sprites/UI/ListFrame" );
+            UIStyle.ListViewStyle.ListViewFrameCornerSize   = 10;
+            UIStyle.ListRowInsertMarker                     = Content.Load<Texture2D>( "Sprites/UI/ListRowInsertMarker" );
 
-            UIStyle.GridBoxFrameCornerSize      = 10;
-            UIStyle.GridBoxFrame                = Content.Load<Texture2D>( "Sprites/UI/ListRowFrame" );
-            UIStyle.GridBoxFrameSelected        = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameSelected" );
-            UIStyle.GridBoxFrameFocus           = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameFocused" );
-            UIStyle.GridBoxFrameHover           = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameHover" );
-            UIStyle.GridHeaderFrame             = Content.Load<Texture2D>( "Sprites/UI/ButtonFrame" ); // FIXME
+            UIStyle.ListViewStyle.CellFrame         = Content.Load<Texture2D>( "Sprites/UI/ListRowFrame" );
+            UIStyle.ListViewStyle.CellCornerSize    = 10;
+            UIStyle.ListViewStyle.SelectedCellFrame = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameSelected" );
+            UIStyle.ListViewStyle.CellFocusOverlay  = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameFocused" );
+            UIStyle.ListViewStyle.CellHoverOverlay  = Content.Load<Texture2D>( "Sprites/UI/ListRowFrameHover" );
+            UIStyle.ListViewStyle.ColumnHeaderFrame = Content.Load<Texture2D>( "Sprites/UI/ButtonFrame" ); // FIXME
 
             UIStyle.PopupFrame                  = Content.Load<Texture2D>( "Sprites/UI/PopupFrame" );
             UIStyle.PopupFrameCornerSize        = 30;
-
-            UIStyle.TreeViewContainerFrameSelected = Content.Load<Texture2D>( "Sprites/UI/TreeViewContainerFrameSelected" );
-
-            UIStyle.TreeViewBranchOpen          = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranchOpen" );
-            UIStyle.TreeViewBranchOpenEmpty     = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranchOpenEmpty" );
-            UIStyle.TreeViewBranchClosed        = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranchClosed" );
-            UIStyle.TreeViewBranch              = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranch" );
-            UIStyle.TreeViewBranchLast          = Content.Load<Texture2D>( "Sprites/UI/TreeViewBranchLast" );
-            UIStyle.TreeViewLine                = Content.Load<Texture2D>( "Sprites/UI/TreeViewLine" );
-            UIStyle.TreeViewCheckBoxFrame       = Content.Load<Texture2D>( "Sprites/UI/TreeViewCheckBoxFrame" );
 
             UIStyle.CheckBoxFrameHover          = Content.Load<Texture2D>( "Sprites/UI/CheckBoxFrameHover" );
             UIStyle.CheckBoxChecked             = Content.Load<Texture2D>( "Sprites/UI/Checked" );
             UIStyle.CheckBoxUnchecked           = Content.Load<Texture2D>( "Sprites/UI/Unchecked" );
 
+            UIStyle.SliderFrame                 = Content.Load<Texture2D>( "Sprites/UI/ListFrame" );
+
             UIStyle.VerticalScrollbar           = Content.Load<Texture2D>( "Sprites/UI/VerticalScrollbar" );
             UIStyle.VerticalScrollbarCornerSize = 5;
 
+            UIStyle.DropDownBoxEntryHoverOverlay= Content.Load<Texture2D>( "Sprites/UI/ListRowFrameFocused" );
             UIStyle.DropDownArrow               = Content.Load<Texture2D>( "Sprites/UI/DropDownArrow" );
+
             UIStyle.SplitterFrame               = Content.Load<Texture2D>( "Sprites/UI/SplitterFrame" );
             UIStyle.SplitterDragHandle          = Content.Load<Texture2D>( "Sprites/UI/SplitterDragHandle" );
             UIStyle.SplitterCollapseArrow       = Content.Load<Texture2D>( "Sprites/UI/SplitterCollapseArrow" );
@@ -169,6 +164,8 @@ namespace NuclearSample
             UIStyle.ProgressBar                 = Content.Load<Texture2D>( "Sprites/UI/ProgressBar" );
             UIStyle.ProgressBarCornerSize       = 15;
 
+            UIStyle.TextAreaFrame               = Content.Load<Texture2D>( "Sprites/UI/ListFrame" );
+            UIStyle.TextAreaFrameCornerSize     = 15;
             UIStyle.TextAreaGutterFrame         = Content.Load<Texture2D>( "Sprites/UI/TextAreaGutterFrame" );
             UIStyle.TextAreaGutterCornerSize    = 15;
 
