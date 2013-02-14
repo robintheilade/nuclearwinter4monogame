@@ -400,6 +400,9 @@ namespace NuclearWinter.UI
         public Scrollbar            Scrollbar           { get; private set; }
 
         //----------------------------------------------------------------------
+        public Action<ListView>             HoverHandler;
+
+        //----------------------------------------------------------------------
         // Drag & drop
         public Func<ListViewRow,int,bool>   DragNDropHandler;
         bool                                mbIsMouseDown;
@@ -582,6 +585,7 @@ namespace NuclearWinter.UI
             int iRowY = ( mHoverPoint.Y - ( LayoutRect.Y + Padding.Top + ( DisplayColumnHeaders ? Style.RowHeight : 0 ) - (int)Scrollbar.LerpOffset ) );
             int iHoveredRowIndex = Math.Max( -1, iRowY / ( Style.RowHeight + Style.RowSpacing ) );
 
+            var oldHoveredRow = HoveredRow;
             HoveredRow = null;
 
             int iOffset = iRowY % ( Style.RowHeight + Style.RowSpacing );
@@ -602,6 +606,12 @@ namespace NuclearWinter.UI
             if( iHoveredRowIndex >= 0 )
             {
                 HoveredRow = Rows[ iHoveredRowIndex ];
+
+                if( HoverHandler != null && oldHoveredRow != HoveredRow )
+                {
+                    HoverHandler( this );
+                }
+
                 if( mHoveredActionButton != null )
                 {
                     if( mHoveredActionButton.HitTest( mHoverPoint ) != null )
