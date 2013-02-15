@@ -57,7 +57,7 @@ namespace NuclearWinter.UI
         public Color                            Color;
 
         public List<ListViewCellIndicator>      Indicators { get; private set; }
-        protected int                           miIndicatorAndActionButtonsWidth;
+        protected int                           miIndicatorsWidth;
 
         //----------------------------------------------------------------------
         public ListViewCell( ListView _view, string _strText, Texture2D _image )
@@ -91,13 +91,22 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
         {
+            miIndicatorsWidth = 0;
+
+            // Indicators
+            foreach( ListViewCellIndicator indicator in Indicators )
+            {
+                miIndicatorsWidth += indicator.ContentWidth + mListView.Style.CellHorizontalPadding;
+                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorsWidth - mListView.Style.CellHorizontalPadding, _rect.Top + mListView.Style.IndicatorVerticalPadding, indicator.ContentWidth, mListView.Style.RowHeight - mListView.Style.IndicatorVerticalPadding * 2 ) );
+            }
+
             mstrText = Text;
             mfTextWidth = mListView.Screen.Style.MediumFont.MeasureString( mstrText ).X;
-            if( mstrText != "" && mfTextWidth + mListView.Style.CellHorizontalPadding * 2 > _col.Width )
+            if( mstrText != "" )
             {
                 int iOffset = mstrText.Length;
 
-                while( mfTextWidth > _col.Width )
+                while( mfTextWidth + mListView.Style.CellHorizontalPadding * 2 > _col.Width - miIndicatorsWidth )
                 {
                     iOffset--;
                     mstrText = Text.Substring( 0, iOffset ) + "…";
@@ -119,15 +128,6 @@ namespace NuclearWinter.UI
                 case Anchor.End:
                     mvTextOffset.X += _col.Width - mListView.Style.CellHorizontalPadding - mfTextWidth;
                     break;
-            }
-
-            miIndicatorAndActionButtonsWidth = 0;
-
-            // Indicators
-            foreach( ListViewCellIndicator indicator in Indicators )
-            {
-                miIndicatorAndActionButtonsWidth += indicator.ContentWidth + mListView.Style.CellHorizontalPadding;
-                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorAndActionButtonsWidth - mListView.Style.CellHorizontalPadding, _rect.Top, indicator.ContentWidth, mListView.Style.RowHeight ) );
             }
         }
 
@@ -311,6 +311,8 @@ namespace NuclearWinter.UI
                 int _iRowHeight,
                 int _iRowSpacing,
                 int _iCellHorizontalPadding,
+                int _iIndicatorVerticalPadding=10,
+                int _iActionButtonsRightPadding=0,
 
                 int _iListViewFrameCornerSize=10,
                 Texture2D _listViewFrame=null,
@@ -330,6 +332,8 @@ namespace NuclearWinter.UI
                 RowHeight = _iRowHeight;
                 RowSpacing = _iRowSpacing;
                 CellHorizontalPadding = _iCellHorizontalPadding;
+                IndicatorVerticalPadding = _iIndicatorVerticalPadding;
+                ActionButtonsRightPadding = _iActionButtonsRightPadding;
 
                 ListViewFrameCornerSize = _iListViewFrameCornerSize;
                 ListViewFrame           = _listViewFrame;
@@ -349,6 +353,8 @@ namespace NuclearWinter.UI
             public int              RowHeight;
             public int              RowSpacing;
             public int              CellHorizontalPadding;
+            public int              IndicatorVerticalPadding;
+            public int              ActionButtonsRightPadding;
 
             public Texture2D        ListViewFrame;
             public int              ListViewFrameCornerSize;
@@ -535,7 +541,7 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             if( HoveredRow != null )
             {
-                int iButtonX = 0;
+                int iButtonX = Style.ActionButtonsRightPadding;
                 foreach( Button button in ActionButtons.Reverse<Button>() )
                 {
                     button.DoLayout( new Rectangle(
@@ -963,7 +969,6 @@ namespace NuclearWinter.UI
                 for( int i = 0; i < row.Cells.Length; i++ )
                 {
                     ListViewColumn col = Columns[i];
-
                     Rectangle rowRect = new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY, col.Width, Style.RowHeight );
 
                     if( ! MergeColumns )
