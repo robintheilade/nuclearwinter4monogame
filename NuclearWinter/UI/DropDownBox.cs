@@ -89,7 +89,7 @@ namespace NuclearWinter.UI
         bool                            mbIsPressed;
 
         Rectangle                       mDropDownHitBox;
-        const int                       siMaxLineDisplayed = 5;
+        const int                       siMaxLineDisplayed = 10;
 
         int                             miScrollItemOffset;
         public Scrollbar                mScrollbar;
