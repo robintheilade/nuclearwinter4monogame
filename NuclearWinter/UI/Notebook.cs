@@ -18,8 +18,21 @@ namespace NuclearWinter.UI
         public object           Tag;
 
         public bool             IsActive        { get { return mNotebook.Tabs[mNotebook.ActiveTabIndex] == this; } }
-        public bool             IsUnread;
-        public Action           OnReadHandler;
+
+        bool mbIsUnread;
+        public bool             IsUnread
+        {
+            get { return mbIsUnread; }
+            set {
+                mbIsUnread = value;
+                if( OnUnreadStatusChanged != null )
+                {
+                    OnUnreadStatusChanged( mbIsUnread );
+                }
+            }
+        }
+
+        public Action<bool>     OnUnreadStatusChanged;
 
         public bool             IsPinned
         {
@@ -601,7 +614,6 @@ namespace NuclearWinter.UI
 
             ActiveTabIndex = Tabs.IndexOf( _tab );
             _tab.IsUnread = false;
-            if( _tab.OnReadHandler != null ) _tab.OnReadHandler();
         }
 
         //----------------------------------------------------------------------
