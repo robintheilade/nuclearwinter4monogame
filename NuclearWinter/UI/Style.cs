@@ -77,7 +77,15 @@ namespace NuclearWinter.UI
         public Texture2D        ListRowInsertMarker;
         public int              ListRowInsertMarkerCornerSize = 10;
 
-        public ListView.ListViewStyle ListViewStyle = new ListView.ListViewStyle( 40, 0, 10 );
+        public ListView.ListViewStyle ListViewStyle = new ListView.ListViewStyle {
+            RowHeight=40,
+            RowSpacing=0,
+            CellHorizontalPadding=10,
+            IndicatorVerticalPadding=10,
+            ListViewFrameCornerSize=10,
+            CellCornerSize=10,
+            NewRowFrameCornerSize=10
+        };
         public Box              ListViewPadding = new Box(10);
 
         // Tree view

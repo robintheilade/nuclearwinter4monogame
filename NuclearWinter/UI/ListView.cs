@@ -307,49 +307,6 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public struct ListViewStyle
         {
-            public ListViewStyle(
-                int _iRowHeight,
-                int _iRowSpacing,
-                int _iCellHorizontalPadding,
-                int _iIndicatorVerticalPadding=10,
-                int _iActionButtonsRightPadding=0,
-
-                int _iListViewFrameCornerSize=10,
-                Texture2D _listViewFrame=null,
-
-                int _iColumnHeaderCornerSize=10,
-                Texture2D _columnHeaderFrame=null,
-
-                int _iCellCornerSize=10,
-                Texture2D _cellFrame=null,
-                Texture2D _cellHoverOverlay=null,
-                Texture2D _cellFocusOverlay=null,
-                Texture2D _selectedCellFrame=null,
-                Texture2D _selectedCellHoverOverlay=null,
-                Texture2D _selectedCellFocusOverlay=null
-                )
-            {
-                RowHeight = _iRowHeight;
-                RowSpacing = _iRowSpacing;
-                CellHorizontalPadding = _iCellHorizontalPadding;
-                IndicatorVerticalPadding = _iIndicatorVerticalPadding;
-                ActionButtonsRightPadding = _iActionButtonsRightPadding;
-
-                ListViewFrameCornerSize = _iListViewFrameCornerSize;
-                ListViewFrame           = _listViewFrame;
-
-                ColumnHeaderCornerSize  = _iColumnHeaderCornerSize;
-                ColumnHeaderFrame       = _columnHeaderFrame;
-
-                CellCornerSize              = _iCellCornerSize;
-                CellFrame                   = _cellFrame;
-                CellHoverOverlay            = _cellHoverOverlay;
-                CellFocusOverlay            = _cellFocusOverlay;
-                SelectedCellFrame           = _selectedCellFrame;
-                SelectedCellHoverOverlay    = _selectedCellHoverOverlay;
-                SelectedCellFocusOverlay    = _selectedCellFocusOverlay;
-            }
-
             public int              RowHeight;
             public int              RowSpacing;
             public int              CellHorizontalPadding;
@@ -372,6 +329,14 @@ namespace NuclearWinter.UI
             public Texture2D        SelectedCellFrame;
             public Texture2D        SelectedCellHoverOverlay;
             public Texture2D        SelectedCellFocusOverlay;
+
+            public int              NewRowFrameCornerSize;
+            public Texture2D        NewRowFrame;
+            public Texture2D        NewRowHoveredFrame;
+
+            public int              NewRowHorizontalPadding;
+            public Color            NewRowTextColor;
+            public Color            NewRowHoveredTextColor;
         }
 
         //----------------------------------------------------------------------
@@ -397,6 +362,8 @@ namespace NuclearWinter.UI
         public ListViewStyle        Style;
         public Color                TextColor;
 
+        public string               NewRowText;
+
         //----------------------------------------------------------------------
         public List<Button>         ActionButtons       { get; private set; }
         Button                      mHoveredActionButton;
@@ -407,6 +374,7 @@ namespace NuclearWinter.UI
 
         //----------------------------------------------------------------------
         public Action<ListView>             HoverHandler;
+        public Action<ListView>             NewRowClickedHandler;
 
         //----------------------------------------------------------------------
         // Drag & drop
@@ -416,6 +384,8 @@ namespace NuclearWinter.UI
         Point                               mMouseDownPoint;
         Point                               mMouseDragPoint;
         bool                                mbInsertAfter;
+
+        bool                                mbIsHoveringNewRow;
 
         //----------------------------------------------------------------------
         public ListView( Screen _screen )
@@ -556,6 +526,11 @@ namespace NuclearWinter.UI
 
             //------------------------------------------------------------------
             ContentHeight = Padding.Vertical + Rows.Count * ( Style.RowHeight + Style.RowSpacing ) - Style.RowSpacing;
+            if( NewRowText != null )
+            {
+                ContentHeight += Style.RowHeight;
+            }
+
             Scrollbar.DoLayout( LayoutRect, ContentHeight );
         }
 
@@ -594,6 +569,9 @@ namespace NuclearWinter.UI
             var oldHoveredRow = HoveredRow;
             HoveredRow = null;
 
+            bool bWasHoveringNewRow = mbIsHoveringNewRow;
+            mbIsHoveringNewRow = false;
+
             int iOffset = iRowY % ( Style.RowHeight + Style.RowSpacing );
             mbInsertAfter = iOffset >= ( Style.RowHeight + Style.RowSpacing ) / 2;
 
@@ -607,6 +585,11 @@ namespace NuclearWinter.UI
                     mbIsHoveredActionButtonDown = false;
                 }
                 mHoveredActionButton = null;
+
+                if( iHoveredRowIndex == Rows.Count && NewRowText != null )
+                {
+                    mbIsHoveringNewRow = true;
+                }
             }
             else
             if( iHoveredRowIndex >= 0 )
@@ -653,12 +636,34 @@ namespace NuclearWinter.UI
                     }
                 }
             }
+
+            if( bWasHoveringNewRow && ! mbIsHoveringNewRow )
+            {
+#if !MONOGAME
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
+            }
+            else
+            if( ! bWasHoveringNewRow && mbIsHoveringNewRow )
+            {
+#if !MONOGAME
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
+#endif
+            }
         }
 
         //----------------------------------------------------------------------
         public override void OnMouseOut( Point _hitPoint )
         {
             HoveredRow = null;
+
+            if( mbIsHoveringNewRow )
+            {
+#if !MONOGAME
+                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
+                mbIsHoveringNewRow = false;
+            }
 
             if( mHoveredActionButton != null )
             {
@@ -757,6 +762,14 @@ namespace NuclearWinter.UI
                 }
 
                 IsDragging = false;
+            }
+            else
+            if( mbIsHoveringNewRow )
+            {
+                if( NewRowClickedHandler != null )
+                {
+                    NewRowClickedHandler( this );
+                }
             }
             else
             {
@@ -1006,6 +1019,17 @@ namespace NuclearWinter.UI
 
                     iColX += col.Width + ColSpacing;
                 }
+
+                iRowIndex++;
+            }
+
+            if( NewRowText != null )
+            {
+                int iRowY = GetRowY( iRowIndex );
+                Screen.DrawBox( mbIsHoveringNewRow ? Style.NewRowHoveredFrame : Style.NewRowFrame, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top + iRowY, LayoutRect.Width - Padding.Horizontal, Style.RowHeight ), Style.NewRowFrameCornerSize, Color.White );
+
+                Vector2 vTextPos = new Vector2( LayoutRect.X + Padding.Left + Style.NewRowHorizontalPadding, LayoutRect.Y + Padding.Top + iRowY + Style.RowHeight / 2f - (int)( Screen.Style.MediumFont.LineSpacing * 0.9f / 2f ) + Screen.Style.MediumFont.YOffset );
+                Screen.Game.SpriteBatch.DrawString( Screen.Style.MediumFont, NewRowText, vTextPos, mbIsHoveringNewRow ? Style.NewRowHoveredTextColor : Style.NewRowTextColor );
 
                 iRowIndex++;
             }
