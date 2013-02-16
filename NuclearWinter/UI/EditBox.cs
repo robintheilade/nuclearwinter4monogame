@@ -346,14 +346,6 @@ namespace NuclearWinter.UI
                 SelectionOffset = iOffset - miCaretOffset;
                 mbIsDragging = false;
             }
-            else
-            if( HitTest( _hitPoint ) == this )
-            {
-                OnActivateUp();
-            }
-            else
-            {
-            }
         }
 
         int GetCaretOffsetAtX( int _x )
