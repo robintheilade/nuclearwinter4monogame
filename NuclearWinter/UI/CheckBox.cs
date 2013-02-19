@@ -92,10 +92,20 @@ namespace NuclearWinter.UI
         {
             if( mbIsHovered )
             {
-                CheckBoxState newState = ( CheckState == CheckBoxState.Checked ) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
-                if( ChangeHandler != null ) ChangeHandler( this, newState );
-                CheckState = newState;
+                OnActivateUp();
             }
+        }
+
+        protected internal override bool OnActivateDown()
+        {
+            return true;
+        }
+
+        protected internal override void OnActivateUp()
+        {
+            CheckBoxState newState = ( CheckState == CheckBoxState.Checked ) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
+            if( ChangeHandler != null ) ChangeHandler( this, newState );
+            CheckState = newState;
         }
 
         //----------------------------------------------------------------------
