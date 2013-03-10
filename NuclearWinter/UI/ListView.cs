@@ -123,7 +123,7 @@ namespace NuclearWinter.UI
                     mvTextOffset.X += mListView.Style.CellHorizontalPadding;
                     break;
                 case Anchor.Center:
-                    mvTextOffset.X += _col.Width / 2f - mfTextWidth / 2f;
+                    mvTextOffset.X += (int)( _col.Width / 2f - mfTextWidth / 2f );
                     break;
                 case Anchor.End:
                     mvTextOffset.X += _col.Width - mListView.Style.CellHorizontalPadding - mfTextWidth;
