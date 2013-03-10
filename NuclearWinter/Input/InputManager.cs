@@ -181,6 +181,7 @@ namespace NuclearWinter.Input
 
         private EnterTextDelegate EnterText;
         private JustPressedKeyDelegate JustPressedKey;
+        private JustReleasedKeyDelegate JustReleasedKey;
         private MonoMacGameView GameView;
     }
 #endif

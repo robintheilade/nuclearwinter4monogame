@@ -262,7 +262,12 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnTextEntered( character );
                 }
 
+#if !MACOSX
                 if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
+#else
+                if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
+#endif
+
                 {
                     if( FocusedWidget.OnActivateDown() )
                     {
@@ -270,7 +275,11 @@ namespace NuclearWinter.UI
                     }
                 }
                 else
+#if !MACOSX
                 if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
+#else
+                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
+#endif
                 {
                     if( mbHasActivatedFocusedWidget )
                     {
