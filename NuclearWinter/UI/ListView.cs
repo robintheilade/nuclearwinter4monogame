@@ -848,6 +848,8 @@ namespace NuclearWinter.UI
                         SelectedRow = FocusedRow;
                     }
                 }
+
+                if( SelectHandler != null ) SelectHandler( this );
             }
             else
             if( _direction == Direction.Down )
@@ -862,13 +864,13 @@ namespace NuclearWinter.UI
                         SelectedRow = FocusedRow;
                     }
                 }
+
+                if( SelectHandler != null ) SelectHandler( this );
             }
             else
             {
                 base.OnPadMove( _direction );
             }
-
-            if( SelectHandler != null ) SelectHandler( this );
         }
 
         //----------------------------------------------------------------------
