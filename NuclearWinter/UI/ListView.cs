@@ -70,7 +70,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal abstract void DoLayout( Rectangle _rect, ListViewColumn _col );
+        protected internal abstract void DoLayout( Rectangle _rect, int _iColumnIndex, ListViewColumn _col, ListViewRow _row );
         protected internal abstract void Draw( Point _location );
     }
 
@@ -89,15 +89,21 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
+        protected internal override void DoLayout( Rectangle _rect, int _iColumnIndex, ListViewColumn _col, ListViewRow _row )
         {
+            int iIndicatorRight = _rect.Right;
+            if( mListView.ActionButtonsColumn == _iColumnIndex && mListView.HoveredRow == _row && mListView.ActionButtons.Count > 0 )
+            {
+                iIndicatorRight -= mListView.ActionButtons.Sum( x => x.ContentWidth + mListView.Style.CellHorizontalPadding ) + mListView.Style.ActionButtonsRightPadding;
+            }
+
             miIndicatorsWidth = 0;
 
             // Indicators
             foreach( ListViewCellIndicator indicator in Indicators )
             {
                 miIndicatorsWidth += indicator.ContentWidth + mListView.Style.CellHorizontalPadding;
-                indicator.DoLayout( new Rectangle ( _rect.Right - miIndicatorsWidth - mListView.Style.CellHorizontalPadding, _rect.Top + mListView.Style.IndicatorVerticalPadding, indicator.ContentWidth, mListView.Style.RowHeight - mListView.Style.IndicatorVerticalPadding * 2 ) );
+                indicator.DoLayout( new Rectangle ( iIndicatorRight - miIndicatorsWidth - mListView.Style.CellHorizontalPadding - mListView.Style.ActionButtonsRightPadding, _rect.Top + mListView.Style.IndicatorVerticalPadding, indicator.ContentWidth, mListView.Style.RowHeight - mListView.Style.IndicatorVerticalPadding * 2 ) );
             }
 
             mstrText = Text;
@@ -164,7 +170,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
+        protected internal override void DoLayout( Rectangle _rect, int _iColumnIndex, ListViewColumn _col, ListViewRow _row )
         {
             mvOffset = Vector2.Zero;
 
@@ -181,10 +187,10 @@ namespace NuclearWinter.UI
                     mvOffset.X += 10;
                     break;
                 case Anchor.Center:
-                    mvOffset.X += _col.Width / 2f - mvSize.X / 2f;
+                    mvOffset.X += (int)( _col.Width / 2f - mvSize.X / 2f );
                     break;
                 case Anchor.End:
-                    mvOffset.X += _col.Width - mvSize.X - 10;
+                    mvOffset.X += (int)( _col.Width - mvSize.X - 10 );
                     break;
             }
         }
@@ -384,7 +390,8 @@ namespace NuclearWinter.UI
         public string               NewRowText;
 
         //----------------------------------------------------------------------
-        public List<Button>         ActionButtons       { get; private set; }
+        public readonly ObservableList<Button> ActionButtons;
+        public int                  ActionButtonsColumn = -1;
         Button                      mHoveredActionButton;
         bool                        mbIsHoveredActionButtonDown;
 
@@ -456,7 +463,18 @@ namespace NuclearWinter.UI
             Scrollbar = new Scrollbar( _screen );
             Scrollbar.Parent = this;
             
-            ActionButtons = new List<Button>();
+            ActionButtons = new ObservableList<Button>();
+
+            ActionButtons.ListCleared += delegate {
+                mHoveredActionButton = null;
+            };
+
+            ActionButtons.ListChanged += delegate {
+                if( mHoveredActionButton != null && ! ActionButtons.Contains( mHoveredActionButton ) )
+                {
+                    mHoveredActionButton = null;
+                }
+            };
 
             UpdateContentSize();
         }
@@ -517,7 +535,7 @@ namespace NuclearWinter.UI
                 foreach( ListViewRow row in Rows )
                 {
                     int iRowY = GetRowY( iRowIndex );
-                    row.Cells[ iColIndex ].DoLayout( new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY, col.Width, Style.RowHeight + Style.RowSpacing ), col );
+                    row.Cells[ iColIndex ].DoLayout( new Rectangle( LayoutRect.X + Padding.Left + iColX, LayoutRect.Y + Padding.Top + iRowY, col.Width, Style.RowHeight + Style.RowSpacing ), iColIndex, col, row );
 
                     iRowIndex++;
                 }
@@ -530,11 +548,17 @@ namespace NuclearWinter.UI
             //------------------------------------------------------------------
             if( HoveredRow != null )
             {
+                int iRight = LayoutRect.Right - Padding.Right - Style.CellHorizontalPadding;
+                if( ActionButtonsColumn != -1 )
+                {
+                    iRight = LayoutRect.Left + Padding.Left + Columns.Take(ActionButtonsColumn + 1).Sum( x => x.Width );
+                }
+
                 int iButtonX = Style.ActionButtonsRightPadding;
                 foreach( Button button in ActionButtons.Reverse<Button>() )
                 {
                     button.DoLayout( new Rectangle(
-                        LayoutRect.Right - Padding.Right - Style.CellHorizontalPadding - iButtonX - button.ContentWidth,
+                        iRight - iButtonX - button.ContentWidth,
                         LayoutRect.Y + Padding.Top + GetRowY( Rows.IndexOf( HoveredRow ) ) + Style.RowHeight / 2 - button.ContentHeight / 2,
                         button.ContentWidth, button.ContentHeight )
                     );

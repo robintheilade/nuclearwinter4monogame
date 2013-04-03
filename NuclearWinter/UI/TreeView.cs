@@ -665,7 +665,7 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public List<Button>                 ActionButtons       { get; private set; }
+        public readonly ObservableList<Button>  ActionButtons;
         Button                              mHoveredActionButton;
         bool                                mbIsHoveredActionButtonDown;
 
@@ -750,7 +750,18 @@ namespace NuclearWinter.UI
             Scrollbar = new UI.Scrollbar( _screen );
             Scrollbar.Parent = this;
 
-            ActionButtons = new List<Button>();
+            ActionButtons = new ObservableList<Button>();
+
+            ActionButtons.ListCleared += delegate {
+                mHoveredActionButton = null;
+            };
+
+            ActionButtons.ListChanged += delegate {
+                if( mHoveredActionButton != null && ! ActionButtons.Contains( mHoveredActionButton ) )
+                {
+                    mHoveredActionButton = null;
+                }
+            };
         }
 
         //----------------------------------------------------------------------
