@@ -150,12 +150,16 @@ namespace NuclearWinter.UI
     //--------------------------------------------------------------------------
     public class ListViewImageCell: ListViewCell
     {
+        public int ForcedHeight;
+
         Vector2     mvOffset;
+        Vector2     mvSize;
 
         //----------------------------------------------------------------------
-        public ListViewImageCell( ListView _view, Texture2D _image )
+        public ListViewImageCell( ListView _view, Texture2D _image, int _iForcedHeight=0 )
         : base( _view, null, _image )
         {
+            ForcedHeight = _iForcedHeight;
             Color   = Color.White;
         }
 
@@ -163,16 +167,24 @@ namespace NuclearWinter.UI
         protected internal override void DoLayout( Rectangle _rect, ListViewColumn _col )
         {
             mvOffset = Vector2.Zero;
+
+            mvSize = new Vector2( Image.Width, Image.Height );
+            if( ForcedHeight > 0 )
+            {
+                mvSize.X *= ForcedHeight / mvSize.Y;
+                mvSize.Y = ForcedHeight;
+            }
+
             switch( _col.Anchor )
             {
                 case Anchor.Start:
                     mvOffset.X += 10;
                     break;
                 case Anchor.Center:
-                    mvOffset.X += _col.Width / 2f - Image.Width / 2f;
+                    mvOffset.X += _col.Width / 2f - mvSize.X / 2f;
                     break;
                 case Anchor.End:
-                    mvOffset.X += _col.Width - Image.Width - 10;
+                    mvOffset.X += _col.Width - mvSize.X - 10;
                     break;
             }
         }
@@ -180,10 +192,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void Draw( Point _location )
         {
-            Vector2 vImagePos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2 - Image.Height / 2f );
+            Vector2 vImagePos = new Vector2( _location.X, _location.Y + mListView.Style.RowHeight / 2 - mvSize.Y / 2f );
             vImagePos += mvOffset;
 
-            mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color );
+            if( ForcedHeight == 0 )
+            {
+                mListView.Screen.Game.SpriteBatch.Draw( Image, vImagePos, Color );
+            }
+            else
+            {
+                mListView.Screen.Game.SpriteBatch.Draw( Image, new Rectangle( (int)vImagePos.X, (int)vImagePos.Y, (int)mvSize.X, (int)mvSize.Y ), Color );
+            }
         }
     }
 
