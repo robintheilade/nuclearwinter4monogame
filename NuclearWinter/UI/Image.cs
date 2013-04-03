@@ -131,7 +131,7 @@ namespace NuclearWinter.UI
 
             Point pCenter = LayoutRect.Center;
 
-            HitBox = new Rectangle(
+            HitBox = mbStretch ? LayoutRect : new Rectangle(
                 pCenter.X - ContentWidth / 2,
                 pCenter.Y - ContentHeight / 2,
                 ContentWidth,
