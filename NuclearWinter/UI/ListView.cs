@@ -94,7 +94,7 @@ namespace NuclearWinter.UI
             int iIndicatorRight = _rect.Right;
             if( mListView.ActionButtonsColumn == _iColumnIndex && mListView.HoveredRow == _row && mListView.ActionButtons.Count > 0 )
             {
-                iIndicatorRight -= mListView.ActionButtons.Sum( x => x.ContentWidth + mListView.Style.CellHorizontalPadding ) + mListView.Style.ActionButtonsRightPadding;
+                iIndicatorRight -= mListView.ActionButtons.Sum( x => x.ContentWidth + mListView.Style.IndicatorHorizontalSpacing ) + mListView.Style.ActionButtonsRightPadding;
             }
 
             miIndicatorsWidth = 0;
@@ -102,7 +102,7 @@ namespace NuclearWinter.UI
             // Indicators
             foreach( ListViewCellIndicator indicator in Indicators )
             {
-                miIndicatorsWidth += indicator.ContentWidth + mListView.Style.CellHorizontalPadding;
+                miIndicatorsWidth += indicator.ContentWidth + mListView.Style.IndicatorHorizontalSpacing;
                 indicator.DoLayout( new Rectangle ( iIndicatorRight - miIndicatorsWidth - mListView.Style.CellHorizontalPadding - mListView.Style.ActionButtonsRightPadding, _rect.Top + mListView.Style.IndicatorVerticalPadding, indicator.ContentWidth, mListView.Style.RowHeight - mListView.Style.IndicatorVerticalPadding * 2 ) );
             }
 
@@ -335,6 +335,7 @@ namespace NuclearWinter.UI
             public int              RowHeight;
             public int              RowSpacing;
             public int              CellHorizontalPadding;
+            public int              IndicatorHorizontalSpacing;
             public int              IndicatorVerticalPadding;
             public int              ActionButtonsRightPadding;
 

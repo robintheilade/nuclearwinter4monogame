@@ -81,6 +81,7 @@ namespace NuclearWinter.UI
             RowHeight=40,
             RowSpacing=0,
             CellHorizontalPadding=10,
+            IndicatorHorizontalSpacing=10,
             IndicatorVerticalPadding=10,
             ListViewFrameCornerSize=10,
             CellCornerSize=10,
