@@ -59,6 +59,7 @@ namespace NuclearWinter.UI
         public int              FirstPaneMinSize = 100;
         public int              SecondPaneMinSize = 100;
 
+        public bool             Enabled = true;
         public int              SplitterOffset;
         public bool             Collapsable;
 
@@ -324,6 +325,8 @@ namespace NuclearWinter.UI
 
         public override void OnMouseEnter( Point _hitPoint )
         {
+            if( ! Enabled ) return;
+
             mbIsHovered = true;
 
             switch( mDirection )
@@ -353,6 +356,18 @@ namespace NuclearWinter.UI
 
         public override void OnMouseMove( Point _hitPoint )
         {
+            if( ! Enabled )
+            {
+                mbIsDragging = false;
+
+                if( mbIsHovered )
+                {
+                    mbIsHovered = false;
+                    Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+                }
+                return;
+            }
+
             if( ! Collapsable && mbIsDragging )
             {
                 switch( mDirection )
@@ -375,7 +390,7 @@ namespace NuclearWinter.UI
 
         protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
+            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton || ! Enabled ) return false;
 
             if( Collapsable )
             {
@@ -409,7 +424,7 @@ namespace NuclearWinter.UI
 
         protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
         {
-            if( Collapsable )
+            if( Collapsable && Enabled )
             {
                 mbCollapsed = ! mbCollapsed;
             }
