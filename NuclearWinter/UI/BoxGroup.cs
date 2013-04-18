@@ -135,7 +135,7 @@ namespace NuclearWinter.UI
                 ContentHeight   = 0;
                 foreach( Widget child in mlChildren )
                 {
-                    ContentWidth += Math.Max( child.AnchoredRect.Width, child.ContentWidth );
+                    ContentWidth += child.AnchoredRect.HasWidth ? child.AnchoredRect.Width : child.ContentWidth;
                     ContentHeight = Math.Max( ContentHeight, child.ContentHeight );
                 }
 
@@ -152,7 +152,7 @@ namespace NuclearWinter.UI
                 ContentWidth    = 0;
                 foreach( Widget child in mlChildren )
                 {
-                    ContentHeight += Math.Max( child.AnchoredRect.Height, child.ContentHeight );
+                    ContentHeight += child.AnchoredRect.HasHeight ? child.AnchoredRect.Height : child.ContentHeight;
                     ContentWidth = Math.Max( ContentWidth, child.ContentWidth );
                 }
 
@@ -184,8 +184,8 @@ namespace NuclearWinter.UI
                 if( ! mlExpandedChildren[iIndex] )
                 {
                     iUnexpandedSize += ( mOrientation == Orientation.Horizontal ) ?
-                        Math.Max( mlChildren[iIndex].AnchoredRect.Width, mlChildren[iIndex].ContentWidth ) :
-                        Math.Max( mlChildren[iIndex].AnchoredRect.Height, mlChildren[iIndex].ContentHeight );
+                        ( mlChildren[iIndex].AnchoredRect.HasWidth ? mlChildren[iIndex].AnchoredRect.Width : mlChildren[iIndex].ContentWidth ) :
+                        ( mlChildren[iIndex].AnchoredRect.HasHeight ? mlChildren[iIndex].AnchoredRect.Height : mlChildren[iIndex].ContentHeight );
                 }
                 else
                 {
@@ -248,7 +248,10 @@ namespace NuclearWinter.UI
             {
                 Widget widget = mlChildren[iIndex];
 
-                int iWidgetSize = ( mOrientation == Orientation.Horizontal ) ? Math.Max( widget.AnchoredRect.Width, widget.ContentWidth ) : Math.Max( widget.AnchoredRect.Height, widget.ContentHeight );
+                int iWidgetSize = ( mOrientation == Orientation.Horizontal ) ? 
+                    ( mlChildren[iIndex].AnchoredRect.HasWidth ? mlChildren[iIndex].AnchoredRect.Width : mlChildren[iIndex].ContentWidth ) :
+                    ( mlChildren[iIndex].AnchoredRect.HasHeight ? mlChildren[iIndex].AnchoredRect.Height : mlChildren[iIndex].ContentHeight );
+
                 if( mlExpandedChildren[iIndex] )
                 {
                     if( iIndex < mlChildren.Count - 1 )

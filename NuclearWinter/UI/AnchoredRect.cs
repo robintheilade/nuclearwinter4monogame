@@ -25,6 +25,16 @@ namespace NuclearWinter.UI
             }
         }
 
+        public bool HasWidth
+        {
+            get { return ! Left.HasValue || ! Right.HasValue; }
+        }
+
+        public bool HasHeight
+        {
+            get { return ! Top.HasValue || ! Bottom.HasValue; }
+        }
+
         //----------------------------------------------------------------------
         public AnchoredRect( int? _iLeft, int? _iTop, int? _iRight, int? _iBottom, int _iWidth, int _iHeight )
         {
