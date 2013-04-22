@@ -23,48 +23,108 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public int StartTextBlockIndex
         {
-            get { return Math.Min( TextArea.TextBlocks.Count - 1, miStartTextBlockIndex ); }
+            get {
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    return Math.Min( TextArea.TextBlocks.Count - 1, miStartTextBlockIndex );
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set
             {
-                miStartTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
+                miStartTextBlockIndex = Math.Max( 0, Math.Min( TextArea.TextBlocks.Count - 1, value ) );
                 EndTextBlockIndex = miStartTextBlockIndex;
             }
         }
 
         public int StartOffset
         {
-            get { return (int)MathHelper.Clamp( miStartOffset, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength ); }
+            get {
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    return (int)MathHelper.Clamp( miStartOffset, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength );
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set 
             {
-                miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength );
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    miStartOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ StartTextBlockIndex ].TextLength );
+                    EndTextBlockIndex   = StartTextBlockIndex;
+                    EndOffset           = StartOffset;
+                }
+                else
+                {
+                    miStartOffset = 0;
+                    EndTextBlockIndex = 0;
+                    EndOffset = 0;
+                }
 
-                EndTextBlockIndex   = StartTextBlockIndex;
-                EndOffset           = StartOffset;
                 Timer = 0f;
             }
         }
 
         public int EndTextBlockIndex
         {
-            get { return Math.Min( TextArea.TextBlocks.Count - 1, miEndTextBlockIndex ); }
+            get {
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    return Math.Min( TextArea.TextBlocks.Count - 1, miEndTextBlockIndex );
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set
             {
-                miEndTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
                 Timer = 0f;
 
-                if( TextBlockChangedHandler != null )
+                if( TextArea.TextBlocks.Count > 0 )
                 {
-                    TextBlockChangedHandler( this );
+                    miEndTextBlockIndex = Math.Min( TextArea.TextBlocks.Count - 1, value );
+
+                    if( TextBlockChangedHandler != null )
+                    {
+                        TextBlockChangedHandler( this );
+                    }
+                }
+                else
+                {
+                    miEndTextBlockIndex = 0;
                 }
             }
         }
 
         public int EndOffset
         {
-            get { return (int)MathHelper.Clamp( miEndOffset, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength ); }
+            get { 
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    return (int)MathHelper.Clamp( miEndOffset, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength );
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set 
             {
-                miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength );
+                if( TextArea.TextBlocks.Count > 0 )
+                {
+                    miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.TextBlocks[ EndTextBlockIndex ].TextLength );
+                }
+                else
+                {
+                    miEndOffset = 0;
+                }
             }
         }
 
