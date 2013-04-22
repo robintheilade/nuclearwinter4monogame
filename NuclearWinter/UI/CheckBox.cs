@@ -31,13 +31,15 @@ namespace NuclearWinter.UI
         public Texture2D        Frame;
         public int              FrameCornerSize;
         
+        public object           Tag;
+
         //----------------------------------------------------------------------
         Label                   mLabel;
         bool                    mbIsHovered;
         Rectangle               mCheckBoxRect; 
 
         //----------------------------------------------------------------------
-        public CheckBox( Screen _screen, string _strText )
+        public CheckBox( Screen _screen, string _strText, object _tag=null )
         : base( _screen )
         {
             Frame = Screen.Style.CheckBoxFrame;
@@ -47,6 +49,8 @@ namespace NuclearWinter.UI
             mLabel.Padding = new Box( 0, 0, 0, Screen.Style.CheckBoxLabelSpacing );
 
             Padding = Screen.Style.CheckBoxPadding;
+
+            Tag = _tag;
 
             UpdateContentSize();
         }
