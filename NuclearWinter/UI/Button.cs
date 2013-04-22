@@ -227,19 +227,29 @@ namespace NuclearWinter.UI
                         )
                     );
                     break;
-                case UI.Anchor.Center:
+                case UI.Anchor.Center: {
+                    int iLabelWidth = mLabel.ContentWidth;
+                    int iLabelOffset = ContentWidth;
+
                     if( mIcon.Texture != null )
                     {
                         mIcon.DoLayout( new Rectangle( pCenter.X - ContentWidth / 2 + Padding.Left + Margin.Left, pCenter.Y - mIcon.ContentHeight / 2, mIcon.ContentWidth, mIcon.ContentHeight ) );
                     }
+                    else
+                    {
+                        iLabelWidth = Math.Min( mLabel.ContentWidth - mLabel.Padding.Horizontal, LayoutRect.Width ) + mLabel.Padding.Horizontal;
+                        iLabelOffset += iLabelWidth - mLabel.ContentWidth;
+                    }
 
                     mLabel.DoLayout(
+
                         new Rectangle(
-                            pCenter.X - ContentWidth / 2 + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
-                            mLabel.ContentWidth, mLabel.ContentHeight
+                            pCenter.X - iLabelOffset / 2 + Padding.Left + Margin.Left + ( mIcon.Texture != null ? mIcon.ContentWidth : 0 ), pCenter.Y - mLabel.ContentHeight / 2,
+                            iLabelWidth, mLabel.ContentHeight
                         )
                     );
                     break;
+                }
             }
         }
 
