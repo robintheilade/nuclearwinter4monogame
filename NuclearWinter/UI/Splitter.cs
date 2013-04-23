@@ -363,7 +363,9 @@ namespace NuclearWinter.UI
                 if( mbIsHovered )
                 {
                     mbIsHovered = false;
+#if !MONOGAME
                     Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
+#endif
                 }
                 return;
             }
