@@ -93,7 +93,7 @@ namespace NuclearWinter
         public static Keys USEnglishToLocal( Keys _key )
         {
 #if WINDOWS
-            if( _key > Keys.Z && ( _key < Keys.OemSemicolon && _key > Keys.OemTilde )  && ( _key < Keys.OemOpenBrackets && _key > Keys.OemBackslash ) ) return _key;
+            if( _key > Keys.Z && ( _key < Keys.OemSemicolon || ( _key > Keys.OemTilde && ( _key < Keys.OemOpenBrackets || _key > Keys.OemBackslash ) ) ) ) return _key;
 
             var activeScanCode = MapVirtualKeyEx((uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
             var nativeVirtualCode = MapVirtualKeyEx(activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle);
