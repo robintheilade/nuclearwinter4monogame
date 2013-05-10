@@ -585,12 +585,12 @@ namespace NuclearWinter.Input
         //----------------------------------------------------------------------
         public bool IsShortcutKeyDown()
         {
-            return ( ( ActiveShortcutKey & ShortcutKey.LeftCtrl ) == ShortcutKey.LeftCtrl && KeyboardState.IsKeyDown( Keys.LeftControl ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightCtrl ) == ShortcutKey.RightCtrl && KeyboardState.IsKeyDown( Keys.RightControl ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.LeftAlt ) == ShortcutKey.LeftAlt && KeyboardState.IsKeyDown( Keys.LeftAlt ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightAlt ) == ShortcutKey.RightAlt && KeyboardState.IsKeyDown( Keys.RightAlt ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.LeftWindows ) == ShortcutKey.LeftWindows && KeyboardState.IsKeyDown( Keys.LeftWindows ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightWindows ) == ShortcutKey.RightWindows && KeyboardState.IsKeyDown( Keys.RightWindows ) );
+            return ( ( ActiveShortcutKey & ShortcutKey.LeftCtrl ) == ShortcutKey.LeftCtrl && KeyboardState.Native.IsKeyDown( Keys.LeftControl ) && ! KeyboardState.Native.IsKeyDown( Keys.RightAlt ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightCtrl ) == ShortcutKey.RightCtrl && KeyboardState.Native.IsKeyDown( Keys.RightControl ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.LeftAlt ) == ShortcutKey.LeftAlt && KeyboardState.Native.IsKeyDown( Keys.LeftAlt ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightAlt ) == ShortcutKey.RightAlt && KeyboardState.Native.IsKeyDown( Keys.RightAlt ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.LeftWindows ) == ShortcutKey.LeftWindows && KeyboardState.Native.IsKeyDown( Keys.LeftWindows ) )
+                || ( ( ActiveShortcutKey & ShortcutKey.RightWindows ) == ShortcutKey.RightWindows && KeyboardState.Native.IsKeyDown( Keys.RightWindows ) );
         }
 
         //----------------------------------------------------------------------
