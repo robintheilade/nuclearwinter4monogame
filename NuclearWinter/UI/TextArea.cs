@@ -865,7 +865,7 @@ namespace NuclearWinter.UI
                                         iEndOffset += strTab.Length;
                                     }
 
-                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
+                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1, Math.Max( 0, iEndOffset - iLastLineBreak - 2 ) );
                                 }
                                 while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
                             }
@@ -888,7 +888,7 @@ namespace NuclearWinter.UI
                                         iEndOffset -= iSpaces;
                                     }
 
-                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1 );
+                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1, Math.Max( 0, iEndOffset - iLastLineBreak - 2 ) );
                                 }
                                 while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
                             }
