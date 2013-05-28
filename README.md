@@ -18,5 +18,5 @@ NuclearWinter development is led by [Elisée Maurer](http://twitter.com/elisee). 
 Screenshots
 -----------
 
-![CraftStudio, made with NuclearWinter](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=465281)
+[![CraftStudio, made with NuclearWinter](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=685072)](http://craftstud.io/)
 ![NuclearSample](http://download-codeplex.sec.s-msft.com/Download?ProjectName=nuclearwinter&DownloadId=465280)
