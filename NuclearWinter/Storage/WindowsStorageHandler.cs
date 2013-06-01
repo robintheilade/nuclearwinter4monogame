@@ -23,14 +23,14 @@ namespace NuclearWinter.Storage
         //----------------------------------------------------------------------
         public override BinaryReader OpenRead( string _strFilename )
         {
-            BinaryReader reader = new BinaryReader( File.OpenRead( Path.Combine( RootPath, _strFilename ) ) );
+            var reader = new BinaryReader( File.OpenRead( Path.Combine( RootPath, _strFilename ) ) );
             return reader;
         }
 
         //----------------------------------------------------------------------
         public override BinaryWriter OpenWrite( string _strFilename )
         {
-            BinaryWriter writer = new BinaryWriter( File.OpenWrite( Path.Combine( RootPath, _strFilename ) ) );
+            var writer = new BinaryWriter( File.OpenWrite( Path.Combine( RootPath, _strFilename ) ) );
             return writer;
         }
     }
