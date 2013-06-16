@@ -861,7 +861,7 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case OSKey.Tab:
-                    if( ! IsReadOnly )
+                    if( ! IsReadOnly && ! bCtrl )
                     {
                         if( Caret.HasSelection )
                         {

@@ -676,7 +676,10 @@ namespace NuclearWinter.UI
         {
             bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
 
-            NotebookTab activeTab = Tabs[ ActiveTabIndex ];
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
+
+            var activeTab = Tabs[ ActiveTabIndex ];
             if( bShortcutKey && _key == Keys.W && activeTab.IsClosable )
             {
                 activeTab.Close();
@@ -686,6 +689,22 @@ namespace NuclearWinter.UI
                 {
                     TabClosedHandler( activeTab );
                 }
+            }
+            else
+            if( bCtrl && _key == Keys.Tab )
+            {
+                if( bShift )
+                {
+                    int iActiveTabIndex = ActiveTabIndex - 1;
+                    if( iActiveTabIndex == -1 ) iActiveTabIndex = Tabs.Count - 1;
+                    ActiveTabIndex = iActiveTabIndex;
+                }
+                else
+                {
+                    ActiveTabIndex = ( ActiveTabIndex + 1 ) % Tabs.Count;
+                }
+
+                Screen.Focus( Tabs[ ActiveTabIndex ] );
             }
             else
             {

@@ -1846,7 +1846,7 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case OSKey.Tab:
-                    if( ! IsReadOnly )
+                    if( ! IsReadOnly && ! bCtrl )
                     {
                         int iNewIndentLevel = bShift ? Math.Max( 0, (int)TextBlocks[ Caret.EndTextBlockIndex ].IndentLevel - 1 ) : Math.Min( 4, (int)TextBlocks[ Caret.EndTextBlockIndex ].IndentLevel + 1 );
                         if( BlockIndentLevelChangedHandler == null || BlockIndentLevelChangedHandler( this, Caret.EndTextBlockIndex, iNewIndentLevel ) )

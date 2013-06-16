@@ -244,7 +244,9 @@ namespace NuclearWinter.UI
 
         protected internal virtual void OnOSKeyPress( OSKey _key )
         {
-            if( _key == OSKey.Tab )
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+
+            if( ! bCtrl && _key == OSKey.Tab )
             {
                 List<Direction> directions = new List<Direction>();
 
