@@ -167,7 +167,7 @@ namespace NuclearWinter.UI
                 iOffset += TextArea.WrappedLines[ iLine ].Item1.Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX, TextArea.WrappedLines[ iBlockLineIndex ].Item1, TextArea.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX( _iX, TextArea.WrappedLines[ iBlockLineIndex ].Item1, TextArea.Style.Font );
             iOffset += iOffsetInLine;
             if( _iLine < TextArea.WrappedLines.Count - 1 && iOffsetInLine == TextArea.WrappedLines[ iBlockLineIndex ].Item1.Length )
             {
@@ -219,7 +219,7 @@ namespace NuclearWinter.UI
 
         int ComputeCaretOffsetAtX( int _iX, string _strText, UIFont _font )
         {
-            // FIXME: This does many calls to Font.MeasureString
+            // FIXME: This does many calls to Style.Font.MeasureString
             // We should do a binary search instead!
             int iIndex = 0;
             float fPreviousX = 0f;
@@ -330,6 +330,26 @@ namespace NuclearWinter.UI
     //--------------------------------------------------------------------------
     public class TextArea: Widget
     {
+        public class TextAreaStyle
+        {
+            public UIFont Font;
+            public UIFont BoldFont;
+
+            public Color CommentColor = new Color( 0, 128, 0 );
+
+            public Color StringColor = new Color( 128, 128, 128 );
+            public Color NumberColor = new Color( 255, 0, 0 );
+
+            public Color KeywordColor = new Color( 0, 0, 255 );
+            public bool KeywordBold = true;
+
+            public Color CustomKeywordColor = new Color( 0, 0, 128 );
+            public bool CustomKeywordBold = true;
+            public string[] CustomKeywords = {};
+        }
+
+        public TextAreaStyle Style = new TextAreaStyle();
+
         //----------------------------------------------------------------------
         public string           Text
         {
@@ -366,7 +386,7 @@ namespace NuclearWinter.UI
                 if( mstrText[i] == '\n' ) iLines++;
             }
 
-            miGutterWidth = (int)Font.MeasureString( ( iLines + 1 ).ToString() ).X + Padding.Right;
+            miGutterWidth = (int)Style.Font.MeasureString( ( iLines + 1 ).ToString() ).X + Padding.Right;
         }
 
         int                     miGutterWidth;
@@ -397,14 +417,17 @@ namespace NuclearWinter.UI
 
         public bool             IsReadOnly;
 
+        // FIXME: Properly support generic syntax highlighting instead
+        // This is just a quick hack
+        public bool             EnableLuaHighlight;
+
         // FIXME: Use EventHandler for those?
         public Func<TextArea,int,string,bool>           TextInsertedHandler;
         public Func<TextArea,int,int,bool>              TextRemovedHandler;
         public Action<TextCaret>                        CaretMovedHandler;
 
         //----------------------------------------------------------------------
-        public UIFont           Font;
-        public int              LineHeight  { get { return Font.LineSpacing; } }
+        public int              LineHeight  { get { return Style.Font.LineSpacing; } }
 
         //----------------------------------------------------------------------
         public Scrollbar        Scrollbar           { get; private set; }
@@ -422,7 +445,8 @@ namespace NuclearWinter.UI
         public TextArea( Screen _screen )
         : base( _screen )
         {
-            Font            = Screen.Style.ParagraphFont;
+            Style.Font      = Screen.Style.ParagraphFont;
+            Style.BoldFont  = Screen.Style.ParagraphFont;
             Text            = "";
             mbWrapTextNeeded = true;
             Caret           = new TextCaret( this );
@@ -566,7 +590,7 @@ namespace NuclearWinter.UI
                 else
                 {
                     _iLine = iLine;
-                    return new Point( (int)Font.MeasureString( lineTuple.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X, iLine * LineHeight );
+                    return new Point( (int)Style.Font.MeasureString( lineTuple.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X, iLine * LineHeight );
                 }
 
                 iLine++;
@@ -580,7 +604,7 @@ namespace NuclearWinter.UI
         public void DoWrap( int _iWidth )
         {
             int iActualWidth = _iWidth;
-            mlWrappedLines = Screen.Game.WrapText( Font, Text, iActualWidth );
+            mlWrappedLines = Screen.Game.WrapText( Style.Font, Text, iActualWidth );
             mbWrapTextNeeded = false;
         }
 
@@ -1192,6 +1216,23 @@ namespace NuclearWinter.UI
             Scrollbar.Update( _fElapsedTime );
         }
 
+        enum HighlightType
+        {
+            None,
+            QuotedString,
+            DoubleQuotedString,
+            Number,
+            InlineComment,
+            BlockComment
+        }
+        
+        string[] LuaKeywords = { 
+            "and",      "break",    "do",       "else",         "elseif",
+            "end",      "false",    "for",      "function",     "if",
+            "in",       "local",    "nil",      "not",          "or",
+            "repeat",   "return",   "then",     "true",         "until",    "while"
+        };
+
         //----------------------------------------------------------------------
         public override void Draw()
         {
@@ -1212,23 +1253,201 @@ namespace NuclearWinter.UI
             int iLine = 1;
             bool bNewLine = true;
 
+            HighlightType hlType = HighlightType.None;
+
             foreach( Tuple<string,bool> lineTuple in WrappedLines )
             {
-                if( DisplayLineNumbers && bNewLine )
+                string strText = lineTuple.Item1;
+
+                if( bNewLine )
                 {
-                    string strLineNumber = iLine.ToString();
-                    int iWidth = (int)Font.MeasureString( strLineNumber ).X;
-                    Screen.Game.SpriteBatch.DrawString( Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor * 0.5f );
+                    if( DisplayLineNumbers )
+                    {
+                        string strLineNumber = iLine.ToString();
+                        int iWidth = (int)Style.Font.MeasureString( strLineNumber ).X;
+                        Screen.Game.SpriteBatch.DrawString( Style.Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor * 0.5f );
+                    }
+
                     bNewLine = false;
                 }
 
-                Screen.Game.SpriteBatch.DrawString( Font, lineTuple.Item1, new Vector2( iX, iY + Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
-                iY += Font.LineSpacing;
+                if( ! EnableLuaHighlight )
+                {
+                    Screen.Game.SpriteBatch.DrawString( Style.Font, strText, new Vector2( iX, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
+                }
+                else
+                {
+                    var color = Screen.Style.DefaultTextColor;
+                    var font = Style.Font;
+                    int iXOffset = 0;
+                    string strAccumulator = "";
+
+                    int iOffset = 0;
+                    bool bCharIsAlpha = false;
+
+                    while( iOffset < strText.Length )
+                    {
+                        char newChar = strText[iOffset];
+
+                        bool bPrevCharIsAlpha = bCharIsAlpha;
+                        bCharIsAlpha = ( newChar >= 'A' && newChar <= 'Z' ) || ( newChar >= 'a' && newChar <= 'z' );
+
+                        if( ! bCharIsAlpha || bCharIsAlpha != bPrevCharIsAlpha )
+                        {
+                            bool bAddCharAfter = true;
+
+                            if( hlType == HighlightType.BlockComment )
+                            {
+                                if( newChar == ']' && ( iOffset > 0 ) && strText[iOffset - 1] == ']' )
+                                {
+                                    bAddCharAfter = false;
+                                    hlType = HighlightType.None;
+                                }
+                            }
+                            else
+                            if( hlType == HighlightType.InlineComment )
+                            {
+                                
+                            }
+                            else
+                            if( hlType == HighlightType.QuotedString )
+                            {
+                                if( newChar == '\''  && ( iOffset == 0 || strText[iOffset - 1] != '\\' ) )
+                                {
+                                    color = Style.StringColor;
+                                    hlType = HighlightType.None;
+                                    bAddCharAfter = false;
+                                }
+                            }
+                            else
+                            if( hlType == HighlightType.DoubleQuotedString )
+                            {
+                                if( newChar == '"'  && ( iOffset == 0 || strText[iOffset - 1] != '\\' ) )
+                                {
+                                    color = Style.StringColor;
+                                    hlType = HighlightType.None;
+                                    bAddCharAfter = false;
+                                }
+                            }
+                            else
+                            if( hlType == HighlightType.Number )
+                            {
+                                if( ! bCharIsAlpha && ! ( newChar >= '0' && newChar <= '9' ) )
+                                {
+                                    color = Style.NumberColor;
+                                    hlType = HighlightType.None;
+                                }
+                            }
+                            else
+                            if( newChar == '\'' )
+                            {
+                                if( hlType == HighlightType.None )
+                                {
+                                    hlType = HighlightType.QuotedString;
+                                }
+                            }
+                            else
+                            if( newChar == '"' )
+                            {
+                                if( hlType == HighlightType.None )
+                                {
+                                    hlType = HighlightType.DoubleQuotedString;
+                                }
+                            }
+                            else
+                            if( ( newChar >= '0' && newChar <= '9' ) )
+                            {
+                                if( ! bPrevCharIsAlpha && hlType == HighlightType.None )
+                                {
+                                    hlType = HighlightType.Number;
+                                }
+                            }
+                            else
+                            if( newChar == '-' && ( iOffset < strText.Length - 1) && strText[iOffset + 1] == '-' )
+                            {
+                                if( iOffset < strText.Length - 3 && strText[iOffset + 2] == '[' && strText[iOffset + 3]  == '[' )
+                                {
+                                    hlType = HighlightType.BlockComment;
+                                }
+                                else
+                                {
+                                    hlType = HighlightType.InlineComment;
+                                }
+                            }
+                            else
+                            if( LuaKeywords.Contains( strAccumulator ) )
+                            {
+                                color = Style.KeywordColor;
+                                font = Style.KeywordBold ? Style.BoldFont : Style.Font;
+                            }
+                            else
+                            if( Style.CustomKeywords.Contains( strAccumulator ) )
+                            {
+                                color = Style.CustomKeywordColor;
+                                font = Style.CustomKeywordBold ? Style.BoldFont : Style.Font;
+                            }
+                            else
+                            {
+                                color = Screen.Style.DefaultTextColor;
+                            }
+
+                            if( ! bAddCharAfter )
+                            {
+                                strAccumulator += newChar;
+                            }
+
+                            Screen.Game.SpriteBatch.DrawString( font, strAccumulator, new Vector2( iX + iXOffset, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), color );
+                            iXOffset += (int)font.MeasureString( strAccumulator ).X;
+
+                            strAccumulator = "";
+                            font = Style.Font;
+
+                            if( bAddCharAfter )
+                            {
+                                strAccumulator += newChar;
+                            }
+
+                            switch( hlType )
+                            {
+                                case HighlightType.BlockComment:
+                                case HighlightType.InlineComment:
+                                    color = Style.CommentColor;
+                                    break;
+
+                                case HighlightType.QuotedString:
+                                case HighlightType.DoubleQuotedString:
+                                    color = Style.StringColor;
+                                    break;
+
+                                case HighlightType.Number:
+                                    color = Style.NumberColor;
+                                    break;
+
+                                case HighlightType.None:
+                                    color = Screen.Style.DefaultTextColor;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            strAccumulator += newChar;
+                        }
+
+                        iOffset++;
+                    }
+                }
+
+                iY += Style.Font.LineSpacing;
 
                 if( lineTuple.Item2 )
                 {
                     iLine++;
                     bNewLine = true;
+
+                    if( hlType == HighlightType.InlineComment )
+                    {
+                        hlType = HighlightType.None;
+                    }
                 }
             }
 
