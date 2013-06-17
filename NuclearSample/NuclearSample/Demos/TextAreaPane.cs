@@ -15,7 +15,7 @@ namespace NuclearSample.Demos
         : base( _manager )
         {
             NuclearUI.TextArea textArea = new NuclearUI.TextArea( Manager.MenuScreen );
-            textArea.Font = new NuclearUI.UIFont( Manager.Content.Load<SpriteFont>( "Fonts/MediumMonoFont" ) );
+            textArea.Style.Font = new NuclearUI.UIFont( Manager.Content.Load<SpriteFont>( "Fonts/MediumMonoFont" ) );
             textArea.DisplayLineNumbers = true;
 
             AddChild( textArea );
