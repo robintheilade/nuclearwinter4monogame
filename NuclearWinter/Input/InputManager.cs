@@ -126,7 +126,7 @@ namespace NuclearWinter.Input
         // inside MonoGame.
         public override void KeyDown(NSEvent theEvent)
         {
-            NSKey theKey = (NSKey)Enum.ToObject(typeof(NSKey), theEvent.KeyCode);
+            NSKey theKey = (NSKey)theEvent.KeyCode;
             // Under MacOS, the backspace key is called ˝Delete˝, and the delete key is called ForwardDelete.
             // Well, this unfortunately collides with the XNA's ˝Delete˝ definition of the normal delete key.
             // So, we swap the notion of ˝Delete˝ and ˝ForwardDelete˝ there. This is kind of hackish, but
@@ -149,8 +149,22 @@ namespace NuclearWinter.Input
             }
             // Signalling NuclearWinter of the ˝OS˝ key that has been pushed.
             JustPressedKey(theKey);
+
+            // Create EnterText events for various keys
+            switch( theKey )
+            {
+                case NSKey.ForwardDelete: // NOTE: actually backspace
+                    EnterText( (char)0x08 );
+                    break;
+
+                case NSKey.Return:
+                    EnterText( (char)0x0d );
+                    break;
+            }
+
             // Passing down the event to the OS, to get a nice interpretation.
-            InterpretKeyEvents(new NSEvent[] { theEvent} );
+            InterpretKeyEvents(new NSEvent[] { theEvent });
+
             GameView.KeyDown(theEvent);
         }
 
