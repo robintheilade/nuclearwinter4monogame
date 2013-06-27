@@ -46,7 +46,7 @@ namespace NuclearWinter.Input
                 Application.RemoveMessageFilter( this );
                 mbIsDisposed = true;
             }
-            }
+        }
 
         //---------------------------------------------------------------------
         bool IMessageFilter.PreFilterMessage( ref Message _message )
