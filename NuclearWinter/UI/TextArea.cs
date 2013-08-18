@@ -1087,7 +1087,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         int GetPreviousCaretStop( int _iOffset )
         {
-            if( _iOffset > 0 && mstrText[ _iOffset ] != '\n' )
+            if( _iOffset > 0 && _iOffset < mstrText.Length && mstrText[ _iOffset ] != '\n' )
             {
                 int iPreviousWordOffset = _iOffset;
                 char startChar = mstrText[ iPreviousWordOffset ];
