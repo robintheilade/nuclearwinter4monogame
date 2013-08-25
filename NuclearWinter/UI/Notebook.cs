@@ -704,6 +704,8 @@ namespace NuclearWinter.UI
                     ActiveTabIndex = ( ActiveTabIndex + 1 ) % Tabs.Count;
                 }
 
+                Tabs[ActiveTabIndex].IsUnread = false;
+
                 Screen.Focus( Tabs[ ActiveTabIndex ] );
             }
             else
