@@ -1283,16 +1283,18 @@ namespace NuclearWinter.UI
                     string strAccumulator = "";
 
                     int iOffset = 0;
-                    bool bCharIsAlpha = false;
+                    bool bCharIsAlphanumeric = false;
 
                     while( iOffset < strText.Length )
                     {
                         char newChar = strText[iOffset];
 
-                        bool bPrevCharIsAlpha = bCharIsAlpha;
-                        bCharIsAlpha = ( newChar >= 'A' && newChar <= 'Z' ) || ( newChar >= 'a' && newChar <= 'z' );
+                        bool bPrevCharIsAlphanumeric = bCharIsAlphanumeric;
+                        bool bCharIsAlpha = ( newChar >= 'A' && newChar <= 'Z' ) || ( newChar >= 'a' && newChar <= 'z' );
+                        bool bCharIsNumeric = ( newChar >= '0' && newChar <= '9' );
+                        bCharIsAlphanumeric = bCharIsAlpha || bCharIsNumeric;
 
-                        if( ! bCharIsAlpha || bCharIsAlpha != bPrevCharIsAlpha )
+                        if( ! bCharIsAlphanumeric || ! bPrevCharIsAlphanumeric )
                         {
                             bool bAddCharAfter = true;
 
@@ -1332,7 +1334,7 @@ namespace NuclearWinter.UI
                             else
                             if( hlType == HighlightType.Number )
                             {
-                                if( ! bCharIsAlpha && ! ( newChar >= '0' && newChar <= '9' ) )
+                                if( ! bCharIsAlphanumeric )
                                 {
                                     color = Style.NumberColor;
                                     hlType = HighlightType.None;
@@ -1355,9 +1357,9 @@ namespace NuclearWinter.UI
                                 }
                             }
                             else
-                            if( ( newChar >= '0' && newChar <= '9' ) )
+                            if( bCharIsNumeric && ! bPrevCharIsAlphanumeric )
                             {
-                                if( ! bPrevCharIsAlpha && hlType == HighlightType.None )
+                                if( hlType == HighlightType.None )
                                 {
                                     hlType = HighlightType.Number;
                                 }
