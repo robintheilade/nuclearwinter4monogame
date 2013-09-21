@@ -1257,23 +1257,26 @@ namespace NuclearWinter.UI
 
             foreach( Tuple<string,bool> lineTuple in WrappedLines )
             {
+                float fTextY = iY + Style.Font.YOffset - Scrollbar.LerpOffset;
+                if( fTextY > LayoutRect.Bottom ) break;
+
+                bool bDraw = fTextY >= LayoutRect.Top - Style.Font.LineSpacing;
+
                 string strText = lineTuple.Item1;
 
-                if( bNewLine )
+                if( bDraw && bNewLine &&  DisplayLineNumbers )
                 {
-                    if( DisplayLineNumbers )
-                    {
-                        string strLineNumber = iLine.ToString();
-                        int iWidth = (int)Style.Font.MeasureString( strLineNumber ).X;
-                        Screen.Game.SpriteBatch.DrawString( Style.Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor * 0.5f );
-                    }
-
-                    bNewLine = false;
+                    string strLineNumber = iLine.ToString();
+                    int iWidth = (int)Style.Font.MeasureString( strLineNumber ).X;
+                    Screen.Game.SpriteBatch.DrawString( Style.Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, fTextY ), Screen.Style.DefaultTextColor * 0.5f );
                 }
 
                 if( ! EnableLuaHighlight )
                 {
-                    Screen.Game.SpriteBatch.DrawString( Style.Font, strText, new Vector2( iX, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), Screen.Style.DefaultTextColor );
+                    if( bDraw )
+                    {
+                        Screen.Game.SpriteBatch.DrawString( Style.Font, strText, new Vector2( iX, fTextY ), Screen.Style.DefaultTextColor );
+                    }
                 }
                 else
                 {
@@ -1398,8 +1401,11 @@ namespace NuclearWinter.UI
                                 strAccumulator += newChar;
                             }
 
-                            Screen.Game.SpriteBatch.DrawString( font, strAccumulator, new Vector2( iX + iXOffset, iY + Style.Font.YOffset - Scrollbar.LerpOffset ), color );
-                            iXOffset += (int)font.MeasureString( strAccumulator ).X;
+                            if( fTextY >= LayoutRect.Top - Style.Font.LineSpacing )
+                            {
+                                Screen.Game.SpriteBatch.DrawString( font, strAccumulator, new Vector2( iX + iXOffset, fTextY ), color );
+                                iXOffset += (int)font.MeasureString( strAccumulator ).X;
+                            }
 
                             strAccumulator = "";
                             font = Style.Font;
@@ -1440,6 +1446,7 @@ namespace NuclearWinter.UI
                 }
 
                 iY += Style.Font.LineSpacing;
+                bNewLine = false;
 
                 if( lineTuple.Item2 )
                 {
