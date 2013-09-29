@@ -245,7 +245,7 @@ namespace NuclearWinter.UI
             string strPastedText = null;
             try
             {
-                System.Windows.Forms.Clipboard.GetText();
+                strPastedText = System.Windows.Forms.Clipboard.GetText();
             } catch {}
 #else
             var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
