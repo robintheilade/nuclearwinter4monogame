@@ -697,7 +697,10 @@ namespace NuclearWinter.UI
                 // NOTE: For this to work, you must put [STAThread] before your Main()
                 
                 // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
-                System.Windows.Forms.Clipboard.SetText( strText ); //, System.Windows.Forms.TextDataFormat.Html );
+                try
+                {
+                    System.Windows.Forms.Clipboard.SetText( strText ); //, System.Windows.Forms.TextDataFormat.Html );
+                } catch {}
 #else
                 var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
                 pasteBoard.ClearContents();
@@ -715,7 +718,11 @@ namespace NuclearWinter.UI
             
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
             // GetText( System.Windows.Forms.TextDataFormat.Html );
-            string strPastedText = System.Windows.Forms.Clipboard.GetText();
+            string strPastedText = null;
+            try
+            {
+                System.Windows.Forms.Clipboard.GetText();
+            } catch {}
 #else
             var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
             string strPastedText = pasteBoard.GetStringForType( MonoMac.AppKit.NSPasteboard.NSStringType );

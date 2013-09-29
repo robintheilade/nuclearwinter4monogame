@@ -226,7 +226,10 @@ namespace NuclearWinter.UI
 
 #if !MONOMAC
                 // NOTE: For this to work, you must put [STAThread] before your Main()
-                System.Windows.Forms.Clipboard.SetText( strText );
+                try
+                {
+                    System.Windows.Forms.Clipboard.SetText( strText );
+                } catch {}
 #else
                 var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
                 pasteBoard.ClearContents();
@@ -239,7 +242,11 @@ namespace NuclearWinter.UI
         {
 #if !MONOMAC
             // NOTE: For this to work, you must put [STAThread] before your Main()
-            string strPastedText = System.Windows.Forms.Clipboard.GetText();
+            string strPastedText = null;
+            try
+            {
+                System.Windows.Forms.Clipboard.GetText();
+            } catch {}
 #else
             var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
             string strPastedText = pasteBoard.GetStringForType( MonoMac.AppKit.NSPasteboard.NSStringType );
