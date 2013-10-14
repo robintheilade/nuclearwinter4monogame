@@ -29,6 +29,18 @@ namespace NuclearWinter.Audio
             get { return effect.Volume; }
             set { effect.Volume = MathHelper.Clamp(value, 0, 1); }
         }
+
+        public float Pan
+        {
+            get { return effect.Pan; }
+            set { effect.Pan = value; }
+        }
+
+        public float Pitch
+        {
+            get { return effect.Pitch; }
+            set { effect.Pitch = value; }
+        }
         
         public bool IsLooped { get; set; }
         
