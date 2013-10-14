@@ -1,0 +1,2 @@
+NVorbis with additional fixes & improvements by Renaud Bedard
+https://github.com/renaudbedard/nvorbis/commit/66e42f1d75f899dec3227ee8c50bc80cf15225d2
