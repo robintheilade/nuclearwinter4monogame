@@ -135,6 +135,7 @@ namespace NuclearWinter.Audio
             if (thread == null)
             {
                 thread = new Thread(StreamThread);
+                thread.IsBackground = true;
                 thread.Start();
             }
         }
