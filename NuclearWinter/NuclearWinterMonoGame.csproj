@@ -96,6 +96,9 @@
       <HintPath>..\MonoGame\MonoMac.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="NVorbis">
+      <HintPath>..\NVorbis\NVorbis.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AABB.cs" />
@@ -118,6 +121,7 @@
     </Compile>
     <Compile Include="Input\Accelerometer.cs" />
     <Compile Include="Input\WindowMessageFilter.cs" />
+    <Compile Include="Sound\OggSong.cs" />
     <Compile Include="Storage\StorageHandler.cs" />
     <Compile Include="Storage\WindowsStorageHandler.cs" />
     <Compile Include="Storage\XboxStorageHandler.cs" />
