@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using NVorbis;
 using System.IO;
  
-namespace NuclearWinter.Sound
+namespace NuclearWinter.Audio
 {
     // Based on https://gist.github.com/nickgravelyn/5580531
     public class OggSong : IDisposable
