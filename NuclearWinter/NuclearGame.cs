@@ -125,7 +125,7 @@ namespace NuclearWinter
             ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
 #else
             NSError error;
-            ApplicationDataFolderPath = NSFileManager.DefaultManager.GetUrl( NSSearchPathDirectory.LibraryDirectory, NSSearchPathDomain.User, new NSUrl(), true, out error ).Path;
+            ApplicationDataFolderPath = NSFileManager.DefaultManager.GetUrl( NSSearchPathDirectory.LibraryDirectory, NSSearchPathDomain.User, new NSUrl(""), true, out error ).Path;
 #endif
         }
 
