@@ -78,8 +78,16 @@ namespace NuclearWinter.Audio
  
         protected void Dispose(bool isDisposing)
         {
-            threadRunHandle.Set();
-            effect.Dispose();
+            // They might be null if the constructor threw an exception
+            if( threadRunHandle != null )
+            {
+                threadRunHandle.Set();
+            }
+
+            if( effect != null )
+            {
+                effect.Dispose();
+            }
         }
  
         public void Play()
