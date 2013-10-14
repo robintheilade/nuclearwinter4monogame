@@ -167,10 +167,19 @@ namespace NuclearWinter.Audio
                 int samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
                 
                 // out of data and looping? reset the reader and read again
-                if (samplesRead == 0 && IsLooped)
+                if (samplesRead == 0)
                 {
-                    reader.DecodedTime = TimeSpan.Zero;
-                    samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
+                    if (IsLooped)
+                    {
+                        reader.DecodedTime = TimeSpan.Zero;
+                        samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
+                    }
+                    else
+                    {
+                        // Song is over, stop thread
+                        thread = null;
+                        break;
+                    }
                 }
                 
                 if (samplesRead > 0)
