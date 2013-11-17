@@ -3,7 +3,7 @@ NuclearWinter
 
 _NuclearWinter_ is a set of libraries to develop games and applications using XNA and [MonoGame](http://github.com/mono/monogame).
 
-This repository contains the core of NuclearWinter, featuring game state management, screen resolution handling, an input manager and an user interface library.
+This repository contains the core of NuclearWinter, featuring game state management, screen resolution handling, an input manager and a user interface library.
 
 NuclearWinter used to contain the VectorLevel library for rendering 2D levels based on SVG files edited with [Inkscape](http://inksape.org/), but it has been removed for now as it is currently unmaintained. You can still find it in older revisions. It might be ressurected as a separate repository at some point in the future.
 
