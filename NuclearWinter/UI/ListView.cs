@@ -805,8 +805,6 @@ namespace NuclearWinter.UI
                         Rows.Insert( iIndex, draggedRow );
                     }
                 }
-
-                IsDragging = false;
             }
             else
             if( mbIsHoveringNewRow )
@@ -820,6 +818,8 @@ namespace NuclearWinter.UI
             {
                 SelectRowAt( _hitPoint );
             }
+
+            IsDragging = false;
         }
 
         //----------------------------------------------------------------------
