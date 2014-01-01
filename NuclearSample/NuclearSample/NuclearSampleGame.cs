@@ -64,7 +64,7 @@ namespace NuclearSample
             if( Form.ClientSize.Width != GraphicsDevice.Viewport.Width
             ||  Form.ClientSize.Height != GraphicsDevice.Viewport.Height )
             {
-                PresentationParameters updatedPresentationParams = GraphicsDevice.PresentationParameters.Clone();
+                var updatedPresentationParams = GraphicsDevice.PresentationParameters.Clone();
                 updatedPresentationParams.BackBufferWidth   = Form.ClientSize.Width;
                 updatedPresentationParams.BackBufferHeight  = Form.ClientSize.Height;
                 GraphicsDevice.Reset( updatedPresentationParams );

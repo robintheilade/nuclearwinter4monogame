@@ -14,7 +14,7 @@ namespace NuclearSample.Demos
         public TextAreaPane( MainMenuManager _manager )
         : base( _manager )
         {
-            NuclearUI.TextArea textArea = new NuclearUI.TextArea( Manager.MenuScreen );
+            var textArea = new NuclearUI.TextArea( Manager.MenuScreen );
             textArea.Style.Font = new NuclearUI.UIFont( Manager.Content.Load<SpriteFont>( "Fonts/MediumMonoFont" ) );
             textArea.DisplayLineNumbers = true;
 

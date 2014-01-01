@@ -28,12 +28,12 @@ namespace NuclearSample
             mSplitter.FirstPaneMinSize = 200;
 
             // Demo list
-            NuclearUI.BoxGroup demosBoxGroup = new NuclearUI.BoxGroup( MenuScreen, NuclearUI.Orientation.Vertical, 0, NuclearUI.Anchor.Start );
+            var demosBoxGroup = new NuclearUI.BoxGroup( MenuScreen, NuclearUI.Orientation.Vertical, 0, NuclearUI.Anchor.Start );
             mSplitter.FirstPane = demosBoxGroup;
 
             mDemoPanel = new NuclearUI.Panel( MenuScreen, Content.Load<Texture2D>( "Sprites/UI/Panel04" ), MenuScreen.Style.PanelCornerSize );
 
-            Demos.BasicDemoPane basicDemoPane = new Demos.BasicDemoPane( this );
+            var basicDemoPane = new Demos.BasicDemoPane( this );
             mSplitter.SecondPane = mDemoPanel;
 
             mDemoPanel.AddChild( basicDemoPane );
@@ -47,7 +47,7 @@ namespace NuclearSample
         //----------------------------------------------------------------------
         NuclearUI.Button CreateDemoButton( string _strDemoName, NuclearUI.ManagerPane<MainMenuManager> _demoPane )
         {
-            NuclearUI.Button demoPaneButton = new NuclearUI.Button( MenuScreen, _strDemoName );
+            var demoPaneButton = new NuclearUI.Button( MenuScreen, _strDemoName );
             demoPaneButton.ClickHandler = delegate {
                 mDemoPanel.Clear();
                 mDemoPanel.AddChild( _demoPane );

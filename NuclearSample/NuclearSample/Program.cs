@@ -8,11 +8,11 @@ namespace NuclearSample
         {
             // This sample uses an ApplicationMutex to prevent running the game multiple times at once.
             // Useful for games where progress or settings might be overwritten if two instances are running at the same time.
-            using( NuclearWinter.ApplicationMutex mutex = new NuclearWinter.ApplicationMutex() )
+            using( var mutex = new NuclearWinter.ApplicationMutex() )
             {
                 if( mutex.HasHandle )
                 {
-                    using( NuclearSampleGame game = new NuclearSampleGame() )
+                    using( var game = new NuclearSampleGame() )
                     {
                         game.Run();
                     }

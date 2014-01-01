@@ -22,7 +22,7 @@ namespace NuclearSample.Demos
         {
             int iRows = 3;
 
-            NuclearUI.GridGroup gridGroup = new NuclearUI.GridGroup( Manager.MenuScreen, 2, iRows, false, 0 );
+            var gridGroup = new NuclearUI.GridGroup( Manager.MenuScreen, 2, iRows, false, 0 );
             gridGroup.AnchoredRect = NuclearUI.AnchoredRect.CreateTopLeftAnchored( 0, 0, 400, iRows * 50 );
             AddChild( gridGroup );
 
@@ -33,7 +33,7 @@ namespace NuclearSample.Demos
 
             {
 
-                List<NuclearUI.DropDownItem> lItems = new List<NuclearUI.DropDownItem>();
+                var lItems = new List<NuclearUI.DropDownItem>();
                 lItems.Add( new NuclearUI.DropDownItem( Manager.MenuScreen, "Chocolate", Flavor.Chocolate ) );
                 lItems.Add( new NuclearUI.DropDownItem( Manager.MenuScreen, "Vanilla", Flavor.Vanilla ) );
                 lItems.Add( new NuclearUI.DropDownItem( Manager.MenuScreen, "Cheese", Flavor.Cheese ) );
@@ -48,7 +48,7 @@ namespace NuclearSample.Demos
             gridGroup.AddChildAt( new NuclearUI.Label( Manager.MenuScreen, "Choose Cone Size", NuclearUI.Anchor.Start ), 0, iRowIndex );
 
             {
-                NuclearUI.Slider sizeSlider = new NuclearUI.Slider( Manager.MenuScreen, 1, 5, 1, 1 );
+                var sizeSlider = new NuclearUI.Slider( Manager.MenuScreen, 1, 5, 1, 1 );
                 gridGroup.AddChildAt( sizeSlider, 1, iRowIndex );
             }
 
@@ -58,7 +58,7 @@ namespace NuclearSample.Demos
             gridGroup.AddChildAt( new NuclearUI.Label( Manager.MenuScreen, "Clicky clicky", NuclearUI.Anchor.Start ), 0, iRowIndex );
 
             {
-                NuclearUI.Button button = new NuclearUI.Button( Manager.MenuScreen, "Get Ice Cream!" );
+                var button = new NuclearUI.Button( Manager.MenuScreen, "Get Ice Cream!" );
                 button.ClickHandler = delegate {
                     Manager.MessagePopup.Setup( "Oh noes!", "It melted already. Sorry.", NuclearWinter.i18n.Common.Close, false );
                     Manager.MessagePopup.Open( 600, 250 );
