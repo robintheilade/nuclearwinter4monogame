@@ -205,7 +205,10 @@ namespace NuclearWinter.Audio
                     {
                         // ensure the effect isn't disposed
                         if (effect.IsDisposed) { break; }
-    
+                        
+                        // ensure the number of samples read is block-aligned
+                        samplesRead += samplesRead % (reader.Channels * 2);
+
                         effect.SubmitBuffer(buffer, 0, samplesRead);
                         effect.SubmitBuffer(buffer, samplesRead, samplesRead);
                     }
