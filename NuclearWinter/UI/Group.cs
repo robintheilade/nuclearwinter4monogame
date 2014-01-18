@@ -16,7 +16,7 @@ namespace NuclearWinter.UI
     {
         protected List<Widget> mlChildren;
 
-        public void Clear()
+        public virtual void Clear()
         {
             mlChildren.RemoveAll( delegate(Widget _widget) { _widget.Parent = null; return true; } );
             UpdateContentSize();

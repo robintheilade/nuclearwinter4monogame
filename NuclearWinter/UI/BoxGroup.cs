@@ -66,6 +66,12 @@ namespace NuclearWinter.UI
             UpdateContentSize();
         }
 
+        public override void Clear()
+        {
+            base.Clear();
+            mlExpandedChildren.Clear();
+        }
+
         //----------------------------------------------------------------------
         public override Widget GetFirstFocusableDescendant( Direction _direction )
         {
