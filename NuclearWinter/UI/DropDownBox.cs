@@ -309,7 +309,7 @@ namespace NuclearWinter.UI
         {
             if( IsOpen )
             {
-                int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta / 120 * 3, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
+                int iNewScrollOffset = (int)MathHelper.Clamp( ScrollItemOffset - _iDelta * 3 / 120, 0, Math.Max( 0, Items.Count - siMaxLineDisplayed ) );
                 miHoveredItemIndex += iNewScrollOffset - ScrollItemOffset;
                 ScrollItemOffset = iNewScrollOffset;
             }

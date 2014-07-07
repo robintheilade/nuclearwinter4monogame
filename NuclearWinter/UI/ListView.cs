@@ -724,7 +724,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
         {
-            DoScroll( -_iDelta / 120 * 3 * ( Style.RowHeight + Style.RowSpacing ) );
+            DoScroll( -_iDelta * 3 * ( Style.RowHeight + Style.RowSpacing ) / 120 );
         }
 
         //----------------------------------------------------------------------

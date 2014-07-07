@@ -511,7 +511,7 @@ namespace NuclearWinter.UI
                 return;
             }
 
-            DoScroll( -_iDelta / 120 * 50 );
+            DoScroll( -_iDelta * 50 / 120 );
         }
 
         //----------------------------------------------------------------------
