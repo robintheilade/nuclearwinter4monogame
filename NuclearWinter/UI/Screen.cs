@@ -263,7 +263,7 @@ namespace NuclearWinter.UI
                     }
                 }
                 else
-                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
+                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
                 {
                     if( mbHasActivatedFocusedWidget )
                     {
