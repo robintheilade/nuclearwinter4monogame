@@ -185,18 +185,12 @@ namespace NuclearWinter.Input
 
             mbDoubleClicked = false;
 
-#if MONOGAME
+#if FNA
             if( WasMouseButtonJustPressed( PrimaryMouseButton ) )
             {
-#if !MONOMAC
                 float fDoubleClickTime = System.Windows.Forms.SystemInformation.DoubleClickTime / 1000f;
                 int iDoubleClickWidth = System.Windows.Forms.SystemInformation.DoubleClickSize.Width;
                 int iDoubleClickHeight = System.Windows.Forms.SystemInformation.DoubleClickSize.Height;
-#else
-                float fDoubleClickTime = 0.5f;
-                int iDoubleClickWidth = 4;
-                int iDoubleClickHeight = 4;
-#endif
 
                 if( mfTimeSinceLastClick <= fDoubleClickTime )
                 {

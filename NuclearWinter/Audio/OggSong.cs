@@ -1,5 +1,4 @@
-﻿#if ! MONOGAME
-using System;
+﻿using System;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -220,4 +219,3 @@ namespace NuclearWinter.Audio
         }
     }
 }
-#endif
