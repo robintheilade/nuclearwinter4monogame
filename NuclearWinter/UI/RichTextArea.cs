@@ -1374,9 +1374,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseEnter( Point _hitPoint )
         {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
-#endif
+            Screen.Game.SetCursor( MouseCursor.IBeam );
 
             base.OnMouseEnter( _hitPoint );
         }
@@ -1384,9 +1382,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseOut( Point _hitPoint )
         {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+            Screen.Game.SetCursor( MouseCursor.Default );
 
             base.OnMouseOut( _hitPoint );
         }
@@ -1451,15 +1447,11 @@ namespace NuclearWinter.UI
                 var textSpan = ! bShortcutKey ? GetTextSpanAtPosition( _hitPoint ) : null;
                 if( textSpan != null && textSpan.SpanType == TextSpanType.Link )
                 {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
-#endif
+                    Screen.Game.SetCursor( MouseCursor.Hand );
                 }
                 else
                 {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
-#endif
+                    Screen.Game.SetCursor( MouseCursor.IBeam );
                 }
 
                 foreach( var remoteCaret in RemoteCaretsById.Values )
@@ -1684,9 +1676,8 @@ namespace NuclearWinter.UI
                         PasteFromClipboard();
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Enter:
-#else
+#if FNA
                 case OSKey.Return:
 #endif
                     if( ! IsReadOnly )
@@ -1761,11 +1752,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Back:
-#else
-                case OSKey.ForwardDelete:
-#endif
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -1857,20 +1844,12 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Left: {
-#else
-                case OSKey.LeftArrow: {
-#endif
                     Caret.MoveLeft( bShift, bCtrl );
                     mbScrollToCaret = true;
                     break;
                 }
-#if !MONOMAC
                 case OSKey.Right: {
-#else
-                case OSKey.RightArrow: {
-#endif
                     Caret.MoveRight( bShift, bCtrl );
                     mbScrollToCaret = true;
                     break;
@@ -1883,19 +1862,11 @@ namespace NuclearWinter.UI
                     Caret.MoveStart( bShift );
                     mbScrollToCaret = true;
                     break;
-#if !MONOMAC
                 case OSKey.Up:
-#else
-                case OSKey.UpArrow:
-#endif
                     Caret.MoveUp( bShift );
                     mbScrollToCaret = true;
                     break;
-#if !MONOMAC
                 case OSKey.Down:
-#else
-                case OSKey.DownArrow:
-#endif
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;

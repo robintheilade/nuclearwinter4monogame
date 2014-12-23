@@ -525,20 +525,14 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseEnter( Point _hitPoint )
         {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
-#endif
-
+            Screen.Game.SetCursor( MouseCursor.IBeam );
             base.OnMouseEnter( _hitPoint );
         }
 
         //----------------------------------------------------------------------
         public override void OnMouseOut( Point _hitPoint )
         {
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
-
+            Screen.Game.SetCursor( MouseCursor.Default );
             base.OnMouseOut( _hitPoint );
         }
 
@@ -799,6 +793,9 @@ namespace NuclearWinter.UI
                     }
                     break;
                 case OSKey.Enter:
+#if FNA
+                case OSKey.Return:
+#endif
                     if( ! IsReadOnly )
                     {
                         int iLineStartIndex = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) ) + 1;
@@ -815,11 +812,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Back:
-#else
-                case OSKey.ForwardDelete:
-#endif
                     if( ! IsReadOnly )
                     {
                         if( Caret.HasSelection )
@@ -960,11 +953,7 @@ namespace NuclearWinter.UI
                         }
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Left: {
-#else
-                case OSKey.LeftArrow: {
-#endif
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
 
                     if( bCtrl )
@@ -996,11 +985,7 @@ namespace NuclearWinter.UI
                     mbScrollToCaret = true;
                     break;
                 }
-#if !MONOMAC
                 case OSKey.Right: {
-#else
-                case OSKey.RightArrow: {
-#endif
                     int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset );
 
                     if( bCtrl )
@@ -1044,19 +1029,11 @@ namespace NuclearWinter.UI
                     Caret.MoveStart( bShift );
                     mbScrollToCaret = true;
                     break;
-#if !MONOMAC
                 case OSKey.Up:
-#else
-                case OSKey.UpArrow:
-#endif
                     Caret.MoveUp( bShift );
                     mbScrollToCaret = true;
                     break;
-#if !MONOMAC
                 case OSKey.Down:
-#else
-                case OSKey.DownArrow:
-#endif
                     Caret.MoveDown( bShift );
                     mbScrollToCaret = true;
                     break;

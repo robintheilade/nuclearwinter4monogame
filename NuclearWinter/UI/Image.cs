@@ -73,9 +73,7 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
-#if !FNA
-                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
-#endif
+                Screen.Game.SetCursor( MouseCursor.Hand );
             }
 
             if( MouseEnterHandler != null ) MouseEnterHandler( this );
@@ -85,9 +83,7 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
-#if !FNA
-                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+                Screen.Game.SetCursor( MouseCursor.Default );
             }
 
             if( MouseOutHandler != null ) MouseOutHandler( this );

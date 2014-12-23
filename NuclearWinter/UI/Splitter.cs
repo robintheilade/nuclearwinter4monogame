@@ -333,15 +333,11 @@ namespace NuclearWinter.UI
             {
                 case Direction.Left:
                 case Direction.Right:
-#if !FNA
-                    Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeWE;
-#endif
+                    Screen.Game.SetCursor( Collapsable ? MouseCursor.Hand : MouseCursor.SizeWE );
                     break;
                 case Direction.Up:
                 case Direction.Down:
-#if !FNA
-                    Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeNS;
-#endif
+                    Screen.Game.SetCursor( Collapsable ? MouseCursor.Hand : MouseCursor.SizeNS );
                     break;
             }
         }
@@ -349,9 +345,7 @@ namespace NuclearWinter.UI
         public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
-#if !FNA
-            Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+            Screen.Game.SetCursor( MouseCursor.Default );
         }
 
         public override void OnMouseMove( Point _hitPoint )
@@ -363,9 +357,7 @@ namespace NuclearWinter.UI
                 if( mbIsHovered )
                 {
                     mbIsHovered = false;
-#if !FNA
-                    Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+                    Screen.Game.SetCursor( MouseCursor.Default );
                 }
                 return;
             }

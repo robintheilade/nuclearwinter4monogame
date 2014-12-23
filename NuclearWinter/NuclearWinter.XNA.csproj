@@ -105,6 +105,7 @@
     </Compile>
     <Compile Include="Input\WindowMessageFilter.cs" />
     <Compile Include="Audio\OggSong.cs" />
+    <Compile Include="MouseCursor.cs" />
     <Compile Include="Storage\StorageHandler.cs" />
     <Compile Include="Storage\DesktopStorageHandler.cs" />
     <Compile Include="Storage\SaveHandler.cs" />

@@ -138,7 +138,7 @@ namespace NuclearWinter
                 }
                 
                 default:
-                    throw new Exception("SDL platform unhandled: " + platform);
+                    throw new Exception("Unhandled SDL platform: " + platform);
             }
 
 #endif
@@ -180,6 +180,37 @@ namespace NuclearWinter
             SetWindowTextW( Window.Handle, _strTitle );
 #else
             Window.Title = _strTitle;
+#endif
+        }
+
+
+        //----------------------------------------------------------------------
+#if !FNA
+        Dictionary<MouseCursor,Cursor> mWindowsCursors = new Dictionary<MouseCursor,Cursor> {
+            { MouseCursor.Default, Cursors.Default },
+            { MouseCursor.SizeWE, Cursors.SizeWE },
+            { MouseCursor.SizeNS, Cursors.SizeNS },
+            { MouseCursor.SizeAll, Cursors.SizeAll },
+
+            { MouseCursor.Hand, Cursors.Hand },
+            { MouseCursor.IBeam, Cursors.IBeam },
+            { MouseCursor.Cross, Cursors.Cross },
+        };
+#else
+        Dictionary<MouseCursor,IntPtr> mSDLCursors = new Dictionary<MouseCursor,IntPtr>();
+#endif
+
+        public void SetCursor( MouseCursor _cursor )
+        {
+#if !FNA
+            Form.Cursor = mWindowsCursors[_cursor];
+#else
+            IntPtr SDLCursor;
+            if( ! mSDLCursors.TryGetValue( _cursor, out SDLCursor ) )
+            {
+                mSDLCursors[_cursor] = SDLCursor = SDL2.SDL.SDL_CreateSystemCursor( (SDL2.SDL.SDL_SystemCursor)_cursor );
+            }
+            SDL2.SDL.SDL_SetCursor(SDLCursor);
 #endif
         }
 

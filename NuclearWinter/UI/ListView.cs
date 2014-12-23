@@ -680,16 +680,12 @@ namespace NuclearWinter.UI
 
             if( bWasHoveringNewRow && ! mbIsHoveringNewRow )
             {
-#if !FNA
-                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+                Screen.Game.SetCursor( MouseCursor.Default );
             }
             else
             if( ! bWasHoveringNewRow && mbIsHoveringNewRow )
             {
-#if !FNA
-                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
-#endif
+                Screen.Game.SetCursor( MouseCursor.Hand );
             }
         }
 
@@ -700,9 +696,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHoveringNewRow )
             {
-#if !FNA
-                Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+                Screen.Game.SetCursor( MouseCursor.Default );
                 mbIsHoveringNewRow = false;
             }
 
@@ -931,9 +925,8 @@ namespace NuclearWinter.UI
                 case OSKey.PageDown:
                     Scrollbar.Offset += LayoutRect.Height;
                     break;
-#if !MONOMAC
                 case OSKey.Enter:
-#else
+#if FNA
                 case OSKey.Return:
 #endif
                     if( SelectedRow != null && ValidateHandler != null ) ValidateHandler( this );

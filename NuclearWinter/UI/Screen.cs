@@ -79,9 +79,7 @@ namespace NuclearWinter.UI
 
             if( HoveredWidget != null && HoveredWidget.IsOrphan )
             {
-#if !FNA
-                Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
-#endif
+                Game.SetCursor( MouseCursor.Default );
                 HoveredWidget = null;
             }
 
@@ -257,7 +255,7 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnTextEntered( character );
                 }
 
-                if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
+                if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
                 {
                     if( FocusedWidget.OnActivateDown() )
                     {
@@ -265,7 +263,7 @@ namespace NuclearWinter.UI
                     }
                 }
                 else
-                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
+                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
                 {
                     if( mbHasActivatedFocusedWidget )
                     {

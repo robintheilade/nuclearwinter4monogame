@@ -6,6 +6,7 @@ namespace NuclearWinter
     public enum OSKey
     {
         A           = SDL2.SDL.SDL_Keycode.SDLK_a,
+        D           = SDL2.SDL.SDL_Keycode.SDLK_d,
         X           = SDL2.SDL.SDL_Keycode.SDLK_x,
         C           = SDL2.SDL.SDL_Keycode.SDLK_c,
         V           = SDL2.SDL.SDL_Keycode.SDLK_v,
