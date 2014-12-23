@@ -12,3 +12,8 @@ bin/*
 .svn
 .git
 *.pidb
+NuclearSample/Workbench/
+FNA/native/**.dll
+FNA/native/**.dylib
+FNA/native/**.so
+FNA/native/**.so.*

@@ -7,12 +7,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
-#if !MONOGAME
+#if !FNA
 using OSKey = System.Windows.Forms.Keys;
-#elif !MONOMAC
-using OSKey = OpenTK.Input.Key;
-#else
-using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -1378,7 +1374,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseEnter( Point _hitPoint )
         {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
 #endif
 
@@ -1388,7 +1384,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseOut( Point _hitPoint )
         {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
 
@@ -1455,13 +1451,13 @@ namespace NuclearWinter.UI
                 var textSpan = ! bShortcutKey ? GetTextSpanAtPosition( _hitPoint ) : null;
                 if( textSpan != null && textSpan.SpanType == TextSpanType.Link )
                 {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
 #endif
                 }
                 else
                 {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
 #endif
                 }
@@ -1577,7 +1573,7 @@ namespace NuclearWinter.UI
                 {
                     strText += TextBlocks[ iStartBlockIndex ].Content.SimpleText.Substring( iStartOffset, iEndOffset - iStartOffset );
                 }
-#if !MONOMAC
+#if !FNA
                 // NOTE: For this to work, you must put [STAThread] before your Main()
                 
                 try
@@ -1586,9 +1582,7 @@ namespace NuclearWinter.UI
                     System.Windows.Forms.Clipboard.SetText( strText ); //, System.Windows.Forms.TextDataFormat.Html );
                 } catch {}
 #else
-                var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
-                pasteBoard.ClearContents();
-                pasteBoard.SetStringForType( strText, MonoMac.AppKit.NSPasteboard.NSStringType );
+                SDL2.SDL.SDL_SetClipboardText( strText );
 #endif
             }
         }
@@ -1597,7 +1591,7 @@ namespace NuclearWinter.UI
         {
             if( IsReadOnly ) return;
 
-#if !MONOMAC
+#if !FNA
             // NOTE: For this to work, you must put [STAThread] before your Main()
             
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
@@ -1608,8 +1602,7 @@ namespace NuclearWinter.UI
                 strPastedText = System.Windows.Forms.Clipboard.GetText();
             } catch {}
 #else
-            var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
-            string strPastedText = pasteBoard.GetStringForType( MonoMac.AppKit.NSPasteboard.NSStringType );
+            string strPastedText = SDL2.SDL.SDL_GetClipboardText();
 #endif
 
             if( strPastedText != null )

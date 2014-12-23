@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -42,7 +41,9 @@ namespace NuclearSample
 
             //------------------------------------------------------------------
             Window.AllowUserResizing = true;
+#if ! FNA
             Form.MinimumSize = new System.Drawing.Size( 1260, 720 );
+#endif
 
             IsMouseVisible = true;
 
@@ -53,9 +54,12 @@ namespace NuclearSample
             GameStateMgr.SwitchState( Intro );
 
             //------------------------------------------------------------------
+#if ! FNA
             Form.Resize += delegate { EnsureProperPresentationParams(); };
+#endif
         }
 
+#if ! FNA
         //----------------------------------------------------------------------
         void EnsureProperPresentationParams()
         {
@@ -70,6 +74,7 @@ namespace NuclearSample
                 GraphicsDevice.Reset( updatedPresentationParams );
             }
         }
+#endif
 
         //----------------------------------------------------------------------
         protected override void LoadContent()
@@ -169,7 +174,9 @@ namespace NuclearSample
             UIStyle.TextAreaGutterFrame         = Content.Load<Texture2D>( "Sprites/UI/TextAreaGutterFrame" );
             UIStyle.TextAreaGutterCornerSize    = 15;
 
+#if ! FNA
             EnsureProperPresentationParams();
+#endif
         }
 
         //----------------------------------------------------------------------

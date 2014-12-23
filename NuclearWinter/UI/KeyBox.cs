@@ -5,12 +5,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-#if !MONOGAME
+#if !FNA
 using OSKey = System.Windows.Forms.Keys;
-#elif !MONOMAC
-using OSKey = OpenTK.Input.Key;
-#else
-using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI

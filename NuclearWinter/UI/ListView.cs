@@ -9,12 +9,8 @@ using Microsoft.Xna.Framework.Input;
 using NuclearWinter.Collections;
 using System.Diagnostics;
 
-#if !MONOGAME
+#if !FNA
 using OSKey = System.Windows.Forms.Keys;
-#elif !MONOMAC
-using OSKey = OpenTK.Input.Key;
-#else
-using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -684,14 +680,14 @@ namespace NuclearWinter.UI
 
             if( bWasHoveringNewRow && ! mbIsHoveringNewRow )
             {
-#if !MONOGAME
+#if !FNA
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
             }
             else
             if( ! bWasHoveringNewRow && mbIsHoveringNewRow )
             {
-#if !MONOGAME
+#if !FNA
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
 #endif
             }
@@ -704,7 +700,7 @@ namespace NuclearWinter.UI
 
             if( mbIsHoveringNewRow )
             {
-#if !MONOGAME
+#if !FNA
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
                 mbIsHoveringNewRow = false;

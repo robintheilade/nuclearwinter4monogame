@@ -6,12 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-#if !MONOGAME
+#if !FNA
 using OSKey = System.Windows.Forms.Keys;
-#elif !MONOMAC
-using OSKey = OpenTK.Input.Key;
-#else
-using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -224,23 +220,21 @@ namespace NuclearWinter.UI
                     strText = Text.Substring( CaretOffset + SelectionOffset, -SelectionOffset );
                 }
 
-#if !MONOMAC
+#if !FNA
                 // NOTE: For this to work, you must put [STAThread] before your Main()
                 try
                 {
                     System.Windows.Forms.Clipboard.SetText( strText );
                 } catch {}
 #else
-                var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
-                pasteBoard.ClearContents();
-                pasteBoard.SetStringForType( strText, MonoMac.AppKit.NSPasteboard.NSStringType );
+                SDL2.SDL.SDL_SetClipboardText( strText );
 #endif
             }
         }
 
         public void PasteFromClipboard()
         {
-#if !MONOMAC
+#if !FNA
             // NOTE: For this to work, you must put [STAThread] before your Main()
             string strPastedText = null;
             try
@@ -248,8 +242,7 @@ namespace NuclearWinter.UI
                 strPastedText = System.Windows.Forms.Clipboard.GetText();
             } catch {}
 #else
-            var pasteBoard = MonoMac.AppKit.NSPasteboard.GeneralPasteboard;
-            string strPastedText = pasteBoard.GetStringForType( MonoMac.AppKit.NSPasteboard.NSStringType );
+            string strPastedText = SDL2.SDL.SDL_GetClipboardText();
 #endif
             if( strPastedText != null )
             {
@@ -295,7 +288,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void OnMouseEnter( Point _hitPoint )
         {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.IBeam;
 #endif
             base.OnMouseEnter( _hitPoint );
@@ -313,7 +306,7 @@ namespace NuclearWinter.UI
 
         public override void OnMouseOut( Point _hitPoint )
         {
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
             base.OnMouseOut( _hitPoint );
@@ -446,11 +439,7 @@ namespace NuclearWinter.UI
                         PasteFromClipboard();
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Back:
-#else
-                case OSKey.ForwardDelete:
-#endif
                     if( ! IsReadOnly && Text.Length > 0 )
                     {
                         if( SelectionOffset != 0 )
@@ -489,11 +478,7 @@ namespace NuclearWinter.UI
                         DeleteSelectedText();
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Left:
-#else
-                case OSKey.LeftArrow:
-#endif
                     if( bShift )
                     {
                         if( bCtrl )
@@ -534,11 +519,7 @@ namespace NuclearWinter.UI
                         CaretOffset = iNewCaretOffset;
                     }
                     break;
-#if !MONOMAC
                 case OSKey.Right:
-#else
-                case OSKey.RightArrow:
-#endif
                     if( bShift )
                     {
                         if( bCtrl )

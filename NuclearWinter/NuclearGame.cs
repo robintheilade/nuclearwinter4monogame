@@ -7,22 +7,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework.GamerServices;
 
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 
-#if WINDOWS
+#if !FNA
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-#endif
-
-#if MONOMAC
-using MonoMac.Foundation;
-#endif
-
-#if WINDOWS_PHONE
-using Microsoft.Phone.Shell;
 #endif
 
 namespace NuclearWinter
@@ -39,19 +30,12 @@ namespace NuclearWinter
         public RasterizerState                      ScissorRasterizerState  { get; private set; }
 
         
-#if WINDOWS || LINUX || MACOSX || XBOX
         // Index of the player responsible for menu navigation (or null if none yet)
         public PlayerIndex?                         PlayerInCharge;
-#endif
 
         public static readonly string               ApplicationDataFolderPath;
 
         public Storage.SaveHandler                  NuclearSaveHandler;
-#if XBOX
-        public StorageDevice                        SaveGameStorageDevice;
-        bool                                        mbShouldDisplayStorageSelector;
-        Action                                      DeviceSelectedCallback;
-#endif
 
         //----------------------------------------------------------------------
         // Sound & Music
@@ -64,22 +48,13 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Input
-#if WINDOWS || LINUX || MACOSX || XBOX
         public Input.InputManager                   InputMgr                { get; private set; }
-#endif
-
-#if WINDOWS_PHONE
-        public Input.TouchManager                   TouchMgr                { get; private set; }
-#endif
 
         public const float                          LerpMultiplier = 15f;
 
         //----------------------------------------------------------------------
-#if WINDOWS
-
-#if !MONOGAME
+#if !FNA
         public Form                                 Form                    { get; private set; }
-#endif
 
         [DllImport("user32.dll")]
         static extern bool IsWindowUnicode(IntPtr hWnd);
@@ -121,31 +96,59 @@ namespace NuclearWinter
 
         static NuclearGame()
         {
-#if !MONOMAC
+#if !FNA
             ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
 #else
-            NSError error;
-            ApplicationDataFolderPath = NSFileManager.DefaultManager.GetUrl( NSSearchPathDirectory.LibraryDirectory, NSSearchPathDomain.User, new NSUrl(""), true, out error ).Path;
+            string platform = SDL2.SDL.SDL_GetPlatform();
+
+            switch( platform )
+            {
+                case "Windows":
+                    ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
+                    break;
+
+                case "Mac OS X": {
+                    string osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    if( String.IsNullOrEmpty(osConfigDir) )
+                    {
+                        ApplicationDataFolderPath = "."; // Oh well.
+                    }
+                    else
+                    {
+                        ApplicationDataFolderPath = osConfigDir + "/Library";
+                    }
+                    break;
+                }
+
+                case "Linux": {
+                    string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                    if( String.IsNullOrEmpty(osConfigDir) )
+                    {
+                        osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                        if( String.IsNullOrEmpty(osConfigDir) )
+                        {
+                            ApplicationDataFolderPath = "."; // Oh well.
+                        }
+                        else
+                        {
+                            ApplicationDataFolderPath = osConfigDir + "/.local/share";
+                        }
+                    }
+                    break;
+                }
+                
+                default:
+                    throw new Exception("SDL platform unhandled: " + platform);
+            }
+
 #endif
         }
 
         //----------------------------------------------------------------------
         public NuclearGame( bool _bUseGameStateManager=true )
         {
-#if WINDOWS_PHONE
-            PhoneApplicationService.Current.Deactivated += new EventHandler<DeactivatedEventArgs>( OnDeactivated );
-            PhoneApplicationService.Current.Closing     += new EventHandler<ClosingEventArgs>( OnClosing );
-#endif
-
-#if XBOX
-            StorageDevice.DeviceChanged                 += new EventHandler<EventArgs>( OnStorageDeviceChange );
-#endif
-
-#if WINDOWS
-
-#if !MONOGAME
+#if !FNA
             Form = (Form)Form.FromHandle( Window.Handle );
-#endif
 
             // Is the Game window unicode-aware?
             if( ! IsWindowUnicode( Window.Handle ) )
@@ -173,7 +176,7 @@ namespace NuclearWinter
         /// </summary>
         public void SetWindowTitle( string _strTitle )
         {
-#if !MONOGAME
+#if !FNA
             SetWindowTextW( Window.Handle, _strTitle );
 #else
             Window.Title = _strTitle;
@@ -194,70 +197,11 @@ namespace NuclearWinter
                 Components.Add( GameStateMgr );
             }
 
-#if WINDOWS || LINUX || MACOSX || XBOX
             InputMgr                = new Input.InputManager( this );
             Components.Add( InputMgr );
-#endif
-
-#if WINDOWS_PHONE
-            TouchMgr                = new Input.TouchManager( this );
-            Components.Add( TouchMgr );
-#endif
 
             base.Initialize();
         }
-
-#if XBOX
-        protected override void Update( GameTime _time )
-        {
-#if GAMERSERVICES || XBOX
-            if( ! Guide.IsVisible )
-            {
-#endif
-                if( mbShouldDisplayStorageSelector && PlayerInCharge.HasValue )
-                {
-                    StorageDevice.BeginShowSelector( PlayerInCharge.Value, new AsyncCallback( StorageDeviceCallback ), null );
-                    mbShouldDisplayStorageSelector= false;
-                }
-#if GAMERSERVICES || XBOX
-            }
-#endif
-
-            base.Update( _time );
-        }
-#endif
-
-#if WINDOWS_PHONE
-        //----------------------------------------------------------------------
-        protected virtual void OnDeactivated( object _sender, DeactivatedEventArgs _args )
-        {
-            if( NuclearSaveHandler != null )
-            {
-                NuclearSaveHandler.Save();
-            }
-
-            if( MediaPlayer.GameHasControl )
-            {
-                MediaPlayer.Stop();
-            }
-
-            // FIXME: We might want to handle tombstoning through PhoneApplicationService.Current.State
-        }
-
-        //----------------------------------------------------------------------
-        void OnClosing( object _sender, ClosingEventArgs _args )
-        {
-            if( NuclearSaveHandler != null )
-            {
-                NuclearSaveHandler.Save();
-            }
-
-            if( MediaPlayer.GameHasControl )
-            {
-                MediaPlayer.Stop();
-            }
-        }
-#endif
 
         //----------------------------------------------------------------------
         protected override void LoadContent()
@@ -266,77 +210,12 @@ namespace NuclearWinter
             WhitePixelTex.SetData( new[] { Color.White } );
         }
 
-#if XBOX
-        //----------------------------------------------------------------------
-        public void ShowDeviceSelector( Action _deviceSelectedCallback )
-        {
-            SaveGameStorageDevice = null;
-            mbShouldDisplayStorageSelector = true;
-
-            DeviceSelectedCallback = _deviceSelectedCallback;
-        }
-
-        //----------------------------------------------------------------------
-        void StorageDeviceCallback( IAsyncResult _result )
-        {
-            SaveGameStorageDevice = StorageDevice.EndShowSelector( _result );
-            
-            if( SaveGameStorageDevice == null )
-            {
-                // The dialog was cancelled, we're not taking no as an answer!
-                // Let's ask again
-                mbShouldDisplayStorageSelector = true;
-            }
-            else
-            {
-                DeviceSelectedCallback();
-            }
-        }
-        
-        //----------------------------------------------------------------------
-        protected void OnStorageDeviceChange( object _sender, EventArgs _args )
-        {
-            if( SaveGameStorageDevice != null )
-            {
-                mbShouldDisplayStorageSelector = ! SaveGameStorageDevice.IsConnected;
-            }
-        }
-#endif
-
-        //----------------------------------------------------------------------
-#if WINDOWS_PHONE
-        protected override void OnActivated(object sender, EventArgs args)
-        {
-            base.OnActivated(sender, args);
-
-            if( GameStateMgr != null && GameStateMgr.CurrentState != null )
-            {
-                GameStateMgr.CurrentState.OnActivated();
-            }
-        }
-#endif
-
-
-#if MACOSX
-        //----------------------------------------------------------------------
-        public void DoExiting()
-        {
-            OnExiting(this, EventArgs.Empty);
-            UnloadContent();
-        }
-#endif
-
         //----------------------------------------------------------------------
         protected override void OnExiting( object _sender, EventArgs _args )
         {
             if( NuclearSaveHandler != null )
             {
-#if WINDOWS || LINUX || MACOSX || XBOX
                 NuclearSaveHandler.SaveGameSettings();
-#endif
-#if XBOX
-                NuclearSaveHandler.SaveGameData();
-#endif
             }
 
             if( GameStateMgr != null && GameStateMgr.CurrentState != null )

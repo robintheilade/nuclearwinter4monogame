@@ -1,0 +1,5 @@
+Put all native dependencies from here:
+
+Untar http://www.flibitijibibo.com/fnalibs.tar.bz2 and see https://github.com/flibitijibibo/FNA/wiki/1:-Download-and-Update-FNA#2-download-native-libraries for additional Windows dependencies to put in win32/.
+
+Use 32-bit versions of libraries on Windows for maximum compat.

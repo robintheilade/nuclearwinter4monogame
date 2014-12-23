@@ -333,13 +333,13 @@ namespace NuclearWinter.UI
             {
                 case Direction.Left:
                 case Direction.Right:
-#if !MONOGAME
+#if !FNA
                     Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeWE;
 #endif
                     break;
                 case Direction.Up:
                 case Direction.Down:
-#if !MONOGAME
+#if !FNA
                     Screen.Game.Form.Cursor = Collapsable ? System.Windows.Forms.Cursors.Hand : System.Windows.Forms.Cursors.SizeNS;
 #endif
                     break;
@@ -349,7 +349,7 @@ namespace NuclearWinter.UI
         public override void OnMouseOut( Point _hitPoint )
         {
             mbIsHovered = false;
-#if !MONOGAME
+#if !FNA
             Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
         }
@@ -363,7 +363,7 @@ namespace NuclearWinter.UI
                 if( mbIsHovered )
                 {
                     mbIsHovered = false;
-#if !MONOGAME
+#if !FNA
                     Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
                 }

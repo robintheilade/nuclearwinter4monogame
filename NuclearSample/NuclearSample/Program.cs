@@ -19,7 +19,11 @@ namespace NuclearSample
                 }
                 else
                 {
+#if !FNA
                     System.Windows.Forms.MessageBox.Show( "An instance of NuclearSample is already running.", "Could not start NuclearSample", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop );
+#else
+                    SDL2.SDL.SDL_ShowSimpleMessageBox( SDL2.SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR, "Could not start NuclearSample", "An instance of NuclearSample is already running.", IntPtr.Zero );
+#endif
                 }
             }
         }

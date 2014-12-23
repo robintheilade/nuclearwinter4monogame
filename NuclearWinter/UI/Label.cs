@@ -179,7 +179,7 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
-#if !MONOGAME
+#if !FNA
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Hand;
 #endif
             }
@@ -189,7 +189,7 @@ namespace NuclearWinter.UI
         {
             if( ClickHandler != null )
             {
-#if !MONOGAME
+#if !FNA
                 Screen.Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
             }

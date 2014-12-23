@@ -38,9 +38,7 @@ using System.Collections.Generic;
 
 namespace NuclearWinter.Collections
 {
-#if !XBOX && !WINDOWS_PHONE
 	[Serializable]
-#endif
 	public class KeyedList<K, V> : IDictionary<K, V>, IList<KeyValuePair<K, V>>
 	{
 		private Dictionary<K, V> objectTable = new Dictionary<K, V>();

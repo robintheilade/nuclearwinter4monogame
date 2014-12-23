@@ -9,12 +9,8 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using NuclearWinter.Xna;
 
-#if !MONOGAME
+#if !FNA
 using OSKey = System.Windows.Forms.Keys;
-#elif !MONOMAC
-using OSKey = OpenTK.Input.Key;
-#else
-using OSKey = MonoMac.AppKit.NSKey;
 #endif
 
 namespace NuclearWinter.UI
@@ -83,7 +79,7 @@ namespace NuclearWinter.UI
 
             if( HoveredWidget != null && HoveredWidget.IsOrphan )
             {
-#if !MONOGAME
+#if !FNA
                 Game.Form.Cursor = System.Windows.Forms.Cursors.Default;
 #endif
                 HoveredWidget = null;
@@ -114,7 +110,6 @@ namespace NuclearWinter.UI
                 return;
             }
 
-#if WINDOWS || LINUX || MACOSX
             //------------------------------------------------------------------
             // Mouse buttons
             bool bHasMouseEvent = false;
@@ -262,12 +257,7 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnTextEntered( character );
                 }
 
-#if !MACOSX
                 if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
-#else
-                if( Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustPressedOSKeys.Contains( OSKey.Space ) )
-#endif
-
                 {
                     if( FocusedWidget.OnActivateDown() )
                     {
@@ -275,11 +265,7 @@ namespace NuclearWinter.UI
                     }
                 }
                 else
-#if !MACOSX
                 if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Enter ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
-#else
-                if( Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Return ) || Game.InputMgr.JustReleasedOSKeys.Contains( OSKey.Space ) )
-#endif
                 {
                     if( mbHasActivatedFocusedWidget )
                     {
@@ -303,7 +289,6 @@ namespace NuclearWinter.UI
                     FocusedWidget.OnOSKeyPress( key );
                 }
             }
-#endif
         }
 
         //----------------------------------------------------------------------
