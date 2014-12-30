@@ -119,6 +119,10 @@ namespace Microsoft.Xna.Framework.Graphics
             MGFXHeader header;
             int i=0;
             header.Signature = BitConverter.ToInt32(effectCode, i); i += 4;
+
+            if (header.Signature != MGFXHeader.MGFXSignature)
+                throw new Exception("This does not appear to be a MonoGame MGFX file!");
+
             header.Version = (int)effectCode[i++];
             header.Profile = (int)effectCode[i++];
             if (header.Version == MGFXHeader.MGFXVersion)
@@ -139,9 +143,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
             }
             header.HeaderSize = i;
-
-            if (header.Signature != MGFXHeader.MGFXSignature)
-                throw new Exception("This does not appear to be a MonoGame MGFX file!");
 
 #if DIRECTX
             if (header.Profile != 1)
