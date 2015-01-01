@@ -120,7 +120,9 @@ namespace NuclearWinter.Input
             mMessageFilter.KeyUpHandler         = delegate( System.Windows.Forms.Keys _key ) { JustReleasedOSKeys.Add( _key ); };
             mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
 #else
-            // FIXME: Probably do stuff here?
+            TextInputEXT.TextInput              += delegate( char _char ) { EnteredText.Add( _char ); };
+            TextInputEXT.KeyDown                += delegate( SDL2.SDL.SDL_Keycode _key ) { JustPressedOSKeys.Add( (OSKey)_key ); };
+            TextInputEXT.KeyUp                  += delegate( SDL2.SDL.SDL_Keycode _key ) { JustReleasedOSKeys.Add( (OSKey)_key ); };
 #endif
 
             MouseState = Mouse.GetState();

@@ -91,9 +91,9 @@ namespace NuclearWinter
         //  for that key on the user's keyboard ('O' in dvorak, for example)
         public static Keys USEnglishToLocal( Keys _key )
         {
-#if !FNA
             if( _key > Keys.Z && ( _key < Keys.OemSemicolon || ( _key > Keys.OemTilde && ( _key < Keys.OemOpenBrackets || _key > Keys.OemBackslash ) ) ) ) return _key;
 
+#if !FNA
             var activeScanCode = MapVirtualKeyEx((uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
             var nativeVirtualCode = MapVirtualKeyEx(activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle);
 
@@ -105,9 +105,8 @@ namespace NuclearWinter
 
         public static Keys LocalToUSEnglish( Keys _key )
         {
-#if !FNA
             if( _key > Keys.Z ) return _key;
-
+#if !FNA
             var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
             var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
 

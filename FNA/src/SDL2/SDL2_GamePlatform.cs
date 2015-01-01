@@ -268,6 +268,8 @@ namespace Microsoft.Xna.Framework
 							keys.Add(key);
 							INTERNAL_TextInputIn(key);
 						}
+
+						TextInputEXT.OnKeyDown(evt.key.keysym.sym);
 					}
 					else if (evt.type == SDL.SDL_EventType.SDL_KEYUP)
 					{
@@ -276,6 +278,8 @@ namespace Microsoft.Xna.Framework
 						{
 							INTERNAL_TextInputOut(key);
 						}
+
+						TextInputEXT.OnKeyUp(evt.key.keysym.sym);
 					}
 
 					// Mouse Input
