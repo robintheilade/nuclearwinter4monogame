@@ -1912,6 +1912,8 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
+            if( LayoutRect.Height < 0 ) return;
+
             if( PanelTex != null )
             {
                 Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.RichTextAreaFrameCornerSize, Color.White );
