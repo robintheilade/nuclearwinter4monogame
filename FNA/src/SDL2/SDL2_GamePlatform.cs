@@ -438,7 +438,16 @@ namespace Microsoft.Xna.Framework
 					else if (evt.type == SDL.SDL_EventType.SDL_TEXTINPUT && !INTERNAL_TextInputSuppress)
 					{
 						string text;
-						unsafe { text = new string((char*) evt.text.text); }
+
+						unsafe
+						{
+							var endPtr = evt.text.text;
+							while (*endPtr != 0) endPtr++;
+							var bytes = new byte[endPtr - evt.text.text];
+							System.Runtime.InteropServices.Marshal.Copy((IntPtr)evt.text.text, bytes, 0, bytes.Length);
+							text = System.Text.Encoding.UTF8.GetString(bytes);
+						}
+
 						if (text.Length > 0)
 						{
 							TextInputEXT.OnTextInput(text[0]);
