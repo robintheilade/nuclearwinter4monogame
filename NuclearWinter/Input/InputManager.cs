@@ -190,9 +190,10 @@ namespace NuclearWinter.Input
 #if FNA
             if( WasMouseButtonJustPressed( PrimaryMouseButton ) )
             {
-                float fDoubleClickTime = System.Windows.Forms.SystemInformation.DoubleClickTime / 1000f;
-                int iDoubleClickWidth = System.Windows.Forms.SystemInformation.DoubleClickSize.Width;
-                int iDoubleClickHeight = System.Windows.Forms.SystemInformation.DoubleClickSize.Height;
+				// Can't use System.Windows.Forms on Mac so let's just hard-code some reasonable values
+				float fDoubleClickTime = 0.5f; 	// System.Windows.Forms.SystemInformation.DoubleClickTime / 1000f;
+				int iDoubleClickWidth = 4; 		// System.Windows.Forms.SystemInformation.DoubleClickSize.Width;
+				int iDoubleClickHeight = 4; 	// System.Windows.Forms.SystemInformation.DoubleClickSize.Height;
 
                 if( mfTimeSinceLastClick <= fDoubleClickTime )
                 {
