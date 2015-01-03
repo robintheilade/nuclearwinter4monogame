@@ -447,6 +447,14 @@ namespace Microsoft.Xna.Framework
 						{
 							SDL.SDL_EnableScreenSaver();
 						}
+
+						else if
+							(evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MINIMIZED ||
+							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MAXIMIZED ||
+							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED)
+						{
+							((SDL2_GameWindow) Window).INTERNAL_StateChangedNUCLEAR();
+						}
 					}
 
 					// Controller device management

@@ -274,6 +274,11 @@ namespace Microsoft.Xna.Framework
 			OnClientSizeChanged();
 		}
 
+		internal void INTERNAL_StateChangedNUCLEAR()
+		{
+			OnStateChangedNUCLEAR();
+		}
+
 		#endregion
 
 		#region Protected GameWindow Methods
