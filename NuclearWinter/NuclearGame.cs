@@ -214,6 +214,20 @@ namespace NuclearWinter
 #endif
         }
 
+        public void ShowErrorMessageBox( string _strTitle, string _strMessage )
+        {
+            ShowErrorMessageBox( _strTitle, _strMessage, Window.Handle );
+        }
+
+        public static void ShowErrorMessageBox( string _strTitle, string _strMessage, IntPtr _windowHandle )
+        {
+#if !FNA
+            System.Windows.Forms.MessageBox.Show( _strMessage, _strTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop );
+#else
+            SDL2.SDL.SDL_ShowSimpleMessageBox( SDL2.SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR, _strTitle, _strMessage, _windowHandle );
+#endif
+        }
+
         //----------------------------------------------------------------------
         protected override void Initialize()
         {

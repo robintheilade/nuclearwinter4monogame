@@ -40,7 +40,7 @@ namespace NuclearWinter.Input
 
         public int PrimaryMouseButton
         {
-#if ! FNA
+#if !FNA
             get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 2 : 0; }
 #else
             get { return 0; }
@@ -49,7 +49,7 @@ namespace NuclearWinter.Input
 
         public int SecondaryMouseButton
         {
-#if ! FNA
+#if !FNA
             get { return System.Windows.Forms.SystemInformation.MouseButtonsSwapped ? 0 : 2; }
 #else
             get { return 2; }

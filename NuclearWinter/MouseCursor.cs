@@ -6,7 +6,7 @@ using System.Text;
 namespace NuclearWinter
 {
         public enum MouseCursor {
-#if ! FNA
+#if !FNA
             Default,
             SizeWE,
             SizeNS,
