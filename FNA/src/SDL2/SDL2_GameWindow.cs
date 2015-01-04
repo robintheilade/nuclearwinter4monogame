@@ -177,12 +177,7 @@ namespace Microsoft.Xna.Framework
 			);
 			INTERNAL_SetIcon(title);
 
-			if (!AllowUserResizing)
-			{
-				var clientBounds = ClientBounds;
-				SDL2.SDL.SDL_SetWindowMinimumSize(Handle, GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
-				SDL2.SDL.SDL_SetWindowMaximumSize(Handle, GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
-			}
+			INTERNAL_SetWindowMinMaxSize();
 
 			INTERNAL_isFullscreen = false;
 			INTERNAL_wantsFullscreen = false;
