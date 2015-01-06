@@ -127,7 +127,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\NuclearWinter\NuclearWinter.XNA.csproj">
       <Project>{2F2A1E2C-560B-44D3-B693-FFB05D271C53}</Project>
-      <Name>NuclearWinter-windows</Name>
+      <Name>NuclearWinter.XNA</Name>
     </ProjectReference>
     <ProjectReference Include="..\NuclearSampleContent\NuclearSampleContent.contentproj">
       <Name>NuclearSampleContent %28Content%29</Name>
