@@ -47,64 +47,78 @@ namespace NuclearWinter.Audio
         OggSong(VorbisReader _reader)
         {
             reader = _reader;
-            effect = new DynamicSoundEffectInstance(reader.SampleRate, (AudioChannels)reader.Channels);
-            buffer = new byte[effect.GetSampleSizeInBytes(TimeSpan.FromMilliseconds(500))];
+            effect = new DynamicSoundEffectInstance( reader.SampleRate, (AudioChannels)reader.Channels );
+            buffer = new byte[ effect.GetSampleSizeInBytes( TimeSpan.FromMilliseconds(500) ) ];
             nvBuffer = new float[buffer.Length / 2];
  
-            // when a buffer is needed, set our handle so the helper thread will read in more data
+            // When a buffer is needed, set our handle so the helper thread will read in more data
             effect.BufferNeeded += (s, e) => needBufferHandle.Set();
         }
 
-        public OggSong(string oggFile)
-        : this(new VorbisReader(oggFile))
+        public OggSong( string oggFile )
+        : this( new VorbisReader( oggFile ) )
         {
         }
 
-        public OggSong(Stream oggStream)
-        : this(new VorbisReader(oggStream, true))
+        public OggSong( Stream oggStream )
+        : this( new VorbisReader( oggStream, true ) )
         {
         }
 
         ~OggSong()
         {
-            Dispose(false);
+            Dispose( false );
         }
  
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            Dispose( true );
+            GC.SuppressFinalize( this );
         }
  
-        protected void Dispose(bool isDisposing)
+        protected void Dispose( bool isDisposing )
         {
             // They might be null if the constructor threw an exception
-            if( threadRunHandle != null )
-            {
-                threadRunHandle.Set();
-            }
+
+            if( threadRunHandle != null ) threadRunHandle.Set();
 
             if( effect != null )
             {
-                effect.Dispose();
+                lock( effect )
+                {
+                    effect.Dispose();
+                }
             }
         }
  
         public void Play()
         {
             Stop();
- 
-            lock (effect)
+
+            // Submit a few samples to get started
+            // If we submitted less, we'd risk running out of buffers before the thread even starts
+            for( int i = 0; i < 8; i++ )
+            {
+                if( ! SubmitSamples() ) break;
+            }
+
+            lock( effect )
             {
                 effect.Play();
             }
- 
-            StartThread();
+
+            // Start the streaming thread
+            if( thread == null )
+            {
+                thread = new Thread( StreamThread );
+                thread.IsBackground = true;
+                thread.Start();
+            }
         }
  
         public void Pause()
         {
-            lock (effect)
+            lock( effect )
             {
                 effect.Pause();
             }
@@ -112,7 +126,7 @@ namespace NuclearWinter.Audio
  
         public void Resume()
         {
-            lock (effect)
+            lock( effect )
             {
                 effect.Resume();
             }
@@ -120,9 +134,9 @@ namespace NuclearWinter.Audio
  
         public void Stop()
         {
-            lock (effect)
+            lock( effect )
             {
-                if (!effect.IsDisposed)
+                if( ! effect.IsDisposed )
                 {
                     effect.Stop();
                 }
@@ -130,92 +144,99 @@ namespace NuclearWinter.Audio
  
             reader.DecodedTime = TimeSpan.Zero;
  
-            if (thread != null)
+            if( thread != null )
             {
-                // set the handle to stop our thread
+                // Stop our thread
                 threadRunHandle.Set();
+                thread.Join();
                 thread = null;
-            }
-        }
- 
-        private void StartThread()
-        {
-            if (thread == null)
-            {
-                thread = new Thread(StreamThread);
-                thread.IsBackground = true;
-                thread.Start();
             }
         }
  
         private void StreamThread()
         {
-            while (!effect.IsDisposed)
+            lock( effect )
+            {
+                if( effect.IsDisposed ) return;
+            }
+
+            while( true )
             {
                 // sleep until we need a buffer
-                while (!effect.IsDisposed && !threadRunHandle.WaitOne(0) && !needBufferHandle.WaitOne(0))
+                while( ! effect.IsDisposed && ! threadRunHandle.WaitOne(0) && ! needBufferHandle.WaitOne(0) )
                 {
                     Thread.Sleep(50);
                 }
  
                 // if the thread is waiting to exit, leave
-                if (threadRunHandle.WaitOne(0))
+                if( threadRunHandle.WaitOne(0) )
                 {
                     threadRunHandle.Reset();
                     break;
                 }
                 
-                lock (effect)
-                {
-                    // ensure the effect isn't disposed
-                    if (effect.IsDisposed) { break; }
-                }
- 
-                // read the next chunk of data
-                int samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
-                
-                // out of data and looping? reset the reader and read again
-                if (samplesRead == 0)
-                {
-                    if (IsLooped)
-                    {
-                        reader.DecodedTime = TimeSpan.Zero;
-                        samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
-                    }
-                    else
-                    {
-                        // Song is over, stop thread
-                        thread = null;
-                        break;
-                    }
-                }
-                
-                if (samplesRead > 0)
-                {
-                    for (int i = 0; i < samplesRead; i++)
-                    {
-                        short sValue = (short)Math.Max(Math.Min(short.MaxValue * nvBuffer[i], short.MaxValue), short.MinValue);
-                        buffer[i * 2] = (byte)(sValue & 0xff);
-                        buffer[i * 2 + 1] = (byte)((sValue >> 8) & 0xff);
-                    }
-    
-                    // submit our buffers
-                    lock (effect)
-                    {
-                        // ensure the effect isn't disposed
-                        if (effect.IsDisposed) { break; }
-                        
-                        // ensure the number of samples read is block-aligned
-                        samplesRead += samplesRead % (reader.Channels * 2);
-
-                        effect.SubmitBuffer(buffer, 0, samplesRead);
-                        effect.SubmitBuffer(buffer, samplesRead, samplesRead);
-                    }
-                }
-                
                 // reset our handle
                 needBufferHandle.Reset();
+                
+                lock( effect )
+                {
+                    if( effect.IsDisposed ) break;
+                }
+
+                if( ! SubmitSamples() ) break;
             }
+        }
+
+        bool SubmitSamples()
+        {
+            // read the next chunk of data
+            int samplesRead = reader.ReadSamples( nvBuffer, 0, nvBuffer.Length );
+            
+            // out of data and looping? reset the reader and read again
+            if( samplesRead == 0 )
+            {
+                if( IsLooped )
+                {
+                    reader.DecodedTime = TimeSpan.Zero;
+                    samplesRead = reader.ReadSamples(nvBuffer, 0, nvBuffer.Length);
+                }
+                else
+                {
+                    // Song is over, stop thread
+                    thread = null;
+                    return false;
+                }
+            }
+                
+            if( samplesRead > 0 )
+            {
+                // Submit our buffers
+#if !FNA
+                for (int i = 0; i < samplesRead; i++)
+                {
+                    short sValue = (short)Math.Max(Math.Min(short.MaxValue * nvBuffer[i], short.MaxValue), short.MinValue);
+                    buffer[i * 2] = (byte)(sValue & 0xff);
+                    buffer[i * 2 + 1] = (byte)((sValue >> 8) & 0xff);
+                }
+#endif
+                lock( effect )
+                {
+                    // Ensure the effect isn't disposed
+                    if( effect.IsDisposed ) return false;
+                    
+                    // Ensure the number of samples read is block-aligned
+                    samplesRead += samplesRead % (reader.Channels * 2);
+
+#if !FNA
+                    effect.SubmitBuffer(buffer, 0, samplesRead);
+                    effect.SubmitBuffer(buffer, samplesRead, samplesRead);
+#else
+                    effect.SubmitFloatBufferEXT( nvBuffer );
+#endif
+                }
+            }
+                
+            return true;
         }
     }
 }
