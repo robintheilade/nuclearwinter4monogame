@@ -276,6 +276,9 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if (State == SoundState.Stopped)
 			{
+				/* Reset PendingBufferCount or it'll mess with our next Play()
+				 * -elisee
+				 */
 				PendingBufferCount = 0;
 				
 				/* If we've stopped, remove ourselves from the list.
