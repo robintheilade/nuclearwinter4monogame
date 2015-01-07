@@ -276,6 +276,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if (State == SoundState.Stopped)
 			{
+				PendingBufferCount = 0;
+				
 				/* If we've stopped, remove ourselves from the list.
 				 * Do NOT do anything else, Play/Stop/Dispose do this!
 				 * -flibit
