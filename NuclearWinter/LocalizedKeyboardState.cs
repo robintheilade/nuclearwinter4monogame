@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace NuclearWinter
 {
     public struct LocalizedKeyboardState {
-#if !FNA
+
         internal enum MAPVK : uint {
             VK_TO_VSC = 0,
             VSC_TO_VK = 1,
@@ -57,34 +57,38 @@ namespace NuclearWinter
                 }
             }
         }
-#endif
 
         public readonly KeyboardState Native;
 
-        public LocalizedKeyboardState (KeyboardState keyboardState) {
+        static bool isWindows = SDL2.SDL.SDL_GetPlatform() == "Windows";
+
+        public LocalizedKeyboardState( KeyboardState keyboardState )
+        {
             Native = keyboardState;
         }
 
-        public bool IsKeyDown (Keys key, bool isLocalKey) {
-            if (!isLocalKey)
-                key = USEnglishToLocal(key);
-
+        public bool IsKeyDown( Keys key, bool isLocalKey )
+        {
+            if (!isLocalKey) key = USEnglishToLocal(key);
             return Native.IsKeyDown(key);
         }
 
-        public bool IsKeyUp (Keys key, bool isLocalKey) {
+        public bool IsKeyUp( Keys key, bool isLocalKey )
+        {
             if (!isLocalKey)
                 key = USEnglishToLocal(key);
 
             return Native.IsKeyUp(key);
         }
 
-        public bool IsKeyDown (Keys key) {
-            return IsKeyDown(key, false);
+        public bool IsKeyDown( Keys key )
+        {
+            return IsKeyDown( key, false );
         }
 
-        public bool IsKeyUp (Keys key) {
-            return IsKeyUp(key, false);
+        public bool IsKeyUp( Keys key )
+        {
+            return IsKeyUp( key, false );
         }
 
         // Maps a localized character like 'S' to the virtual scan code
@@ -93,12 +97,17 @@ namespace NuclearWinter
         {
             if( _key > Keys.Z && ( _key < Keys.OemSemicolon || ( _key > Keys.OemTilde && ( _key < Keys.OemOpenBrackets || _key > Keys.OemBackslash ) ) ) ) return _key;
 
-#if !FNA
-            var activeScanCode = MapVirtualKeyEx((uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle);
-            var nativeVirtualCode = MapVirtualKeyEx(activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle);
+#if FNA
+            if( isWindows )
+#endif
+            {
+                var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle );
+                var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle );
 
-            return (Keys)nativeVirtualCode;
-#else
+                return (Keys)nativeVirtualCode;
+            }
+
+#if FNA
             return _key;
 #endif
         }
@@ -106,12 +115,18 @@ namespace NuclearWinter
         public static Keys LocalToUSEnglish( Keys _key )
         {
             if( _key > Keys.Z ) return _key;
-#if !FNA
-            var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
-            var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
 
-            return (Keys)nativeVirtualCode;
-#else
+#if FNA
+            if( isWindows )
+#endif
+            {
+                var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
+                var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
+
+                return (Keys)nativeVirtualCode;
+            }
+
+#if FNA
             return _key;
 #endif
         }
