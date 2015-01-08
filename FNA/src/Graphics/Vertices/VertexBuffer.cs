@@ -126,8 +126,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				GraphicsDevice.AddDisposeAction(() =>
 				{
-					Game.Instance.GraphicsDevice.GLDevice.DeleteVertexBuffer(Handle);
-					Handle = null;
+					if( Handle != null )
+					{
+						Game.Instance.GraphicsDevice.GLDevice.DeleteVertexBuffer(Handle);
+						Handle = null;
+					}
 				});
 			}
 			base.Dispose(disposing);
