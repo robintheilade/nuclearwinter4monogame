@@ -39,10 +39,23 @@ namespace NuclearWinter.UI
 
         Tooltip                 mTooltip;
 
+        // Style
+        public Texture2D        Frame;
+        public Texture2D        HandleFrame;
+        public Texture2D        HandleDownFrame;
+        public Texture2D        HandleHoverOverlay;
+        public Texture2D        HandleFocusOverlay;
+
         //----------------------------------------------------------------------
         public Slider( Screen _screen, int _iMin, int _iMax, int _iInitialValue, int _iStep )
         : base( _screen )
         {
+            Frame = Screen.Style.SliderFrame;
+            HandleFrame = Screen.Style.ButtonFrame;
+            HandleDownFrame = Screen.Style.ButtonDownFrame;
+            HandleHoverOverlay = Screen.Style.ButtonHoverOverlay;
+            HandleFocusOverlay = Screen.Style.ButtonFocusOverlay;
+
             Debug.Assert( _iMin < _iMax );
 
             mTooltip    = new Tooltip( Screen, "" );
@@ -152,24 +165,23 @@ namespace NuclearWinter.UI
             mTooltip.Update( _fElapsedTime );
         }
 
-        //----------------------------------------------------------------------
         public override void Draw()
         {
             Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
 
-            Screen.DrawBox( Screen.Style.SliderFrame, rect, Screen.Style.SliderFrameCornerSize, Color.White );
+            Screen.DrawBox( Frame, rect, Screen.Style.SliderFrameCornerSize, Color.White );
 
             int handleX = rect.X + (int)( ( rect.Width - Screen.Style.SliderHandleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
 
-            Screen.DrawBox( (!mbIsPressed) ? Screen.Style.ButtonFrame : Screen.Style.ButtonDownFrame, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+            Screen.DrawBox( (!mbIsPressed) ? HandleFrame : HandleDownFrame, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonHoverOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( HandleHoverOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
 
             if( Screen.IsActive && HasFocus && ! mbIsPressed )
             {
-                Screen.DrawBox( Screen.Style.ButtonFocusOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox( HandleFocusOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
             }
         }
 
