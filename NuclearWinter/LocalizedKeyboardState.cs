@@ -103,15 +103,20 @@ namespace NuclearWinter
             if( isWindows )
 #endif
             {
-                var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle );
-                var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle );
-
-                return (Keys)nativeVirtualCode;
+                return Windows_USEnglishToLocal(_key);
             }
 
 #if FNA
             return _key;
 #endif
+        }
+
+        public static Keys Windows_USEnglishToLocal( Keys _key )
+        {
+            var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.US_English.Handle );
+            var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.Active.Handle );
+
+            return (Keys)nativeVirtualCode;
         }
 
         public static Keys LocalToUSEnglish( Keys _key )
@@ -122,15 +127,20 @@ namespace NuclearWinter
             if( isWindows )
 #endif
             {
-                var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
-                var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
-
-                return (Keys)nativeVirtualCode;
+                return Windows_LocalToUSEnglish(_key);
             }
 
 #if FNA
             return _key;
 #endif
+        }
+
+        public static Keys Windows_LocalToUSEnglish( Keys _key )
+        {
+            var activeScanCode = MapVirtualKeyEx( (uint)_key, MAPVK.VK_TO_VSC, KeyboardLayout.Active.Handle );
+            var nativeVirtualCode = MapVirtualKeyEx( activeScanCode, MAPVK.VSC_TO_VK, KeyboardLayout.US_English.Handle );
+
+            return (Keys)nativeVirtualCode;
         }
     }
 }
