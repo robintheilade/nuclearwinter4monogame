@@ -60,7 +60,9 @@ namespace NuclearWinter
 
         public readonly KeyboardState Native;
 
+#if FNA
         static bool isWindows = SDL2.SDL.SDL_GetPlatform() == "Windows";
+#endif
 
         public LocalizedKeyboardState( KeyboardState keyboardState )
         {
