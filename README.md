@@ -1,19 +1,18 @@
 NuclearWinter
 =============
 
-_NuclearWinter_ is a set of libraries to develop games and applications using XNA and [MonoGame](http://github.com/mono/monogame).
+_NuclearWinter_ is a set of libraries to develop games and applications using XNA and [FNA](https://github.com/flibitijibibo/FNA) on Windows, Mac and Linux.
 
-This repository contains the core of NuclearWinter, featuring game state management, screen resolution handling, an input manager and a user interface library.
+It featuring game state management, an input manager and a fairly versatile user interface library.
 
-NuclearWinter used to contain the VectorLevel library for rendering 2D levels based on SVG files edited with [Inkscape](http://inksape.org/), but it has been removed for now as it is currently unmaintained. You can still find it in older revisions. It might be ressurected as a separate repository at some point in the future.
+NuclearWinter used to contain the VectorLevel library for rendering 2D levels based on SVG files edited with [Inkscape](http://inksape.org/), but it has been removed for now as it is currently unmaintained. You can still find it in older revisions.
 
 NuclearWinter is distributed under the MIT license (see LICENSE.txt). Feel free to use it in your own projects! Contributions are welcome too.
 
 Development
 -----------
 
-NuclearWinter development is led by [Elisée Maurer](http://twitter.com/elisee). NuclearWinter powers both [CraftStudio](http://craftstud.io/), a 3d real-time cooperative game-making platform and the 2D multiplayer arcade game [QuadSmash](http://quadsmash.com/).
-
+NuclearWinter development is led by [Elisée Maurer](http://twitter.com/elisee). NuclearWinter powers both [CraftStudio](http://craftstud.io/), a 3D cubic game-making platform featuring real-time cooperation and the 2D multiplayer arcade game [QuadSmash](http://www.desura.com/games/quadsmash).
 
 Screenshots
 -----------
