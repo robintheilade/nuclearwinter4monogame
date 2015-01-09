@@ -134,6 +134,11 @@ namespace NuclearWinter
                             ApplicationDataFolderPath = osConfigDir + "/.local/share";
                         }
                     }
+                    else
+                    {
+                        ApplicationDataFolderPath = osConfigDir;
+                    }
+
                     break;
                 }
                 
