@@ -34,6 +34,7 @@ namespace NuclearWinter
         public PlayerIndex?                         PlayerInCharge;
 
         public static readonly string               ApplicationDataFolderPath;
+        public static readonly string               DocumentsPath;
 
         public Storage.SaveHandler                  NuclearSaveHandler;
 
@@ -105,18 +106,15 @@ namespace NuclearWinter
             {
                 case "Windows":
                     ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
+                    DocumentsPath = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
                     break;
 
                 case "Mac OS X": {
                     string osConfigDir = Environment.GetEnvironmentVariable("HOME");
-                    if( String.IsNullOrEmpty(osConfigDir) )
-                    {
-                        ApplicationDataFolderPath = "."; // Oh well.
-                    }
-                    else
-                    {
-                        ApplicationDataFolderPath = osConfigDir + "/Library";
-                    }
+                    if( String.IsNullOrEmpty(osConfigDir) ) osConfigDir = ApplicationDataFolderPath = "."; // Oh well.
+                    else ApplicationDataFolderPath = osConfigDir + "/Library";
+
+                    DocumentsPath = System.IO.Path.Combine( osConfigDir, "Documents" );
                     break;
                 }
 
@@ -125,20 +123,17 @@ namespace NuclearWinter
                     if( String.IsNullOrEmpty(osConfigDir) )
                     {
                         osConfigDir = Environment.GetEnvironmentVariable("HOME");
-                        if( String.IsNullOrEmpty(osConfigDir) )
-                        {
-                            ApplicationDataFolderPath = "."; // Oh well.
-                        }
-                        else
-                        {
-                            ApplicationDataFolderPath = osConfigDir + "/.local/share";
-                        }
+
+                        if( String.IsNullOrEmpty(osConfigDir) ) ApplicationDataFolderPath = osConfigDir = "."; // Oh well.
+                        else ApplicationDataFolderPath = osConfigDir + "/.local/share";
                     }
                     else
                     {
                         ApplicationDataFolderPath = osConfigDir;
                     }
 
+                    DocumentsPath = Environment.GetEnvironmentVariable("XDG_DOCUMENTS_DIR");
+                    if( String.IsNullOrEmpty(DocumentsPath) ) DocumentsPath = System.IO.Path.Combine( osConfigDir, "Documents" );
                     break;
                 }
                 
