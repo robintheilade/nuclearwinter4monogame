@@ -101,7 +101,7 @@ namespace NuclearWinter.Input
 
             ActiveShortcutKey       = ShortcutKey.LeftWindows | ShortcutKey.RightWindows;;
 #if FNA
-            if( SDL2.SDL.SDL_GetPlatform() == "MAC OS X" )
+            if( SDL2.SDL.SDL_GetPlatform() == "Mac OS X" )
             {
                 ActiveShortcutKey = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
             }
