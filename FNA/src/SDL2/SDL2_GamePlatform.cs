@@ -639,11 +639,11 @@ namespace Microsoft.Xna.Framework
 				{
 					if (SDL.SDL_GL_SetSwapInterval(-1) != -1)
 					{
-						System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
+						// System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
 					}
 					else
 					{
-						System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
+						// System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
 						SDL.SDL_ClearError();
 						SDL.SDL_GL_SetSwapInterval(1);
 					}

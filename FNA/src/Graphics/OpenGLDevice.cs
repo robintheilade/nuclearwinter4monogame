@@ -512,9 +512,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			LoadGLEntryPoints();
 
 			// Print GL information
-			System.Console.WriteLine("OpenGL Device: " + glGetString(GLenum.GL_RENDERER));
-			System.Console.WriteLine("OpenGL Driver: " + glGetString(GLenum.GL_VERSION));
-			System.Console.WriteLine("OpenGL Vendor: " + glGetString(GLenum.GL_VENDOR));
+			// System.Console.WriteLine("OpenGL Device: " + glGetString(GLenum.GL_RENDERER));
+			// System.Console.WriteLine("OpenGL Driver: " + glGetString(GLenum.GL_VERSION));
+			// System.Console.WriteLine("OpenGL Vendor: " + glGetString(GLenum.GL_VENDOR));
 
 			// Load the extension list, initialize extension-dependent components
 			Extensions = glGetString(GLenum.GL_EXTENSIONS);
