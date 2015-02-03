@@ -99,11 +99,11 @@ namespace NuclearWinter.Input
             lButtons                = Utils.GetValues<Buttons>();
             
 
-            ActiveShortcutKey       = ShortcutKey.LeftWindows | ShortcutKey.RightWindows;;
+            ActiveShortcutKey       = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
 #if FNA
             if( SDL2.SDL.SDL_GetPlatform() == "Mac OS X" )
             {
-                ActiveShortcutKey = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
+                ActiveShortcutKey = ShortcutKey.LeftWindows | ShortcutKey.RightWindows;
             }
 #endif
 
