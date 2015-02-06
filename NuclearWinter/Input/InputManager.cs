@@ -76,6 +76,7 @@ namespace NuclearWinter.Input
         Point                                       mLastPrimaryClickPosition;
 #endif
         bool                                        mbDoubleClicked;
+        bool                                        mbDoubleClicking;
 
         Buttons[]                                   maLastPressedButtons;
         float[]                                     mafRepeatTimers;
@@ -201,6 +202,8 @@ namespace NuclearWinter.Input
                        && Math.Abs( MouseState.Y - mLastPrimaryClickPosition.Y ) <= iDoubleClickHeight )
                     {
                         mbDoubleClicked = true;
+                        // Suppress mouse down / up like the Windows event loop does
+                        mbDoubleClicking = true;
                     }
                 }
 
@@ -209,6 +212,11 @@ namespace NuclearWinter.Input
             }
             else
             {
+                if( mbDoubleClicking && ! IsMouseButtonDown(PrimaryMouseButton) && ! WasMouseButtonDown(PrimaryMouseButton) )
+                {
+                    mbDoubleClicking = false;
+                }
+
                 mfTimeSinceLastClick += fElapsedTime;
             }
 #endif
@@ -312,6 +320,8 @@ namespace NuclearWinter.Input
         //----------------------------------------------------------------------
         public bool IsMouseButtonDown( int _iButton )
         {
+            if( mbDoubleClicking ) return false;
+
             switch( _iButton )
             {
                 case 0:
@@ -333,9 +343,34 @@ namespace NuclearWinter.Input
             }
         }
 
+
+        //----------------------------------------------------------------------
+        bool WasMouseButtonDown( int _iButton )
+        {
+            if( mbDoubleClicking ) return false;
+
+            switch( _iButton )
+            {
+                case 0:
+                    return PreviousMouseState.LeftButton    == ButtonState.Pressed;
+                case 1:
+                    return PreviousMouseState.MiddleButton  == ButtonState.Pressed;
+                case 2:
+                    return PreviousMouseState.RightButton   == ButtonState.Pressed;
+                case 3:
+                    return PreviousMouseState.XButton1      == ButtonState.Pressed;
+                case 4:
+                    return PreviousMouseState.XButton2      == ButtonState.Pressed;
+                default:
+                    return false;
+            }
+        }
+
         //----------------------------------------------------------------------
         public bool WasMouseButtonJustPressed( int _iButton )
         {
+            if( mbDoubleClicking ) return false;
+
             switch( _iButton )
             {
                 case 0:
@@ -358,8 +393,10 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
-        public bool WasMouseButtonJustReleased( int _iButton )
+        public bool WasMouseButtonJustReleased( int _iButton, bool _bIgnoreDoubleClick=false )
         {
+            if( ! _bIgnoreDoubleClick && mbDoubleClicking ) return false;
+
             switch( _iButton )
             {
                 case 0:
