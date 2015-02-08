@@ -280,10 +280,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public virtual void Play()
 		{
-			if (State != SoundState.Stopped && INTERNAL_alSource != 0) // FIXME: alSource check part of timer hack!
+			if (State != SoundState.Stopped)
 			{
-				// FIXME: Is this XNA4 behavior?
-				Stop();
+				return;
 			}
 
 			if (INTERNAL_delayMS != 0 && !INTERNAL_timer.IsRunning)
