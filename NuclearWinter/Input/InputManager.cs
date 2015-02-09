@@ -161,7 +161,21 @@ namespace NuclearWinter.Input
 
             if( IsMouseCaptured )
             {
+#if ! FNA
                 Mouse.SetPosition( PreviousMouseState.X, PreviousMouseState.Y );
+#else
+                int x, y;
+                SDL2.SDL.SDL_GetRelativeMouseState(out x, out y);
+
+                MouseState = new MouseState(
+                    x, y,
+                    MouseState.ScrollWheelValue,
+                    MouseState.LeftButton,
+                    MouseState.MiddleButton,
+                    MouseState.RightButton,
+                    MouseState.XButton1,
+                    MouseState.XButton2 );
+#endif
             }
 
             PreviousKeyboardState = KeyboardState;
@@ -661,13 +675,40 @@ namespace NuclearWinter.Input
         //----------------------------------------------------------------------
         public void CaptureMouse()
         {
-            mSavedMousePosition = new Point( Mouse.GetState().X, Mouse.GetState().Y );
+            var savedMouseState = Mouse.GetState();
+            mSavedMousePosition = new Point( savedMouseState.X, savedMouseState.Y );
+
+#if ! FNA
             Game.IsMouseVisible = false;
             Point mouseCenter = new Point( Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
             Mouse.SetPosition( mouseCenter.X, mouseCenter.Y );
 
             MouseState = Mouse.GetState();
             PreviousMouseState = MouseState;
+#else
+            SDL2.SDL.SDL_SetRelativeMouseMode(SDL2.SDL.SDL_bool.SDL_TRUE);
+            int x, y;
+            SDL2.SDL.SDL_GetRelativeMouseState(out x, out y);
+
+            PreviousMouseState = new MouseState(
+                0, 0, 
+                PreviousMouseState.ScrollWheelValue,
+                PreviousMouseState.LeftButton,
+                PreviousMouseState.MiddleButton,
+                PreviousMouseState.RightButton,
+                PreviousMouseState.XButton1,
+                PreviousMouseState.XButton2 );
+
+            MouseState = new MouseState(
+                0, 0, 
+                MouseState.ScrollWheelValue,
+                MouseState.LeftButton,
+                MouseState.MiddleButton,
+                MouseState.RightButton,
+                MouseState.XButton1,
+                MouseState.XButton2 );
+#endif
+
 
             IsMouseCaptured = true;
         }
@@ -676,6 +717,10 @@ namespace NuclearWinter.Input
         public void ReleaseMouse()
         {
             Debug.Assert( IsMouseCaptured );
+
+#if FNA
+            SDL2.SDL.SDL_SetRelativeMouseMode(SDL2.SDL.SDL_bool.SDL_FALSE);
+#endif
 
             IsMouseCaptured = false;
 
