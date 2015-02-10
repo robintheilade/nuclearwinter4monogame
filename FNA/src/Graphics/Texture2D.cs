@@ -447,7 +447,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			// Create an SDL_RWops*, save PNG to RWops
-			byte[] pngOut = new byte[width * height * 4]; // Max image size
+			const int pngHeaderSize = 41;
+			const int pngFooterSize = 57;
+			byte[] pngOut = new byte[
+				(width * height * 4) +
+				pngHeaderSize +
+				pngFooterSize
+			]; // Max image size
 			IntPtr dst = SDL.SDL_RWFromMem(pngOut, pngOut.Length);
 			SDL_image.IMG_SavePNG_RW(surface, dst, 1);
 			SDL.SDL_FreeSurface(surface); // We're done with the surface.
@@ -458,7 +464,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				(pngOut[34] << 16) |
 				(pngOut[35] << 8) |
 				(pngOut[36])
-			) + 41 + 57; // 41 - header, 57 - footer
+			) + pngHeaderSize + pngFooterSize;
 			stream.Write(pngOut, 0, size);
 		}
 
