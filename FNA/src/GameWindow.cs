@@ -43,6 +43,11 @@ namespace Microsoft.Xna.Framework
 			get;
 		}
 
+		public abstract IntPtr WindowsHandleEXT
+		{
+			get;
+		}
+
 		public abstract string ScreenDeviceName
 		{
 			get;

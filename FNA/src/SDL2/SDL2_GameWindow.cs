@@ -102,6 +102,16 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
+		public override IntPtr WindowsHandleEXT
+		{
+			get
+			{
+				var info = new SDL.SDL_SysWMinfo();
+				SDL.SDL_GetWindowWMInfo(INTERNAL_sdlWindow, ref info);
+				return info.info.win.window;
+			}
+		}
+
 		public override bool IsBorderlessEXT
 		{
 			get
