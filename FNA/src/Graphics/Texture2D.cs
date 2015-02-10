@@ -450,9 +450,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			const int pngHeaderSize = 41;
 			const int pngFooterSize = 57;
 			byte[] pngOut = new byte[
+				Math.Max( 120,
 				(width * height * 4) +
 				pngHeaderSize +
-				pngFooterSize
+				pngFooterSize )
 			]; // Max image size
 			IntPtr dst = SDL.SDL_RWFromMem(pngOut, pngOut.Length);
 			SDL_image.IMG_SavePNG_RW(surface, dst, 1);
