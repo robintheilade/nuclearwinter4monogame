@@ -450,7 +450,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			const int pngHeaderSize = 41;
 			const int pngFooterSize = 57;
 			byte[] pngOut = new byte[
-				Math.Max( 120,
+				Math.Max( 200,
 				(width * height * 4) +
 				pngHeaderSize +
 				pngFooterSize )
