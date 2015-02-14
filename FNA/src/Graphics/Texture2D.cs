@@ -450,11 +450,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			const int pngHeaderSize = 41;
 			const int pngFooterSize = 57;
 			byte[] pngOut = new byte[
-				Math.Max( 200,
 				(width * height * 4) +
 				pngHeaderSize +
-				pngFooterSize )
-			]; // Max image size
+				pngFooterSize +
+				256 // FIXME: Arbitrary zlib data padding for low-res images
+ 			]; // Max image size
 			IntPtr dst = SDL.SDL_RWFromMem(pngOut, pngOut.Length);
 			SDL_image.IMG_SavePNG_RW(surface, dst, 1);
 			SDL.SDL_FreeSurface(surface); // We're done with the surface.
