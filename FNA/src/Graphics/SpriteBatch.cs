@@ -89,10 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		#region Private Static Variables
 
 		private static readonly short[] indexData = GenerateIndexArray();
-		private static readonly byte[] spriteEffectCode = Effect.LoadEffectResource(
-			// FIXME: This will change when we move to MojoShader#!
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
-		);
+		private static readonly byte[] spriteEffectCode = Resources.SpriteEffect;
 		private static readonly TextureComparer TextureCompare = new TextureComparer();
 		private static readonly BackToFrontComparer BackToFrontCompare = new BackToFrontComparer();
 		private static readonly FrontToBackComparer FrontToBackCompare = new FrontToBackComparer();
@@ -479,7 +476,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			DrawString(
 				spriteFont,
-				text.ToString(),
+				text,
 				position,
 				color,
 				0.0f,
@@ -507,7 +504,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			DrawString(
 				spriteFont,
-				text.ToString(),
+				text,
 				position,
 				color,
 				rotation,
@@ -529,21 +526,116 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effects,
 			float layerDepth
 		) {
+			/* FIXME: This method is a duplicate of DrawString(string)!
+			 * The only difference is how we iterate through the StringBuilder.
+			 * We don't use ToString() since it generates garbage.
+			 * -flibit
+			 */
+			CheckBegin("DrawString");
 			if (text == null)
 			{
 				throw new ArgumentNullException("text");
 			}
-			DrawString(
-				spriteFont,
-				text.ToString(),
-				position,
-				color,
-				rotation,
-				origin,
-				scale,
-				effects,
-				layerDepth
-			);
+			if (text.Length == 0)
+			{
+				return;
+			}
+
+			// FIXME: This needs an accuracy check! -flibit
+
+			// Calculate offset, using the string size for flipped text
+			Vector2 baseOffset = origin;
+			if (effects != SpriteEffects.None)
+			{
+				baseOffset -= spriteFont.MeasureString(text) * axisIsMirrored[(int) effects];
+			}
+
+			Vector2 curOffset = Vector2.Zero;
+			bool firstInLine = true;
+			for (int i = 0; i < text.Length; i += 1)
+			{
+				char c = text[i];
+
+				// Special characters
+				if (c == '\r')
+				{
+					continue;
+				}
+				if (c == '\n')
+				{
+					curOffset.X = 0.0f;
+					curOffset.Y += spriteFont.LineSpacing;
+					firstInLine = true;
+					continue;
+				}
+
+				/* Get the List index from the character map, defaulting to the
+				 * DefaultCharacter if it's set.
+				 */
+				int index = spriteFont.characterMap.IndexOf(c);
+				if (index == -1)
+				{
+					if (!spriteFont.DefaultCharacter.HasValue)
+					{
+						throw new ArgumentException(
+							"Text contains characters that cannot be" +
+							" resolved by this SpriteFont.",
+							"text"
+						);
+					}
+					index = spriteFont.characterMap.IndexOf(
+						spriteFont.DefaultCharacter.Value
+					);
+				}
+
+				/* For the first character in a line, always push the width
+				 * rightward, even if the kerning pushes the character to the
+				 * left.
+				 */
+				if (firstInLine)
+				{
+					curOffset.X += Math.Abs(spriteFont.kerning[index].X);
+					firstInLine = false;
+				}
+				else
+				{
+					curOffset.X += spriteFont.Spacing + spriteFont.kerning[index].X;
+				}
+
+				// Calculate the character origin
+				Vector2 offset = baseOffset;
+				offset.X += (curOffset.X + spriteFont.croppingData[index].X) * axisDirection[(int) effects].X;
+				offset.Y += (curOffset.Y + spriteFont.croppingData[index].Y) * axisDirection[(int) effects].Y;
+				if (effects != SpriteEffects.None)
+				{
+					offset += new Vector2(
+						spriteFont.glyphData[index].Width,
+						spriteFont.glyphData[index].Height
+					) * axisIsMirrored[(int) effects];
+				}
+
+				// Draw!
+				PushSprite(
+					spriteFont.textureValue,
+					spriteFont.glyphData[index],
+					new Vector4(
+						position.X,
+						position.Y,
+						scale.X,
+						scale.Y
+					),
+					color,
+					offset,
+					rotation,
+					layerDepth,
+					(byte) effects
+				);
+
+				/* Add the character width and right-side bearing to the line
+				 * width.
+				 */
+				curOffset.X += spriteFont.kerning[index].Y + spriteFont.kerning[index].Z;
+			}
 		}
 
 		public void DrawString(
@@ -600,6 +692,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effects,
 			float layerDepth
 		) {
+			/* FIXME: This method is a duplicate of DrawString(StringBuilder)!
+			 * The only difference is how we iterate through the string.
+			 * -flibit
+			 */
 			CheckBegin("DrawString");
 			if (text == null)
 			{
@@ -913,6 +1009,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			int offset = 0;
 			Texture2D curTexture = null;
 
+			PrepRenderState();
+
+			if (numSprites == 0)
+			{
+				// Nothing to do.
+				return;
+			}
+
 			// FIXME: OPTIMIZATION POINT: Speed up sprite sorting! -flibit
 			if (sortMode == SpriteSortMode.Texture)
 			{
@@ -942,8 +1046,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				);
 			}
 
-			PrepRenderState();
-
 			for (int i = 0; i < numSprites; i += 1)
 			{
 				if (spriteData[i].texture != curTexture)
@@ -972,22 +1074,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			GraphicsDevice.Indices = indexBuffer;
 
 			Viewport viewport = GraphicsDevice.Viewport;
-			Matrix projection;
-			Matrix.CreateOrthographicOffCenter(
-				0,
-				viewport.Width,
-				viewport.Height,
-				0,
-				0,
-				1,
-				out projection
-			);
-			/* FIXME: Half-pixel offset for GL!
-			 * Abstract out, or remove altogether.
+
+			/* FIXME: The following const value is OpenGL-specific!
+			 * We're essentially switching it from a right-handed matrix to a
+			 * left-handed matrix. This allows depths to be accurate for OpenGL
+			 * renderers without having to actually change any data on the game
+			 * side. If you use Ortho in your game, you may have to do this too!
 			 * -flibit
 			 */
-			projection.M41 += -0.5f * projection.M11;
-			projection.M42 += -0.5f * projection.M22;
+			const float depthHand = 1.0f; // Could be -1.0f for D3D!
+
+			// Inlined CreateOrthoGraphicOffCenter
+			Matrix projection = new Matrix(
+				(float) (2.0 / (double) viewport.Width),
+				0.0f,
+				0.0f,
+				0.0f,
+				0.0f,
+				(float) (-2.0 / (double) viewport.Height),
+				0.0f,
+				0.0f,
+				0.0f,
+				0.0f,
+				depthHand,
+				0.0f,
+				-1.0f,
+				1.0f,
+				0.0f,
+				1.0f
+			);
 			Matrix.Multiply(
 				ref transformMatrix,
 				ref projection,

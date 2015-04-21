@@ -77,7 +77,6 @@
     <Compile Include="src\Ray.cs" />
     <Compile Include="src\Rectangle.cs" />
     <Compile Include="src\ReusableItemList.cs" />
-    <Compile Include="src\Threading.cs" />
     <Compile Include="src\Vector2.cs" />
     <Compile Include="src\Vector3.cs" />
     <Compile Include="src\Vector4.cs" />
@@ -103,11 +102,11 @@
     <Compile Include="src\Properties\AssemblyInfo.cs" />
     <Compile Include="src\Storage\StorageContainer.cs" />
     <Compile Include="src\Storage\StorageDevice.cs" />
+    <Compile Include="src\Storage\StorageDeviceNotConnectedException.cs" />
     <Compile Include="src\Input\TextInputEXT.cs" />
     <Compile Include="src\Audio\AudioChannels.cs" />
     <Compile Include="src\Media\MediaPlayer.cs" />
     <Compile Include="src\Media\MediaState.cs" />
-    <Compile Include="src\Media\MediaSourceType.cs" />
     <Compile Include="src\Content\ContentReader.cs" />
     <Compile Include="src\Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="src\Content\ContentTypeReader.cs" />
@@ -149,13 +148,9 @@
     <Compile Include="src\Graphics\States\Blend.cs" />
     <Compile Include="src\Graphics\States\BlendFunction.cs" />
     <Compile Include="src\Graphics\States\BlendState.cs" />
-    <Compile Include="src\Graphics\Effect\EffectParameterCollection.cs" />
-    <Compile Include="src\Graphics\Effect\EffectPassCollection.cs" />
-    <Compile Include="src\Graphics\Effect\EffectTechnique.cs" />
-    <Compile Include="src\Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="src\Graphics\States\CompareFunction.cs" />
     <Compile Include="src\Graphics\States\CullMode.cs" />
-    <Compile Include="src\Graphics\States\DepthFormat.cs" />
+    <Compile Include="src\Graphics\DepthFormat.cs" />
     <Compile Include="src\Graphics\States\DepthStencilState.cs" />
     <Compile Include="src\Graphics\States\FillMode.cs" />
     <Compile Include="src\Graphics\States\RasterizerState.cs" />
@@ -176,9 +171,6 @@
     <Compile Include="src\GraphicsDeviceInformation.cs" />
     <Compile Include="src\GraphicsDeviceManager.cs" />
     <Compile Include="src\Graphics\ColorWriteChannels.cs" />
-    <Compile Include="src\Graphics\Effect\IEffectFog.cs" />
-    <Compile Include="src\Graphics\Effect\IEffectLights.cs" />
-    <Compile Include="src\Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="src\Graphics\DirectionalLight.cs" />
     <Compile Include="src\Graphics\States\TextureAddressMode.cs" />
     <Compile Include="src\Graphics\States\TextureFilter.cs" />
@@ -212,8 +204,6 @@
     <Compile Include="src\Content\ContentReaders\DecimalReader.cs" />
     <Compile Include="src\Content\ContentReaders\RayReader.cs" />
     <Compile Include="src\Content\ContentReaders\SByteReader.cs" />
-    <Compile Include="src\Graphics\Effect\EffectParameterClass.cs" />
-    <Compile Include="src\Graphics\Effect\EffectParameterType.cs" />
     <Compile Include="src\Audio\AudioEngine.cs" />
     <Compile Include="src\Audio\AudioStopOptions.cs" />
     <Compile Include="src\Audio\Cue.cs" />
@@ -242,24 +232,12 @@
     <Compile Include="src\Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="src\Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="src\Content\ContentReaders\VideoReader.cs" />
-    <Compile Include="src\Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="src\Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="src\Graphics\Effect\DualTextureEffect.cs" />
-    <Compile Include="src\Graphics\Shader\ConstantBufferCollection.cs" />
-    <Compile Include="src\Graphics\Shader\ConstantBuffer.cs" />
-    <Compile Include="src\Graphics\Shader\ConstantBuffer.OpenGL.cs" />
-    <Compile Include="src\Graphics\Shader\Shader.cs" />
-    <Compile Include="src\Graphics\Shader\Shader.OpenGL.cs" />
-    <Compile Include="src\Graphics\Shader\ShaderStage.cs" />
-    <Compile Include="src\Graphics\Effect\Effect.cs" />
-    <Compile Include="src\Graphics\Effect\EffectAnnotation.cs" />
-    <Compile Include="src\Graphics\Effect\EffectAnnotationCollection.cs" />
-    <Compile Include="src\Graphics\Effect\EffectHelpers.cs" />
-    <Compile Include="src\Graphics\Effect\EffectParameter.cs" />
-    <Compile Include="src\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="src\Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="src\Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="src\Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="src\Graphics\PackedVector\Alpha8.cs" />
+    <Compile Include="src\Graphics\PackedVector\Bgra5551.cs" />
+    <Compile Include="src\Graphics\PackedVector\Rg32.cs" />
+    <Compile Include="src\Graphics\PackedVector\Rgba1010102.cs" />
+    <Compile Include="src\Graphics\PackedVector\Rgba64.cs" />
     <Compile Include="src\Graphics\PackedVector\Bgra4444.cs" />
     <Compile Include="src\Graphics\PackedVector\Byte4.cs" />
     <Compile Include="src\Graphics\PackedVector\IPackedVector.cs" />
@@ -300,19 +278,13 @@
     <Compile Include="src\Input\MouseState.cs" />
     <Compile Include="src\TitleContainer.cs" />
     <Compile Include="src\Input\Keyboard.cs" />
-    <Compile Include="src\Media\MediaLibrary.cs" />
-    <Compile Include="src\Media\MediaSource.cs" />
     <Compile Include="src\Media\MediaQueue.cs" />
-    <Compile Include="src\Media\Playlist.cs" />
-    <Compile Include="src\Media\PlaylistCollection.cs" />
     <Compile Include="src\Media\SongCollection.cs" />
     <Compile Include="src\Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="src\Content\ContentReaders\ExternalReferenceReader.cs" />
-    <Compile Include="src\Graphics\Effect\EffectMaterial.cs" />
-    <Compile Include="src\Graphics\Shader\ShaderProgramCache.cs" />
-    <Compile Include="src\Utilities\Hash.cs" />
     <Compile Include="src\Content\ResourceContentManager.cs" />
     <Compile Include="src\Media\VideoSoundtrackType.cs" />
+    <Compile Include="src\Audio\RendererDetail.cs" />
     <Compile Include="src\Audio\OpenALDevice.cs" />
     <Compile Include="src\Audio\SoundEffect.cs" />
     <Compile Include="src\Audio\SoundEffectInstance.cs" />
@@ -321,31 +293,52 @@
     <Compile Include="src\SDL2\SDL2_GameWindow.cs" />
     <Compile Include="src\SDL2\Input\SDL2_Mouse.cs" />
     <Compile Include="src\SDL2\Input\SDL2_KeyboardUtil.cs" />
-    <Compile Include="src\SDL2\Media\Video.cs" />
-    <Compile Include="src\SDL2\Media\VideoPlayer.cs" />
-    <Compile Include="src\SDL2\Media\Song.cs" />
+    <Compile Include="src\Media\Xiph\Video.cs" />
+    <Compile Include="src\Media\Xiph\VideoPlayer.cs" />
+    <Compile Include="src\Media\Xiph\Song.cs" />
     <Compile Include="src\Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="src\Audio\CueData.cs" />
     <Compile Include="src\Audio\XACTInternal.cs" />
     <Compile Include="src\Graphics\DeviceLostException.cs" />
     <Compile Include="src\Graphics\DeviceNotResetException.cs" />
     <Compile Include="src\Graphics\NoSuitableGraphicsDeviceException.cs" />
+    <Compile Include="src\Graphics\IGLDevice.cs" />
     <Compile Include="src\Graphics\OpenGLDevice.cs" />
     <Compile Include="src\Graphics\OpenGLDevice_GL.cs" />
     <Compile Include="src\Graphics\OcclusionQuery.cs" />
     <Compile Include="src\Input\Touch\TouchPanelState.cs" />
     <Compile Include="src\Audio\DynamicSoundEffectInstance.cs" />
     <Compile Include="src\FrameworkDispatcher.cs" />
-    <Compile Include="src\Audio\DSPEffect.cs" />
+    <Compile Include="src\Audio\IALDevice.cs" />
+    <Compile Include="src\Audio\AudioDevice.cs" />
     <Compile Include="src\Utilities\AssemblyHelper.cs" />
     <Compile Include="src\Utilities\FileHelpers.cs" />
     <Compile Include="src\Content\ContentSerializerRuntimeTypeAttribute.cs" />
     <Compile Include="src\Content\ContentSerializerTypeVersionAttribute.cs" />
     <Compile Include="src\Content\ContentSerializerCollectionItemNameAttribute.cs" />
-    <Compile Include="src\Media\Album.cs" />
-    <Compile Include="src\Media\AlbumCollection.cs" />
-    <Compile Include="src\Media\Artist.cs" />
-    <Compile Include="src\Media\Genre.cs" />
+    <Compile Include="src\Graphics\Effect\Effect.cs" />
+    <Compile Include="src\Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="src\Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="src\Graphics\Effect\EffectMaterial.cs" />
+    <Compile Include="src\Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="src\Graphics\Effect\EffectParameterClass.cs" />
+    <Compile Include="src\Graphics\Effect\EffectParameterCollection.cs" />
+    <Compile Include="src\Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="src\Graphics\Effect\EffectPass.cs" />
+    <Compile Include="src\Graphics\Effect\EffectPassCollection.cs" />
+    <Compile Include="src\Graphics\Effect\EffectTechnique.cs" />
+    <Compile Include="src\Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="src\Graphics\Effect\IEffectFog.cs" />
+    <Compile Include="src\Graphics\Effect\IEffectLights.cs" />
+    <Compile Include="src\Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="src\Graphics\Effect\Resources.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\AlphaTestEffect.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\BasicEffect.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\DualTextureEffect.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\EffectHelpers.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\EnvironmentMapEffect.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\SkinnedEffect.cs" />
+    <Compile Include="src\Graphics\Effect\StockEffects\SpriteEffect.cs" />
     <Compile Include="src\Design\ColorConverter.cs" />
     <Compile Include="src\Design\PointConverter.cs" />
     <Compile Include="src\Design\Vector2Converter.cs" />
@@ -355,13 +348,14 @@
     <Compile Include="src\NamespaceDocs.cs" />
     <Compile Include="lib\SDL2-CS\src\SDL2.cs" />
     <Compile Include="lib\SDL2-CS\src\SDL2_image.cs" />
-    <Compile Include="lib\SDL2-CS\src\SDL2_mixer.cs" />
     <Compile Include="lib\SDL2-CS\src\LPUtf8StrMarshaler.cs" />
     <Compile Include="lib\OpenAL-CS\src\ALC10.cs" />
     <Compile Include="lib\OpenAL-CS\src\AL10.cs" />
     <Compile Include="lib\OpenAL-CS\src\ALEXT.cs" />
     <Compile Include="lib\OpenAL-CS\src\EFX.cs" />
+    <Compile Include="lib\MojoShader-CS\MojoShader.cs" />
     <Compile Include="lib\TheoraPlay-CS\TheoraPlay.cs" />
+    <Compile Include="lib\Vorbisfile-CS\Vorbisfile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FNA.dll.config">
@@ -369,23 +363,26 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\AlphaTestEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.fxb</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\BasicEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.fxb</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\DualTextureEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.fxb</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\EnvironmentMapEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.fxb</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\SkinnedEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.fxb</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
-      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo</LogicalName>
+    <EmbeddedResource Include="src\Graphics\Effect\StockEffects\FXB\SpriteEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.fxb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\Graphics\Effect\YUVToRGBA\YUVToRGBAEffect.fxb">
+      <LogicalName>Microsoft.Xna.Framework.Graphics.Effect.Resources.YUVToRGBAEffect.fxb</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ProjectExtensions>

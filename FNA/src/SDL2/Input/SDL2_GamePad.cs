@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Input
 	[Serializable]
 	public class MonoGameJoystickConfig
 	{
-		// public MonoGameJoystickValue BUTTON_GUIDE = new MonoGameJoystickValue();
+		public MonoGameJoystickValue BUTTON_GUIDE = new MonoGameJoystickValue();
 		public MonoGameJoystickValue BUTTON_START = new MonoGameJoystickValue();
 		public MonoGameJoystickValue BUTTON_BACK = new MonoGameJoystickValue();
 		public MonoGameJoystickValue BUTTON_A = new MonoGameJoystickValue();
@@ -314,19 +314,19 @@ namespace Microsoft.Xna.Framework.Input
 			// Check for an SDL_GameController configuration first!
 			if (INTERNAL_isGameController[which])
 			{
-				/*System.Console.WriteLine(
+				System.Console.WriteLine(
 					"Controller " + which.ToString() + ", " +
 					SDL.SDL_GameControllerName(INTERNAL_devices[which]) +
 					", will use SDL_GameController support."
-				);*/
+				);
 			}
 			else
 			{
-				/*System.Console.WriteLine(
+				System.Console.WriteLine(
 					"Controller " + which.ToString() + ", " +
 					SDL.SDL_JoystickName(INTERNAL_devices[which]) +
 					", will use generic MonoGameJoystick support."
-				);*/
+				);
 			}
 		}
 
@@ -561,6 +561,10 @@ namespace Microsoft.Xna.Framework.Input
 			{
 				b |= Buttons.Start;
 			}
+			if (READTYPE_ReadBool(INTERNAL_joystickConfig.BUTTON_GUIDE, device, DeadZone))
+			{
+				b |= Buttons.BigButton;
+			}
 
 			// Stick buttons
 			if (READTYPE_ReadBool(INTERNAL_joystickConfig.BUTTON_LSTICK, device, DeadZone))
@@ -691,6 +695,7 @@ namespace Microsoft.Xna.Framework.Input
 				HasYButton =			INTERNAL_joystickConfig.BUTTON_Y.INPUT_TYPE		!= InputType.None,
 				HasBackButton =			INTERNAL_joystickConfig.BUTTON_BACK.INPUT_TYPE		!= InputType.None,
 				HasStartButton =		INTERNAL_joystickConfig.BUTTON_START.INPUT_TYPE		!= InputType.None,
+				HasBigButton =			INTERNAL_joystickConfig.BUTTON_GUIDE.INPUT_TYPE		!= InputType.None,
 				HasDPadDownButton =		INTERNAL_joystickConfig.DPAD_DOWN.INPUT_TYPE		!= InputType.None,
 				HasDPadLeftButton =		INTERNAL_joystickConfig.DPAD_LEFT.INPUT_TYPE		!= InputType.None,
 				HasDPadRightButton =		INTERNAL_joystickConfig.DPAD_RIGHT.INPUT_TYPE		!= InputType.None,
@@ -708,8 +713,7 @@ namespace Microsoft.Xna.Framework.Input
 
 				HasLeftVibrationMotor = INTERNAL_haptics[(int) playerIndex] != IntPtr.Zero,
 				HasRightVibrationMotor = INTERNAL_haptics[(int) playerIndex] != IntPtr.Zero,
-				HasVoiceSupport = false,
-				HasBigButton = false
+				HasVoiceSupport = false
 			};
 		}
 
@@ -756,9 +760,9 @@ namespace Microsoft.Xna.Framework.Input
 							device,
 							SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY
 						) / -32768.0f
-					)
+					),
+					deadZoneMode
 				);
-				gc_sticks.ApplyDeadZone(deadZoneMode, DeadZoneSize);
 				gc_buttonState |= READ_StickToButtons(
 					gc_sticks.Left,
 					Buttons.LeftThumbstickLeft,
@@ -826,6 +830,10 @@ namespace Microsoft.Xna.Framework.Input
 				if (SDL.SDL_GameControllerGetButton(device, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START) != 0)
 				{
 					gc_buttonState |= Buttons.Start;
+				}
+				if (SDL.SDL_GameControllerGetButton(device, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_GUIDE) != 0)
+				{
+					gc_buttonState |= Buttons.BigButton;
 				}
 				if (SDL.SDL_GameControllerGetButton(device, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK) != 0)
 				{
@@ -898,9 +906,9 @@ namespace Microsoft.Xna.Framework.Input
 				new Vector2(
 					READTYPE_ReadFloat(INTERNAL_joystickConfig.AXIS_RX, device),
 					-READTYPE_ReadFloat(INTERNAL_joystickConfig.AXIS_RY, device)
-				)
+				),
+				deadZoneMode
 			);
-			sticks.ApplyDeadZone(deadZoneMode, DeadZoneSize);
 			buttonState |= READ_StickToButtons(
 				sticks.Left,
 				Buttons.LeftThumbstickLeft,

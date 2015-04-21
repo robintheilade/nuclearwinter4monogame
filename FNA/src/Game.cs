@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -290,6 +291,8 @@ namespace Microsoft.Xna.Framework
 			Platform.Activated += OnActivated;
 			Platform.Deactivated += OnDeactivated;
 			_services.AddService(typeof(GamePlatform), Platform);
+
+			AudioDevice.Initialize();
 		}
 
 		#endregion
@@ -339,12 +342,12 @@ namespace Microsoft.Xna.Framework
 
 					if (_graphicsDeviceManager != null)
 					{
-						Effect.FlushCache();
-
 						// FIXME: Does XNA4 require the GDM to be disposable? -flibit
 						(_graphicsDeviceManager as IDisposable).Dispose();
 						_graphicsDeviceManager = null;
 					}
+
+					AudioDevice.Dispose();
 
 					if (Platform != null)
 					{
@@ -732,6 +735,8 @@ namespace Microsoft.Xna.Framework
 			AssertNotDisposed();
 			if (Platform.BeforeUpdate(gameTime))
 			{
+				AudioDevice.Update();
+
 				Update(gameTime);
 
 				/* The TouchPanel needs to know the time for when

@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 
 // TODO: THEORAPLAY_Io and its functions.
 
-public class TheoraPlay
+public static class TheoraPlay
 {
 	const string theoraplay_libname = "libtheoraplay.dll";
 

@@ -40,11 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#region Internal Properties
 
-		internal OpenGLDevice.OpenGLVertexBuffer Handle
-		{
-			get;
-			private set;
-		}
+		internal IGLBuffer buffer;
 
 		#endregion
 
@@ -91,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		) {
 			if (graphicsDevice == null)
 			{
-				throw new ArgumentNullException("GraphicsDevice cannot be null");
+				throw new ArgumentNullException("graphicsDevice");
 			}
 
 			GraphicsDevice = graphicsDevice;
@@ -105,15 +101,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				vertexDeclaration.GraphicsDevice = graphicsDevice;
 			}
 
-			Threading.ForceToMainThread(() =>
-			{
-				Handle = new OpenGLDevice.OpenGLVertexBuffer(
-					GraphicsDevice,
-					dynamic,
-					VertexCount,
-					VertexDeclaration.VertexStride
-				);
-			});
+			buffer = GraphicsDevice.GLDevice.GenVertexBuffer(
+				dynamic,
+				VertexCount,
+				VertexDeclaration.VertexStride
+			);
 		}
 
 		#endregion
@@ -124,14 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (!IsDisposed)
 			{
-				GraphicsDevice.AddDisposeAction(() =>
-				{
-					if( Handle != null )
-					{
-						Game.Instance.GraphicsDevice.GLDevice.DeleteVertexBuffer(Handle);
-						Handle = null;
-					}
-				});
+				GraphicsDevice.GLDevice.AddDisposeVertexBuffer(buffer);
 			}
 			base.Dispose(disposing);
 		}
@@ -174,10 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		) where T : struct {
 			if (data == null)
 			{
-				throw new ArgumentNullException(
-					"data",
-					"This method does not accept null for this parameter."
-				);
+				throw new ArgumentNullException("data");
 			}
 			if (data.Length < (startIndex + elementCount))
 			{
@@ -190,20 +172,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 			}
-			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+
+			if (vertexStride == 0)
+			{
+				vertexStride = Marshal.SizeOf(typeof(T));
+			}
+			if (	elementCount > 1 &&
+				(elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride)	)
 			{
 				throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 			}
 
-			Threading.ForceToMainThread(() =>
-				GraphicsDevice.GLDevice.GetVertexBufferData(
-					Handle,
-					offsetInBytes,
-					data,
-					startIndex,
-					elementCount,
-					vertexStride
-				)
+			GraphicsDevice.GLDevice.GetVertexBufferData(
+				buffer,
+				offsetInBytes,
+				data,
+				startIndex,
+				elementCount,
+				vertexStride
 			);
 		}
 
@@ -218,7 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				data,
 				0,
 				data.Length,
-				VertexDeclaration.VertexStride,
+				Marshal.SizeOf(typeof(T)),
 				SetDataOptions.None
 			);
 		}
@@ -233,7 +219,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				data,
 				startIndex,
 				elementCount,
-				VertexDeclaration.VertexStride,
+				Marshal.SizeOf(typeof(T)),
 				SetDataOptions.None
 			);
 		}
@@ -250,7 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				data,
 				startIndex,
 				elementCount,
-				VertexDeclaration.VertexStride,
+				vertexStride,
 				SetDataOptions.None
 			);
 		}
@@ -269,39 +255,47 @@ namespace Microsoft.Xna.Framework.Graphics
 		) where T : struct {
 			if (data == null)
 			{
-				throw new ArgumentNullException("data is null");
+				throw new ArgumentNullException("data");
 			}
-			if (data.Length < (startIndex + elementCount))
+			if ((startIndex + elementCount > data.Length) || elementCount <= 0)
 			{
-				throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+				throw new InvalidOperationException(
+					"The array specified in the data parameter" +
+					" is not the correct size for the amount of" +
+					" data requested."
+				);
 			}
 
-			int bufferSize = VertexCount * VertexDeclaration.VertexStride;
-
-			if (	vertexStride > bufferSize ||
-				vertexStride < VertexDeclaration.VertexStride	)
+			if (	elementCount > 1 &&
+				(elementCount * vertexStride > (int) buffer.BufferSize)	)
 			{
-				throw new ArgumentOutOfRangeException(
-					"One of the following conditions is true:\n" +
-					"The vertex stride is larger than the vertex buffer.\n" +
-					"The vertex stride is too small for the type of data requested."
+				throw new InvalidOperationException(
+					"The vertex stride is larger than the vertex buffer."
 				);
 			}
 
 			int elementSizeInBytes = Marshal.SizeOf(typeof(T));
+			if (vertexStride == 0)
+			{
+				vertexStride = elementSizeInBytes;
+			}
+			if (vertexStride < elementSizeInBytes)
+			{
+				throw new ArgumentOutOfRangeException(
+					"The vertex stride must be greater than" +
+					" or equal to the size of the specified data (" +
+					elementSizeInBytes.ToString() + ")."
+				);
+			}
 
-			Threading.ForceToMainThread(() =>
-				GraphicsDevice.GLDevice.SetVertexBufferData(
-					Handle,
-					bufferSize,
-					elementSizeInBytes,
-					offsetInBytes,
-					data,
-					startIndex,
-					elementCount,
-					vertexStride,
-					options
-				)
+			GraphicsDevice.GLDevice.SetVertexBufferData(
+				buffer,
+				elementSizeInBytes,
+				offsetInBytes,
+				data,
+				startIndex,
+				elementCount,
+				options
 			);
 		}
 

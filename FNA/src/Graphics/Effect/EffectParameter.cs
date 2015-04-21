@@ -1,881 +1,1275 @@
+#region License
+/* FNA - XNA4 Reimplementation for Desktop Platforms
+ * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ *
+ * Released under the Microsoft Public License.
+ * See LICENSE for details.
+ */
+#endregion
+
+#region Using Statements
 using System;
-using System.Text;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [DebuggerDisplay("{DebugDisplayString}")]
-	public class EffectParameter
+	public sealed class EffectParameter
 	{
-        /// <summary>
-        /// The next state key used when an effect parameter
-        /// is updated by any of the 'set' methods.
-        /// </summary>
-        internal static ulong NextStateKey { get; private set; }
+		#region Public Properties
 
-        internal EffectParameter(   EffectParameterClass class_, 
-                                    EffectParameterType type, 
-                                    string name, 
-                                    int rowCount, 
-                                    int columnCount,
-                                    string semantic, 
-                                    EffectAnnotationCollection annotations,
-                                    EffectParameterCollection elements,
-                                    EffectParameterCollection structMembers,
-                                    object data )
+		public string Name
 		{
-            ParameterClass = class_;
-            ParameterType = type;
+			get;
+			private set;
+		}
 
-            Name = name;
-            Semantic = semantic;
-            Annotations = annotations;
+		public string Semantic
+		{
+			get;
+			private set;
+		}
 
-            RowCount = rowCount;
+		public int RowCount
+		{
+			get;
+			private set;
+		}
+
+		public int ColumnCount
+		{
+			get;
+			private set;
+		}
+
+		public EffectParameterClass ParameterClass
+		{
+			get;
+			private set;
+		}
+
+		public EffectParameterType ParameterType
+		{
+			get;
+			private set;
+		}
+
+		public EffectParameterCollection Elements
+		{
+			get;
+			private set;
+		}
+
+		public EffectParameterCollection StructureMembers
+		{
+			get;
+			private set;
+		}
+
+		public EffectAnnotationCollection Annotations
+		{
+			get;
+			private set;
+		}
+
+		#endregion
+
+		#region Internal Variables
+
+		internal Texture texture;
+
+		#endregion
+
+		#region Private Variables
+
+		private IntPtr values;
+
+		#endregion
+
+		#region Internal Constructor
+
+		internal EffectParameter(
+			string name,
+			string semantic,
+			int rowCount,
+			int columnCount,
+			int elementCount,
+			EffectParameterClass parameterClass,
+			EffectParameterType parameterType,
+			EffectParameterCollection structureMembers,
+			EffectAnnotationCollection annotations,
+			IntPtr data
+		) {
+			Name = name;
+			Semantic = semantic;
+			RowCount = rowCount;
 			ColumnCount = columnCount;
-
-            Elements = elements;
-            StructureMembers = structMembers;
-
-            Data = data;
-            StateKey = unchecked(NextStateKey++);
-		}
-
-        internal EffectParameter(EffectParameter cloneSource)
-        {
-            // Share all the immutable types.
-            ParameterClass = cloneSource.ParameterClass;
-            ParameterType = cloneSource.ParameterType;
-            Name = cloneSource.Name;
-            Semantic = cloneSource.Semantic;
-            Annotations = cloneSource.Annotations;
-            RowCount = cloneSource.RowCount;
-            ColumnCount = cloneSource.ColumnCount;
-
-            // Clone the mutable types.
-            Elements = cloneSource.Elements.Clone();
-            StructureMembers = cloneSource.StructureMembers.Clone();
-
-            // The data is mutable, so we have to clone it.
-            var array = cloneSource.Data as Array;
-            if (array != null)
-                Data = array.Clone();
-            StateKey = unchecked(NextStateKey++);
-        }
-
-		public string Name { get; private set; }
-
-        public string Semantic { get; private set; }
-
-		public EffectParameterClass ParameterClass { get; private set; }
-
-		public EffectParameterType ParameterType { get; private set; }
-
-		public int RowCount { get; private set; }
-
-        public int ColumnCount { get; private set; }
-
-        public EffectParameterCollection Elements { get; private set; }
-
-        public EffectParameterCollection StructureMembers { get; private set; }
-
-        public EffectAnnotationCollection Annotations { get; private set; }
-
-
-        // TODO: Using object adds alot of boxing/unboxing overhead
-        // and garbage generation.  We should consider a templated
-        // type implementation to fix this!
-
-        internal object Data { get; private set; }
-
-        /// <summary>
-        /// The current state key which is used to detect
-		/// if the parameter value has been changed.
-        /// </summary>
-        internal ulong StateKey { get; private set; }
-
-        /// <summary>
-        /// Property referenced by the DebuggerDisplayAttribute.
-        /// </summary>
-        private string DebugDisplayString
-        {
-            get
-            {
-                var semanticStr = string.Empty;
-                if (!string.IsNullOrEmpty(Semantic))                
-                    semanticStr = string.Concat(" <", Semantic, ">");
-
-                string valueStr;
-                if (Data == null)
-                    valueStr = "(null)";
-                else
-                {
-                    switch (ParameterClass)
-                    {
-                        // Object types are stored directly in the Data property.
-                        // Display Data's string value.
-                        case EffectParameterClass.Object:
-                            valueStr = Data.ToString();
-                            break;
-
-                        // Matrix types are stored in a float[16] which we don't really have room for.
-                        // Display "...".
-                        case EffectParameterClass.Matrix:
-                            valueStr = "...";
-                            break;
-
-                        // Scalar types are stored as a float[1].
-                        // Display the first (and only) element's string value.                    
-                        case EffectParameterClass.Scalar:
-                            valueStr = (Data as Array).GetValue(0).ToString();
-                            break;
-
-                        // Vector types are stored as an Array<Type>.
-                        // Display the string value of each array element.
-                        case EffectParameterClass.Vector:
-                            var array = Data as Array;
-                            var arrayStr = new string[array.Length];
-                            var idx = 0;
-                            foreach (var e in array)
-                            {
-                                arrayStr[idx] = array.GetValue(idx).ToString();
-                                idx++;
-                            }
-
-                            valueStr = string.Join(" ", arrayStr);
-                            break;
-
-                        // Handle additional cases here...
-                        default:
-                            valueStr = Data.ToString();
-                            break;
-                    }
-                }
-                
-                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", valueStr);
-            }
-        }
-
-
-        public bool GetValueBoolean ()
-		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
-                throw new InvalidCastException();
-
-#if DIRECTX
-            return ((int[])Data)[0] != 0;
-#else
-            // MojoShader encodes even booleans into a float.
-            return ((float[])Data)[0] != 0.0f;
-#endif
-        }
-        
-        /*
-		public bool[] GetValueBooleanArray ()
-		{
-			throw new NotImplementedException();
-		}
-        */
-
-		public int GetValueInt32 ()
-		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
-                throw new InvalidCastException();
-
-#if DIRECTX
-            return ((int[])Data)[0];
-#else
-            // MojoShader encodes integers into a float.
-            return (int)((float[])Data)[0];
-#endif
-        }
-        
-        /*
-		public int[] GetValueInt32Array ()
-		{
-			throw new NotImplementedException();
-		}
-        */
-
-		public Matrix GetValueMatrix ()
-		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            if (RowCount != 4 || ColumnCount != 4)
-                throw new InvalidCastException();
-
-            var floatData = (float[])Data;
-
-            return new Matrix(  floatData[0], floatData[4], floatData[8], floatData[12],
-                                floatData[1], floatData[5], floatData[9], floatData[13],
-                                floatData[2], floatData[6], floatData[10], floatData[14],
-                                floatData[3], floatData[7], floatData[11], floatData[15]);
-		}
-        
-		public Matrix[] GetValueMatrixArray (int count)
-		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var ret = new Matrix[count];
-            for (var i = 0; i < count; i++)
-                ret[i] = Elements[i].GetValueMatrix();
-
-		    return ret;
-		}
-
-		public Quaternion GetValueQuaternion ()
-		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var vecInfo = (float[])Data;
-            return new Quaternion(vecInfo[0], vecInfo[1], vecInfo[2], vecInfo[3]);
-        }
-
-        /*
-		public Quaternion[] GetValueQuaternionArray ()
-		{
-			throw new NotImplementedException();
-		}
-        */
-
-		public Single GetValueSingle ()
-		{
-            // TODO: Should this fetch int and bool as a float?
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-			return ((float[])Data)[0];
-		}
-
-		public Single[] GetValueSingleArray ()
-		{
-			if (Elements != null && Elements.Count > 0)
-            {
-                var ret = new Single[RowCount * ColumnCount * Elements.Count];
-				for (int i=0; i<Elements.Count; i++)
-                {
-                    var elmArray = Elements[i].GetValueSingleArray();
-                    for (var j = 0; j < elmArray.Length; j++)
-						ret[RowCount*ColumnCount*i+j] = elmArray[j];
-				}
-				return ret;
-			}
-			
-			switch(ParameterClass) 
-            {
-			case EffectParameterClass.Scalar:
-				return new Single[] { GetValueSingle () };
-            case EffectParameterClass.Vector:
-			case EffectParameterClass.Matrix:
-                    if (Data is Matrix)
-                        return Matrix.ToFloatArray((Matrix)Data);
-                    else
-                        return (float[])Data;
-			default:
-				throw new NotImplementedException();
-			}
-		}
-
-		public string GetValueString ()
-		{
-            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.String)
-                throw new InvalidCastException();
-
-		    return ((string[])Data)[0];
-		}
-
-		public Texture2D GetValueTexture2D ()
-		{
-            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Texture2D)
-                throw new InvalidCastException();
-
-			return (Texture2D)Data;
-		}
-
-#if !GLES
-	    public Texture3D GetValueTexture3D ()
-	    {
-            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Texture3D)
-                throw new InvalidCastException();
-
-            return (Texture3D)Data;
-	    }
-#endif
-
-		public TextureCube GetValueTextureCube ()
-		{
-            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.TextureCube)
-                throw new InvalidCastException();
-
-            return (TextureCube)Data;
-		}
-
-		public Vector2 GetValueVector2 ()
-		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var vecInfo = (float[])Data;
-			return new Vector2(vecInfo[0],vecInfo[1]);
-		}
-
-		public Vector2[] GetValueVector2Array()
-		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-			if (Elements != null && Elements.Count > 0)
+			if (elementCount > 0)
 			{
-				Vector2[] result = new Vector2[Elements.Count];
-				for (int i = 0; i < Elements.Count; i++)
+				List<EffectParameter> elements = new List<EffectParameter>(elementCount);
+				for (int i = 0; i < elementCount; i += 1)
 				{
-					var v = Elements[i].GetValueSingleArray();
-					result[i] = new Vector2(v[0], v[1]);
+					// FIXME: Probably incomplete? -flibit
+					elements.Add(new EffectParameter(
+						null,
+						null,
+						rowCount,
+						columnCount,
+						0,
+						ParameterClass,
+						parameterType,
+						null, // FIXME: See mojoshader_effects.c:readvalue -flibit
+						null,
+						new IntPtr(
+							data.ToInt64() + (i * rowCount * columnCount)
+						)
+					));
 				}
-			return result;
+				Elements = new EffectParameterCollection(elements);
 			}
-			
-		return null;
+			ParameterClass = parameterClass;
+			ParameterType = parameterType;
+			StructureMembers = structureMembers;
+			Annotations = annotations;
+			values = data;
 		}
 
-		public Vector3 GetValueVector3 ()
+		#endregion
+
+		#region Public Get Methods
+
+		public bool GetValueBoolean()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var vecInfo = (float[])Data;
-			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
+			unsafe
+			{
+				// Values are always 4 bytes, so we get to do this. -flibit
+				int* resPtr = (int*) values;
+				return *resPtr != 0;
+			}
 		}
 
-       public Vector3[] GetValueVector3Array()
-        {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector3[] result = new Vector3[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector3(v[0], v[1], v[2]);
-                }
-                return result;
-            }
-            return null;
-        }
-
-
-		public Vector4 GetValueVector4 ()
+		public bool[] GetValueBooleanArray(int count)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var vecInfo = (float[])Data;
-			return new Vector4(vecInfo[0],vecInfo[1],vecInfo[2],vecInfo[3]);
+			bool[] result = new bool[count];
+			unsafe
+			{
+				int* resPtr = (int*) values;
+				for (int i = 0; i < count; i += 1)
+				{
+					result[i] = resPtr[i] != 0;
+				}
+			}
+			return result;
 		}
-        
-          public Vector4[] GetValueVector4Array()
-        {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
 
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector4[] result = new Vector4[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector4(v[0], v[1],v[2], v[3]);
-                }
-                return result;
-            }
-            return null;
-        }
-
-		public void SetValue (bool value)
+		public int GetValueInt32()
 		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
-                throw new InvalidCastException();
-
-#if DIRECTX
-            // We store the bool as an integer as that
-            // is what the constant buffers expect.
-            ((int[])Data)[0] = value ? 1 : 0;
-#else
-            // MojoShader encodes even booleans into a float.
-            ((float[])Data)[0] = value ? 1 : 0;
-#endif
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				int* resPtr = (int*) values;
+				return *resPtr;
+			}
 		}
 
-        /*
-		public void SetValue (bool[] value)
+		public int[] GetValueInt32Array(int count)
 		{
-			throw new NotImplementedException();
+			int[] result = new int[count];
+			Marshal.Copy(values, result, 0, count);
+			return result;
 		}
-        */
 
-		public void SetValue (int value)
+		public Matrix GetValueMatrix()
 		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
-                throw new InvalidCastException();
-
-#if DIRECTX
-            ((int[])Data)[0] = value;
-#else
-            // MojoShader encodes integers into a float.
-            ((float[])Data)[0] = value;
-#endif
-            StateKey = unchecked(NextStateKey++);
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[1],
+						resPtr[2],
+						resPtr[3],
+						resPtr[4],
+						resPtr[5],
+						resPtr[6],
+						resPtr[7],
+						resPtr[8],
+						resPtr[9],
+						resPtr[10],
+						resPtr[11],
+						resPtr[12],
+						resPtr[13],
+						resPtr[14],
+						resPtr[15]
+					);
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[1],
+						resPtr[2],
+						0.0f,
+						resPtr[3],
+						resPtr[4],
+						resPtr[5],
+						0.0f,
+						resPtr[6],
+						resPtr[7],
+						resPtr[8],
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f
+					);
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[1],
+						resPtr[2],
+						0.0f,
+						resPtr[3],
+						resPtr[4],
+						resPtr[5],
+						0.0f,
+						resPtr[6],
+						resPtr[7],
+						resPtr[8],
+						0.0f,
+						resPtr[9],
+						resPtr[10],
+						resPtr[11],
+						0.0f
+					);
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[1],
+						resPtr[2],
+						resPtr[3],
+						resPtr[4],
+						resPtr[5],
+						resPtr[6],
+						resPtr[7],
+						resPtr[8],
+						resPtr[9],
+						resPtr[10],
+						resPtr[11],
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f
+					);
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
 		}
 
-        /*
-		public void SetValue (int[] value)
+		public Matrix[] GetValueMatrixArray(int count)
 		{
-			throw new NotImplementedException();
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			Matrix[] result = new Matrix[count];
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				int curOffset = 0;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 8],
+							resPtr[curOffset + 9],
+							resPtr[curOffset + 10],
+							resPtr[curOffset + 11],
+							resPtr[curOffset + 12],
+							resPtr[curOffset + 13],
+							resPtr[curOffset + 14],
+							resPtr[curOffset + 15]
+						);
+					}
+					curOffset += 16;
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 2],
+							0.0f,
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 5],
+							0.0f,
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 8],
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f
+						);
+					}
+					curOffset += 9;
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 2],
+							0.0f,
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 5],
+							0.0f,
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 8],
+							0.0f,
+							resPtr[curOffset + 9],
+							resPtr[curOffset + 10],
+							resPtr[curOffset + 11],
+							0.0f
+						);
+					}
+					curOffset += 12;
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 8],
+							resPtr[curOffset + 9],
+							resPtr[curOffset + 10],
+							resPtr[curOffset + 11],
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f
+						);
+					}
+					curOffset += 12;
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
+			return result;
 		}
-        */
 
-        public void SetValue(Matrix value)
-        {
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
+		public Matrix GetValueMatrixTranspose()
+		{
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[4],
+						resPtr[8],
+						resPtr[12],
+						resPtr[1],
+						resPtr[5],
+						resPtr[9],
+						resPtr[13],
+						resPtr[2],
+						resPtr[6],
+						resPtr[10],
+						resPtr[14],
+						resPtr[3],
+						resPtr[7],
+						resPtr[11],
+						resPtr[15]
+					);
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[3],
+						resPtr[6],
+						0.0f,
+						resPtr[1],
+						resPtr[4],
+						resPtr[7],
+						0.0f,
+						resPtr[2],
+						resPtr[5],
+						resPtr[8],
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f
+					);
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[4],
+						resPtr[8],
+						0.0f,
+						resPtr[1],
+						resPtr[5],
+						resPtr[9],
+						0.0f,
+						resPtr[2],
+						resPtr[6],
+						resPtr[10],
+						0.0f,
+						resPtr[3],
+						resPtr[7],
+						resPtr[11],
+						0.0f
+					);
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					return new Matrix(
+						resPtr[0],
+						resPtr[3],
+						resPtr[6],
+						resPtr[9],
+						resPtr[1],
+						resPtr[4],
+						resPtr[7],
+						resPtr[10],
+						resPtr[2],
+						resPtr[5],
+						resPtr[8],
+						resPtr[11],
+						0.0f,
+						0.0f,
+						0.0f,
+						0.0f
+					);
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
+		}
 
-            // HLSL expects matrices to be transposed by default.
-            // These unrolled loops do the transpose during assignment.
-            if (RowCount == 4 && ColumnCount == 4)
-            {
-                var fData = (float[])Data;
+		public Matrix[] GetValueMatrixTransposeArray(int count)
+		{
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			Matrix[] result = new Matrix[count];
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				int curOffset = 0;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset + 0],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 8],
+							resPtr[curOffset + 12],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 9],
+							resPtr[curOffset + 13],
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 10],
+							resPtr[curOffset + 14],
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 11],
+							resPtr[curOffset + 15]
+						);
+						curOffset += 16;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 6],
+							0.0f,
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 7],
+							0.0f,
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 8],
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f
+						);
+						curOffset += 9;
+					}
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 8],
+							0.0f,
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 9],
+							0.0f,
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 10],
+							0.0f,
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 11],
+							0.0f
+						);
+						curOffset += 12;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					for (int i = 0; i < count; i += 1)
+					{
+						result[i] = new Matrix(
+							resPtr[curOffset],
+							resPtr[curOffset + 3],
+							resPtr[curOffset + 6],
+							resPtr[curOffset + 9],
+							resPtr[curOffset + 1],
+							resPtr[curOffset + 4],
+							resPtr[curOffset + 7],
+							resPtr[curOffset + 10],
+							resPtr[curOffset + 2],
+							resPtr[curOffset + 5],
+							resPtr[curOffset + 8],
+							resPtr[curOffset + 11],
+							0.0f,
+							0.0f,
+							0.0f,
+							0.0f
+						);
+						curOffset += 12;
+					}
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
+			return result;
+		}
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-                fData[3] = value.M41;
+		public Quaternion GetValueQuaternion()
+		{
+			// FIXME: Is this really a thing Effects do? -flibit
+			throw new NotImplementedException("Quaternions?");
+		}
 
-                fData[4] = value.M12;
-                fData[5] = value.M22;
-                fData[6] = value.M32;
-                fData[7] = value.M42;
+		public Quaternion[] GetValueQuaternionArray(int count)
+		{
+			// FIXME: Is this really a thing Effects do? -flibit
+			throw new NotImplementedException("Quaternions?");
+		}
 
-                fData[8] = value.M13;
-                fData[9] = value.M23;
-                fData[10] = value.M33;
-                fData[11] = value.M43;
+		public float GetValueSingle()
+		{
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				return *resPtr;
+			}
+		}
 
-                fData[12] = value.M14;
-                fData[13] = value.M24;
-                fData[14] = value.M34;
-                fData[15] = value.M44;
-            }
-            else if (RowCount == 4 && ColumnCount == 3)
-            {
-                var fData = (float[])Data;
+		public float[] GetValueSingleArray(int count)
+		{
+			float[] result = new float[count];
+			Marshal.Copy(values, result, 0, count);
+			return result;
+		}
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-                fData[3] = value.M41;
+		public string GetValueString()
+		{
+			/* FIXME: This requires digging into the effect->objects list.
+			 * We've got the data, we just need to hook it up to FNA.
+			 * -flibit
+			 */
+			throw new NotImplementedException("effect->objects[?]");
+		}
 
-                fData[4] = value.M12;
-                fData[5] = value.M22;
-                fData[6] = value.M32;
-                fData[7] = value.M42;
+		public Texture2D GetValueTexture2D()
+		{
+			return (Texture2D) texture;
+		}
 
-                fData[8] = value.M13;
-                fData[9] = value.M23;
-                fData[10] = value.M33;
-                fData[11] = value.M43;
-            }
-            else if (RowCount == 3 && ColumnCount == 4)
-            {
-                var fData = (float[])Data;
+		public Texture3D GetValueTexture3D()
+		{
+			return (Texture3D) texture;
+		}
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
+		public TextureCube GetValueTextureCube()
+		{
+			return (TextureCube) texture;
+		}
 
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
+		public Vector2 GetValueVector2()
+		{
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				return new Vector2(resPtr[0], resPtr[1]);
+			}
+		}
 
-                fData[6] = value.M13;
-                fData[7] = value.M23;
-                fData[8] = value.M33;
+		public Vector2[] GetValueVector2Array(int count)
+		{
+			Vector2[] result = new Vector2[count];
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < count; i += 1)
+				{
+					result[i] = new Vector2(
+						resPtr[curOffset++],
+						resPtr[curOffset++]
+					);
+				}
+			}
+			return result;
+		}
 
-                fData[9] = value.M14;
-                fData[10] = value.M24;
-                fData[11] = value.M34;
-            }
-            else if (RowCount == 3 && ColumnCount == 3)
-            {
-                var fData = (float[])Data;
+		public Vector3 GetValueVector3()
+		{
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				return new Vector3(resPtr[0], resPtr[1], resPtr[2]);
+			}
+		}
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
+		public Vector3[] GetValueVector3Array(int count)
+		{
+			Vector3[] result = new Vector3[count];
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < count; i += 1)
+				{
+					result[i] = new Vector3(
+						resPtr[curOffset++],
+						resPtr[curOffset++],
+						resPtr[curOffset++]
+					);
+				}
+			}
+			return result;
+		}
 
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
+		public Vector4 GetValueVector4()
+		{
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				return new Vector4(
+					resPtr[0],
+					resPtr[1],
+					resPtr[2],
+					resPtr[3]
+				);
+			}
+		}
 
-                fData[6] = value.M13;
-                fData[7] = value.M23;
-                fData[8] = value.M33;
-            }
-            else if (RowCount == 3 && ColumnCount == 2)
-            {
-                var fData = (float[])Data;
+		public Vector4[] GetValueVector4Array(int count)
+		{
+			Vector4[] result = new Vector4[count];
+			unsafe
+			{
+				float* resPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < count; i += 1)
+				{
+					result[i] = new Vector4(
+						resPtr[curOffset++],
+						resPtr[curOffset++],
+						resPtr[curOffset++],
+						resPtr[curOffset++]
+					);
+				}
+			}
+			return result;
+		}
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
+		#endregion
 
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
-            }
+		#region Public Set Methods
 
-            StateKey = unchecked(NextStateKey++);
-        }
+		public void SetValue(bool value)
+		{
+			unsafe
+			{
+				int* dstPtr = (int*) values;
+				// Ugh, this branch, stupid C#.
+				*dstPtr = value ? 1 : 0;
+			}
+		}
+
+		public void SetValue(bool[] value)
+		{
+			unsafe
+			{
+				int* dstPtr = (int*) values;
+				for (int i = 0; i < value.Length; i += 1)
+				{
+					// Ugh, this branch, stupid C#.
+					dstPtr[i] = value[i] ? 1 : 0;
+				}
+			}
+		}
+
+		public void SetValue(int value)
+		{
+			if (ParameterType == EffectParameterType.Single)
+			{
+				unsafe
+				{
+					float *dstPtr = (float*) values;
+					*dstPtr = (float) value;
+				}
+			}
+			else
+			{
+				unsafe
+				{
+					int* dstPtr = (int*) values;
+					*dstPtr = value;
+				}
+			}
+		}
+
+		public void SetValue(int[] value)
+		{
+			Marshal.Copy(value, 0, values, value.Length);
+		}
+
+		public void SetValue(Matrix value)
+		{
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M12;
+					dstPtr[2] = value.M13;
+					dstPtr[3] = value.M14;
+					dstPtr[4] = value.M21;
+					dstPtr[5] = value.M22;
+					dstPtr[6] = value.M23;
+					dstPtr[7] = value.M24;
+					dstPtr[8] = value.M31;
+					dstPtr[9] = value.M32;
+					dstPtr[10] = value.M33;
+					dstPtr[11] = value.M34;
+					dstPtr[12] = value.M41;
+					dstPtr[13] = value.M42;
+					dstPtr[14] = value.M43;
+					dstPtr[15] = value.M44;
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M12;
+					dstPtr[2] = value.M13;
+					dstPtr[3] = value.M21;
+					dstPtr[4] = value.M22;
+					dstPtr[5] = value.M23;
+					dstPtr[6] = value.M31;
+					dstPtr[7] = value.M32;
+					dstPtr[8] = value.M33;
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M12;
+					dstPtr[2] = value.M13;
+					dstPtr[3] = value.M21;
+					dstPtr[4] = value.M22;
+					dstPtr[5] = value.M23;
+					dstPtr[6] = value.M31;
+					dstPtr[7] = value.M32;
+					dstPtr[8] = value.M33;
+					dstPtr[9] = value.M41;
+					dstPtr[10] = value.M42;
+					dstPtr[11] = value.M43;
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M12;
+					dstPtr[2] = value.M13;
+					dstPtr[3] = value.M14;
+					dstPtr[4] = value.M21;
+					dstPtr[5] = value.M22;
+					dstPtr[6] = value.M23;
+					dstPtr[7] = value.M24;
+					dstPtr[8] = value.M31;
+					dstPtr[9] = value.M32;
+					dstPtr[10] = value.M33;
+					dstPtr[11] = value.M34;
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
+		}
+
+		public void SetValue(Matrix[] value)
+		{
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				int curOffset = 0;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M14;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M24;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M34;
+						dstPtr[curOffset++] = value[i].M41;
+						dstPtr[curOffset++] = value[i].M42;
+						dstPtr[curOffset++] = value[i].M43;
+						dstPtr[curOffset++] = value[i].M44;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M33;
+					}
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M41;
+						dstPtr[curOffset++] = value[i].M42;
+						dstPtr[curOffset++] = value[i].M43;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M14;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M24;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M34;
+					}
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
+		}
 
 		public void SetValueTranspose(Matrix value)
 		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            // HLSL expects matrices to be transposed by default, so copying them straight
-            // from the in-memory version effectively transposes them back to row-major.
-            if (RowCount == 4 && ColumnCount == 4)
-            {
-                var fData = (float[])Data;
-
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-                fData[3] = value.M14;
-
-                fData[4] = value.M21;
-                fData[5] = value.M22;
-                fData[6] = value.M23;
-                fData[7] = value.M24;
-
-                fData[8] = value.M31;
-                fData[9] = value.M32;
-                fData[10] = value.M33;
-                fData[11] = value.M34;
-
-                fData[12] = value.M41;
-                fData[13] = value.M42;
-                fData[14] = value.M43;
-                fData[15] = value.M44;
-            }
-            else if (RowCount == 4 && ColumnCount == 3)
-            {
-                var fData = (float[])Data;
-
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
-
-                fData[6] = value.M31;
-                fData[7] = value.M32;
-                fData[8] = value.M33;
-
-                fData[9] = value.M41;
-                fData[10] = value.M42;
-                fData[11] = value.M43;
-            }
-            else if (RowCount == 3 && ColumnCount == 4)
-            {
-                var fData = (float[])Data;
-
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-                fData[3] = value.M14;
-
-                fData[4] = value.M21;
-                fData[5] = value.M22;
-                fData[6] = value.M23;
-                fData[7] = value.M24;
-
-                fData[8] = value.M31;
-                fData[9] = value.M32;
-                fData[10] = value.M33;
-                fData[11] = value.M34;
-            }
-            else if (RowCount == 3 && ColumnCount == 3)
-            {
-                var fData = (float[])Data;
-
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
-
-                fData[6] = value.M31;
-                fData[7] = value.M32;
-                fData[8] = value.M33;
-            }
-            else if (RowCount == 3 && ColumnCount == 2)
-            {
-                var fData = (float[])Data;
-
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
-            }
-
-			StateKey = unchecked(NextStateKey++);
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M21;
+					dstPtr[2] = value.M31;
+					dstPtr[3] = value.M41;
+					dstPtr[4] = value.M12;
+					dstPtr[5] = value.M22;
+					dstPtr[6] = value.M32;
+					dstPtr[7] = value.M42;
+					dstPtr[8] = value.M13;
+					dstPtr[9] = value.M23;
+					dstPtr[10] = value.M33;
+					dstPtr[11] = value.M43;
+					dstPtr[12] = value.M14;
+					dstPtr[13] = value.M24;
+					dstPtr[14] = value.M34;
+					dstPtr[15] = value.M44;
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M21;
+					dstPtr[2] = value.M31;
+					dstPtr[3] = value.M12;
+					dstPtr[4] = value.M22;
+					dstPtr[5] = value.M32;
+					dstPtr[6] = value.M13;
+					dstPtr[7] = value.M23;
+					dstPtr[8] = value.M33;
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M21;
+					dstPtr[2] = value.M31;
+					dstPtr[3] = value.M41;
+					dstPtr[4] = value.M12;
+					dstPtr[5] = value.M22;
+					dstPtr[6] = value.M32;
+					dstPtr[7] = value.M42;
+					dstPtr[8] = value.M13;
+					dstPtr[9] = value.M23;
+					dstPtr[10] = value.M33;
+					dstPtr[11] = value.M43;
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					dstPtr[0] = value.M11;
+					dstPtr[1] = value.M21;
+					dstPtr[2] = value.M31;
+					dstPtr[3] = value.M12;
+					dstPtr[4] = value.M22;
+					dstPtr[5] = value.M32;
+					dstPtr[6] = value.M13;
+					dstPtr[7] = value.M23;
+					dstPtr[8] = value.M33;
+					dstPtr[9] = value.M14;
+					dstPtr[10] = value.M24;
+					dstPtr[11] = value.M34;
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
 		}
 
-		public void SetValue (Matrix[] value)
+		public void SetValueTranspose(Matrix[] value)
 		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-		    if (RowCount == 4 && ColumnCount == 4)
-		    {
-		        for (var i = 0; i < value.Length; i++)
-		        {
-		            var fData = (float[])Elements[i].Data;
-
-		            fData[0] = value[i].M11;
-		            fData[1] = value[i].M21;
-		            fData[2] = value[i].M31;
-		            fData[3] = value[i].M41;
-
-		            fData[4] = value[i].M12;
-		            fData[5] = value[i].M22;
-		            fData[6] = value[i].M32;
-		            fData[7] = value[i].M42;
-
-		            fData[8] = value[i].M13;
-		            fData[9] = value[i].M23;
-		            fData[10] = value[i].M33;
-		            fData[11] = value[i].M43;
-
-		            fData[12] = value[i].M14;
-		            fData[13] = value[i].M24;
-		            fData[14] = value[i].M34;
-		            fData[15] = value[i].M44;
-		        }
-		    }
-		    else if (RowCount == 4 && ColumnCount == 3)
-            {
-                for (var i = 0; i < value.Length; i++)
-                {
-                    var fData = (float[])Elements[i].Data;
-
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-                    fData[3] = value[i].M41;
-
-                    fData[4] = value[i].M12;
-                    fData[5] = value[i].M22;
-                    fData[6] = value[i].M32;
-                    fData[7] = value[i].M42;
-
-                    fData[8] = value[i].M13;
-                    fData[9] = value[i].M23;
-                    fData[10] = value[i].M33;
-                    fData[11] = value[i].M43;
-                }
-            }
-            else if (RowCount == 3 && ColumnCount == 4)
-            {
-                for (var i = 0; i < value.Length; i++)
-                {
-                    var fData = (float[])Elements[i].Data;
-
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
-
-                    fData[6] = value[i].M13;
-                    fData[7] = value[i].M23;
-                    fData[8] = value[i].M33;
-
-                    fData[9] = value[i].M14;
-                    fData[10] = value[i].M24;
-                    fData[11] = value[i].M34;
-                }
-            }
-            else if (RowCount == 3 && ColumnCount == 3)
-            {
-                for (var i = 0; i < value.Length; i++)
-                {
-                    var fData = (float[])Elements[i].Data;
-
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
-
-                    fData[6] = value[i].M13;
-                    fData[7] = value[i].M23;
-                    fData[8] = value[i].M33;
-                }
-            }
-            else if (RowCount == 3 && ColumnCount == 2)
-            {
-                for (var i = 0; i < value.Length; i++)
-                {
-                    var fData = (float[])Elements[i].Data;
-
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
-                }
-            }
-
-            StateKey = unchecked(NextStateKey++);
+			// FIXME: All Matrix sizes... this will get ugly. -flibit
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				int curOffset = 0;
+				if (ColumnCount == 4 && RowCount == 4)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M41;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M42;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M43;
+						dstPtr[curOffset++] = value[i].M14;
+						dstPtr[curOffset++] = value[i].M24;
+						dstPtr[curOffset++] = value[i].M34;
+						dstPtr[curOffset++] = value[i].M44;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 3)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M33;
+					}
+				}
+				else if (ColumnCount == 4 && RowCount == 3)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M41;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M42;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M43;
+					}
+				}
+				else if (ColumnCount == 3 && RowCount == 4)
+				{
+					for (int i = 0; i < value.Length; i += 1)
+					{
+						dstPtr[curOffset++] = value[i].M11;
+						dstPtr[curOffset++] = value[i].M21;
+						dstPtr[curOffset++] = value[i].M31;
+						dstPtr[curOffset++] = value[i].M12;
+						dstPtr[curOffset++] = value[i].M22;
+						dstPtr[curOffset++] = value[i].M32;
+						dstPtr[curOffset++] = value[i].M13;
+						dstPtr[curOffset++] = value[i].M23;
+						dstPtr[curOffset++] = value[i].M33;
+						dstPtr[curOffset++] = value[i].M14;
+						dstPtr[curOffset++] = value[i].M24;
+						dstPtr[curOffset++] = value[i].M34;
+					}
+				}
+				else
+				{
+					throw new NotImplementedException(
+						"Matrix Size: " +
+						RowCount.ToString() + " " +
+						ColumnCount.ToString()
+					);
+				}
+			}
 		}
 
-		public void SetValue (Quaternion value)
+		public void SetValue(Quaternion value)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var fData = (float[])Data;
-            fData[0] = value.X;
-            fData[1] = value.Y;
-            fData[2] = value.Z;
-            fData[3] = value.W;
-            StateKey = unchecked(NextStateKey++);
+			// FIXME: Is this really a thing Effects do? -flibit
+			throw new NotImplementedException("Quaternions?");
 		}
 
-        /*
-		public void SetValue (Quaternion[] value)
+		public void SetValue(Quaternion[] value)
 		{
-			throw new NotImplementedException();
+			// FIXME: Is this really a thing Effects do? -flibit
+			throw new NotImplementedException("Quaternions?");
 		}
-        */
 
-		public void SetValue (Single value)
+		public void SetValue(float value)
 		{
-            if (ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-#if PSM
-            if(Data == null) {
-                return;
-            }
-#endif
-			((float[])Data)[0] = value;
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				*dstPtr = value;
+			}
 		}
 
-		public void SetValue (Single[] value)
+		public void SetValue(float[] value)
 		{
-			for (var i=0; i<value.Length; i++)
-				Elements[i].SetValue (value[i]);
-
-            StateKey = unchecked(NextStateKey++);
+			Marshal.Copy(value, 0, values, value.Length);
 		}
-		
-        /*
-		public void SetValue (string value)
+
+		public void SetValue(string value)
 		{
-			throw new NotImplementedException();
+			/* FIXME: This requires digging into the effect->objects list.
+			 * We've got the data, we just need to hook it up to FNA.
+			 * -flibit
+			 */
+			throw new NotImplementedException("effect->objects[?]");
 		}
-        */
 
-		public void SetValue (Texture value)
+		public void SetValue(Texture value)
 		{
-            if (this.ParameterType != EffectParameterType.Texture && 
-                this.ParameterType != EffectParameterType.Texture1D &&
-                this.ParameterType != EffectParameterType.Texture2D &&
-                this.ParameterType != EffectParameterType.Texture3D &&
-                this.ParameterType != EffectParameterType.TextureCube) 
-            {
-                throw new InvalidCastException();
-            }
-
-			Data = value;
-            StateKey = unchecked(NextStateKey++);
+			texture = value;
 		}
 
-		public void SetValue (Vector2 value)
+		public void SetValue(Vector2 value)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var fData = (float[])Data;
-            fData[0] = value.X;
-            fData[1] = value.Y;
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				dstPtr[0] = value.X;
+				dstPtr[1] = value.Y;
+			}
 		}
 
-		public void SetValue (Vector2[] value)
+		public void SetValue(Vector2[] value)
 		{
-            for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < value.Length; i += 1)
+				{
+					dstPtr[curOffset++] = value[i].X;
+					dstPtr[curOffset++] = value[i].Y;
+				}
+			}
 		}
 
-		public void SetValue (Vector3 value)
+		public void SetValue(Vector3 value)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-            var fData = (float[])Data;
-            fData[0] = value.X;
-            fData[1] = value.Y;
-            fData[2] = value.Z;
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				dstPtr[0] = value.X;
+				dstPtr[1] = value.Y;
+				dstPtr[2] = value.Z;
+			}
 		}
 
-		public void SetValue (Vector3[] value)
+		public void SetValue(Vector3[] value)
 		{
-            for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < value.Length; i += 1)
+				{
+					dstPtr[curOffset++] = value[i].X;
+					dstPtr[curOffset++] = value[i].Y;
+					dstPtr[curOffset++] = value[i].Z;
+				}
+			}
 		}
 
-		public void SetValue (Vector4 value)
+		public void SetValue(Vector4 value)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
-                throw new InvalidCastException();
-
-			var fData = (float[])Data;
-            fData[0] = value.X;
-            fData[1] = value.Y;
-            fData[2] = value.Z;
-            fData[3] = value.W;
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				dstPtr[0] = value.X;
+				dstPtr[1] = value.Y;
+				dstPtr[2] = value.Z;
+				dstPtr[3] = value.W;
+			}
 		}
 
-		public void SetValue (Vector4[] value)
+		public void SetValue(Vector4[] value)
 		{
-            for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+			unsafe
+			{
+				float* dstPtr = (float*) values;
+				int curOffset = 0;
+				for (int i = 0; i < value.Length; i += 1)
+				{
+					dstPtr[curOffset++] = value[i].X;
+					dstPtr[curOffset++] = value[i].Y;
+					dstPtr[curOffset++] = value[i].Z;
+					dstPtr[curOffset++] = value[i].W;
+				}
+			}
 		}
+
+		#endregion
 	}
 }

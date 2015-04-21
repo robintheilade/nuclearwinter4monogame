@@ -87,6 +87,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			private set;
 		}
 
+		public TextureCollection VertexTextures
+		{
+			get;
+			private set;
+		}
+
+		public SamplerStateCollection VertexSamplerStates
+		{
+			get;
+			private set;
+		}
+
 		private BlendState INTERNAL_blendState;
 		public BlendState BlendState
 		{
@@ -166,11 +178,38 @@ namespace Microsoft.Xna.Framework.Graphics
 					value,
 					RenderTargetCount > 0
 				);
+			}
+		}
 
-				/* In OpenGL we have to re-apply the special "posFixup"
-				 * vertex shader uniform if the viewport changes.
+		public Color BlendFactor
+		{
+			get
+			{
+				return GLDevice.BlendFactor;
+			}
+			set
+			{
+				/* FIXME: Does this affect the value found in
+				 * BlendState?
+				 * -flibit
 				 */
-				vertexShaderDirty = true;
+				GLDevice.BlendFactor = value;
+			}
+		}
+
+		public int MultiSampleMask
+		{
+			get
+			{
+				return GLDevice.MultiSampleMask;
+			}
+			set
+			{
+				/* FIXME: Does this affect the value found in
+				 * BlendState?
+				 * -flibit
+				 */
+				GLDevice.MultiSampleMask = value;
 			}
 		}
 
@@ -202,16 +241,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#endregion
 
-		#region Internal OpenGL Device Property
-
-		internal OpenGLDevice GLDevice
-		{
-			get;
-			private set;
-		}
-
-		#endregion
-
 		#region Internal RenderTarget Properties
 
 		internal int RenderTargetCount
@@ -222,16 +251,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#endregion
 
+		#region Internal GL Device
+
+		internal readonly IGLDevice GLDevice;
+
+		#endregion
+
 		#region Internal Sampler Change Queue
 
-		internal readonly Queue<int> ModifiedSamplers = new Queue<int>();
+		private readonly Queue<int> modifiedSamplers = new Queue<int>();
+		private readonly Queue<int> modifiedVertexSamplers = new Queue<int>();
 
 		#endregion
 
 		#region Private Disposal Variables
 
-		private static List<Action> disposeActions = new List<Action>();
-		private static object disposeActionsLock = new object();
+		/* Use WeakReference for the global resources list as we do not
+		 * know when a resource may be disposed and collected. We do not
+		 * want to prevent a resource from being collected by holding a
+		 * strong reference to it in this list.
+		 */
+		private readonly List<WeakReference> resources = new List<WeakReference>();
+		private readonly object resourcesLock = new object();
 
 		#endregion
 
@@ -244,9 +285,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		 * -sulix
 		 */
 #if DEBUG
-		private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+		private static readonly Vector4 DiscardColor = new Color(68, 34, 136, 255).ToVector4();
 #else
-		private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
+		private static readonly Vector4 DiscardColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 #endif
 
 		#endregion
@@ -263,72 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		// 16, per XNA4 HiDef spec
 		private VertexBufferBinding[] vertexBufferBindings = new VertexBufferBinding[16];
 		private int vertexBufferCount = 0;
-
-		#endregion
-
-		#region Shader "Stuff" (Here Be Dragons)
-
-		private bool vertexShaderDirty;
-		private bool pixelShaderDirty;
-
-		private ShaderProgram shaderProgram;
-		private readonly ShaderProgramCache programCache = new ShaderProgramCache();
-
-		private readonly ConstantBufferCollection vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
-		private readonly ConstantBufferCollection pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
-
-		private static readonly float[] posFixup = new float[4];
-		// FIXME: Leak!
-		private static GCHandle posFixupHandle = GCHandle.Alloc(posFixup, GCHandleType.Pinned);
-		private static IntPtr posFixupPtr = posFixupHandle.AddrOfPinnedObject();
-
-		private Shader INTERNAL_vertexShader;
-		internal Shader VertexShader
-		{
-			get
-			{
-				return INTERNAL_vertexShader;
-			}
-			set
-			{
-				if (value == INTERNAL_vertexShader)
-				{
-					return;
-				}
-				INTERNAL_vertexShader = value;
-				vertexShaderDirty = true;
-			}
-		}
-
-		private Shader INTERNAL_pixelShader;
-		internal Shader PixelShader
-		{
-			get
-			{
-				return INTERNAL_pixelShader;
-			}
-			set
-			{
-				if (value == INTERNAL_pixelShader)
-				{
-					return;
-				}
-				INTERNAL_pixelShader = value;
-				pixelShaderDirty = true;
-			}
-		}
-
-		internal void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer buffer)
-		{
-			if (stage == ShaderStage.Vertex)
-			{
-				vertexConstantBuffers[slot] = buffer;
-			}
-			else
-			{
-				pixelConstantBuffers[slot] = buffer;
-			}
-		}
+		private bool vertexBuffersUpdated = false;
 
 		#endregion
 
@@ -399,24 +375,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			RasterizerState = RasterizerState.CullCounterClockwise;
 
 			// Initialize the Texture/Sampler state containers
-			Textures = new TextureCollection(this);
-			SamplerStates = new SamplerStateCollection(this);
-
-			// Clear constant buffers
-			vertexConstantBuffers.Clear();
-			pixelConstantBuffers.Clear();
-
-			// First draw will need to set the shaders.
-			vertexShaderDirty = true;
-			pixelShaderDirty = true;
+			Textures = new TextureCollection(
+				GLDevice.MaxTextureSlots,
+				modifiedSamplers
+			);
+			SamplerStates = new SamplerStateCollection(
+				GLDevice.MaxTextureSlots,
+				modifiedSamplers
+			);
+			VertexTextures = new TextureCollection(
+				GLDevice.MaxVertexTextureSlots,
+				modifiedVertexSamplers
+			);
+			VertexSamplerStates = new SamplerStateCollection(
+				GLDevice.MaxVertexTextureSlots,
+				modifiedVertexSamplers
+			);
 
 			// Set the default viewport and scissor rect.
 			Viewport = new Viewport(PresentationParameters.Bounds);
 			ScissorRectangle = Viewport.Bounds;
-
-			// Free all the cached shader programs.
-			programCache.Clear();
-			shaderProgram = null;
 		}
 
 		~GraphicsDevice()
@@ -445,10 +423,18 @@ namespace Microsoft.Xna.Framework.Graphics
 					/* Dispose of all remaining graphics resources before
 					 * disposing of the GraphicsDevice.
 					 */
-					GraphicsResource.DisposeAll();
-
-					// Free all the cached shader programs.
-					programCache.Dispose();
+					lock (resourcesLock)
+					{
+						foreach (WeakReference resource in resources.ToArray())
+						{
+							object target = resource.Target;
+							if (target != null)
+							{
+								(target as IDisposable).Dispose();
+							}
+						}
+						resources.Clear();
+					}
 
 					// Dispose of the GL Device/Context
 					GLDevice.Dispose();
@@ -460,30 +446,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#endregion
 
-		#region Internal Resource Disposal Method
+		#region Internal Resource Management Methods
 
-		/// <summary>
-		/// Adds a dispose action to the list of pending dispose actions. These are executed
-		/// at the end of each call to Present(). This allows GL resources to be disposed
-		/// from other threads, such as the finalizer.
-		/// </summary>
-		/// <param name="disposeAction">The action to execute for the dispose.</param>
-		internal static void AddDisposeAction(Action disposeAction)
+		internal void AddResourceReference(WeakReference resourceReference)
 		{
-			if (disposeAction == null)
+			lock (resourcesLock)
 			{
-				throw new ArgumentNullException("disposeAction");
+				resources.Add(resourceReference);
 			}
-			if (Threading.IsOnMainThread())
+		}
+
+		internal void RemoveResourceReference(WeakReference resourceReference)
+		{
+			lock (resourcesLock)
 			{
-				disposeAction();
-			}
-			else
-			{
-				lock (disposeActionsLock)
-				{
-					disposeActions.Add(disposeAction);
-				}
+				resources.Remove(resourceReference);
 			}
 		}
 
@@ -493,19 +470,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Present()
 		{
-			// Dispose of any GL resources that were disposed in another thread
-			lock (disposeActionsLock)
-			{
-				if (disposeActions.Count > 0)
-				{
-					foreach (Action action in disposeActions)
-					{
-						action();
-					}
-					disposeActions.Clear();
-				}
-			}
-			GLDevice.SwapBuffers(PresentationParameters.DeviceWindowHandle);
+			GLDevice.SwapBuffers(
+				null,
+				null,
+				PresentationParameters.DeviceWindowHandle
+			);
+		}
+
+		public void Present(
+			Rectangle? sourceRectangle,
+			Rectangle? destinationRectangle,
+			IntPtr overrideWindowHandle
+		) {
+			GLDevice.SwapBuffers(
+				sourceRectangle,
+				destinationRectangle,
+				overrideWindowHandle
+			);
 		}
 
 		#endregion
@@ -537,6 +518,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				DeviceResetting(this, EventArgs.Empty);
 			}
 
+			/* FIXME: Why are we not doing this...? -flibit
+			lock (resourcesLock)
+			{
+				foreach (WeakReference resource in resources)
+				{
+					object target = resource.Target;
+					if (target != null)
+					{
+						(target as GraphicsResource).GraphicsDeviceResetting();
+					}
+				}
+
+				// Remove references to resources that have been garbage collected.
+				resources.RemoveAll(wr => !wr.IsAlive);
+			}
+			*/
+
 			// Set the new PresentationParameters first.
 			PresentationParameters = presentationParameters;
 
@@ -545,10 +543,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			 * -flibit
 			 */
 			GLDevice.Backbuffer.ResetFramebuffer(
-				this,
 				PresentationParameters.BackBufferWidth,
 				PresentationParameters.BackBufferHeight,
-				PresentationParameters.DepthStencilFormat
+				PresentationParameters.DepthStencilFormat,
+				RenderTargetCount > 0
 			);
 
 			// Now, update the viewport
@@ -603,6 +601,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
+			DepthFormat dsFormat;
+			if (RenderTargetCount == 0)
+			{
+				dsFormat = PresentationParameters.DepthStencilFormat;
+			}
+			else
+			{
+				dsFormat = (renderTargetBindings[0].RenderTarget as IRenderTarget).DepthStencilFormat;
+			}
+			if (dsFormat == DepthFormat.None)
+			{
+				options &= ClearOptions.Target;
+			}
+			else if (dsFormat != DepthFormat.Depth24Stencil8)
+			{
+				options &= ~ClearOptions.Stencil;
+			}
 			GLDevice.Clear(
 				options,
 				color,
@@ -617,41 +632,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void GetBackBufferData<T>(T[] data) where T : struct
 		{
-			// Store off the old frame buffer components
-			uint prevReadBuffer = GLDevice.CurrentReadFramebuffer;
+			GLDevice.ReadBackbuffer(data, 0, data.Length, null);
+		}
 
-			GLDevice.BindReadFramebuffer(GLDevice.Backbuffer.Handle);
-			GCHandle ptr = GCHandle.Alloc(data, GCHandleType.Pinned);
-			try
-			{
-				GLDevice.glReadPixels(
-					0, 0,
-					GLDevice.Backbuffer.Width,
-					GLDevice.Backbuffer.Height,
-					OpenGLDevice.GLenum.GL_RGBA,
-					OpenGLDevice.GLenum.GL_UNSIGNED_BYTE,
-					ptr.AddrOfPinnedObject()
-				);
-			}
-			finally
-			{
-				ptr.Free();
-			}
+		public void GetBackBufferData<T>(
+			T[] data,
+			int startIndex,
+			int elementCount
+		) where T : struct {
+			GLDevice.ReadBackbuffer(data, startIndex, elementCount, null);
+		}
 
-			// Restore old buffer components
-			GLDevice.BindReadFramebuffer(prevReadBuffer);
-
-			// Now we get to do a software-based flip! Yes, really! -flibit
-			int width = GLDevice.Backbuffer.Width;
-			int height = GLDevice.Backbuffer.Height;
-			int pitch = width * 4 / Marshal.SizeOf(typeof(T));
-			T[] tempRow = new T[pitch];
-			for (int row = 0; row < height / 2; row += 1)
-			{
-				Array.Copy(data, row * pitch, tempRow, 0, pitch);
-				Array.Copy(data, (height - row - 1) * pitch, data, row * pitch, pitch);
-				Array.Copy(tempRow, 0, data, (height - row - 1) * pitch, pitch);
-			}
+		public void GetBackBufferData<T>(
+			Rectangle? rect,
+			T[] data,
+			int startIndex,
+			int elementCount
+		) where T : struct {
+			GLDevice.ReadBackbuffer(data, startIndex, elementCount, rect);
 		}
 
 		#endregion
@@ -706,20 +704,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
+			int newWidth;
+			int newHeight;
+			RenderTargetUsage clearTarget;
 			if (renderTargets == null || renderTargets.Length == 0)
 			{
-				GLDevice.SetRenderTargets(null, null, 0, DepthFormat.None);
+				GLDevice.SetRenderTargets(null, null, DepthFormat.None);
 
-				// Set the viewport to the size of the backbuffer.
-				Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-
-				// Set the scissor rectangle to the size of the backbuffer.
-				ScissorRectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-
-				if (PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents)
-				{
-					Clear(DiscardColor);
-				}
+				// Set the viewport/scissor to the size of the backbuffer.
+				newWidth = PresentationParameters.BackBufferWidth;
+				newHeight = PresentationParameters.BackBufferHeight;
+				clearTarget = PresentationParameters.RenderTargetUsage;
 
 				// Generate mipmaps for previous targets, if needed
 				for (int i = 0; i < RenderTargetCount; i += 1)
@@ -736,27 +731,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-				uint[] glTarget = new uint[renderTargets.Length];
-				OpenGLDevice.GLenum[] glTargetFace = new OpenGLDevice.GLenum[renderTargets.Length];
-				for (int i = 0; i < renderTargets.Length; i += 1)
-				{
-					glTarget[i] = renderTargets[i].RenderTarget.texture.Handle;
-					if (renderTargets[i].RenderTarget is RenderTarget2D)
-					{
-						glTargetFace[i] = OpenGLDevice.GLenum.GL_TEXTURE_2D;
-					}
-					else
-					{
-						glTargetFace[i] = OpenGLDevice.GLenum.GL_TEXTURE_CUBE_MAP_POSITIVE_X + (int) renderTargets[i].CubeMapFace;
-					}
-				}
 				IRenderTarget target = renderTargets[0].RenderTarget as IRenderTarget;
 				GLDevice.SetRenderTargets(
-					glTarget,
-					glTargetFace,
+					renderTargets,
 					target.DepthStencilBuffer,
 					target.DepthStencilFormat
 				);
+
+				// Set the viewport/scissor to the size of the first render target.
+				newWidth = target.Width;
+				newHeight = target.Height;
+				clearTarget = target.RenderTargetUsage;
 
 				// Generate mipmaps for previous targets, if needed
 				for (int i = 0; i < RenderTargetCount; i += 1)
@@ -784,17 +769,19 @@ namespace Microsoft.Xna.Framework.Graphics
 				Array.Clear(renderTargetBindings, 0, renderTargetBindings.Length);
 				Array.Copy(renderTargets, renderTargetBindings, renderTargets.Length);
 				RenderTargetCount = renderTargets.Length;
+			}
 
-				// Set the viewport to the size of the first render target.
-				Viewport = new Viewport(0, 0, target.Width, target.Height);
-
-				// Set the scissor rectangle to the size of the first render target.
-				ScissorRectangle = new Rectangle(0, 0, target.Width, target.Height);
-
-				if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
-				{
-					Clear(DiscardColor);
-				}
+			// Apply new GL state, clear target if requested
+			Viewport = new Viewport(0, 0, newWidth, newHeight);
+			ScissorRectangle = new Rectangle(0, 0, newWidth, newHeight);
+			if (clearTarget == RenderTargetUsage.DiscardContents)
+			{
+				Clear(
+					ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil,
+					DiscardColor,
+					Viewport.MaxDepth,
+					0
+				);
 			}
 		}
 
@@ -819,11 +806,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (vertexBuffer == null)
 			{
+				if (vertexBufferCount == 0)
+				{
+					return;
+				}
 				for (int i = 0; i < vertexBufferCount; i += 1)
 				{
 					vertexBufferBindings[i] = VertexBufferBinding.None;
 				}
 				vertexBufferCount = 0;
+				vertexBuffersUpdated = true;
 				return;
 			}
 
@@ -834,11 +826,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					vertexBuffer,
 					vertexOffset
 				);
+				vertexBuffersUpdated = true;
 			}
 
-			for (int i = 1; i < vertexBufferCount; i += 1)
+			if (vertexBufferCount > 1)
 			{
-				vertexBufferBindings[i] = VertexBufferBinding.None;
+				for (int i = 1; i < vertexBufferCount; i += 1)
+				{
+					vertexBufferBindings[i] = VertexBufferBinding.None;
+				}
+				vertexBuffersUpdated = true;
 			}
 
 			vertexBufferCount = 1;
@@ -848,11 +845,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (vertexBuffers == null)
 			{
+				if (vertexBufferCount == 0)
+				{
+					return;
+				}
 				for (int j = 0; j < vertexBufferCount; j += 1)
 				{
 					vertexBufferBindings[j] = VertexBufferBinding.None;
 				}
 				vertexBufferCount = 0;
+				vertexBuffersUpdated = true;
 				return;
 			}
 
@@ -875,13 +877,18 @@ namespace Microsoft.Xna.Framework.Graphics
 					vertexBufferBindings[i].InstanceFrequency != vertexBuffers[i].InstanceFrequency	)
 				{
 					vertexBufferBindings[i] = vertexBuffers[i];
+					vertexBuffersUpdated = true;
 				}
 				i += 1;
 			}
-			while (i < vertexBufferCount)
+			if (vertexBuffers.Length < vertexBufferCount)
 			{
-				vertexBufferBindings[i] = VertexBufferBinding.None;
-				i += 1;
+				while (i < vertexBufferCount)
+				{
+					vertexBufferBindings[i] = VertexBufferBinding.None;
+					i += 1;
+				}
+				vertexBuffersUpdated = true;
 			}
 
 			vertexBufferCount = vertexBuffers.Length;
@@ -905,23 +912,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// <summary>
 		/// Draw geometry by indexing into the vertex buffer.
 		/// </summary>
-		/// <param name="primitiveType">The type of primitives in the index buffer.</param>
+		/// <param name="primitiveType">
+		/// The type of primitives in the index buffer.
+		/// </param>
 		/// <param name="baseVertex">
 		/// Used to offset the vertex range indexed from the vertex buffer.
 		/// </param>
 		/// <param name="minVertexIndex">
 		/// A hint of the lowest vertex indexed relative to baseVertex.
 		/// </param>
-		/// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+		/// <param name="numVertices">
+		/// A hint of the maximum vertex indexed.
+		/// </param>
 		/// <param name="startIndex">
 		/// The index within the index buffer to start drawing from.
 		/// </param>
 		/// <param name="primitiveCount">
 		/// The number of primitives to render from the index buffer.
 		/// </param>
-		/// <remarks>
-		/// Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.
-		/// </remarks>
 		public void DrawIndexedPrimitives(
 			PrimitiveType primitiveType,
 			int baseVertex,
@@ -930,43 +938,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			int startIndex,
 			int primitiveCount
 		) {
-			// Flush the GL state before moving on!
 			ApplyState();
 
-			// Unsigned short or unsigned int?
-			bool shortIndices = Indices.IndexElementSize == IndexElementSize.SixteenBits;
+			// Set up the vertex buffers
+			GLDevice.ApplyVertexAttributes(
+				vertexBufferBindings,
+				vertexBufferCount,
+				vertexBuffersUpdated,
+				baseVertex
+			);
+			vertexBuffersUpdated = false;
 
-			// Set up the vertex buffers.
-			for (int i = 0; i < vertexBufferCount; i += 1)
-			{
-				GLDevice.BindVertexBuffer(
-					vertexBufferBindings[i].VertexBuffer.Handle
-				);
-				vertexBufferBindings[i].VertexBuffer.VertexDeclaration.Apply(
-					VertexShader,
-					(IntPtr) (
-						vertexBufferBindings[i].VertexBuffer.VertexDeclaration.VertexStride *
-						(vertexBufferBindings[i].VertexOffset + baseVertex)
-					)
-				);
-			}
-
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Bind the index buffer
-			GLDevice.BindIndexBuffer(Indices.Handle);
-
-			// Draw!
-			GLDevice.glDrawRangeElements(
-				PrimitiveTypeGL(primitiveType),
+			GLDevice.DrawIndexedPrimitives(
+				primitiveType,
+				baseVertex,
 				minVertexIndex,
-				minVertexIndex + numVertices - 1,
-				GetElementCountArray(primitiveType, primitiveCount),
-				shortIndices ?
-					OpenGLDevice.GLenum.GL_UNSIGNED_SHORT :
-					OpenGLDevice.GLenum.GL_UNSIGNED_INT,
-				(IntPtr) (startIndex * (shortIndices ? 2 : 4))
+				numVertices,
+				startIndex,
+				primitiveCount,
+				Indices
 			);
 		}
 
@@ -979,51 +969,32 @@ namespace Microsoft.Xna.Framework.Graphics
 			int primitiveCount,
 			int instanceCount
 		) {
-			// Note that minVertexIndex and numVertices are NOT used!
-
 			// If this device doesn't have the support, just explode now before it's too late.
 			if (!GLDevice.SupportsHardwareInstancing)
 			{
 				throw new NoSuitableGraphicsDeviceException("Your hardware does not support hardware instancing!");
 			}
 
-			// Flush the GL state before moving on!
 			ApplyState();
 
-			// Unsigned short or unsigned int?
-			bool shortIndices = Indices.IndexElementSize == IndexElementSize.SixteenBits;
+			// Set up the vertex buffers
+			GLDevice.ApplyVertexAttributes(
+				vertexBufferBindings,
+				vertexBufferCount,
+				vertexBuffersUpdated,
+				baseVertex
+			);
+			vertexBuffersUpdated = false;
 
-			// Set up the vertex buffers.
-			for (int i = 0; i < vertexBufferCount; i += 1)
-			{
-				GLDevice.BindVertexBuffer(
-					vertexBufferBindings[i].VertexBuffer.Handle
-				);
-				vertexBufferBindings[i].VertexBuffer.VertexDeclaration.Apply(
-					VertexShader,
-					(IntPtr) (
-						vertexBufferBindings[i].VertexBuffer.VertexDeclaration.VertexStride *
-						(vertexBufferBindings[i].VertexOffset + baseVertex)
-					),
-					vertexBufferBindings[i].InstanceFrequency
-				);
-			}
-
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Bind the index buffer
-			GLDevice.BindIndexBuffer(Indices.Handle);
-
-			// Draw!
-			GLDevice.glDrawElementsInstanced(
-				PrimitiveTypeGL(primitiveType),
-				GetElementCountArray(primitiveType, primitiveCount),
-				shortIndices ?
-					OpenGLDevice.GLenum.GL_UNSIGNED_SHORT :
-					OpenGLDevice.GLenum.GL_UNSIGNED_INT,
-				(IntPtr) (startIndex * (shortIndices ? 2 : 4)),
-				instanceCount
+			GLDevice.DrawInstancedPrimitives(
+				primitiveType,
+				baseVertex,
+				minVertexIndex,
+				numVertices,
+				startIndex,
+				primitiveCount,
+				instanceCount,
+				Indices
 			);
 		}
 
@@ -1031,34 +1002,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#region DrawPrimitives: VertexBuffer, No Indices
 
-		public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
-		{
-			// Flush the GL state before moving on!
+		public void DrawPrimitives(
+			PrimitiveType primitiveType,
+			int vertexStart,
+			int primitiveCount
+		) {
 			ApplyState();
 
-			// Set up the vertex buffers.
-			for (int i = 0; i < vertexBufferCount; i += 1)
-			{
-				GLDevice.BindVertexBuffer(
-					vertexBufferBindings[i].VertexBuffer.Handle
-				);
-				vertexBufferBindings[i].VertexBuffer.VertexDeclaration.Apply(
-					VertexShader,
-					(IntPtr) (
-						vertexBufferBindings[i].VertexBuffer.VertexDeclaration.VertexStride *
-						vertexBufferBindings[i].VertexOffset
-					)
-				);
-			}
+			// Set up the vertex buffers
+			GLDevice.ApplyVertexAttributes(
+				vertexBufferBindings,
+				vertexBufferCount,
+				vertexBuffersUpdated,
+				0
+			);
+			vertexBuffersUpdated = false;
 
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Draw!
-			GLDevice.glDrawArrays(
-				PrimitiveTypeGL(primitiveType),
+			GLDevice.DrawPrimitives(
+				primitiveType,
 				vertexStart,
-				GetElementCountArray(primitiveType, primitiveCount)
+				primitiveCount
 			);
 		}
 
@@ -1075,16 +1038,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			int indexOffset,
 			int primitiveCount
 		) where T : struct, IVertexType {
-			DrawUserIndexedPrimitives<T>(
+			ApplyState();
+
+			// Pin the buffers.
+			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+			GCHandle ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
+			IntPtr ibPtr = ibHandle.AddrOfPinnedObject();
+
+			// Setup the vertex declaration to point at the vertex data.
+			VertexDeclaration vertexDeclaration = VertexDeclarationCache<T>.VertexDeclaration;
+			vertexDeclaration.GraphicsDevice = this;
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				vertexOffset
+			);
+
+			GLDevice.DrawUserIndexedPrimitives(
 				primitiveType,
-				vertexData,
+				vbPtr,
 				vertexOffset,
 				numVertices,
-				indexData,
+				ibPtr,
 				indexOffset,
-				primitiveCount,
-				VertexDeclarationCache<T>.VertexDeclaration
+				IndexElementSize.SixteenBits,
+				primitiveCount
 			);
+
+			// Release the handles.
+			ibHandle.Free();
+			vbHandle.Free();
 		}
 
 		public void DrawUserIndexedPrimitives<T>(
@@ -1097,35 +1081,31 @@ namespace Microsoft.Xna.Framework.Graphics
 			int primitiveCount,
 			VertexDeclaration vertexDeclaration
 		) where T : struct {
-			// Flush the GL state before moving on!
 			ApplyState();
-
-			// Unbind current buffer objects.
-			GLDevice.BindVertexBuffer(OpenGLDevice.OpenGLVertexBuffer.NullBuffer);
-			GLDevice.BindIndexBuffer(OpenGLDevice.OpenGLIndexBuffer.NullBuffer);
 
 			// Pin the buffers.
 			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 			GCHandle ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
+			IntPtr ibPtr = ibHandle.AddrOfPinnedObject();
 
-			// Setup the vertex declaration to point at the VB data.
+			// Setup the vertex declaration to point at the vertex data.
 			vertexDeclaration.GraphicsDevice = this;
-			vertexDeclaration.Apply(
-				VertexShader,
-				(IntPtr) (vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset)
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				vertexOffset
 			);
 
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Draw!
-			GLDevice.glDrawRangeElements(
-				PrimitiveTypeGL(primitiveType),
-				0,
-				numVertices - 1,
-				GetElementCountArray(primitiveType, primitiveCount),
-				OpenGLDevice.GLenum.GL_UNSIGNED_SHORT,
-				(IntPtr) (ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short)))
+			GLDevice.DrawUserIndexedPrimitives(
+				primitiveType,
+				vbPtr,
+				vertexOffset,
+				numVertices,
+				ibPtr,
+				indexOffset,
+				IndexElementSize.SixteenBits,
+				primitiveCount
 			);
 
 			// Release the handles.
@@ -1142,16 +1122,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			int indexOffset,
 			int primitiveCount
 		) where T : struct, IVertexType {
-			DrawUserIndexedPrimitives<T>(
+			ApplyState();
+
+			// Pin the buffers.
+			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+			GCHandle ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
+			IntPtr ibPtr = ibHandle.AddrOfPinnedObject();
+
+			// Setup the vertex declaration to point at the vertex data.
+			VertexDeclaration vertexDeclaration = VertexDeclarationCache<T>.VertexDeclaration;
+			vertexDeclaration.GraphicsDevice = this;
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				vertexOffset
+			);
+
+			GLDevice.DrawUserIndexedPrimitives(
 				primitiveType,
-				vertexData,
+				vbPtr,
 				vertexOffset,
 				numVertices,
-				indexData,
+				ibPtr,
 				indexOffset,
-				primitiveCount,
-				VertexDeclarationCache<T>.VertexDeclaration
+				IndexElementSize.ThirtyTwoBits,
+				primitiveCount
 			);
+
+			// Release the handles.
+			ibHandle.Free();
+			vbHandle.Free();
 		}
 
 		public void DrawUserIndexedPrimitives<T>(
@@ -1164,35 +1165,31 @@ namespace Microsoft.Xna.Framework.Graphics
 			int primitiveCount,
 			VertexDeclaration vertexDeclaration
 		) where T : struct, IVertexType {
-			// Flush the GL state before moving on!
 			ApplyState();
-
-			// Unbind current buffer objects.
-			GLDevice.BindVertexBuffer(OpenGLDevice.OpenGLVertexBuffer.NullBuffer);
-			GLDevice.BindIndexBuffer(OpenGLDevice.OpenGLIndexBuffer.NullBuffer);
 
 			// Pin the buffers.
 			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 			GCHandle ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
+			IntPtr ibPtr = ibHandle.AddrOfPinnedObject();
 
-			// Setup the vertex declaration to point at the VB data.
+			// Setup the vertex declaration to point at the vertex data.
 			vertexDeclaration.GraphicsDevice = this;
-			vertexDeclaration.Apply(
-				VertexShader,
-				(IntPtr) (vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset)
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				vertexOffset
 			);
 
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Draw!
-			GLDevice.glDrawRangeElements(
-				PrimitiveTypeGL(primitiveType),
-				0,
-				numVertices - 1,
-				GetElementCountArray(primitiveType, primitiveCount),
-				OpenGLDevice.GLenum.GL_UNSIGNED_INT,
-				(IntPtr) (ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int)))
+			GLDevice.DrawUserIndexedPrimitives(
+				primitiveType,
+				vbPtr,
+				vertexOffset,
+				numVertices,
+				ibPtr,
+				indexOffset,
+				IndexElementSize.ThirtyTwoBits,
+				primitiveCount
 			);
 
 			// Release the handles.
@@ -1210,13 +1207,30 @@ namespace Microsoft.Xna.Framework.Graphics
 			int vertexOffset,
 			int primitiveCount
 		) where T : struct, IVertexType {
-			DrawUserPrimitives(
-				primitiveType,
-				vertexData,
-				vertexOffset,
-				primitiveCount,
-				VertexDeclarationCache<T>.VertexDeclaration
+			ApplyState();
+
+			// Pin the buffers.
+			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
+
+			// Setup the vertex declaration to point at the vertex data.
+			VertexDeclaration vertexDeclaration = VertexDeclarationCache<T>.VertexDeclaration;
+			vertexDeclaration.GraphicsDevice = this;
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				0
 			);
+
+			GLDevice.DrawUserPrimitives(
+				primitiveType,
+				vbPtr,
+				vertexOffset,
+				primitiveCount
+			);
+
+			// Release the handles.
+			vbHandle.Free();
 		}
 
 		public void DrawUserPrimitives<T>(
@@ -1226,27 +1240,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			int primitiveCount,
 			VertexDeclaration vertexDeclaration
 		) where T : struct {
-			// Flush the GL state before moving on!
 			ApplyState();
-
-			// Unbind current VBOs.
-			GLDevice.BindVertexBuffer(OpenGLDevice.OpenGLVertexBuffer.NullBuffer);
 
 			// Pin the buffers.
 			GCHandle vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+			IntPtr vbPtr = vbHandle.AddrOfPinnedObject();
 
-			// Setup the vertex declaration to point at the VB data.
+			// Setup the vertex declaration to point at the vertex data.
 			vertexDeclaration.GraphicsDevice = this;
-			vertexDeclaration.Apply(VertexShader, vbHandle.AddrOfPinnedObject());
+			GLDevice.ApplyVertexAttributes(
+				vertexDeclaration,
+				vbPtr,
+				0
+			);
 
-			// Enable the appropriate vertex attributes.
-			GLDevice.FlushGLVertexAttributes();
-
-			// Draw!
-			GLDevice.glDrawArrays(
-				PrimitiveTypeGL(primitiveType),
+			GLDevice.DrawUserPrimitives(
+				primitiveType,
+				vbPtr,
 				vertexOffset,
-				GetElementCountArray(primitiveType, primitiveCount)
+				primitiveCount
 			);
 
 			// Release the handles.
@@ -1264,44 +1276,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#endregion
 
-		#region Private XNA->GL Conversion Methods
-
-		private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
-		{
-			switch (primitiveType)
-			{
-				case PrimitiveType.LineList:
-					return primitiveCount * 2;
-				case PrimitiveType.LineStrip:
-					return primitiveCount + 1;
-				case PrimitiveType.TriangleList:
-					return primitiveCount * 3;
-				case PrimitiveType.TriangleStrip:
-					return 3 + (primitiveCount - 1);
-			}
-
-			throw new NotSupportedException();
-		}
-
-		private static OpenGLDevice.GLenum PrimitiveTypeGL(PrimitiveType primitiveType)
-		{
-			switch (primitiveType)
-			{
-				case PrimitiveType.LineList:
-					return OpenGLDevice.GLenum.GL_LINES;
-				case PrimitiveType.LineStrip:
-					return OpenGLDevice.GLenum.GL_LINE_STRIP;
-				case PrimitiveType.TriangleList:
-					return OpenGLDevice.GLenum.GL_TRIANGLES;
-				case PrimitiveType.TriangleStrip:
-					return OpenGLDevice.GLenum.GL_TRIANGLE_STRIP;
-			}
-
-			throw new ArgumentException("Should be a value defined in PrimitiveType", "primitiveType");
-		}
-
-		#endregion
-
 		#region Private State Flush Methods
 
 		private void ApplyState()
@@ -1312,108 +1286,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				RenderTargetCount > 0
 			);
 
-			while (ModifiedSamplers.Count > 0)
+			while (modifiedSamplers.Count > 0)
 			{
-				int sampler = ModifiedSamplers.Dequeue();
+				int sampler = modifiedSamplers.Dequeue();
 				GLDevice.VerifySampler(
 					sampler,
 					Textures[sampler],
 					SamplerStates[sampler]
 				);
 			}
-
-			// TODO: MSAA?
-
-			if (VertexShader == null)
+			while (modifiedVertexSamplers.Count > 0)
 			{
-				throw new InvalidOperationException("A vertex shader must be set!");
+				int sampler = modifiedVertexSamplers.Dequeue();
+				GLDevice.VerifyVertexSampler(
+					sampler,
+					VertexTextures[sampler],
+					VertexSamplerStates[sampler]
+				);
 			}
-			if (PixelShader == null)
-			{
-				throw new InvalidOperationException("A pixel shader must be set!");
-			}
-
-			if (vertexShaderDirty || pixelShaderDirty)
-			{
-				ActivateShaderProgram();
-				vertexShaderDirty = pixelShaderDirty = false;
-			}
-
-			vertexConstantBuffers.SetConstantBuffers(this, shaderProgram);
-			pixelConstantBuffers.SetConstantBuffers(this, shaderProgram);
-		}
-
-		/// <summary>
-		/// Activates the Current Vertex/Pixel shader pair into a program.
-		/// </summary>
-		private void ActivateShaderProgram()
-		{
-			// Lookup the shader program.
-			ShaderProgram program = programCache.GetProgram(VertexShader, PixelShader);
-			if (program.Program == 0)
-			{
-				return;
-			}
-
-			// Set the new program if it has changed.
-			if (shaderProgram != program)
-			{
-				GLDevice.glUseProgram(program.Program);
-				shaderProgram = program;
-			}
-
-			int posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
-			if (posFixupLoc == -1)
-			{
-				return;
-			}
-
-			/* Apply vertex shader fix:
-			 * The following two lines are appended to the end of vertex shaders
-			 * to account for rendering differences between OpenGL and DirectX:
-			 * 
-			 * gl_Position.y = gl_Position.y * posFixup.y;
-			 * gl_Position.xy += posFixup.zw * gl_Position.ww;
-			 * 
-			 * (the following paraphrased from wine, wined3d/state.c and
-			 * wined3d/glsl_shader.c)
-			 * 
-			 * - We need to flip along the y-axis in case of offscreen rendering.
-			 * - D3D coordinates refer to pixel centers while GL coordinates refer
-			 *   to pixel corners.
-			 * - D3D has a top-left filling convention. We need to maintain this
-			 *   even after the y-flip mentioned above.
-			 * 
-			 * In order to handle the last two points, we translate by
-			 * (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
-			 * translating slightly less than half a pixel. We want the difference to
-			 * be large enough that it doesn't get lost due to rounding inside the
-			 * driver, but small enough to prevent it from interfering with any
-			 * anti-aliasing.
-			 * 
-			 * OpenGL coordinates specify the center of the pixel while d3d coords
-			 * specify the corner. The offsets are stored in z and w in posFixup.
-			 * posFixup.y contains 1.0 or -1.0 to turn the rendering upside down for
-			 * offscreen rendering.
-			 */
-
-			posFixup[0] = 1.0f;
-			posFixup[1] = 1.0f;
-			posFixup[2] = (63.0f / 64.0f) / Viewport.Width;
-			posFixup[3] = -(63.0f / 64.0f) / Viewport.Height;
-
-			// Flip vertically if we have a render target bound (rendering offscreen)
-			if (RenderTargetCount > 0)
-			{
-				posFixup[1] *= -1.0f;
-				posFixup[3] *= -1.0f;
-			}
-
-			GLDevice.glUniform4fv(
-				posFixupLoc,
-				1,
-				posFixupPtr
-			);
 		}
 
 		#endregion

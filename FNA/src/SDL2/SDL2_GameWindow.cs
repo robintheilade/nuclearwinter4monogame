@@ -7,6 +7,16 @@
  */
 #endregion
 
+#region RESIZABLE_WINDOW Option
+// #define RESIZABLE_WINDOW
+/* So we've got this silly issue in SDL2's video API at the moment. We can't
+ * add/remove the resizable property to the SDL_Window*!
+ *
+ * So, if you want to have your GameWindow be resizable, uncomment this define.
+ * -flibit
+ */
+#endregion
+
 #region Using Statements
 using System;
 using System.Collections.Generic;
@@ -33,12 +43,15 @@ namespace Microsoft.Xna.Framework
 			 */
 			get
 			{
-				return INTERNAL_allowUserResizing;
+#if RESIZABLE_WINDOW
+				return true;
+#else
+				return false;
+#endif
 			}
 			set
 			{
-				INTERNAL_allowUserResizing = value;
-				INTERNAL_SetWindowMinMaxSize();
+				// No-op. :(
 			}
 		}
 
@@ -102,16 +115,6 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-		public override IntPtr WindowsHandleEXT
-		{
-			get
-			{
-				var info = new SDL.SDL_SysWMinfo();
-				SDL.SDL_GetWindowWMInfo(INTERNAL_sdlWindow, ref info);
-				return info.info.win.window;
-			}
-		}
-
 		public override bool IsBorderlessEXT
 		{
 			get
@@ -146,8 +149,6 @@ namespace Microsoft.Xna.Framework
 
 		private string INTERNAL_deviceName;
 
-		private bool INTERNAL_allowUserResizing;
-
 		#endregion
 
 		#region Internal Constructor
@@ -158,9 +159,14 @@ namespace Microsoft.Xna.Framework
 				SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL |
 				SDL.SDL_WindowFlags.SDL_WINDOW_HIDDEN |
 				SDL.SDL_WindowFlags.SDL_WINDOW_INPUT_FOCUS |
-				SDL.SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS |
-				SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE
+				SDL.SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS
 			);
+
+			// FIXME: Once we have SDL_SetWindowResizable, remove this. -flibit
+			if (AllowUserResizing)
+			{
+				initFlags |= SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
+			}
 
 			SDL.SDL_GL_SetAttribute(SDL.SDL_GLattr.SDL_GL_RED_SIZE, 8);
 			SDL.SDL_GL_SetAttribute(SDL.SDL_GLattr.SDL_GL_GREEN_SIZE, 8);
@@ -186,8 +192,6 @@ namespace Microsoft.Xna.Framework
 				initFlags
 			);
 			INTERNAL_SetIcon(title);
-
-			INTERNAL_SetWindowMinMaxSize();
 
 			INTERNAL_isFullscreen = false;
 			INTERNAL_wantsFullscreen = false;
@@ -230,9 +234,7 @@ namespace Microsoft.Xna.Framework
 			}
 
 			// Window bounds
-			INTERNAL_ClearWindowMinMaxSize();
 			SDL.SDL_SetWindowSize(INTERNAL_sdlWindow, clientWidth, clientHeight);
-			INTERNAL_SetWindowMinMaxSize();
 
 			// Window position
 			if (INTERNAL_isFullscreen && !INTERNAL_wantsFullscreen)
@@ -270,35 +272,6 @@ namespace Microsoft.Xna.Framework
 		internal void INTERNAL_ClientSizeChanged()
 		{
 			OnClientSizeChanged();
-		}
-
-		internal void INTERNAL_StateChangedNUCLEAR()
-		{
-			OnStateChangedNUCLEAR();
-		}
-
-		internal void INTERNAL_ClearWindowMinMaxSize()
-		{
-			SDL2.SDL.SDL_SetWindowMinimumSize(Handle, 1, 1);
-
-			// FIXME: SDL_SetWindowMaximumSize doesn't allow resetting back to zero
-			// after setting a maximum size once.
-			// https://github.com/spurious/SDL-mirror/blob/c2c793b74c2c9478814e4d49ea44577a6829c154/src/video/SDL_video.c#L1793
-			SDL2.SDL.SDL_SetWindowMaximumSize(Handle, 100000, 100000);
-		}
-
-		internal void INTERNAL_SetWindowMinMaxSize()
-		{
-			if (!INTERNAL_allowUserResizing)
-			{
-				var clientBounds = ClientBounds;
-				SDL2.SDL.SDL_SetWindowMinimumSize(Handle, clientBounds.Width, clientBounds.Height);
-				SDL2.SDL.SDL_SetWindowMaximumSize(Handle, clientBounds.Width, clientBounds.Height);
-			}
-			else
-			{
-				INTERNAL_ClearWindowMinMaxSize();
-			}
 		}
 
 		#endregion

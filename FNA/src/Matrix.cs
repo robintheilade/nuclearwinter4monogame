@@ -322,19 +322,19 @@ namespace Microsoft.Xna.Framework
 				"{M11:" + M11.ToString() +
 				" M12:" + M12.ToString() +
 				" M13:" + M13.ToString() +
-				" M14:}" + M14.ToString() +
-				" {M21:" + M21.ToString() +
+				" M14:" + M14.ToString() +
+				"} {M21:" + M21.ToString() +
 				" M22:" + M22.ToString() +
 				" M23:" + M23.ToString() +
-				" M24:}" + M24.ToString() +
-				" {M31:" + M31.ToString() +
+				" M24:" + M24.ToString() +
+				"} {M31:" + M31.ToString() +
 				" M32:" + M32.ToString() +
 				" M33:" + M33.ToString() +
-				" M34:}" + M34.ToString() +
-				" {M41:" + M41.ToString() +
+				" M34:" + M34.ToString() +
+				"} {M41:" + M41.ToString() +
 				" M42:" + M42.ToString() +
 				" M43:" + M43.ToString() +
-				" M44:}" + M44.ToString()
+				" M44:" + M44.ToString() + "}"
 			);
 		}
 
@@ -2067,25 +2067,6 @@ namespace Microsoft.Xna.Framework
 		) {
 			Matrix rotMatrix = CreateFromQuaternion(rotation);
 			Multiply(ref value, ref rotMatrix, out result);
-		}
-
-		#endregion
-
-		#region Internal Static Methods
-
-		/* Required for OpenGL 2.0 projection matrix stuff
-		 * TODO: have this work correctly for 3x3 Matrices. Needs to return
-		 * a float[9] for a 3x3, and a float[16] for a 4x4
-		 */
-		internal static float[] ToFloatArray(Matrix mat)
-		{
-			float[] matarray = {
-				mat.M11, mat.M12, mat.M13, mat.M14,
-				mat.M21, mat.M22, mat.M23, mat.M24,
-				mat.M31, mat.M32, mat.M33, mat.M34,
-				mat.M41, mat.M42, mat.M43, mat.M44
-			};
-			return matarray;
 		}
 
 		#endregion

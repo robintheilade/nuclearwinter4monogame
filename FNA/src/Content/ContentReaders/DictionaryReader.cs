@@ -16,6 +16,18 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
 	{
+		#region Public Properties
+
+		public override bool CanDeserializeIntoExistingObject
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		#endregion
+
 		#region Private Variables
 
 		ContentTypeReader keyReader;

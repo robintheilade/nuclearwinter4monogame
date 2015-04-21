@@ -40,11 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#region Internal Properties
 
-		internal OpenGLDevice.OpenGLIndexBuffer Handle
-		{
-			get;
-			private set;
-		}
+		internal IGLBuffer buffer;
 
 		#endregion
 
@@ -106,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		) {
 			if (graphicsDevice == null)
 			{
-				throw new ArgumentNullException("GraphicsDevice is null");
+				throw new ArgumentNullException("graphicsDevice");
 			}
 
 			GraphicsDevice = graphicsDevice;
@@ -114,15 +110,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			IndexCount = indexCount;
 			BufferUsage = usage;
 
-			Threading.ForceToMainThread(() =>
-			{
-				Handle = new OpenGLDevice.OpenGLIndexBuffer(
-					GraphicsDevice,
-					dynamic,
-					IndexCount,
-					IndexElementSize
-				);
-			});
+			buffer = GraphicsDevice.GLDevice.GenIndexBuffer(
+				dynamic,
+				IndexCount,
+				IndexElementSize
+			);
 		}
 
 		#endregion
@@ -133,14 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (!IsDisposed)
 			{
-				GraphicsDevice.AddDisposeAction(() =>
-				{
-					if( Handle != null )
-					{
-						Game.Instance.GraphicsDevice.GLDevice.DeleteIndexBuffer(Handle);
-						Handle = null;
-					}
-				});
+				GraphicsDevice.GLDevice.AddDisposeIndexBuffer(buffer);
 			}
 			base.Dispose(disposing);
 		}
@@ -180,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		) where T : struct {
 			if (data == null)
 			{
-				throw new ArgumentNullException("data is null");
+				throw new ArgumentNullException("data");
 			}
 			if (data.Length < (startIndex + elementCount))
 			{
@@ -194,14 +179,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				);
 			}
 
-			Threading.ForceToMainThread(() =>
-				GraphicsDevice.GLDevice.GetIndexBufferData(
-					Handle,
-					offsetInBytes,
-					data,
-					startIndex,
-					elementCount
-				)
+			GraphicsDevice.GLDevice.GetIndexBufferData(
+				buffer,
+				offsetInBytes,
+				data,
+				startIndex,
+				elementCount
 			);
 		}
 
@@ -264,22 +247,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		) where T : struct {
 			if (data == null)
 			{
-				throw new ArgumentNullException("data is null");
+				throw new ArgumentNullException("data");
 			}
 			if (data.Length < (startIndex + elementCount))
 			{
 				throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 			}
 
-			Threading.ForceToMainThread(() =>
-				GraphicsDevice.GLDevice.SetIndexBufferData(
-					Handle,
-					offsetInBytes,
-					data,
-					startIndex,
-					elementCount,
-					options
-				)
+			GraphicsDevice.GLDevice.SetIndexBufferData(
+				buffer,
+				offsetInBytes,
+				data,
+				startIndex,
+				elementCount,
+				options
 			);
 		}
 
@@ -325,7 +306,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				return IndexElementSize.ThirtyTwoBits;
 			}
 
-			throw new ArgumentOutOfRangeException("Index buffers can only be created for types that are sixteen or thirty two bits in length");
+			throw new ArgumentOutOfRangeException(
+				"type",
+				"Index buffers can only be created for types" +
+				" that are sixteen or thirty two bits in length"
+			);
 		}
 
 		#endregion

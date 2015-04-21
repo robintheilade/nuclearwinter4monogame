@@ -20,8 +20,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public GraphicsDevice GraphicsDevice
 		{
-			get;
-			internal set;
+			get
+			{
+				return graphicsDevice;
+			}
+			internal set
+			{
+				if (graphicsDevice == value)
+				{
+					return;
+				}
+
+				/* VertexDeclaration objects can be bound to
+				 * multiple GraphicsDevice objects during their
+				 * lifetime. But only one GraphicsDevice should
+				 * retain ownership.
+				 */
+				if (graphicsDevice != null)
+				{
+					graphicsDevice.RemoveResourceReference(selfReference);
+					selfReference = null;
+				}
+
+				graphicsDevice = value;
+
+				selfReference = new WeakReference(this);
+				graphicsDevice.AddResourceReference(selfReference);
+			}
 		}
 
 		public bool IsDisposed
@@ -48,18 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private WeakReference selfReference;
 
-		#endregion
-
-		#region Private Static Variables
-
-		// Resources may be added to and removed from the list from many threads.
-		private static object resourcesLock = new object();
-
-		/* Use WeakReference for the global resources list as we do not know when a resource
-		 * may be disposed and collected. We do not want to prevent a resource from being
-		 * collected by holding a strong reference to it in this list.
-		 */
-		private static List<WeakReference> resources = new List<WeakReference>();
+		private GraphicsDevice graphicsDevice;
 
 		#endregion
 
@@ -73,17 +87,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal GraphicsResource()
 		{
-			lock (resourcesLock)
-			{
-				selfReference = new WeakReference(this);
-				resources.Add(selfReference);
-			}
 		}
 
 		~GraphicsResource()
 		{
 			// Pass false so the managed objects are not released
-			// FIXME: How, I say, how in the fuck was this supposed to work? -flibit
+			// FIXME: This can lock up your game from the GC! -flibit
 			// Dispose(false);
 		}
 
@@ -137,74 +146,23 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </remarks>
 		protected virtual void Dispose(bool disposing)
 		{
-			// FIXME: What was this? No, really, what? -flibit
-			//if (!IsDisposed)
-			//{
-			//if (disposing)
-			//{
-			// Release managed objects
-			// ...
-			//}
-
-			// Release native objects
-			// ...
-
-			// Do not trigger the event if called from the finalizer
-			if (disposing && Disposing != null)
+			if (!IsDisposed)
 			{
-				Disposing(this, EventArgs.Empty);
-			}
-
-			// Remove from the global list of graphics resources
-			lock (resourcesLock)
-			{
-				resources.Remove(selfReference);
-			}
-
-			selfReference = null;
-			GraphicsDevice = null;
-			IsDisposed = true;
-			//}
-		}
-
-		#endregion
-
-		#region Internal Static Methods
-
-		internal static void DoGraphicsDeviceResetting()
-		{
-			lock (resourcesLock)
-			{
-				foreach (WeakReference resource in resources)
+				// Do not trigger the event if called from the finalizer
+				if (disposing && Disposing != null)
 				{
-					object target = resource.Target;
-					if (target != null)
-					{
-						(target as GraphicsResource).GraphicsDeviceResetting();
-					}
+					Disposing(this, EventArgs.Empty);
 				}
 
-				// Remove references to resources that have been garbage collected.
-				resources.RemoveAll(wr => !wr.IsAlive);
-			}
-		}
-
-		/// <summary>
-		/// Dispose all graphics resources remaining in the global resources list.
-		/// </summary>
-		internal static void DisposeAll()
-		{
-			lock (resourcesLock)
-			{
-				foreach (WeakReference resource in resources.ToArray())
+				// Remove from the list of graphics resources
+				if (graphicsDevice != null)
 				{
-					object target = resource.Target;
-					if (target != null)
-					{
-						(target as IDisposable).Dispose();
-					}
+					graphicsDevice.RemoveResourceReference(selfReference);
 				}
-				resources.Clear();
+
+				selfReference = null;
+				graphicsDevice = null;
+				IsDisposed = true;
 			}
 		}
 

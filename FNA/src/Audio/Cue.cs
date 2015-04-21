@@ -10,6 +10,7 @@
 #region Using Statements
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Microsoft.Xna.Framework.Audio
@@ -35,18 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get
 			{
-				if (INTERNAL_queuedPaused)
-				{
-					return true;
-				}
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-				{
-					if (sfi.State == SoundState.Paused)
-					{
-						return true;
-					}
-				}
-				return false;
+				return (	!INTERNAL_timer.IsRunning &&
+						INTERNAL_timer.ElapsedTicks > 0	);
 			}
 		}
 
@@ -54,18 +45,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get
 			{
-				if (INTERNAL_queuedPlayback)
-				{
-					return true;
-				}
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-				{
-					if (sfi.State != SoundState.Stopped)
-					{
-						return true;
-					}
-				}
-				return false;
+				return (	INTERNAL_timer.IsRunning ||
+						INTERNAL_timer.ElapsedTicks > 0	);
 			}
 		}
 
@@ -110,27 +91,43 @@ namespace Microsoft.Xna.Framework.Audio
 
 		private AudioEngine INTERNAL_baseEngine;
 
+		// Cue information parsed from the SoundBank
 		private CueData INTERNAL_data;
+
+		// Current sound and its events
 		private XACTSound INTERNAL_activeSound;
+		private List<XACTEvent> INTERNAL_eventList;
+		private List<bool> INTERNAL_eventPlayed;
+		private Dictionary<XACTEvent, int> INTERNAL_eventLoops;
+		private Dictionary<SoundEffectInstance, XACTEvent> INTERNAL_waveEventSounds;
+
+		// Used for event timestamps
+		private Stopwatch INTERNAL_timer;
+
+		// Sound list
 		private List<SoundEffectInstance> INTERNAL_instancePool;
 		private List<float> INTERNAL_instanceVolumes;
 		private List<float> INTERNAL_instancePitches;
+
+		// RPC data list
+		private List<float> INTERNAL_rpcTrackVolumes;
+		private List<float> INTERNAL_rpcTrackPitches;
 
 		// User-controlled sounds require a bit more trickery.
 		private bool INTERNAL_userControlledPlaying;
 		private float INTERNAL_controlledValue;
 
+		// 3D audio variables
 		private bool INTERNAL_isPositional;
 		private AudioListener INTERNAL_listener;
 		private AudioEmitter INTERNAL_emitter;
 
+		// XACT instance variables
 		private List<Variable> INTERNAL_variables;
 
+		// Category managing this Cue, and whether or not it's user-managed
 		private AudioCategory INTERNAL_category;
 		private bool INTERNAL_isManaged;
-
-		private bool INTERNAL_queuedPlayback;
-		private bool INTERNAL_queuedPaused;
 
 		#endregion
 
@@ -180,12 +177,20 @@ namespace Microsoft.Xna.Framework.Audio
 
 			INTERNAL_userControlledPlaying = false;
 			INTERNAL_isPositional = false;
-			INTERNAL_queuedPlayback = false;
-			INTERNAL_queuedPaused = false;
+
+			INTERNAL_eventList = new List<XACTEvent>();
+			INTERNAL_eventPlayed = new List<bool>();
+			INTERNAL_eventLoops = new Dictionary<XACTEvent, int>();
+			INTERNAL_waveEventSounds = new Dictionary<SoundEffectInstance, XACTEvent>();
+
+			INTERNAL_timer =  new Stopwatch();
 
 			INTERNAL_instancePool = new List<SoundEffectInstance>();
 			INTERNAL_instanceVolumes = new List<float>();
 			INTERNAL_instancePitches = new List<float>();
+
+			INTERNAL_rpcTrackVolumes = new List<float>();
+			INTERNAL_rpcTrackPitches = new List<float>();
 		}
 
 		#endregion
@@ -218,8 +223,11 @@ namespace Microsoft.Xna.Framework.Audio
 					INTERNAL_instancePool.Clear();
 					INTERNAL_instanceVolumes.Clear();
 					INTERNAL_instancePitches.Clear();
-					INTERNAL_queuedPlayback = false;
+					INTERNAL_rpcTrackVolumes.Clear();
+					INTERNAL_rpcTrackPitches.Clear();
+					INTERNAL_timer.Stop();
 				}
+				INTERNAL_category.INTERNAL_removeActiveCue(this);
 				IsDisposed = true;
 			}
 		}
@@ -273,17 +281,13 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Pause()
 		{
-			if (!IsPlaying)
+			if (IsPlaying)
 			{
-				if (INTERNAL_queuedPlayback)
+				INTERNAL_timer.Stop();
+				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
 				{
-					INTERNAL_queuedPaused = true;
+					sfi.Pause();
 				}
-				return;
-			}
-			foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-			{
-				sfi.Pause();
 			}
 		}
 
@@ -326,36 +330,30 @@ namespace Microsoft.Xna.Framework.Audio
 				return;
 			}
 
+			INTERNAL_timer.Start();
+
 			if (!INTERNAL_calculateNextSound())
 			{
 				return;
 			}
 
-			INTERNAL_setupSounds();
-
-			if (INTERNAL_isPositional)
+			INTERNAL_activeSound.GatherEvents(INTERNAL_eventList);
+			foreach (XACTEvent evt in INTERNAL_eventList)
 			{
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-				{
-					sfi.Apply3D(
-						INTERNAL_listener,
-						INTERNAL_emitter
-					);
-				}
+				INTERNAL_eventPlayed.Add(false);
+				INTERNAL_eventLoops.Add(evt, 0);
 			}
-
-			INTERNAL_queuedPlayback = true;
 		}
 
 		public void Resume()
 		{
-			if (!IsPaused)
+			if (IsPaused)
 			{
-				return;
-			}
-			foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-			{
-				sfi.Resume();
+				INTERNAL_timer.Start();
+				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
+				{
+					sfi.Resume();
+				}
 			}
 		}
 
@@ -378,27 +376,28 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Stop(AudioStopOptions options)
 		{
-			if (INTERNAL_queuedPlayback)
+			if (IsPlaying)
 			{
-				INTERNAL_queuedPlayback = false;
+				INTERNAL_timer.Stop();
+				INTERNAL_timer.Reset();
+				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
+				{
+					sfi.Stop();
+					sfi.Dispose();
+				}
+				INTERNAL_instancePool.Clear();
+				INTERNAL_instanceVolumes.Clear();
+				INTERNAL_instancePitches.Clear();
+				INTERNAL_rpcTrackVolumes.Clear();
+				INTERNAL_rpcTrackPitches.Clear();
+				INTERNAL_userControlledPlaying = false;
 				INTERNAL_category.INTERNAL_removeActiveCue(this);
-				return;
-			}
-			foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-			{
-				sfi.Stop();
-				sfi.Dispose();
-			}
-			INTERNAL_instancePool.Clear();
-			INTERNAL_instanceVolumes.Clear();
-			INTERNAL_instancePitches.Clear();
-			INTERNAL_userControlledPlaying = false;
-			INTERNAL_category.INTERNAL_removeActiveCue(this);
 
-			// If this is a managed Cue, we're done here.
-			if (INTERNAL_isManaged)
-			{
-				Dispose();
+				// If this is a managed Cue, we're done here.
+				if (INTERNAL_isManaged)
+				{
+					Dispose();
+				}
 			}
 		}
 
@@ -408,38 +407,61 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal bool INTERNAL_update()
 		{
-			// If this is our first update, time to play!
-			if (INTERNAL_queuedPlayback)
+			// If we're not running, save some instructions...
+			if (!INTERNAL_timer.IsRunning)
 			{
-				INTERNAL_queuedPlayback = false;
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
-				{
-					sfi.Play();
-					if (INTERNAL_queuedPaused)
-					{
-						sfi.Pause();
-					}
-				}
-				INTERNAL_queuedPaused = false;
+				return true;
 			}
 
+			// Play events when the timestamp has been hit.
+			for (int i = 0; i < INTERNAL_eventList.Count; i += 1)
+			{
+				if (	!INTERNAL_eventPlayed[i] &&
+					INTERNAL_timer.ElapsedMilliseconds > INTERNAL_eventList[i].Timestamp	)
+				{
+					uint type = INTERNAL_eventList[i].Type;
+					if (type == 1)
+					{
+						PlayWave((PlayWaveEvent) INTERNAL_eventList[i]);
+					}
+					else if (type == 2)
+					{
+						// FIXME: SetVariable, or apply instanceVolumes? -flibit
+						SetVariable(
+							"Volume",
+							((SetVolumeEvent) INTERNAL_eventList[i]).GetVolume()
+						);
+					}
+					else
+					{
+						throw new Exception("Unhandled XACTEvent type!");
+					}
+					INTERNAL_eventPlayed[i] = true;
+				}
+			}
+
+			// Clear out sound effect instances as they finish
 			for (int i = 0; i < INTERNAL_instancePool.Count; i += 1)
 			{
-				if (INTERNAL_instancePool[i].INTERNAL_timer.ElapsedMilliseconds > INTERNAL_instancePool[i].INTERNAL_delayMS)
-				{
-					// Okay, play this NOW!
-					INTERNAL_instancePool[i].Play();
-					if (IsPaused)
-					{
-						INTERNAL_instancePool[i].Pause();
-					}
-				}
 				if (INTERNAL_instancePool[i].State == SoundState.Stopped)
 				{
+					// Get the event that spawned this instance...
+					PlayWaveEvent evt = (PlayWaveEvent) INTERNAL_waveEventSounds[INTERNAL_instancePool[i]];
+
+					// Then delete all the guff
+					INTERNAL_waveEventSounds.Remove(INTERNAL_instancePool[i]);
 					INTERNAL_instancePool[i].Dispose();
 					INTERNAL_instancePool.RemoveAt(i);
 					INTERNAL_instanceVolumes.RemoveAt(i);
 					INTERNAL_instancePitches.RemoveAt(i);
+					INTERNAL_rpcTrackVolumes.RemoveAt(i);
+					INTERNAL_rpcTrackPitches.RemoveAt(i);
+
+					// Increment the loop counter, try to get another loop
+					INTERNAL_eventLoops[evt] += 1;
+					PlayWave(evt);
+
+					// Removed a wave, have to step back...
 					i -= 1;
 				}
 			}
@@ -450,8 +472,8 @@ namespace Microsoft.Xna.Framework.Audio
 				string varName = INTERNAL_data.UserControlVariable;
 				if (	INTERNAL_userControlledPlaying &&
 					(INTERNAL_baseEngine.INTERNAL_isGlobalVariable(varName) ?
-						(INTERNAL_controlledValue != INTERNAL_baseEngine.GetGlobalVariable(varName)) :
-						(INTERNAL_controlledValue != GetVariable(INTERNAL_data.UserControlVariable)))	)
+						!MathHelper.WithinEpsilon(INTERNAL_controlledValue, INTERNAL_baseEngine.GetGlobalVariable(varName)) :
+						!MathHelper.WithinEpsilon(INTERNAL_controlledValue, GetVariable(INTERNAL_data.UserControlVariable)))	)
 				{
 					// TODO: Crossfading
 					foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
@@ -462,16 +484,22 @@ namespace Microsoft.Xna.Framework.Audio
 					INTERNAL_instancePool.Clear();
 					INTERNAL_instanceVolumes.Clear();
 					INTERNAL_instancePitches.Clear();
+					INTERNAL_rpcTrackVolumes.Clear();
+					INTERNAL_rpcTrackPitches.Clear();
 					if (!INTERNAL_calculateNextSound())
 					{
 						// Nothing to play, bail.
 						return true;
 					}
-					INTERNAL_setupSounds();
-					foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
+					INTERNAL_activeSound.GatherEvents(INTERNAL_eventList);
+					foreach (XACTEvent evt in INTERNAL_eventList)
 					{
-						sfi.Play();
+						INTERNAL_eventPlayed.Add(false);
+						INTERNAL_eventLoops.Add(evt, 0);
 					}
+					INTERNAL_timer.Stop();
+					INTERNAL_timer.Reset();
+					INTERNAL_timer.Start();
 				}
 
 				if (INTERNAL_activeSound == null)
@@ -480,76 +508,156 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			}
 
-			if (INTERNAL_isPositional)
+			// If everything has been played and finished, we're done here.
+			if (INTERNAL_instancePool.Count == 0)
 			{
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
+				bool allPlayed = true;
+				foreach (bool played in INTERNAL_eventPlayed)
 				{
-					sfi.Apply3D(
+					if (!played)
+					{
+						allPlayed = false;
+						break;
+					}
+				}
+				if (allPlayed)
+				{
+					// If this is managed, we're done completely.
+					if (INTERNAL_isManaged)
+					{
+						Dispose();
+					}
+					else
+					{
+						INTERNAL_timer.Stop();
+						INTERNAL_timer.Reset();
+						INTERNAL_category.INTERNAL_removeActiveCue(this);
+					}
+					return INTERNAL_userControlledPlaying;
+				}
+			}
+
+			// RPC updates
+			float rpcVolume = 1.0f;
+			float rpcPitch = 0.0f;
+			float hfGain = 1.0f;
+			float lfGain = 1.0f;
+			for (int i = 0; i < INTERNAL_activeSound.RPCCodes.Count; i += 1)
+			{
+				if (i > INTERNAL_instancePool.Count)
+				{
+					break;
+				}
+				if (i > 0)
+				{
+					INTERNAL_rpcTrackVolumes[i - 1] = 1.0f;
+					INTERNAL_rpcTrackPitches[i - 1] = 0.0f;
+				}
+				foreach (uint curCode in INTERNAL_activeSound.RPCCodes[i])
+				{
+					RPC curRPC = INTERNAL_baseEngine.INTERNAL_getRPC(curCode);
+					float result;
+					if (!INTERNAL_baseEngine.INTERNAL_isGlobalVariable(curRPC.Variable))
+					{
+						result = curRPC.CalculateRPC(GetVariable(curRPC.Variable));
+					}
+					else
+					{
+						// It's a global variable we're looking for!
+						result = curRPC.CalculateRPC(
+							INTERNAL_baseEngine.GetGlobalVariable(
+								curRPC.Variable
+							)
+						);
+					}
+					if (curRPC.Parameter == RPCParameter.Volume)
+					{
+						float vol = XACTCalculator.CalculateAmplitudeRatio(result / 100.0);
+						if (i == 0)
+						{
+							rpcVolume *= vol;
+						}
+						else
+						{
+							INTERNAL_rpcTrackVolumes[i - 1] *= vol;
+						}
+					}
+					else if (curRPC.Parameter == RPCParameter.Pitch)
+					{
+						float pitch = result / 1000.0f;
+						if (i == 0)
+						{
+							rpcPitch += pitch;
+						}
+						else
+						{
+							INTERNAL_rpcTrackPitches[i - 1] += pitch;
+						}
+					}
+					else if (curRPC.Parameter == RPCParameter.FilterFrequency)
+					{
+						// FIXME: Just listening to the last RPC!
+						float hf = result / 20000.0f;
+						float lf = 1.0f - hfGain;
+						if (i == 0)
+						{
+							hfGain = hf;
+							lfGain = lf;
+						}
+						else
+						{
+							throw new NotImplementedException("Per-track filter RPCs!");
+						}
+					}
+					else
+					{
+						throw new Exception("RPC Parameter Type: " + curRPC.Parameter.ToString());
+					}
+				}
+			}
+
+			// Sound effect instance updates
+			float cueVolume = GetVariable("Volume");
+			for (int i = 0; i < INTERNAL_instancePool.Count; i += 1)
+			{
+				/* The final volume should be the combination of the
+				 * authored volume, Volume variable and RPC volume results.
+				 */
+				INTERNAL_instancePool[i].Volume = (
+					INTERNAL_instanceVolumes[i] *
+					cueVolume *
+					rpcVolume *
+					INTERNAL_rpcTrackVolumes[i]
+				);
+
+				/* The final pitch should be the combination of the
+				 * authored pitch and RPC pitch results.
+				 */
+				INTERNAL_instancePool[i].Pitch = (
+					INTERNAL_instancePitches[i] +
+					rpcPitch +
+					INTERNAL_rpcTrackPitches[i]
+				);
+
+				/* The final filter is determined by the instance's filter type,
+				 * in addition to our calculation of the HF/LF gain values.
+				 */
+				INTERNAL_instancePool[i].INTERNAL_applyFilter(
+					INTERNAL_baseEngine.Filter,
+					hfGain,
+					lfGain
+				);
+
+				// Update 3D position, if applicable
+				if (INTERNAL_isPositional)
+				{
+					INTERNAL_instancePool[i].Apply3D(
 						INTERNAL_listener,
 						INTERNAL_emitter
 					);
 				}
 			}
 
-			float rpcVolume = 1.0f;
-			float rpcPitch = 0.0f;
-			foreach (uint curCode in INTERNAL_activeSound.RPCCodes)
-			{
-				RPC curRPC = INTERNAL_baseEngine.INTERNAL_getRPC(curCode);
-				float result;
-				if (!INTERNAL_baseEngine.INTERNAL_isGlobalVariable(curRPC.Variable))
-				{
-					result = curRPC.CalculateRPC(GetVariable(curRPC.Variable));
-				}
-				else
-				{
-					// It's a global variable we're looking for!
-					result = curRPC.CalculateRPC(
-						INTERNAL_baseEngine.GetGlobalVariable(
-							curRPC.Variable
-						)
-					);
-				}
-				if (curRPC.Parameter == RPCParameter.Volume)
-				{
-					rpcVolume *= XACTCalculator.CalculateAmplitudeRatio(result / 100.0);
-				}
-				else if (curRPC.Parameter == RPCParameter.Pitch)
-				{
-					rpcPitch += result / 1000.0f;
-				}
-				else if (curRPC.Parameter == RPCParameter.FilterFrequency)
-				{
-					// TODO: Filters?
-				}
-				else
-				{
-					throw new Exception("RPC Parameter Type: " + curRPC.Parameter.ToString());
-				}
-			}
-			for (int i = 0; i < INTERNAL_instancePool.Count; i += 1)
-			{
-				/* The final volume should be the combination of the
-				 * authored volume, Volume variable and RPC volume results.
-				 */
-				INTERNAL_instancePool[i].Volume = INTERNAL_instanceVolumes[i] * GetVariable("Volume") * rpcVolume;
-
-				/* The final pitch should be the combination of the
-				 * authored pitch and RPC pitch results.
-				 */
-				INTERNAL_instancePool[i].Pitch = INTERNAL_instancePitches[i] + rpcPitch;
-			}
-
-			// Finally, check if we're still active.
-			if (IsStopped && !INTERNAL_queuedPlayback && !INTERNAL_userControlledPlaying)
-			{
-				// If this is managed, we're done here.
-				if (INTERNAL_isManaged)
-				{
-					Dispose();
-				}
-				return false;
-			}
 			return true;
 		}
 
@@ -565,6 +673,10 @@ namespace Microsoft.Xna.Framework.Audio
 		private bool INTERNAL_calculateNextSound()
 		{
 			INTERNAL_activeSound = null;
+			INTERNAL_eventList.Clear();
+			INTERNAL_eventPlayed.Clear();
+			INTERNAL_eventLoops.Clear();
+			INTERNAL_waveEventSounds.Clear();
 
 			// Pick a sound based on a Cue instance variable
 			if (INTERNAL_data.IsUserControlled)
@@ -623,22 +735,33 @@ namespace Microsoft.Xna.Framework.Audio
 			return true;
 		}
 
-		private void INTERNAL_setupSounds()
+		private void PlayWave(PlayWaveEvent evt)
 		{
-			INTERNAL_activeSound.GenerateInstances(
-				INTERNAL_instancePool,
-				INTERNAL_instanceVolumes,
-				INTERNAL_instancePitches
+			SoundEffectInstance sfi = evt.GenerateInstance(
+				INTERNAL_activeSound.Volume,
+				INTERNAL_activeSound.Pitch,
+				INTERNAL_eventLoops[evt]
 			);
-
-			foreach (uint curDSP in INTERNAL_activeSound.DSPCodes)
+			if (sfi != null)
 			{
-				DSPEffect handle = INTERNAL_baseEngine.INTERNAL_getDSP(curDSP);
-				foreach (SoundEffectInstance sfi in INTERNAL_instancePool)
+				if (INTERNAL_isPositional)
+				{
+					sfi.Apply3D(INTERNAL_listener, INTERNAL_emitter);
+				}
+				foreach (uint curDSP in INTERNAL_activeSound.DSPCodes)
 				{
 					// FIXME: This only applies the last DSP!
-					sfi.INTERNAL_applyEffect(handle);
+					sfi.INTERNAL_applyReverb(
+						INTERNAL_baseEngine.INTERNAL_getDSP(curDSP)
+					);
 				}
+				INTERNAL_instancePool.Add(sfi);
+				INTERNAL_instanceVolumes.Add(sfi.Volume);
+				INTERNAL_instancePitches.Add(sfi.Pitch);
+				INTERNAL_waveEventSounds.Add(sfi, evt);
+				INTERNAL_rpcTrackVolumes.Add(1.0f);
+				INTERNAL_rpcTrackPitches.Add(0.0f);
+				sfi.Play();
 			}
 		}
 

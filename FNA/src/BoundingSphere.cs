@@ -423,21 +423,9 @@ namespace Microsoft.Xna.Framework
 			box.Intersects(ref this, out result);
 		}
 
-		public void Intersects(ref BoundingSphere sphere, out bool result)
+		public bool Intersects(BoundingFrustum frustum)
 		{
-			float sqDistance;
-			Vector3.DistanceSquared(ref sphere.Center, ref Center, out sqDistance);
-			result = !(sqDistance > (sphere.Radius + Radius) * (sphere.Radius + Radius));
-		}
-
-		public void Intersects(ref Ray ray, out Nullable<float> result)
-		{
-			ray.Intersects(ref this, out result);
-		}
-
-		public Nullable<float> Intersects(Ray ray)
-		{
-			return ray.Intersects(this);
+			return frustum.Intersects(this);
 		}
 
 		public bool Intersects(BoundingSphere sphere)
@@ -445,6 +433,23 @@ namespace Microsoft.Xna.Framework
 			bool result;
 			Intersects(ref sphere, out result);
 			return result;
+		}
+
+		public void Intersects(ref BoundingSphere sphere, out bool result)
+		{
+			float sqDistance;
+			Vector3.DistanceSquared(ref sphere.Center, ref Center, out sqDistance);
+			result = !(sqDistance > (sphere.Radius + Radius) * (sphere.Radius + Radius));
+		}
+
+		public Nullable<float> Intersects(Ray ray)
+		{
+			return ray.Intersects(this);
+		}
+
+		public void Intersects(ref Ray ray, out Nullable<float> result)
+		{
+			ray.Intersects(ref this, out result);
 		}
 
 		public PlaneIntersectionType Intersects(Plane plane)

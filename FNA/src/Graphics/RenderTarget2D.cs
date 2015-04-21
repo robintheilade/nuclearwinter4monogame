@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		#region IRenderTarget Properties
 
 		/// <inheritdoc/>
-		uint IRenderTarget.DepthStencilBuffer
+		IGLRenderbuffer IRenderTarget.DepthStencilBuffer
 		{
 			get
 			{
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#region Private Variables
 
-		private uint glDepthStencilBuffer;
+		private IGLRenderbuffer glDepthStencilBuffer;
 
 		#endregion
 
@@ -136,14 +136,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				return;
 			}
 
-			Threading.ForceToMainThread(() =>
-			{
-				glDepthStencilBuffer = graphicsDevice.GLDevice.GenRenderbuffer(
-					width,
-					height,
-					preferredDepthFormat
-				);
-			});
+			glDepthStencilBuffer = graphicsDevice.GLDevice.GenRenderbuffer(
+				width,
+				height,
+				preferredDepthFormat
+			);
 		}
 
 		#endregion
@@ -154,13 +151,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (!IsDisposed)
 			{
-				GraphicsDevice.AddDisposeAction(() =>
+				if (glDepthStencilBuffer != null)
 				{
-					if (glDepthStencilBuffer != 0)
-					{
-						Game.Instance.GraphicsDevice.GLDevice.DeleteRenderbuffer(glDepthStencilBuffer);
-					}
-				});
+					GraphicsDevice.GLDevice.AddDisposeRenderbuffer(glDepthStencilBuffer);
+				}
 			}
 			base.Dispose(disposing);
 		}

@@ -43,11 +43,6 @@ namespace Microsoft.Xna.Framework
 			get;
 		}
 
-		public abstract IntPtr WindowsHandleEXT
-		{
-			get;
-		}
-
 		public abstract string ScreenDeviceName
 		{
 			get;
@@ -115,7 +110,6 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
-		public event EventHandler<EventArgs> StateChangedNUCLEAR;
 
 		#endregion
 
@@ -183,14 +177,6 @@ namespace Microsoft.Xna.Framework
 		);
 
 		protected abstract void SetTitle(string title);
-
-		protected void OnStateChangedNUCLEAR()
-		{
-			if (StateChangedNUCLEAR != null)
-			{
-				StateChangedNUCLEAR(this, EventArgs.Empty);
-			}
-		}
 
 		#endregion
 	}

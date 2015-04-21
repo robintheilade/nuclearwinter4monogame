@@ -1744,6 +1744,14 @@ namespace SDL2
 			out SDL_RendererInfo info
 		);
 
+		/* renderer refers to an SDL_Renderer* */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDL_GetRendererOutputSize(
+			IntPtr renderer,
+			out int w,
+			out int h
+		);
+
 		/* texture refers to an SDL_Texture* */
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int SDL_GetTextureAlphaMod(
@@ -1933,6 +1941,15 @@ namespace SDL2
 			ref SDL_Rect rect
 		);
 
+		/* renderer refers to an SDL_Renderer*, rect to an SDL_Rect*.
+		 * This overload allows for IntPtr.Zero (null) to be passed for rect.
+		 */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDL_RenderDrawRect(
+			IntPtr renderer,
+			IntPtr rect
+		);
+
 		/* renderer refers to an SDL_Renderer* */
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int SDL_RenderDrawRects(
@@ -1947,6 +1964,15 @@ namespace SDL2
 		public static extern int SDL_RenderFillRect(
 			IntPtr renderer,
 			ref SDL_Rect rect
+		);
+
+		/* renderer refers to an SDL_Renderer*, rect to an SDL_Rect*.
+		 * This overload allows for IntPtr.Zero (null) to be passed for rect.
+		 */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDL_RenderFillRect(
+			IntPtr renderer,
+			IntPtr rect
 		);
 
 		/* renderer refers to an SDL_Renderer* */
@@ -2100,6 +2126,16 @@ namespace SDL2
 			IntPtr pixels,
 			int pitch
 		);
+
+		/* renderer refers to an SDL_Renderer* */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern SDL_bool SDL_RenderTargetSupported(
+			IntPtr renderer
+		);
+
+		/* IntPtr refers to an SDL_Texture*, renderer to an SDL_Renderer* */
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr SDL_GetRenderTarget(IntPtr renderer);
 
 		#endregion
 

@@ -10,6 +10,7 @@
 #region Using Statements
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 #endregion
 
@@ -26,7 +27,25 @@ namespace Microsoft.Xna.Framework.Audio
 
 		#region Public Properties
 
+		public ReadOnlyCollection<RendererDetail> RendererDetails
+		{
+			get
+			{
+				return AudioDevice.Renderers;
+			}
+		}
+
 		public bool IsDisposed
+		{
+			get;
+			private set;
+		}
+
+		#endregion
+
+		#region Internal Properties
+
+		internal IALFilter Filter
 		{
 			get;
 			private set;
@@ -219,7 +238,9 @@ namespace Microsoft.Xna.Framework.Audio
 					ushort fadeOutMS = reader.ReadUInt16();
 
 					// Instance Behavior Flags
-					int maxBehavior = reader.ReadByte() & 0x0F; // FIXME: What?
+					byte instanceFlags = reader.ReadByte();
+					int fadeType = instanceFlags & 0x07;
+					int maxBehavior = instanceFlags >> 3;
 
 					// Unknown value
 					reader.ReadUInt16();
@@ -238,7 +259,8 @@ namespace Microsoft.Xna.Framework.Audio
 							maxInstances,
 							maxBehavior,
 							fadeInMS,
-							fadeOutMS
+							fadeOutMS,
+							fadeType
 						)
 					);
 				}
@@ -415,6 +437,9 @@ namespace Microsoft.Xna.Framework.Audio
 			// Create the WaveBank Dictionary
 			INTERNAL_waveBanks = new Dictionary<string, WaveBank>();
 
+			// Create the device filter
+			Filter = AudioDevice.ALDevice.GenFilter();
+
 			// Finally.
 			IsDisposed = false;
 		}
@@ -424,6 +449,10 @@ namespace Microsoft.Xna.Framework.Audio
 			TimeSpan lookAheadTime,
 			string rendererId
 		) {
+			/* TODO: May require either resetting the ALDevice,
+			 * or adding a second AL device/context for this engine.
+			 * -flibit
+			 */
 			throw new NotSupportedException();
 		}
 
@@ -461,6 +490,7 @@ namespace Microsoft.Xna.Framework.Audio
 				INTERNAL_dspParameters.Clear();
 				INTERNAL_variables.Clear();
 				INTERNAL_RPCs.Clear();
+				AudioDevice.ALDevice.DeleteFilter(Filter);
 				IsDisposed = true;
 			}
 		}
@@ -548,7 +578,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Apply all DSP changes once they have been made
 			foreach (DSPPreset curDSP in INTERNAL_dspPresets.Values)
 			{
-				curDSP.Effect.CommitChanges();
+				AudioDevice.ALDevice.CommitReverbChanges(curDSP.Effect);
 			}
 
 			// Update Cues
@@ -587,7 +617,7 @@ namespace Microsoft.Xna.Framework.Audio
 			return INTERNAL_RPCs[code];
 		}
 
-		internal DSPEffect INTERNAL_getDSP(uint code)
+		internal IALReverb INTERNAL_getDSP(uint code)
 		{
 			return INTERNAL_dspPresets[code].Effect;
 		}

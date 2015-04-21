@@ -20,6 +20,18 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class ListReader<T> : ContentTypeReader<List<T>>
 	{
+		#region Public Properties
+
+		public override bool CanDeserializeIntoExistingObject
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		#endregion
+
 		#region Private ContentTypeReader Instance
 
 		ContentTypeReader elementReader;

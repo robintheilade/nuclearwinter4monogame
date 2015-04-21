@@ -19,46 +19,15 @@ namespace Microsoft.Xna.Framework.Content
 	{
 		#region Private Supported File Extensions Variable
 
-		static string[] supportedExtensions = new string[] {".fxg"};
+		private static string[] supportedExtensions = new string[] { ".fxb" };
 
 		#endregion
 
-		#region Public Constructor
+		#region Internal Filename Normalizer Method
 
-		public EffectReader()
+		internal static string Normalize(string FileName)
 		{
-		}
-
-		#endregion
-
-		// FIXME: Shouldn't this be internal?
-		#region Public Filename Normalizer Method
-
-		public static string Normalize(string FileName)
-		{
-			return ContentTypeReader.Normalize(FileName, supportedExtensions);
-		}
-
-		#endregion
-
-		// FIXME: Are these ever even used?
-		#region Private Static Methods
-
-		private static string TryFindAnyCased(
-			string search,
-			string[] arr,
-			params string[] extensions
-		) {
-			return arr.FirstOrDefault(
-				s => extensions.Any(
-					ext => s.ToLowerInvariant() == (search.ToLowerInvariant() + ext)
-				)
-			);
-		}
-
-		private static bool Contains(string search, string[] arr)
-		{
-			return arr.Any(s => s == search);
+			return Normalize(FileName, supportedExtensions);
 		}
 
 		#endregion
@@ -69,8 +38,11 @@ namespace Microsoft.Xna.Framework.Content
 			ContentReader input,
 			Effect existingInstance
 		) {
-			int count = input.ReadInt32();
-			Effect effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
+			int length = input.ReadInt32();
+			Effect effect = new Effect(
+				input.GraphicsDevice,
+				input.ReadBytes(length)
+			);
 			effect.Name = input.AssetName;
 			return effect;
 		}
