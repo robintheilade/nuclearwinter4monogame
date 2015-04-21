@@ -314,19 +314,23 @@ namespace Microsoft.Xna.Framework.Input
 			// Check for an SDL_GameController configuration first!
 			if (INTERNAL_isGameController[which])
 			{
+				/*
 				System.Console.WriteLine(
 					"Controller " + which.ToString() + ", " +
 					SDL.SDL_GameControllerName(INTERNAL_devices[which]) +
 					", will use SDL_GameController support."
 				);
+				*/
 			}
 			else
 			{
+				/*
 				System.Console.WriteLine(
 					"Controller " + which.ToString() + ", " +
 					SDL.SDL_JoystickName(INTERNAL_devices[which]) +
 					", will use generic MonoGameJoystick support."
 				);
+				*/
 			}
 		}
 
