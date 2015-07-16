@@ -148,6 +148,7 @@ namespace NuclearSample
             UIStyle.PopupFrame                  = Content.Load<Texture2D>( "Sprites/UI/PopupFrame" );
             UIStyle.PopupFrameCornerSize        = 30;
 
+            UIStyle.CheckBoxFrame               = Content.Load<Texture2D>( "Sprites/UI/EditBoxFrame" );
             UIStyle.CheckBoxFrameHover          = Content.Load<Texture2D>( "Sprites/UI/CheckBoxFrameHover" );
             UIStyle.CheckBoxChecked             = Content.Load<Texture2D>( "Sprites/UI/Checked" );
             UIStyle.CheckBoxUnchecked           = Content.Load<Texture2D>( "Sprites/UI/Unchecked" );
