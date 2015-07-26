@@ -269,10 +269,12 @@ namespace Microsoft.Xna.Framework.Input
 			}
 
 			// Print controller information to stdout.
-			System.Console.WriteLine(
+			/*
+            System.Console.WriteLine(
 				"Controller " + which.ToString() + ": " +
 				SDL.SDL_GameControllerName(INTERNAL_devices[which])
 			);
+            */
 		}
 
 		internal static void INTERNAL_RemoveInstance(int dev)
@@ -297,7 +299,9 @@ namespace Microsoft.Xna.Framework.Input
 			// A lot of errors can happen here, but honestly, they can be ignored...
 			SDL.SDL_ClearError();
 
+            /*
 			System.Console.WriteLine("Removed device, player: " + output.ToString());
+            */
 		}
 
 		#endregion

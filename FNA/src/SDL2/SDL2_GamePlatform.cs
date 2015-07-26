@@ -292,6 +292,8 @@ namespace Microsoft.Xna.Framework
 							keys.Add(key);
 							INTERNAL_TextInputIn(key);
 						}
+
+						TextInputEXT.OnKeyDown(evt.key.keysym.sym);
 					}
 					else if (evt.type == SDL.SDL_EventType.SDL_KEYUP)
 					{
@@ -304,6 +306,8 @@ namespace Microsoft.Xna.Framework
 						{
 							INTERNAL_TextInputOut(key);
 						}
+
+						TextInputEXT.OnKeyUp(evt.key.keysym.sym);
 					}
 
 					// Mouse Input
@@ -449,6 +453,14 @@ namespace Microsoft.Xna.Framework
 						else if (evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE)
 						{
 							SDL.SDL_EnableScreenSaver();
+						}
+
+						else if
+							(evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MINIMIZED ||
+							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MAXIMIZED ||
+							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED)
+						{
+							((SDL2_GameWindow) Window).INTERNAL_StateChangedNUCLEAR();
 						}
 					}
 
@@ -626,11 +638,11 @@ namespace Microsoft.Xna.Framework
 				{
 					if (SDL.SDL_GL_SetSwapInterval(-1) != -1)
 					{
-						System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
+						// System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
 					}
 					else
 					{
-						System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
+						// System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
 						SDL.SDL_ClearError();
 						SDL.SDL_GL_SetSwapInterval(1);
 					}
