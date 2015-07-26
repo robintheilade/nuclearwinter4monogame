@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -125,6 +125,8 @@ namespace Microsoft.Xna.Framework.Content
 				ExternalReferenceReader hExternalReferenceReader = new ExternalReferenceReader();
 				SoundEffectReader hSoundEffectReader = new SoundEffectReader();
 				SongReader hSongReader = new SongReader();
+				ModelReader hModelReader = new ModelReader();
+				Int32Reader hInt32Reader = new Int32Reader();
 			}
 #pragma warning restore 0219, 0649
 

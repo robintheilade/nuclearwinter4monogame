@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		/// <param name="x">The x component</param>
 		/// <param name="y">The y component</param>
 		/// <param name="z">The z component</param>
-		/// <param name="W">The w component</param>
+		/// <param name="w">The w component</param>
 		public Bgra5551(float x, float y, float z, float w)
 		{
 			packedValue = Pack(x, y, z, w);

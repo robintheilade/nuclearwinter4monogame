@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -103,17 +103,17 @@ namespace Microsoft.Xna.Framework.Storage
 
 		#endregion
 
-		#region Internal Variables
-
-		internal static readonly string storageRoot = GetStorageRoot();
-
-		#endregion
-
 		#region Private Variables
 
 		private PlayerIndex? devicePlayer;
 
 		private StorageContainer deviceContainer;
+
+		#endregion
+
+		#region Private Static Variables
+
+		private static readonly string storageRoot = GetStorageRoot();
 
 		#endregion
 
@@ -351,7 +351,12 @@ namespace Microsoft.Xna.Framework.Storage
 		// Private method to handle the creation of the StorageDevice.
 		private StorageContainer Open(string displayName)
 		{
-			deviceContainer = new StorageContainer(this, displayName, devicePlayer);
+			deviceContainer = new StorageContainer(
+				this,
+				displayName,
+				storageRoot,
+				devicePlayer
+			);
 			return deviceContainer;
 		}
 
@@ -373,7 +378,10 @@ namespace Microsoft.Xna.Framework.Storage
 		{
 			if (Game.Instance.Platform.OSVersion.Equals("Windows"))
 			{
-				return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+				return Path.Combine(
+					Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+					"SavedGames"
+				);
 			}
 			if (Game.Instance.Platform.OSVersion.Equals("Mac OS X"))
 			{

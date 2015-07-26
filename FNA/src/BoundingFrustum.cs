@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
 		#region Public Constructors
 
 		/// <summary>
-		/// Creates a new instance of <see cref="BoundingFrustum"/> class.
+		/// Constructs the frustum by extracting the view planes from a matrix.
 		/// </summary>
 		/// <param name="value">Combined matrix which usually is (View * Projection).</param>
 		public BoundingFrustum(Matrix value)

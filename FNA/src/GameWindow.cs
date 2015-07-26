@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -39,11 +39,6 @@ namespace Microsoft.Xna.Framework
 		}
 
 		public abstract IntPtr Handle
-		{
-			get;
-		}
-
-		public abstract IntPtr WindowsHandleEXT
 		{
 			get;
 		}
@@ -115,7 +110,6 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
-		public event EventHandler<EventArgs> StateChangedNUCLEAR;
 
 		#endregion
 
@@ -183,14 +177,6 @@ namespace Microsoft.Xna.Framework
 		);
 
 		protected abstract void SetTitle(string title);
-
-		protected void OnStateChangedNUCLEAR()
-		{
-			if (StateChangedNUCLEAR != null)
-			{
-				StateChangedNUCLEAR(this, EventArgs.Empty);
-			}
-		}
 
 		#endregion
 	}

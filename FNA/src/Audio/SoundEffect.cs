@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -168,28 +168,6 @@ namespace Microsoft.Xna.Framework.Audio
 		#endregion
 
 		#region Internal Constructors
-
-		internal SoundEffect(string fileName)
-		{
-			if (fileName == string.Empty)
-			{
-				throw new ArgumentNullException("fileName");
-			}
-
-			Name = Path.GetFileNameWithoutExtension(fileName);
-
-			try
-			{
-				using (Stream s = File.OpenRead(fileName))
-				{
-					INTERNAL_loadAudioStream(s);
-				}
-			}
-			catch (IOException e)
-			{
-				throw new Content.ContentLoadException("Could not load audio data", e);
-			}
-		}
 
 		internal SoundEffect(Stream s)
 		{

@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -942,7 +942,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 				// Calculate vertices, finally.
-				for (int j = 0; j < 4; j += 1)
+				for (int j = 0, curVertex = i * 4; j < 4; j += 1, curVertex += 1)
 				{
 					Vector2 cornerOffset = (
 						SpriteInfo.CornerOffsets[j] - origin
@@ -961,11 +961,11 @@ namespace Microsoft.Xna.Framework.Graphics
 							destination
 						)
 					);
-					vertexInfo[(i * 4) + j].Position.X = position.X;
-					vertexInfo[(i * 4) + j].Position.Y = position.Y;
-					vertexInfo[(i * 4) + j].Position.Z = info.depth;
-					vertexInfo[(i * 4) + j].Color = info.color;
-					vertexInfo[(i * 4) + j].TextureCoordinate = Vector2.Add(
+					vertexInfo[curVertex].Position.X = position.X;
+					vertexInfo[curVertex].Position.Y = position.Y;
+					vertexInfo[curVertex].Position.Z = info.depth;
+					vertexInfo[curVertex].Color = info.color;
+					vertexInfo[curVertex].TextureCoordinate = Vector2.Add(
 						Vector2.Multiply(
 							SpriteInfo.CornerOffsets[j ^ (info.effects & 0x3)],
 							sourceSize
@@ -1075,16 +1075,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			Viewport viewport = GraphicsDevice.Viewport;
 
-			/* FIXME: The following const value is OpenGL-specific!
-			 * We're essentially switching it from a right-handed matrix to a
-			 * left-handed matrix. This allows depths to be accurate for OpenGL
-			 * renderers without having to actually change any data on the game
-			 * side. If you use Ortho in your game, you may have to do this too!
-			 * -flibit
-			 */
-			const float depthHand = 1.0f; // Could be -1.0f for D3D!
-
-			// Inlined CreateOrthoGraphicOffCenter
+			// Inlined CreateOrthographicOffCenter
 			Matrix projection = new Matrix(
 				(float) (2.0 / (double) viewport.Width),
 				0.0f,
@@ -1096,7 +1087,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				0.0f,
 				0.0f,
 				0.0f,
-				depthHand,
+				1.0f,
 				0.0f,
 				-1.0f,
 				1.0f,
@@ -1114,6 +1105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			spriteEffectPass.Apply();
 		}
 
+		[System.Diagnostics.Conditional("DEBUG")]
 		private void CheckBegin(string method)
 		{
 			if (!beginCalled)

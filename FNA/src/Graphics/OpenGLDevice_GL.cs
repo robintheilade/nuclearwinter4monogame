@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -148,11 +148,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL_R32F =				0x822E,
 			GL_RG16F =				0x822F,
 			GL_RG32F =				0x8230,
-			GL_RG8I =				0x8237,
 			GL_RGBA32F =				0x8814,
 			GL_RGBA16F =				0x881A,
 			GL_DEPTH24_STENCIL8 =			0x88F0,
-			GL_RGBA8I =				0x8D8E,
 			GL_COMPRESSED_TEXTURE_FORMATS =		0x86A3,
 			GL_COMPRESSED_RGBA_S3TC_DXT1_EXT =	0x83F1,
 			GL_COMPRESSED_RGBA_S3TC_DXT3_EXT =	0x83F2,
@@ -196,6 +194,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL_QUERY_RESULT =			0x8866,
 			GL_QUERY_RESULT_AVAILABLE =		0x8867,
 			GL_SAMPLES_PASSED =			0x8914,
+			// Multisampling
+			GL_MAX_SAMPLES =			0x8D57,
 			// Source Enum Values
 			GL_DEBUG_SOURCE_API_ARB =		0x8246,
 			GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB =	0x8247,
@@ -312,6 +312,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			bool alpha
 		);
 		private ColorMaskIndexedEXT glColorMaskIndexedEXT;
+
+		private delegate void SampleMaski(uint maskNumber, uint mask);
+		private SampleMaski glSampleMaski;
 
 		/* END BLEND STATE FUNCTIONS */
 
@@ -653,6 +656,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			int height
 		);
 		private RenderbufferStorage glRenderbufferStorage;
+
+		private delegate void RenderbufferStorageMultisample(
+			GLenum target,
+			int samples,
+			GLenum internalformat,
+			int width,
+			int height
+		);
+		private RenderbufferStorageMultisample glRenderbufferStorageMultisample;
 
 		/* END FRAMEBUFFER FUNCTIONS */
 
@@ -1061,8 +1073,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NoSuitableGraphicsDeviceException("OpenGL framebuffer support is required!");
 			}
 
-			/* ARB_instanced_arrays/ARB_draw_instanced are almost optional. */
-			SupportsHardwareInstancing = true;
+			/* ARB_instanced_arrays/ARB_draw_instanced are almost optional.
+			 * While we do not directly call glVertexAttribDivisor ourselves,
+			 * we still need to check for ARB_instanced_arrays support.
+			 * -flibit
+			 */
+			SupportsHardwareInstancing = SDL.SDL_GL_GetProcAddress("glVertexAttribDivisor") != IntPtr.Zero;
 			try
 			{
 				glDrawElementsInstanced = (DrawElementsInstanced) Marshal.GetDelegateForFunctionPointer(
@@ -1086,6 +1102,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			catch
 			{
 				// FIXME: SupportsIndependentWriteMasks? -flibit
+			}
+
+			/* EXT_framebuffer_multisample/ARB_texture_multisample is glitter -flibit */
+			supportsMultisampling = true;
+			try
+			{
+				glRenderbufferStorageMultisample = (RenderbufferStorageMultisample) Marshal.GetDelegateForFunctionPointer(
+					TryGetFramebufferEP("glRenderbufferStorageMultisample"),
+					typeof(RenderbufferStorageMultisample)
+				);
+				glSampleMaski = (SampleMaski) Marshal.GetDelegateForFunctionPointer(
+					SDL.SDL_GL_GetProcAddress("glSampleMaski"),
+					typeof(SampleMaski)
+				);
+			}
+			catch
+			{
+				supportsMultisampling = false;
 			}
 
 #if DEBUG
@@ -1151,15 +1185,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private IntPtr TryGetFramebufferEP(string ep)
 		{
-			IntPtr result;
-			result = SDL.SDL_GL_GetProcAddress(ep);
+			IntPtr result = SDL.SDL_GL_GetProcAddress(ep);
 			if (result == IntPtr.Zero)
 			{
 				result = SDL.SDL_GL_GetProcAddress(ep + "EXT");
-				if (result == IntPtr.Zero)
-				{
-					throw new NoSuitableGraphicsDeviceException();
-				}
 			}
 			return result;
 		}

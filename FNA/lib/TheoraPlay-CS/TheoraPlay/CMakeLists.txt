@@ -5,6 +5,7 @@ PROJECT(TheoraPlay)
 
 IF (APPLE)
 	SET(CMAKE_OSX_ARCHITECTURES i386 x86_64)
+	SET(CMAKE_OSX_DEPLOYMENT_TARGET 10.6)
 ENDIF()
 
 # Compiler flags
@@ -22,6 +23,5 @@ INCLUDE_DIRECTORIES(include)
 ADD_LIBRARY(theoraplay SHARED src/theoraplay.c)
 TARGET_LINK_LIBRARIES(theoraplay ogg)
 TARGET_LINK_LIBRARIES(theoraplay vorbis)
-TARGET_LINK_LIBRARIES(theoraplay theora)
 TARGET_LINK_LIBRARIES(theoraplay theoradec)
 TARGET_LINK_LIBRARIES(theoraplay pthread)

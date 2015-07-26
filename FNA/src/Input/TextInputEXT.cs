@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -25,8 +25,6 @@ namespace Microsoft.Xna.Framework.Input
 		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
 		/// </summary>
 		public static event Action<char> TextInput;
-		public static event Action<SDL2.SDL.SDL_Keycode> KeyDown;
-		public static event Action<SDL2.SDL.SDL_Keycode> KeyUp;
 
 		#endregion
 
@@ -37,22 +35,6 @@ namespace Microsoft.Xna.Framework.Input
 			if (TextInput != null)
 			{
 				TextInput(c);
-			}
-		}
-
-		internal static void OnKeyDown(SDL2.SDL.SDL_Keycode key)
-		{
-			if(KeyDown != null)
-			{
-				KeyDown(key);
-			}
-		}
-
-		internal static void OnKeyUp(SDL2.SDL.SDL_Keycode key)
-		{
-			if(KeyUp != null)
-			{
-				KeyUp(key);
 			}
 		}
 

@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -175,8 +175,28 @@ namespace Microsoft.Xna.Framework
 				);
 			}
 
+			// If available, load the SDL_GameControllerDB
+			string mappingsDB = Path.Combine(
+				TitleContainer.Location,
+				"gamecontrollerdb.txt"
+			);
+			if (File.Exists(mappingsDB))
+			{
+				SDL.SDL_GameControllerAddMappingsFromFile(
+					mappingsDB
+				);
+			}
+
 			// Set and initialize the SDL2 window
-			Window = new SDL2_GameWindow();
+			bool forceES2 = Environment.GetEnvironmentVariable(
+				"FNA_OPENGL_FORCE_ES2"
+			) == "1";
+			Window = new SDL2_GameWindow(
+				forceES2 ||
+				OSVersion.Equals("Emscripten") ||
+				OSVersion.Equals("Android") ||
+				OSVersion.Equals("iOS")
+			);
 
 			// Create the DisplayMode list
 			displayIndex = SDL.SDL_GetWindowDisplayIndex(
@@ -272,8 +292,6 @@ namespace Microsoft.Xna.Framework
 							keys.Add(key);
 							INTERNAL_TextInputIn(key);
 						}
-
-						TextInputEXT.OnKeyDown(evt.key.keysym.sym);
 					}
 					else if (evt.type == SDL.SDL_EventType.SDL_KEYUP)
 					{
@@ -286,8 +304,6 @@ namespace Microsoft.Xna.Framework
 						{
 							INTERNAL_TextInputOut(key);
 						}
-
-						TextInputEXT.OnKeyUp(evt.key.keysym.sym);
 					}
 
 					// Mouse Input
@@ -386,17 +402,21 @@ namespace Microsoft.Xna.Framework
 							Mouse.INTERNAL_WindowHeight = evt.window.data2;
 
 							// Need to reset the graphics device any time the window size changes
-							if (Game.graphicsDeviceManager.IsFullScreen)
+							GraphicsDeviceManager gdm = Game.Services.GetService(
+								typeof(IGraphicsDeviceService)
+							) as GraphicsDeviceManager;
+							// FIXME: gdm == null? -flibit
+							if (gdm.IsFullScreen)
 							{
 								GraphicsDevice device = Game.GraphicsDevice;
-								Game.graphicsDeviceManager.INTERNAL_ResizeGraphicsDevice(
+								gdm.INTERNAL_ResizeGraphicsDevice(
 									device.GLDevice.Backbuffer.Width,
 									device.GLDevice.Backbuffer.Height
 								);
 							}
 							else
 							{
-								Game.graphicsDeviceManager.INTERNAL_ResizeGraphicsDevice(
+								gdm.INTERNAL_ResizeGraphicsDevice(
 									evt.window.data1,
 									evt.window.data2
 								);
@@ -430,24 +450,16 @@ namespace Microsoft.Xna.Framework
 						{
 							SDL.SDL_EnableScreenSaver();
 						}
-
-						else if
-							(evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MINIMIZED ||
-							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MAXIMIZED ||
-							evt.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED)
-						{
-							((SDL2_GameWindow) Window).INTERNAL_StateChangedNUCLEAR();
-						}
 					}
 
 					// Controller device management
-					else if (evt.type == SDL.SDL_EventType.SDL_JOYDEVICEADDED)
+					else if (evt.type == SDL.SDL_EventType.SDL_CONTROLLERDEVICEADDED)
 					{
-						GamePad.INTERNAL_AddInstance(evt.jdevice.which);
+						GamePad.INTERNAL_AddInstance(evt.cdevice.which);
 					}
-					else if (evt.type == SDL.SDL_EventType.SDL_JOYDEVICEREMOVED)
+					else if (evt.type == SDL.SDL_EventType.SDL_CONTROLLERDEVICEREMOVED)
 					{
-						GamePad.INTERNAL_RemoveInstance(evt.jdevice.which);
+						GamePad.INTERNAL_RemoveInstance(evt.cdevice.which);
 					}
 
 					// Text Input
@@ -509,14 +521,11 @@ namespace Microsoft.Xna.Framework
 				evt,
 				1,
 				SDL.SDL_eventaction.SDL_GETEVENT,
-				SDL.SDL_EventType.SDL_JOYDEVICEADDED,
-				SDL.SDL_EventType.SDL_JOYDEVICEADDED
+				SDL.SDL_EventType.SDL_CONTROLLERDEVICEADDED,
+				SDL.SDL_EventType.SDL_CONTROLLERDEVICEADDED
 			) == 1) {
-				GamePad.INTERNAL_AddInstance(evt[0].jdevice.which);
+				GamePad.INTERNAL_AddInstance(evt[0].cdevice.which);
 			}
-
-			// Also, initialize the MonoGameJoystick.cfg file.
-			GamePad.INTERNAL_InitMonoGameJoystick();
 		}
 
 		public override bool BeforeUpdate(GameTime gameTime)
@@ -617,11 +626,11 @@ namespace Microsoft.Xna.Framework
 				{
 					if (SDL.SDL_GL_SetSwapInterval(-1) != -1)
 					{
-						// System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
+						System.Console.WriteLine("Using EXT_swap_control_tear VSync!");
 					}
 					else
 					{
-						// System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
+						System.Console.WriteLine("EXT_swap_control_tear unsupported. Fall back to standard VSync.");
 						SDL.SDL_ClearError();
 						SDL.SDL_GL_SetSwapInterval(1);
 					}
@@ -654,11 +663,20 @@ namespace Microsoft.Xna.Framework
 		) {
 			// Load the Stream into an SDL_RWops*
 			byte[] mem = new byte[stream.Length];
+			GCHandle handle = GCHandle.Alloc(mem, GCHandleType.Pinned);
 			stream.Read(mem, 0, mem.Length);
 			IntPtr rwops = SDL.SDL_RWFromMem(mem, mem.Length);
 
 			// Load the SDL_Surface* from RWops, get the image data
 			IntPtr surface = SDL_image.IMG_Load_RW(rwops, 1);
+			if (surface == IntPtr.Zero)
+			{
+				// File not found, supported, etc.
+				width = 0;
+				height = 0;
+				pixels = null;
+				return;
+			}
 			surface = INTERNAL_convertSurfaceFormat(surface);
 			unsafe
 			{
@@ -669,6 +687,7 @@ namespace Microsoft.Xna.Framework
 				Marshal.Copy(surPtr->pixels, pixels, 0, pixels.Length);
 			}
 			SDL.SDL_FreeSurface(surface);
+			handle.Free();
 
 			/* Ensure that the alpha pixels are... well, actual alpha.
 			 * You think this looks stupid, but be assured: Your paint program is
@@ -763,6 +782,11 @@ namespace Microsoft.Xna.Framework
 				(pngOut[36])
 			) + pngHeaderSize + pngFooterSize;
 			stream.Write(pngOut, 0, size);
+		}
+
+		internal override Keys GetKeyFromScancode(Keys scancode)
+		{
+			return SDL2_KeyboardUtil.KeyFromScancode(scancode);
 		}
 
 		#endregion

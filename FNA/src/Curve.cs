@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework
 		}
 
 		/// <summary>
-		/// Gets the collection of curve keys.
+		/// The collection of curve keys.
 		/// </summary>
 		public CurveKeyCollection Keys
 		{
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
 		}
 
 		/// <summary>
-		/// Gets or sets how to handle weighting values that are greater than the last control point in the curve.
+		/// Defines how to handle weighting values that are greater than the last control point in the curve.
 		/// </summary>
 		public CurveLoopType PostLoop
 		{
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework
 		}
 
 		/// <summary>
-		/// Gets or sets how to handle weighting values that are less than the first control point in the curve.
+		/// Defines how to handle weighting values that are less than the first control point in the curve.
 		/// </summary>
 		public CurveLoopType PreLoop
 		{
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework
 		#region Public Constructors
 
 		/// <summary>
-		/// Creates a new instance of <see cref="Curve"/> class.
+		/// Constructs a curve.
 		/// </summary>
 		public Curve()
 		{
@@ -108,6 +108,15 @@ namespace Microsoft.Xna.Framework
 		/// <returns>Value at the position on this <see cref="Curve"/>.</returns>
 		public float Evaluate(float position)
 		{
+			if (Keys.Count == 0)
+			{
+				return 0.0f;
+			}
+			if (Keys.Count == 1)
+			{
+				return Keys[0].Value;
+			}
+
 			CurveKey first = Keys[0];
 			CurveKey last = Keys[Keys.Count - 1];
 

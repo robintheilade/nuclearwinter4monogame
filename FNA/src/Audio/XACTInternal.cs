@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -356,7 +356,7 @@ namespace Microsoft.Xna.Framework.Audio
 			Parameters = parameters;
 
 			// FIXME: Did XACT ever go past Reverb? -flibit
-			Effect = AudioDevice.ALDevice.GenReverb(Parameters);
+			Effect = AudioDevice.GenReverb(Parameters);
 		}
 
 		public void Dispose()

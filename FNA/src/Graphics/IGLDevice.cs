@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get;
 		}
 
-		int MaxVertexTextureSlots
+		int MaxMultiSampleCount
 		{
 			get;
 		}
@@ -125,11 +125,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			bool renderTargetBound
 		);
 		void VerifySampler(
-			int index,
-			Texture texture,
-			SamplerState sampler
-		);
-		void VerifyVertexSampler(
 			int index,
 			Texture texture,
 			SamplerState sampler
@@ -368,9 +363,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		void ResetFramebuffer(
-			int width,
-			int height,
-			DepthFormat depthFormat,
+			PresentationParameters presentationParameters,
 			bool renderTargetBound
 		);
 	}

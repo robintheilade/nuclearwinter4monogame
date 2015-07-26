@@ -1,6 +1,6 @@
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
- * Copyright 2009-2014 Ethan Lee and the MonoGame Team
+ * Copyright 2009-2015 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
@@ -127,7 +127,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			preferredFormat
 		) {
 			DepthStencilFormat = preferredDepthFormat;
-			MultiSampleCount = preferredMultiSampleCount;
+			MultiSampleCount = Math.Min(
+				MathHelper.ClosestMSAAPower(preferredMultiSampleCount),
+				graphicsDevice.GLDevice.MaxMultiSampleCount
+			);
 			RenderTargetUsage = usage;
 
 			// If we don't need a depth buffer then we're done.
