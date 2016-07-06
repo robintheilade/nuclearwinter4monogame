@@ -1,41 +1,41 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Collections.Generic;
-using System;
 
 namespace NuclearWinter.Storage
 {
     public abstract class SaveHandler
     {
-        protected NuclearGame                                   Game;
+        protected NuclearGame Game;
 
-        public string                                           FileName                = "SaveData.bin";
+        public string FileName = "SaveData.bin";
 
-        public readonly UInt32                                  SettingsMagicNumber     = 0xffffffff;
-        protected Dictionary<UInt32,Action<BinaryReader>>       ReadSettingsActions;
+        public readonly UInt32 SettingsMagicNumber = 0xffffffff;
+        protected Dictionary<UInt32, Action<BinaryReader>> ReadSettingsActions;
 
-        public readonly UInt32                                  DataMagicNumber         = 0xffffffff;
-        protected Dictionary<UInt32,Action<BinaryReader>>       ReadDataActions;
+        public readonly UInt32 DataMagicNumber = 0xffffffff;
+        protected Dictionary<UInt32, Action<BinaryReader>> ReadDataActions;
 
-        protected string                                        ContainerName;
-
-        //----------------------------------------------------------------------
-        protected abstract void WriteSettings( BinaryWriter _output );
-        protected abstract void WriteData( BinaryWriter _output );
+        protected string ContainerName;
 
         //----------------------------------------------------------------------
-        public SaveHandler( NuclearGame _game, UInt32 _uiSettingsMagicNumber, string _strContainerName, UInt32 _uiDataMagicNumber )
+        protected abstract void WriteSettings(BinaryWriter output);
+        protected abstract void WriteData(BinaryWriter output);
+
+        //----------------------------------------------------------------------
+        public SaveHandler(NuclearGame game, UInt32 uiSettingsMagicNumber, string containerName, UInt32 uiDataMagicNumber)
         {
-            Debug.Assert( _uiDataMagicNumber != 0xffffffff );
-            DataMagicNumber         = _uiDataMagicNumber;
+            Debug.Assert(uiDataMagicNumber != 0xffffffff);
+            DataMagicNumber = uiDataMagicNumber;
 
-            ContainerName   = _strContainerName;
+            ContainerName = containerName;
 
-            Debug.Assert( _uiSettingsMagicNumber != 0xffffffff );
-            SettingsMagicNumber     = _uiSettingsMagicNumber;
+            Debug.Assert(uiSettingsMagicNumber != 0xffffffff);
+            SettingsMagicNumber = uiSettingsMagicNumber;
 
-            Game            = _game;
+            Game = game;
         }
 
         //----------------------------------------------------------------------
@@ -44,16 +44,17 @@ namespace NuclearWinter.Storage
         {
             try
             {
-                using( var store = IsolatedStorageFile.GetUserStoreForDomain() )
+                using (var store = IsolatedStorageFile.GetUserStoreForDomain())
                 {
-                    try {
-                        var stream = store.OpenFile( FileName, FileMode.Create );
+                    try
+                    {
+                        var stream = store.OpenFile(FileName, FileMode.Create);
 
-                        if( stream != null )
+                        if (stream != null)
                         {
-                            var output = new BinaryWriter( stream );
-                            output.Write( SettingsMagicNumber );
-                            WriteSettings( output );
+                            var output = new BinaryWriter(stream);
+                            output.Write(SettingsMagicNumber);
+                            WriteSettings(output);
 
                             stream.Close();
                         }
@@ -67,7 +68,7 @@ namespace NuclearWinter.Storage
             }
             catch
             {
-                Debug.Assert( false, "Saving settings has failed" );
+                Debug.Assert(false, "Saving settings has failed");
             }
         }
 
@@ -81,17 +82,17 @@ namespace NuclearWinter.Storage
 
             try
             {
-                using( var store = IsolatedStorageFile.GetUserStoreForDomain() )
+                using (var store = IsolatedStorageFile.GetUserStoreForDomain())
                 {
-                    if( store.FileExists( FileName ) )
+                    if (store.FileExists(FileName))
                     {
                         try
                         {
-                            var stream = store.OpenFile( FileName, FileMode.Open );
+                            var stream = store.OpenFile(FileName, FileMode.Open);
 
-                            if( stream != null )
+                            if (stream != null)
                             {
-                                using ( var input = new BinaryReader( stream ) )
+                                using (var input = new BinaryReader(stream))
                                 {
                                     uint magicNumber = 0xffffffff;
 
@@ -99,9 +100,9 @@ namespace NuclearWinter.Storage
                                     {
                                         magicNumber = input.ReadUInt32();
 
-                                        if( ReadSettingsActions.ContainsKey( magicNumber ) )
+                                        if (ReadSettingsActions.ContainsKey(magicNumber))
                                         {
-                                            ReadSettingsActions[ magicNumber ]( input );
+                                            ReadSettingsActions[magicNumber](input);
                                         }
                                     }
                                     catch
@@ -122,7 +123,7 @@ namespace NuclearWinter.Storage
             }
             catch
             {
-                Debug.Assert( false, "Loading settings has failed" );
+                Debug.Assert(false, "Loading settings has failed");
             }
         }
     }
