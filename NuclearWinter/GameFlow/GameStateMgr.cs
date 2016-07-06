@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.GameFlow
@@ -11,11 +6,11 @@ namespace NuclearWinter.GameFlow
 
     //--------------------------------------------------------------------------
     // Game Component that handles game states and their transitions
-    public class GameStateMgr<T>: DrawableGameComponent where T:NuclearGame
+    public class GameStateMgr<T> : DrawableGameComponent where T : NuclearGame
     {
         //----------------------------------------------------------------------
-        public GameStateMgr( Game game )
-        : base( game )
+        public GameStateMgr(Game game)
+        : base(game)
         {
         }
 
@@ -30,16 +25,16 @@ namespace NuclearWinter.GameFlow
         /// Switches current GameState.
         /// </summary>
         /// <param name="_newGameState"></param>
-        public void SwitchState( IGameState<T> _newState )
+        public void SwitchState(IGameState<T> newState)
         {
             //------------------------------
             // precondition
-            System.Diagnostics.Debug.Assert( NextState == null );
+            System.Diagnostics.Debug.Assert(NextState == null);
             //------------------------------
 
-            NextState = _newState;
+            NextState = newState;
 
-            if( CurrentState == null )
+            if (CurrentState == null)
             {
                 NextState.Start();
             }
@@ -50,16 +45,16 @@ namespace NuclearWinter.GameFlow
         /// <summary>
         /// Updates the current GameState.
         /// </summary>
-        /// <param name="_time">Provides a snapshot of timing values.</param>
-        public override void Update( Microsoft.Xna.Framework.GameTime _time )
+        /// <param name="time">Provides a snapshot of timing values.</param>
+        public override void Update(GameTime time)
         {
-            float _fElapsedTime = (float)_time.ElapsedGameTime.TotalSeconds;
+            float _fElapsedTime = (float)time.ElapsedGameTime.TotalSeconds;
 
-            if( mbExit )
+            if (mbExit)
             {
                 //---------------------------------------------------------
                 // Fade out current state
-                if( CurrentState.UpdateFadeOut( _fElapsedTime ) )
+                if (CurrentState.UpdateFadeOut(_fElapsedTime))
                 {
                     // We're done
                     CurrentState.Stop();
@@ -70,39 +65,39 @@ namespace NuclearWinter.GameFlow
             //-----------------------------------------------------------------
             // Handle state switching
             else
-            if( NextState != null )
+            if (NextState != null)
             {
-                if( CurrentState != null )
+                if (CurrentState != null)
                 {
                     //---------------------------------------------------------
                     // Fade out current state
-                    if( CurrentState.UpdateFadeOut( _fElapsedTime ) )
+                    if (CurrentState.UpdateFadeOut(_fElapsedTime))
                     {
                         // We're done fading out
                         CurrentState.Stop();
                         CurrentState = null;
 
                         // Reset all vibrations when switching active GameState
-                        GamePad.SetVibration( PlayerIndex.One,      0f, 0f );
-                        GamePad.SetVibration( PlayerIndex.Two,      0f, 0f );
-                        GamePad.SetVibration( PlayerIndex.Three,    0f, 0f );
-                        GamePad.SetVibration( PlayerIndex.Four,     0f, 0f );
+                        GamePad.SetVibration(PlayerIndex.One, 0f, 0f);
+                        GamePad.SetVibration(PlayerIndex.Two, 0f, 0f);
+                        GamePad.SetVibration(PlayerIndex.Three, 0f, 0f);
+                        GamePad.SetVibration(PlayerIndex.Four, 0f, 0f);
 
                         NextState.Start();
                     }
                 }
-                
-                if( CurrentState == null )
+
+                if (CurrentState == null)
                 {
                     //---------------------------------------------------------
                     // Fade in next state
-                    if( NextState.UpdateFadeIn( _fElapsedTime ) )
+                    if (NextState.UpdateFadeIn(_fElapsedTime))
                     {
                         // We're done fading in
                         CurrentState = NextState;
                         NextState = null;
-                        
-                        CurrentState.Update( _fElapsedTime );
+
+                        CurrentState.Update(_fElapsedTime);
                     }
                 }
             }
@@ -111,7 +106,7 @@ namespace NuclearWinter.GameFlow
             // Update current GameState
             else
             {
-                CurrentState.Update( _fElapsedTime );
+                CurrentState.Update(_fElapsedTime);
             }
         }
 
@@ -119,17 +114,17 @@ namespace NuclearWinter.GameFlow
         /// <summary>
         /// Draws the current GameState.
         /// </summary>
-        /// <param name="_time"></param>
-        public override void Draw( Microsoft.Xna.Framework.GameTime _time )
+        /// <param name="time"></param>
+        public override void Draw(GameTime time)
         {
-            if( mbExit )
+            if (mbExit)
             {
                 CurrentState.DrawFadeOut();
             }
             else
-            if( NextState != null )
+            if (NextState != null)
             {
-                if( CurrentState != null )
+                if (CurrentState != null)
                 {
                     CurrentState.DrawFadeOut();
                 }
@@ -143,15 +138,16 @@ namespace NuclearWinter.GameFlow
                 CurrentState.Draw();
             }
         }
-        
+
         //---------------------------------------------------------------------
-        public bool IsSwitching {
+        public bool IsSwitching
+        {
             get { return null != NextState; }
         }
 
         //---------------------------------------------------------------------
-        public IGameState<T>                    CurrentState    { get; private set; }   // Current game state
-        public IGameState<T>                    NextState       { get; private set; }   // Next game state to be started, stored while the current state is fading out
-        private bool                            mbExit;                                 // Is the game exiting?
+        public IGameState<T> CurrentState { get; private set; }   // Current game state
+        public IGameState<T> NextState { get; private set; }   // Next game state to be started, stored while the current state is fading out
+        private bool mbExit;                                 // Is the game exiting?
     }
 }
