@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Storage;
-
-using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
 
 #if !FNA
 using System.Windows.Forms;
@@ -18,44 +13,44 @@ using System.Runtime.InteropServices;
 
 namespace NuclearWinter
 {
-    public class NuclearGame: Game
+    public class NuclearGame : Game
     {
         //----------------------------------------------------------------------
-        public Texture2D                            WhitePixelTex           { get; protected set; }
-        public Matrix                               SpriteMatrix            { get; protected set; }
+        public Texture2D WhitePixelTex { get; protected set; }
+        public Matrix SpriteMatrix { get; protected set; }
 
         //----------------------------------------------------------------------
-        public GraphicsDeviceManager                Graphics                { get; private set; }
-        public SpriteBatch                          SpriteBatch             { get; private set; }
-        public RasterizerState                      ScissorRasterizerState  { get; private set; }
+        public GraphicsDeviceManager Graphics { get; private set; }
+        public SpriteBatch SpriteBatch { get; private set; }
+        public RasterizerState ScissorRasterizerState { get; private set; }
 
-        
+
         // Index of the player responsible for menu navigation (or null if none yet)
-        public PlayerIndex?                         PlayerInCharge;
+        public PlayerIndex? PlayerInCharge;
 
-        public static readonly string               ApplicationDataFolderPath;
-        public static readonly string               DocumentsPath;
+        public static readonly string ApplicationDataFolderPath;
+        public static readonly string DocumentsPath;
 
-        public Storage.SaveHandler                  NuclearSaveHandler;
+        public Storage.SaveHandler NuclearSaveHandler;
 
         //----------------------------------------------------------------------
         // Sound & Music
-        public Song                                 Song;
+        public Song Song;
 
         //----------------------------------------------------------------------
         // Game States
-        protected bool                              UseGameStateManager;
-        public GameFlow.GameStateMgr<NuclearGame>   GameStateMgr            { get; private set; }
+        protected bool UseGameStateManager;
+        public GameFlow.GameStateMgr<NuclearGame> GameStateMgr { get; private set; }
 
         //----------------------------------------------------------------------
         // Input
-        public Input.InputManager                   InputMgr                { get; private set; }
+        public Input.InputManager InputMgr { get; private set; }
 
-        public const float                          LerpMultiplier = 15f;
+        public const float LerpMultiplier = 15f;
 
         //----------------------------------------------------------------------
 #if !FNA
-        public Form                                 Form                    { get; private set; }
+        public Form Form { get; private set; }
 
         [DllImport("user32.dll")]
         static extern bool IsWindowUnicode(IntPtr hWnd);
@@ -71,13 +66,13 @@ namespace NuclearWinter
         [DllImport("user32.dll")]
         static extern int SetWindowLongW(IntPtr hWnd, int nIndex, int dwNewLong);
 
-        [DllImport("user32.dll", SetLastError=true)]
+        [DllImport("user32.dll", SetLastError = true)]
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
-        static extern int SetWindowTextW( IntPtr hwnd, string strText );
+        static extern int SetWindowTextW(IntPtr hwnd, string strText);
 
-        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int GetWindowTextLength(IntPtr hWnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -85,20 +80,20 @@ namespace NuclearWinter
 
         public enum GWL
         {
-             GWL_WNDPROC =      (-4),
-             GWL_HINSTANCE =    (-6),
-             GWL_HWNDPARENT =   (-8),
-             GWL_STYLE =        (-16),
-             GWL_EXSTYLE =      (-20),
-             GWL_USERDATA =     (-21),
-             GWL_ID =           (-12)
+            GWL_WNDPROC = (-4),
+            GWL_HINSTANCE = (-6),
+            GWL_HWNDPARENT = (-8),
+            GWL_STYLE = (-16),
+            GWL_EXSTYLE = (-20),
+            GWL_USERDATA = (-21),
+            GWL_ID = (-12)
         }
 #endif
 
         static NuclearGame()
         {
 #if !FNA
-            ApplicationDataFolderPath = Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
+            ApplicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 #else
             string platform = SDL2.SDL.SDL_GetPlatform();
 
@@ -145,39 +140,39 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
-        public NuclearGame( bool _bUseGameStateManager=true )
+        public NuclearGame(bool useGameStateManager = true)
         {
 #if !FNA
-            Form = (Form)Form.FromHandle( Window.Handle );
+            Form = (Form)Form.FromHandle(Window.Handle);
 
             // Is the Game window unicode-aware?
-            if( ! IsWindowUnicode( Window.Handle ) )
+            if (!IsWindowUnicode(Window.Handle))
             {
                 // No? Well, no problem, we'll just make it aware!
 
-                int iTitleLength = GetWindowTextLength( Window.Handle );
+                int iTitleLength = GetWindowTextLength(Window.Handle);
                 StringBuilder sbTitle = new StringBuilder(iTitleLength + 1);
-                GetWindowText( Window.Handle, sbTitle, sbTitle.Capacity);
+                GetWindowText(Window.Handle, sbTitle, sbTitle.Capacity);
 
-                SetWindowLongW( Window.Handle, (int)GWL.GWL_WNDPROC, GetWindowLong( Window.Handle, (int)GWL.GWL_WNDPROC ) );
-                SetWindowTextW( Window.Handle, sbTitle.ToString() ); 
+                SetWindowLongW(Window.Handle, (int)GWL.GWL_WNDPROC, GetWindowLong(Window.Handle, (int)GWL.GWL_WNDPROC));
+                SetWindowTextW(Window.Handle, sbTitle.ToString());
             }
 #endif
 
             Graphics = new GraphicsDeviceManager(this);
             SpriteMatrix = Matrix.Identity;
 
-            UseGameStateManager = _bUseGameStateManager;
+            UseGameStateManager = useGameStateManager;
         }
 
         //----------------------------------------------------------------------
         /// <summary>
         /// Sets the window title (Unicode-aware)
         /// </summary>
-        public void SetWindowTitle( string _strTitle )
+        public void SetWindowTitle(string title)
         {
 #if !FNA
-            SetWindowTextW( Window.Handle, _strTitle );
+            SetWindowTextW(Window.Handle, title);
 #else
             Window.Title = _strTitle;
 #endif
@@ -186,7 +181,7 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
 #if !FNA
-        Dictionary<MouseCursor,Cursor> mWindowsCursors = new Dictionary<MouseCursor,Cursor> {
+        Dictionary<MouseCursor, Cursor> mWindowsCursors = new Dictionary<MouseCursor, Cursor> {
             { MouseCursor.Default, Cursors.Default },
             { MouseCursor.SizeWE, Cursors.SizeWE },
             { MouseCursor.SizeNS, Cursors.SizeNS },
@@ -200,10 +195,10 @@ namespace NuclearWinter
         Dictionary<MouseCursor,IntPtr> mSDLCursors = new Dictionary<MouseCursor,IntPtr>();
 #endif
 
-        public void SetCursor( MouseCursor _cursor )
+        public void SetCursor(MouseCursor cursor)
         {
 #if !FNA
-            Form.Cursor = mWindowsCursors[_cursor];
+            Form.Cursor = mWindowsCursors[cursor];
 #else
             IntPtr SDLCursor;
             if( ! mSDLCursors.TryGetValue( _cursor, out SDLCursor ) )
@@ -214,15 +209,15 @@ namespace NuclearWinter
 #endif
         }
 
-        public void ShowErrorMessageBox( string _strTitle, string _strMessage )
+        public void ShowErrorMessageBox(string title, string message)
         {
-            ShowErrorMessageBox( _strTitle, _strMessage, Window.Handle );
+            ShowErrorMessageBox(title, message, Window.Handle);
         }
 
-        public static void ShowErrorMessageBox( string _strTitle, string _strMessage, IntPtr _windowHandle )
+        public static void ShowErrorMessageBox(string title, string message, IntPtr windowHandle)
         {
 #if !FNA
-            System.Windows.Forms.MessageBox.Show( _strMessage, _strTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop );
+            System.Windows.Forms.MessageBox.Show(message, title, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
 #else
             SDL2.SDL.SDL_ShowSimpleMessageBox( SDL2.SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR, _strTitle, _strMessage, _windowHandle );
 #endif
@@ -231,19 +226,19 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void Initialize()
         {
-            SpriteBatch = new SpriteBatch( GraphicsDevice );
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
 
             ScissorRasterizerState = new RasterizerState();
             ScissorRasterizerState.ScissorTestEnable = true;
 
-            if( UseGameStateManager )
+            if (UseGameStateManager)
             {
-                GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>( this );
-                Components.Add( GameStateMgr );
+                GameStateMgr = new GameFlow.GameStateMgr<NuclearGame>(this);
+                Components.Add(GameStateMgr);
             }
 
-            InputMgr                = new Input.InputManager( this );
-            Components.Add( InputMgr );
+            InputMgr = new Input.InputManager(this);
+            Components.Add(InputMgr);
 
             base.Initialize();
         }
@@ -251,85 +246,86 @@ namespace NuclearWinter
         //----------------------------------------------------------------------
         protected override void LoadContent()
         {
-            WhitePixelTex = new Texture2D( GraphicsDevice, 1, 1, false, SurfaceFormat.Color );
-            WhitePixelTex.SetData( new[] { Color.White } );
+            WhitePixelTex = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            WhitePixelTex.SetData(new[] { Color.White });
         }
 
         //----------------------------------------------------------------------
-        protected override void OnExiting( object _sender, EventArgs _args )
+        protected override void OnExiting(object sender, EventArgs args)
         {
-            if( NuclearSaveHandler != null )
+            if (NuclearSaveHandler != null)
             {
                 NuclearSaveHandler.SaveGameSettings();
             }
 
-            if( GameStateMgr != null && GameStateMgr.CurrentState != null )
+            if (GameStateMgr != null && GameStateMgr.CurrentState != null)
             {
                 GameStateMgr.CurrentState.OnExiting();
             }
 
-            base.OnExiting( _sender, _args );
+            base.OnExiting(sender, args);
         }
 
         //----------------------------------------------------------------------
-        public void DrawLine( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1f )
+        public void DrawLine(Vector2 from, Vector2 to, Color color, float width = 1f)
         {
-            float fAngle     = (float)Math.Atan2( _vTo.Y - _vFrom.Y, _vTo.X - _vFrom.X );
-            float fLength    = Vector2.Distance( _vFrom, _vTo );
- 
-            Vector2 vOrigin = new Vector2( fLength / 2f, _fWidth / 2f );
+            float fAngle = (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
+            float fLength = Vector2.Distance(from, to);
 
-            SpriteBatch.Draw( WhitePixelTex, ( _vFrom + _vTo ) / 2f, null, _color, fAngle, new Vector2( 0.5f ), new Vector2( fLength + _fWidth, _fWidth ), SpriteEffects.None, 0 );
+            Vector2 vOrigin = new Vector2(fLength / 2f, width / 2f);
+
+            SpriteBatch.Draw(WhitePixelTex, (from + to) / 2f, null, color, fAngle, new Vector2(0.5f), new Vector2(fLength + width, width), SpriteEffects.None, 0);
         }
 
-        public void DrawRect( Vector2 _vFrom, Vector2 _vTo, Color _color, float _fWidth = 1 )
+        public void DrawRect(Vector2 from, Vector2 to, Color color, float width = 1)
         {
-            if( _vFrom.X > _vTo.X )
+            if (from.X > to.X)
             {
-                float x = _vFrom.X;
-                _vFrom.X = _vTo.X;
-                _vTo.X = x;
+                float x = from.X;
+                from.X = to.X;
+                to.X = x;
             }
 
-            if( _vFrom.Y > _vTo.Y )
+            if (from.Y > to.Y)
             {
-                float y = _vFrom.Y;
-                _vFrom.Y = _vTo.Y;
-                _vTo.Y = y;
+                float y = from.Y;
+                from.Y = to.Y;
+                to.Y = y;
             }
 
-            DrawLine( _vFrom + new Vector2( _fWidth / 2f, 0f ), new Vector2( _vTo.X - _fWidth, _vFrom.Y ), _color, _fWidth );
-            DrawLine( new Vector2( _vFrom.X + _fWidth / 2f, _vTo.Y ), _vTo - new Vector2( _fWidth, 0f ), _color, _fWidth );
+            DrawLine(from + new Vector2(width / 2f, 0f), new Vector2(to.X - width, from.Y), color, width);
+            DrawLine(new Vector2(from.X + width / 2f, to.Y), to - new Vector2(width, 0f), color, width);
 
-            DrawLine( _vFrom, new Vector2( _vFrom.X, _vTo.Y ), _color, _fWidth );
-            DrawLine( new Vector2( _vTo.X, _vFrom.Y ), _vTo, _color, _fWidth );
+            DrawLine(from, new Vector2(from.X, to.Y), color, width);
+            DrawLine(new Vector2(to.X, from.Y), to, color, width);
         }
 
         //----------------------------------------------------------------------
-        public virtual string GetUIString( string _strId ) { return _strId; }
+        // TODO should this method be removed? can't find any usages/references of/to it
+        public virtual string GetUIString(string id) { return id; }
 
         //----------------------------------------------------------------------
-        public List<Tuple<string,bool>> WrapText( SpriteFont _font, string _strText, float _fLineWidth )
+        public List<Tuple<string, bool>> WrapText(SpriteFont font, string text, float lineWidth)
         {
-            List<Tuple<string,bool>> lText = new List<Tuple<string,bool>>();
+            List<Tuple<string, bool>> lText = new List<Tuple<string, bool>>();
 
-            foreach( string strChunk in _strText.Split( '\n' ) )
+            foreach (string strChunk in text.Split('\n'))
             {
                 string strLine = string.Empty;
 
-                if( strChunk != "" )
+                if (strChunk != "")
                 {
-                    string[] aWords = strChunk.Split( ' ' );
+                    string[] aWords = strChunk.Split(' ');
 
                     bool bFirst = true;
-                    foreach( string strWord in aWords )
+                    foreach (string strWord in aWords)
                     {
-                        if( bFirst ) bFirst = false;
+                        if (bFirst) bFirst = false;
                         else strLine += " ";
 
-                        if( strLine != "" && _font.MeasureString(strLine + strWord).X > _fLineWidth )
+                        if (strLine != "" && font.MeasureString(strLine + strWord).X > lineWidth)
                         {
-                            lText.Add( new Tuple<string,bool>( strLine, false ) );
+                            lText.Add(new Tuple<string, bool>(strLine, false));
                             strLine = string.Empty;
                         }
 
@@ -337,110 +333,110 @@ namespace NuclearWinter
                     }
                 }
 
-                lText.Add( new Tuple<string,bool>( strLine + " ", true ) );
+                lText.Add(new Tuple<string, bool>(strLine + " ", true));
             }
 
             return lText;
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, string label, Vector2 position)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
+            DrawBlurredText(blurRadius, font, label, position, Color.White, Color.Black, Vector2.Zero, 1f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, string label, Vector2 position, Color color)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
+            DrawBlurredText(blurRadius, font, label, position, color, Color.Black, Vector2.Zero, 1f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, string label, Vector2 position, Color color, Vector2 origin, float scale)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
+            DrawBlurredText(blurRadius, font, label, position, color, Color.Black, origin, scale);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, string label, Vector2 position, Color color, Color blurColor)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
+            DrawBlurredText(blurRadius, font, label, position, color, blurColor, Vector2.Zero, 1f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, string _strLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, string label, Vector2 position, Color color, Color blurColor, Vector2 origin, float scale)
         {
-            if( _fBlurRadius > 0f )
+            if (blurRadius > 0f)
             {
                 //Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
 
-                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y - _fBlurRadius ), _blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y - _fBlurRadius ), _blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y + _fBlurRadius ), _blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y + _fBlurRadius ), _blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius), blurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius), blurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius), blurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius), blurColor, 0f, origin, scale, SpriteEffects.None, 0f);
             }
 
-            SpriteBatch.DrawString( _font, _strLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale, SpriteEffects.None, 0f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, StringBuilder label, Vector2 position)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, Color.White, Color.Black, Vector2.Zero, 1f  );
+            DrawBlurredText(blurRadius, font, label, position, Color.White, Color.Black, Vector2.Zero, 1f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, StringBuilder label, Vector2 position, Color color)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, Color.Black, Vector2.Zero, 1f );
+            DrawBlurredText(blurRadius, font, label, position, color, Color.Black, Vector2.Zero, 1f);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, StringBuilder label, Vector2 position, Color color, Vector2 origin, float scale)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, Color.Black, _vOrigin, _fScale );
+            DrawBlurredText(blurRadius, font, label, position, color, Color.Black, origin, scale);
         }
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, StringBuilder label, Vector2 position, Color color, Color blurColor)
         {
-            DrawBlurredText( _fBlurRadius, _font, _strbLabel, _vPosition, _color, _blurColor, Vector2.Zero, 1f );
+            DrawBlurredText(blurRadius, font, label, position, color, blurColor, Vector2.Zero, 1f);
         }
 
 
         //----------------------------------------------------------------------
-        public void DrawBlurredText( float _fBlurRadius, SpriteFont _font, StringBuilder _strbLabel, Vector2 _vPosition, Color _color, Color _blurColor, Vector2 _vOrigin, float _fScale )
+        public void DrawBlurredText(float blurRadius, SpriteFont font, StringBuilder label, Vector2 position, Color color, Color blurColor, Vector2 origin, float scale)
         {
-            if( _fBlurRadius > 0f )
+            if (blurRadius > 0f)
             {
-                Color blurColor = _blurColor * 0.1f * (_color.A / 255f);
+                Color actualColor = blurColor * 0.1f * (color.A / 255f);
 
-                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y - _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X + _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
-                SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X - _fBlurRadius, _vPosition.Y + _fBlurRadius ), blurColor, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+                SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius), actualColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius), actualColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius), actualColor, 0f, origin, scale, SpriteEffects.None, 0f);
+                SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius), actualColor, 0f, origin, scale, SpriteEffects.None, 0f);
             }
 
-            SpriteBatch.DrawString( _font, _strbLabel, new Vector2( _vPosition.X, _vPosition.Y ), _color, 0f, _vOrigin, _fScale, SpriteEffects.None, 0f );
+            SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale, SpriteEffects.None, 0f);
         }
 
         //----------------------------------------------------------------------
-        public void PlayMusic( Song _song )
+        public void PlayMusic(Song song)
         {
-            if( Song != _song && MediaPlayer.GameHasControl )
+            if (Song != song && MediaPlayer.GameHasControl)
             {
                 MediaPlayer.IsRepeating = true;
 
-                if( _song != null )
+                if (song != null)
                 {
-                    MediaPlayer.Play( _song );
+                    MediaPlayer.Play(song);
                 }
                 else
                 {
                     MediaPlayer.Stop();
                 }
 
-                Song = _song;
+                Song = song;
             }
         }
     }
