@@ -1,69 +1,66 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace NuclearWinter
 {
     public struct AABB
     {
         //----------------------------------------------------------------------
-        public Vector2      Min;
-        public Vector2      Max;
+        public Vector2 Min;
+        public Vector2 Max;
 
         //----------------------------------------------------------------------
-        public AABB( Vector2 _min, Vector2 _max )
+        public AABB(Vector2 min, Vector2 max)
         {
-            Min = _min;
-            Max = _max;
+            Min = min;
+            Max = max;
         }
 
         //----------------------------------------------------------------------
-        public void Extend( Vector2 _vPoint )
+        public void Extend(Vector2 point)
         {
-            Min.X = Math.Min( _vPoint.X, Min.X );
-            Min.Y = Math.Min( _vPoint.Y, Min.Y );
+            Min.X = Math.Min(point.X, Min.X);
+            Min.Y = Math.Min(point.Y, Min.Y);
 
-            Max.X = Math.Max( _vPoint.X, Max.X );
-            Max.Y = Math.Max( _vPoint.Y, Max.Y );
+            Max.X = Math.Max(point.X, Max.X);
+            Max.Y = Math.Max(point.Y, Max.Y);
         }
 
         //----------------------------------------------------------------------
-        public bool Intersects( AABB _aabb )
+        public bool Intersects(AABB aabb)
         {
             return
-                ( ( Min.X <= _aabb.Max.X ) || ( Max.X >= _aabb.Min.X ) )
+                ((Min.X <= aabb.Max.X) || (Max.X >= aabb.Min.X))
                 &&
-                ( ( Min.Y <= _aabb.Max.Y ) || ( Max.Y >= _aabb.Min.Y ) );
+                ((Min.Y <= aabb.Max.Y) || (Max.Y >= aabb.Min.Y));
         }
 
         //----------------------------------------------------------------------
-        public bool Contains( AABB _aabb )
+        public bool Contains(AABB aabb)
         {
             return
-                ( Min.X <= _aabb.Min.X && Max.X >= _aabb.Max.X )
+                (Min.X <= aabb.Min.X && Max.X >= aabb.Max.X)
                 &&
-                ( Min.Y <= _aabb.Min.Y && Max.Y >= _aabb.Max.Y );
+                (Min.Y <= aabb.Min.Y && Max.Y >= aabb.Max.Y);
         }
 
         //----------------------------------------------------------------------
-        public bool Contains( Vector2 _vPoint )
-        {
-            return 
-                ( Min.X <= _vPoint.X && Max.X >= _vPoint.X )
-                && 
-                ( Min.Y <= _vPoint.Y && Max.Y >= _vPoint.Y );
-        }
-
-        //----------------------------------------------------------------------
-        public bool Contains( Vector2 _vPoint, float _fAxisDistance )
+        public bool Contains(Vector2 point)
         {
             return
-                ( _vPoint.X >= Min.X    - _fAxisDistance )
-            &&  ( _vPoint.X <= Max.X    + _fAxisDistance )
-            &&  ( _vPoint.Y >= Min.Y    - _fAxisDistance )
-            &&  ( _vPoint.Y <= Max.Y    + _fAxisDistance );
+                (Min.X <= point.X && Max.X >= point.X)
+                &&
+                (Min.Y <= point.Y && Max.Y >= point.Y);
+        }
+
+        //----------------------------------------------------------------------
+        public bool Contains(Vector2 point, float axisDistance)
+        {
+            return
+                (point.X >= Min.X - axisDistance)
+            && (point.X <= Max.X + axisDistance)
+            && (point.Y >= Min.Y - axisDistance)
+            && (point.Y <= Max.Y + axisDistance);
         }
 
         //----------------------------------------------------------------------
@@ -71,16 +68,16 @@ namespace NuclearWinter
         {
             get
             {
-                return Math.Abs( Max.X - Min.X );
+                return Math.Abs(Max.X - Min.X);
             }
         }
 
         //----------------------------------------------------------------------
-        public float Height 
+        public float Height
         {
             get
             {
-                return Math.Abs( Max.Y - Min.Y );
+                return Math.Abs(Max.Y - Min.Y);
             }
         }
 
@@ -88,7 +85,7 @@ namespace NuclearWinter
         {
             get
             {
-                return ( Min + Max ) / 2f;
+                return (Min + Max) / 2f;
             }
         }
     }
