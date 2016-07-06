@@ -111,7 +111,7 @@ namespace NuclearWinter.UI
         public DropDownBox( Screen _screen, List<DropDownItem> _lItems, int _iInitialValueIndex )
         : base( _screen )
         {
-            mCurrentItemLabel = new Label( Screen, _anchor: Anchor.Start );
+            mCurrentItemLabel = new Label( Screen, anchor: Anchor.Start );
 
             Items = new ObservableList<DropDownItem>( _lItems );
 

@@ -1,9 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
 {
@@ -79,36 +76,36 @@ namespace NuclearWinter.UI
         int             miEllipsizedTextWidth;
 
         //----------------------------------------------------------------------
-        public Label( Screen _screen, string _strText, Anchor _anchor, Color _color )
-        : base( _screen )
+        public Label( Screen screen, string text, Anchor anchor, Color color )
+        : base( screen )
         {
-            mstrText            = _strText;
+            mstrText            = text;
             mstrDisplayedText   = mstrText;
-            mFont               = _screen.Style.MediumFont;
+            mFont               = screen.Style.MediumFont;
             mPadding            = Screen.Style.LabelPadding;
-            mAnchor             = _anchor;
+            mAnchor             = anchor;
 
-            Color               = _color;
+            Color               = color;
             OutlineRadius       = 0;
-            OutlineColor        = _color * 0.5f;
+            OutlineColor        = color * 0.5f;
 
             UpdateContentSize();
         }
 
-        public Label( Screen _screen, string _strText, Color _color )
-        : this( _screen, _strText, Anchor.Center, _color )
+        public Label( Screen screen, string text, Color color )
+        : this( screen, text, Anchor.Center, color )
         {
 
         }
 
-        public Label( Screen _screen, string _strText = "", Anchor _anchor = Anchor.Center )
-        : this( _screen, _strText, _anchor, _screen.Style.DefaultTextColor )
+        public Label( Screen screen, string text = "", Anchor anchor = Anchor.Center )
+        : this( screen, text, anchor, screen.Style.DefaultTextColor )
         {
 
         }
 
         //----------------------------------------------------------------------
-        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        public override Widget GetFirstFocusableDescendant( Direction direction )
         {
             return ClickHandler != null ? this : null;
         }
@@ -170,12 +167,12 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override Widget HitTest( Point _point )
+        public override Widget HitTest( Point point )
         {
-            return ClickHandler != null ? base.HitTest( _point ) : null;
+            return ClickHandler != null ? base.HitTest( point ) : null;
         }
 
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter( Point hitPoint )
         {
             if( ClickHandler != null )
             {
@@ -183,7 +180,7 @@ namespace NuclearWinter.UI
             }
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut( Point hitPoint )
         {
             if( ClickHandler != null )
             {
@@ -191,14 +188,14 @@ namespace NuclearWinter.UI
             }
         }
 
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown( Point hitPoint, int button )
         {
-            return ClickHandler != null && _iButton == Screen.Game.InputMgr.PrimaryMouseButton;
+            return ClickHandler != null && button == Screen.Game.InputMgr.PrimaryMouseButton;
         }
 
-        protected internal override void OnMouseUp(Point _hitPoint, int _iButton)
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if( button != Screen.Game.InputMgr.PrimaryMouseButton ) return;
 
             OnActivateUp();
         }
@@ -213,10 +210,10 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout( Rectangle rectangle )
         {
             Rectangle previousLayoutRect = LayoutRect;
-            base.DoLayout( _rect );
+            base.DoLayout( rectangle );
 
             bool bTextLayoutNeeded = ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height );
 
@@ -259,35 +256,35 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public void DrawWithOffset( Point _pOffset )
+        public void DrawWithOffset( Point offset )
         {
             if( WrapText )
             {
                 for( int i = 0; i < mlWrappedText.Count; i++ )
                 {
-                    float fX = mpTextPosition.X + _pOffset.X;
+                    float fX = mpTextPosition.X + offset.X;
                     float fTextWidth = mFont.MeasureString( mlWrappedText[i].Item1 ).X;
                     if( Anchor == UI.Anchor.Center )
                     {
                         fX += ContentWidth / 2 - Padding.Left - fTextWidth / 2f;
                     }
 
-                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
+                    Screen.Game.DrawBlurredText( OutlineRadius, mFont, mlWrappedText[i].Item1, new Vector2( (int)fX, mpTextPosition.Y + (int)( Font.LineSpacing * i ) + Font.YOffset + offset.Y ), Color, OutlineColor );
 
                     if( Underline )
                     {
-                        var vBottomLeft = new Vector2( fX, mpTextPosition.Y + (int)( Font.LineSpacing * (i+1) ) + Font.YOffset + _pOffset.Y );
+                        var vBottomLeft = new Vector2( fX, mpTextPosition.Y + (int)( Font.LineSpacing * (i+1) ) + Font.YOffset + offset.Y );
                         Screen.Game.DrawLine( vBottomLeft, vBottomLeft + new Vector2( fTextWidth, 0 ), Color );
                     }
                 }
             }
             else
             {
-                Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X + _pOffset.X, mpTextPosition.Y + Font.YOffset + _pOffset.Y ), Color, OutlineColor );
+                Screen.Game.DrawBlurredText( OutlineRadius, mFont, mstrDisplayedText, new Vector2( mpTextPosition.X + offset.X, mpTextPosition.Y + Font.YOffset + offset.Y ), Color, OutlineColor );
 
                 if( Underline )
                 {
-                    var vBottomLeft = new Vector2( mpTextPosition.X + _pOffset.X, mpTextPosition.Y + Font.YOffset + _pOffset.Y + Font.LineSpacing );
+                    var vBottomLeft = new Vector2( mpTextPosition.X + offset.X, mpTextPosition.Y + Font.YOffset + offset.Y + Font.LineSpacing );
                     Screen.Game.DrawLine( vBottomLeft, vBottomLeft + new Vector2( miEllipsizedTextWidth - Padding.Horizontal, 0 ), Color );
                 }
             }
