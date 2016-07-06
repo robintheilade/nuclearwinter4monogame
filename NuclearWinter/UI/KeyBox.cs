@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -11,13 +8,13 @@ using OSKey = System.Windows.Forms.Keys;
 
 namespace NuclearWinter.UI
 {
-    public class KeyBox: Widget
+    public class KeyBox : Widget
     {
         UIFont mFont;
-        public UIFont       Font
+        public UIFont Font
         {
             get { return mFont; }
-            
+
             set
             {
                 mFont = value;
@@ -28,7 +25,7 @@ namespace NuclearWinter.UI
         public bool StoreKeyAsUSEnglish = false;
 
         Keys mKey;
-        public Keys                 Key
+        public Keys Key
         {
             get { return mKey; }
 
@@ -39,31 +36,32 @@ namespace NuclearWinter.UI
             }
         }
 
-        public string               DisplayedKey
+        public string DisplayedKey
         {
-            get {
-                return ( StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.USEnglishToLocal( Key ) : Key ).ToString();
+            get
+            {
+                return (StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.USEnglishToLocal(Key) : Key).ToString();
             }
         }
 
-        public Color                TextColor;
+        public Color TextColor;
 
-        Point                       mpTextPosition;
-        int                         miTextWidth;
+        Point mpTextPosition;
+        int miTextWidth;
 
-        public Func<Keys,bool>      ChangeHandler;
-        public Action<KeyBox>       FocusHandler;
-        public Action<KeyBox>       BlurHandler;
+        public Func<Keys, bool> ChangeHandler;
+        public Action<KeyBox> FocusHandler;
+        public Action<KeyBox> BlurHandler;
 
-        bool                        mbIsHovered;
+        bool mbIsHovered;
 
         //----------------------------------------------------------------------
-        public KeyBox( Screen _screen, Keys _key )
-        : base( _screen )
+        public KeyBox(Screen screen, Keys key)
+        : base(screen)
         {
-            mKey        = _key;
-            mFont       = _screen.Style.MediumFont;
-            mPadding    = _screen.Style.EditBoxPadding;
+            mKey = key;
+            mFont = screen.Style.MediumFont;
+            mPadding = screen.Style.EditBoxPadding;
 
             TextColor = Screen.Style.EditBoxTextColor;
 
@@ -73,17 +71,17 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
-            ContentHeight = (int)( Font.LineSpacing * 0.9f ) + Padding.Top + Padding.Bottom;
+            ContentHeight = (int)(Font.LineSpacing * 0.9f) + Padding.Top + Padding.Bottom;
             ContentWidth = 0;
-            miTextWidth = (int)Font.MeasureString( DisplayedKey ).X;
+            miTextWidth = (int)Font.MeasureString(DisplayedKey).X;
 
             base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
             HitBox = LayoutRect;
 
             mpTextPosition = new Point(
@@ -93,37 +91,37 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter(Point hitPoint)
         {
-            base.OnMouseEnter( _hitPoint );
+            base.OnMouseEnter(hitPoint);
             mbIsHovered = true;
         }
 
-        public override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove(Point hitPoint)
         {
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
-            base.OnMouseOut( _hitPoint );
+            base.OnMouseOut(hitPoint);
             mbIsHovered = false;
         }
 
         //----------------------------------------------------------------------
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return false;
 
-            Screen.Focus( this );
+            Screen.Focus(this);
 
             return true;
         }
 
-        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return;
 
-            if( HitTest( _hitPoint ) == this )
+            if (HitTest(hitPoint) == this)
             {
                 OnActivateUp();
             }
@@ -132,32 +130,32 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         protected internal override void OnFocus()
         {
-            if( FocusHandler != null ) FocusHandler( this );
+            if (FocusHandler != null) FocusHandler(this);
         }
 
         protected internal override void OnBlur()
         {
-            if( BlurHandler != null ) BlurHandler( this );
+            if (BlurHandler != null) BlurHandler(this);
         }
 
-        protected internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove(Direction direction)
         {
             // Nothing
         }
 
-        protected internal override void OnOSKeyPress( OSKey _key )
+        protected internal override void OnOSKeyPress(OSKey key)
         {
-            if( _key == OSKey.Tab ) return;
+            if (key == OSKey.Tab) return;
 
-            base.OnOSKeyPress( _key );
+            base.OnOSKeyPress(key);
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnKeyPress( Keys _key )
+        protected internal override void OnKeyPress(Keys key)
         {
-            Keys newKey = ( _key != Keys.Back ) ? ( StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.LocalToUSEnglish( _key ) : _key ) : Keys.None;
+            Keys newKey = (key != Keys.Back) ? (StoreKeyAsUSEnglish ? NuclearWinter.LocalizedKeyboardState.LocalToUSEnglish(key) : key) : Keys.None;
 
-            if( ChangeHandler == null || ChangeHandler( newKey ) )
+            if (ChangeHandler == null || ChangeHandler(newKey))
             {
                 Key = newKey;
             }
@@ -166,23 +164,23 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Screen.Style.EditBoxFrame, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+            Screen.DrawBox(Screen.Style.EditBoxFrame, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White);
 
-            if( Screen.IsActive && mbIsHovered )
+            if (Screen.IsActive && mbIsHovered)
             {
-                Screen.DrawBox( Screen.Style.EditBoxHoverOverlay, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White );
+                Screen.DrawBox(Screen.Style.EditBoxHoverOverlay, LayoutRect, Screen.Style.EditBoxCornerSize, Color.White);
             }
 
-            Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height ) );
+            Screen.PushScissorRectangle(new Rectangle(LayoutRect.X + Padding.Left, LayoutRect.Y, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height));
 
-            Screen.Game.SpriteBatch.DrawString( mFont, DisplayedKey, new Vector2( mpTextPosition.X , mpTextPosition.Y + mFont.YOffset ), TextColor );
+            Screen.Game.SpriteBatch.DrawString(mFont, DisplayedKey, new Vector2(mpTextPosition.X, mpTextPosition.Y + mFont.YOffset), TextColor);
 
             Screen.PopScissorRectangle();
 
-            if( HasFocus )
+            if (HasFocus)
             {
-                Rectangle selectionRectangle = new Rectangle( mpTextPosition.X, LayoutRect.Y + Padding.Top, miTextWidth, LayoutRect.Height - Padding.Vertical );
-                Screen.Game.SpriteBatch.Draw( Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f );
+                Rectangle selectionRectangle = new Rectangle(mpTextPosition.X, LayoutRect.Y + Padding.Top, miTextWidth, LayoutRect.Height - Padding.Vertical);
+                Screen.Game.SpriteBatch.Draw(Screen.Game.WhitePixelTex, selectionRectangle, TextColor * 0.3f);
             }
         }
     }
