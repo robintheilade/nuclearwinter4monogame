@@ -22,7 +22,8 @@ namespace NuclearWinter.GameFlow
         // Start the GameState, called when it becomes the current one
         public virtual void Start()
         {
-            Game.ResetElapsedTime();
+            // TODO figure out why this method call throws an exception
+            //Game.ResetElapsedTime();
         }
 
         //----------------------------------------------------------------------
