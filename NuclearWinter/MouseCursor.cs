@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NuclearWinter
+﻿namespace NuclearWinter
 {
-        public enum MouseCursor {
+    public enum MouseCursor {
 #if !FNA
             Default,
             SizeWE,
