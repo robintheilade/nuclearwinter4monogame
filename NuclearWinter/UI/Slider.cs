@@ -1,54 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using NuclearWinter.Animation;
-using Microsoft.Xna.Framework.Input;
+using System;
 using System.Diagnostics;
 
 namespace NuclearWinter.UI
 {
-    public class Slider: Widget
+    public class Slider : Widget
     {
-        bool                    mbIsHovered;
-        bool                    mbIsPressed;
+        bool mbIsHovered;
+        bool mbIsPressed;
 
         // FIXME: There should be a IntSlider/FloatSlider or a Discrete/Continuous setting for the Slider
-        public int              MinValue;
-        public int              MaxValue;
-        public int              Step = 1;
+        public int MinValue;
+        public int MaxValue;
+        public int Step = 1;
 
-        int                     miValue;
-        public int              Value
+        int miValue;
+        public int Value
         {
-            get {
+            get
+            {
                 return miValue;
             }
 
-            set {
-                miValue = (int)MathHelper.Clamp( value, MinValue, MaxValue );
+            set
+            {
+                miValue = (int)MathHelper.Clamp(value, MinValue, MaxValue);
                 miValue -= miValue % Step;
 
                 mTooltip.Text = miValue.ToString();
             }
         }
 
-        public Action           ChangeHandler;
+        public Action ChangeHandler;
 
-        Tooltip                 mTooltip;
+        Tooltip mTooltip;
 
         // Style
-        public Texture2D        Frame;
-        public Texture2D        HandleFrame;
-        public Texture2D        HandleDownFrame;
-        public Texture2D        HandleHoverOverlay;
-        public Texture2D        HandleFocusOverlay;
+        public Texture2D Frame;
+        public Texture2D HandleFrame;
+        public Texture2D HandleDownFrame;
+        public Texture2D HandleHoverOverlay;
+        public Texture2D HandleFocusOverlay;
 
         //----------------------------------------------------------------------
-        public Slider( Screen _screen, int _iMin, int _iMax, int _iInitialValue, int _iStep )
-        : base( _screen )
+        public Slider(Screen screen, int min, int max, int initialValue, int step)
+        : base(screen)
         {
             Frame = Screen.Style.SliderFrame;
             HandleFrame = Screen.Style.ButtonFrame;
@@ -56,14 +53,14 @@ namespace NuclearWinter.UI
             HandleHoverOverlay = Screen.Style.ButtonHoverOverlay;
             HandleFocusOverlay = Screen.Style.ButtonFocusOverlay;
 
-            Debug.Assert( _iMin < _iMax );
+            Debug.Assert(min < max);
 
-            mTooltip    = new Tooltip( Screen, "" );
+            mTooltip = new Tooltip(Screen, "");
 
-            MinValue    = _iMin;
-            MaxValue    = _iMax;
-            Value       = _iInitialValue;
-            Step        = _iStep;
+            MinValue = min;
+            MaxValue = max;
+            Value = initialValue;
+            Step = step;
 
             UpdateContentSize();
         }
@@ -75,113 +72,113 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
             HitBox = LayoutRect;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter(Point hitPoint)
         {
             mbIsHovered = true;
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
             mbIsHovered = false;
             mTooltip.EnableDisplayTimer = false;
         }
 
         //----------------------------------------------------------------------
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return false;
 
-            Screen.Focus( this );
+            Screen.Focus(this);
             mbIsPressed = true;
             mTooltip.DisplayNow();
 
             int iWidth = LayoutRect.Width - Screen.Style.SliderHandleSize;
-            int iX = _hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
+            int iX = hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
             float fProgress = (float)iX / iWidth;
 
-            Value = MinValue + (int)Math.Floor( fProgress * ( MaxValue - MinValue ) / Step + 0.5f ) * Step;
+            Value = MinValue + (int)Math.Floor(fProgress * (MaxValue - MinValue) / Step + 0.5f) * Step;
 
-            if( ChangeHandler != null ) ChangeHandler();
+            if (ChangeHandler != null) ChangeHandler();
 
             return true;
         }
 
-        public override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove(Point hitPoint)
         {
-            if( mbIsPressed )
+            if (mbIsPressed)
             {
                 int iWidth = LayoutRect.Width - Screen.Style.SliderHandleSize;
-                int iX = _hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
+                int iX = hitPoint.X - LayoutRect.X - Screen.Style.SliderHandleSize / 2;
                 float fProgress = (float)iX / iWidth;
 
-                int iValue = MinValue + (int)Math.Floor( fProgress * ( MaxValue - MinValue ) / Step + 0.5f ) * Step;
+                int iValue = MinValue + (int)Math.Floor(fProgress * (MaxValue - MinValue) / Step + 0.5f) * Step;
 
-                if( iValue != miValue )
+                if (iValue != miValue)
                 {
                     Value = iValue;
-                    if( ChangeHandler != null ) ChangeHandler();
+                    if (ChangeHandler != null) ChangeHandler();
                 }
             }
         }
 
-        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return;
 
             mbIsPressed = false;
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnPadMove(Direction _direction)
+        protected internal override void OnPadMove(Direction direction)
         {
-            if( _direction == Direction.Left )
+            if (direction == Direction.Left)
             {
                 Value -= Step;
-                if( ChangeHandler != null ) ChangeHandler();
+                if (ChangeHandler != null) ChangeHandler();
             }
             else
-            if( _direction == Direction.Right )
+            if (direction == Direction.Right)
             {
                 Value += Step;
-                if( ChangeHandler != null ) ChangeHandler();
+                if (ChangeHandler != null) ChangeHandler();
             }
             else
             {
-                base.OnPadMove( _direction );
+                base.OnPadMove(direction);
             }
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
             mTooltip.EnableDisplayTimer = mbIsHovered;
-            mTooltip.Update( _fElapsedTime );
+            mTooltip.Update(elapsedTime);
         }
 
         public override void Draw()
         {
-            Rectangle rect = new Rectangle( LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize );
+            Rectangle rect = new Rectangle(LayoutRect.X, LayoutRect.Center.Y - Screen.Style.SliderHandleSize / 2, LayoutRect.Width, Screen.Style.SliderHandleSize);
 
-            Screen.DrawBox( Frame, rect, Screen.Style.SliderFrameCornerSize, Color.White );
+            Screen.DrawBox(Frame, rect, Screen.Style.SliderFrameCornerSize, Color.White);
 
-            int handleX = rect.X + (int)( ( rect.Width - Screen.Style.SliderHandleSize ) * (float)( Value - MinValue ) / ( MaxValue - MinValue ) );
+            int handleX = rect.X + (int)((rect.Width - Screen.Style.SliderHandleSize) * (float)(Value - MinValue) / (MaxValue - MinValue));
 
-            Screen.DrawBox( (!mbIsPressed) ? HandleFrame : HandleDownFrame, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
-            if( Screen.IsActive && mbIsHovered && ! mbIsPressed )
+            Screen.DrawBox((!mbIsPressed) ? HandleFrame : HandleDownFrame, new Rectangle(handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize), Screen.Style.ButtonCornerSize, Color.White);
+            if (Screen.IsActive && mbIsHovered && !mbIsPressed)
             {
-                Screen.DrawBox( HandleHoverOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox(HandleHoverOverlay, new Rectangle(handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize), Screen.Style.ButtonCornerSize, Color.White);
             }
 
-            if( Screen.IsActive && HasFocus && ! mbIsPressed )
+            if (Screen.IsActive && HasFocus && !mbIsPressed)
             {
-                Screen.DrawBox( HandleFocusOverlay, new Rectangle( handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize ), Screen.Style.ButtonCornerSize, Color.White );
+                Screen.DrawBox(HandleFocusOverlay, new Rectangle(handleX, rect.Y, Screen.Style.SliderHandleSize, Screen.Style.SliderHandleSize), Screen.Style.ButtonCornerSize, Color.White);
             }
         }
 
