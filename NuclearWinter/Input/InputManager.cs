@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 using System.Linq;
-using System.Collections;
 using System.Diagnostics;
 
 #if !FNA
@@ -16,27 +14,28 @@ using OSKey = System.Windows.Forms.Keys;
 namespace NuclearWinter.Input
 {
     [Flags]
-    public enum ShortcutKey {
+    public enum ShortcutKey
+    {
         LeftCtrl = 1 << 0,
         RightCtrl = 1 << 1,
-  
+
         LeftAlt = 1 << 2,
         RightAlt = 1 << 3,
-  
+
         LeftWindows = 1 << 4,
         RightWindows = 1 << 5,
     }
 
-    public class InputManager: GameComponent
+    public class InputManager : GameComponent
     {
-        public const int                            siMaxInput              = 4;
-        public const float                          sfStickThreshold        = 0.4f;
+        public const int siMaxInput = 4;
+        public const float sfStickThreshold = 0.4f;
 
-        public readonly GamePadState[]              GamePadStates;
-        public readonly GamePadState[]              PreviousGamePadStates;
+        public readonly GamePadState[] GamePadStates;
+        public readonly GamePadState[] PreviousGamePadStates;
 
-        public MouseState                           MouseState              { get; private set; }
-        public MouseState                           PreviousMouseState      { get; private set; }
+        public MouseState MouseState { get; private set; }
+        public MouseState PreviousMouseState { get; private set; }
 
         public int PrimaryMouseButton
         {
@@ -56,51 +55,51 @@ namespace NuclearWinter.Input
 #endif
         }
 
-        public LocalizedKeyboardState               KeyboardState           { get; private set; }
-        public LocalizedKeyboardState               PreviousKeyboardState   { get; private set; }
-        public PlayerIndex?                         KeyboardPlayerIndex     { get; private set; }
+        public LocalizedKeyboardState KeyboardState { get; private set; }
+        public LocalizedKeyboardState PreviousKeyboardState { get; private set; }
+        public PlayerIndex? KeyboardPlayerIndex { get; private set; }
         /*Keys                                        mLastKeyPressed;
         bool                                        mbRepeatKey;
         float                                       mfRepeatKeyTimer;*/
-        public ShortcutKey                          ActiveShortcutKey;
+        public ShortcutKey ActiveShortcutKey;
 
-        public List<char>                           EnteredText             { get; private set; }
-        public List<Keys>                           JustPressedKeys         { get; private set; }
+        public List<char> EnteredText { get; private set; }
+        public List<Keys> JustPressedKeys { get; private set; }
 
-        public List<OSKey>                          JustPressedOSKeys       { get; private set; }
-        public List<OSKey>                          JustReleasedOSKeys      { get; private set; }
+        public List<OSKey> JustPressedOSKeys { get; private set; }
+        public List<OSKey> JustReleasedOSKeys { get; private set; }
 #if !FNA
-        WindowMessageFilter                         mMessageFilter;
+        WindowMessageFilter mMessageFilter;
 #else
         float                                       mfTimeSinceLastClick;
         Point                                       mLastPrimaryClickPosition;
 #endif
-        bool                                        mbDoubleClicked;
-        bool                                        mbDoubleClicking;
+        bool mbDoubleClicked;
+        bool mbDoubleClicking;
 
-        Buttons[]                                   maLastPressedButtons;
-        float[]                                     mafRepeatTimers;
-        bool[]                                      mabRepeatButtons;
-        const float                                 sfButtonRepeatDelay     = 0.3f;
-        const float                                 sfButtonRepeatInterval  = 0.1f;
+        Buttons[] maLastPressedButtons;
+        float[] mafRepeatTimers;
+        bool[] mabRepeatButtons;
+        const float sfButtonRepeatDelay = 0.3f;
+        const float sfButtonRepeatInterval = 0.1f;
 
-        List<Buttons>                               lButtons;
+        List<Buttons> lButtons;
 
         //---------------------------------------------------------------------
-        public InputManager( Game _game )
-        : base ( _game )
+        public InputManager(Game game)
+        : base(game)
         {
-            GamePadStates           = new GamePadState[ siMaxInput ];
-            PreviousGamePadStates   = new GamePadState[ siMaxInput ];
+            GamePadStates = new GamePadState[siMaxInput];
+            PreviousGamePadStates = new GamePadState[siMaxInput];
 
-            maLastPressedButtons    = new Buttons[ siMaxInput ];
-            mafRepeatTimers         = new float[ siMaxInput ];
-            mabRepeatButtons        = new bool[ siMaxInput ];
+            maLastPressedButtons = new Buttons[siMaxInput];
+            mafRepeatTimers = new float[siMaxInput];
+            mabRepeatButtons = new bool[siMaxInput];
 
-            lButtons                = Utils.GetValues<Buttons>();
-            
+            lButtons = Utils.GetValues<Buttons>();
 
-            ActiveShortcutKey       = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
+
+            ActiveShortcutKey = ShortcutKey.LeftCtrl | ShortcutKey.RightCtrl;
 #if FNA
             if( SDL2.SDL.SDL_GetPlatform() == "Mac OS X" )
             {
@@ -108,18 +107,18 @@ namespace NuclearWinter.Input
             }
 #endif
 
-            EnteredText             = new List<char>();
-            JustPressedKeys         = new List<Keys>();
+            EnteredText = new List<char>();
+            JustPressedKeys = new List<Keys>();
 
-            JustPressedOSKeys   = new List<OSKey>();
-            JustReleasedOSKeys  = new List<OSKey>();
+            JustPressedOSKeys = new List<OSKey>();
+            JustReleasedOSKeys = new List<OSKey>();
 
 #if !FNA
-            mMessageFilter                      = new WindowMessageFilter( Game.Window.Handle );
-            mMessageFilter.CharacterHandler     = delegate( char _char ) { EnteredText.Add( _char ); };
-            mMessageFilter.KeyDownHandler       = delegate( System.Windows.Forms.Keys _key ) { JustPressedOSKeys.Add( _key ); };
-            mMessageFilter.KeyUpHandler         = delegate( System.Windows.Forms.Keys _key ) { JustReleasedOSKeys.Add( _key ); };
-            mMessageFilter.DoubleClickHandler   = delegate { mbDoubleClicked = true; };
+            mMessageFilter = new WindowMessageFilter(Game.Window.Handle);
+            mMessageFilter.CharacterHandler = delegate (char _char) { EnteredText.Add(_char); };
+            mMessageFilter.KeyDownHandler = delegate (System.Windows.Forms.Keys _key) { JustPressedOSKeys.Add(_key); };
+            mMessageFilter.KeyUpHandler = delegate (System.Windows.Forms.Keys _key) { JustReleasedOSKeys.Add(_key); };
+            mMessageFilter.DoubleClickHandler = delegate { mbDoubleClicked = true; };
 #else
             TextInputEXT.TextInput              += delegate( char _char ) { EnteredText.Add( _char ); };
             TextInputEXT.KeyDown                += delegate( SDL2.SDL.SDL_Keycode _key ) { JustPressedOSKeys.Add( (OSKey)_key ); };
@@ -131,17 +130,17 @@ namespace NuclearWinter.Input
         }
 
         //---------------------------------------------------------------------
-        public override void Update( GameTime _time )
+        public override void Update(GameTime time)
         {
-            float fElapsedTime = (float)_time.ElapsedGameTime.TotalSeconds;
+            float fElapsedTime = (float)time.ElapsedGameTime.TotalSeconds;
 
-            for( int i = 0; i < siMaxInput; i++ )
+            for (int i = 0; i < siMaxInput; i++)
             {
-                PreviousGamePadStates[ i ] = GamePadStates[ i ];
-                GamePadStates[ i ] = GamePad.GetState( (PlayerIndex)i );
+                PreviousGamePadStates[i] = GamePadStates[i];
+                GamePadStates[i] = GamePad.GetState((PlayerIndex)i);
             }
 
-            if( ! IsMouseCaptured )
+            if (!IsMouseCaptured)
             {
                 PreviousMouseState = MouseState;
             }
@@ -154,15 +153,15 @@ namespace NuclearWinter.Input
                     MouseState.MiddleButton,
                     MouseState.RightButton,
                     MouseState.XButton1,
-                    MouseState.XButton2 );
+                    MouseState.XButton2);
             }
 
             MouseState = Mouse.GetState();
 
-            if( IsMouseCaptured )
+            if (IsMouseCaptured)
             {
 #if ! FNA
-                Mouse.SetPosition( PreviousMouseState.X, PreviousMouseState.Y );
+                Mouse.SetPosition(PreviousMouseState.X, PreviousMouseState.Y);
 #else
                 int x, y;
                 SDL2.SDL.SDL_GetRelativeMouseState(out x, out y);
@@ -179,12 +178,12 @@ namespace NuclearWinter.Input
             }
 
             PreviousKeyboardState = KeyboardState;
-            KeyboardState = new LocalizedKeyboardState( Keyboard.GetState() );
+            KeyboardState = new LocalizedKeyboardState(Keyboard.GetState());
 
             KeyboardPlayerIndex = null;
-            for( int i = 0; i < siMaxInput; i++ )
+            for (int i = 0; i < siMaxInput; i++)
             {
-                if( ! GamePadStates[i].IsConnected )
+                if (!GamePadStates[i].IsConnected)
                 {
                     KeyboardPlayerIndex = (PlayerIndex)i;
                     break;
@@ -197,8 +196,8 @@ namespace NuclearWinter.Input
 
             Keys[] currentPressedKeys = KeyboardState.Native.GetPressedKeys();
             Keys[] previousPressedKeys = PreviousKeyboardState.Native.GetPressedKeys();
-            
-            JustPressedKeys = currentPressedKeys.Except( previousPressedKeys ).ToList();
+
+            JustPressedKeys = currentPressedKeys.Except(previousPressedKeys).ToList();
 
             mbDoubleClicked = false;
 
@@ -235,123 +234,123 @@ namespace NuclearWinter.Input
             }
 #endif
 
-            for( int iGamePad = 0; iGamePad < siMaxInput; iGamePad++ )
+            for (int iGamePad = 0; iGamePad < siMaxInput; iGamePad++)
             {
-                mabRepeatButtons[ iGamePad ] = false;
+                mabRepeatButtons[iGamePad] = false;
 
-                foreach( Buttons button in lButtons )
+                foreach (Buttons button in lButtons)
                 {
                     bool bButtonPressed;
 
-                    switch( button )
+                    switch (button)
                     {
                         // Override for left stick
                         case Buttons.LeftThumbstickLeft:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.X < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X > -sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.X < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.X > -sfStickThreshold;
                             break;
                         case Buttons.LeftThumbstickRight:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.X > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X < sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.X > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.X < sfStickThreshold;
                             break;
                         case Buttons.LeftThumbstickDown:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.Y < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y > -sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.Y < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y > -sfStickThreshold;
                             break;
                         case Buttons.LeftThumbstickUp:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y < sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.Y > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y < sfStickThreshold;
                             break;
 
                         // Override for right stick
                         case Buttons.RightThumbstickLeft:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.X < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X > -sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.X < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.X > -sfStickThreshold;
                             break;
                         case Buttons.RightThumbstickRight:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.X > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X < sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.X > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.X < sfStickThreshold;
                             break;
                         case Buttons.RightThumbstickDown:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y > -sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.Y < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y > -sfStickThreshold;
                             break;
                         case Buttons.RightThumbstickUp:
-                            bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
+                            bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y < sfStickThreshold;
                             break;
-                        
+
                         // Default button behavior for the rest
                         default:
-                            bButtonPressed = GamePadStates[ iGamePad ].IsButtonDown( button ) && PreviousGamePadStates[ iGamePad ].IsButtonUp( button );
+                            bButtonPressed = GamePadStates[iGamePad].IsButtonDown(button) && PreviousGamePadStates[iGamePad].IsButtonUp(button);
                             break;
                     }
 
-                    if( ! bButtonPressed )
+                    if (!bButtonPressed)
                     {
-                        Keys key = GetKeyboardMapping( button );
-                        bButtonPressed = key != Keys.None && KeyboardState.IsKeyDown( key ) && ! PreviousKeyboardState.IsKeyDown( key );
+                        Keys key = GetKeyboardMapping(button);
+                        bButtonPressed = key != Keys.None && KeyboardState.IsKeyDown(key) && !PreviousKeyboardState.IsKeyDown(key);
                     }
 
-                    if( bButtonPressed )
+                    if (bButtonPressed)
                     {
-                        mafRepeatTimers[ iGamePad ] = 0f;
-                        maLastPressedButtons[ iGamePad ] = button;
+                        mafRepeatTimers[iGamePad] = 0f;
+                        maLastPressedButtons[iGamePad] = button;
                         break;
                     }
                 }
 
-                if( maLastPressedButtons[iGamePad] != 0 )
+                if (maLastPressedButtons[iGamePad] != 0)
                 {
-                    bool bIsButtonStillDown = GamePadStates[ iGamePad ].IsButtonDown( maLastPressedButtons[ iGamePad ] );
+                    bool bIsButtonStillDown = GamePadStates[iGamePad].IsButtonDown(maLastPressedButtons[iGamePad]);
 
-                    if( ! bIsButtonStillDown )
+                    if (!bIsButtonStillDown)
                     {
-                        Keys key = GetKeyboardMapping( maLastPressedButtons[iGamePad] );
-                        bIsButtonStillDown = key != Keys.None && KeyboardState.IsKeyDown( key );
+                        Keys key = GetKeyboardMapping(maLastPressedButtons[iGamePad]);
+                        bIsButtonStillDown = key != Keys.None && KeyboardState.IsKeyDown(key);
                     }
 
-                    if( bIsButtonStillDown )
+                    if (bIsButtonStillDown)
                     {
-                        float fRepeatValue      = ( mafRepeatTimers[ iGamePad ] - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
-                        float fNewRepeatValue   = ( mafRepeatTimers[ iGamePad ] + fElapsedTime - sfButtonRepeatDelay ) % ( sfButtonRepeatInterval );
+                        float fRepeatValue = (mafRepeatTimers[iGamePad] - sfButtonRepeatDelay) % (sfButtonRepeatInterval);
+                        float fNewRepeatValue = (mafRepeatTimers[iGamePad] + fElapsedTime - sfButtonRepeatDelay) % (sfButtonRepeatInterval);
 
-                        if( mafRepeatTimers[ iGamePad ] < sfButtonRepeatDelay && mafRepeatTimers[ iGamePad ] + fElapsedTime >= sfButtonRepeatDelay )
+                        if (mafRepeatTimers[iGamePad] < sfButtonRepeatDelay && mafRepeatTimers[iGamePad] + fElapsedTime >= sfButtonRepeatDelay)
                         {
-                            mabRepeatButtons[ iGamePad ] = true;
+                            mabRepeatButtons[iGamePad] = true;
                         }
                         else
-                        if( mafRepeatTimers[ iGamePad ] > sfButtonRepeatDelay && fRepeatValue > fNewRepeatValue )
+                        if (mafRepeatTimers[iGamePad] > sfButtonRepeatDelay && fRepeatValue > fNewRepeatValue)
                         {
-                            mabRepeatButtons[ iGamePad ] = true;
+                            mabRepeatButtons[iGamePad] = true;
                         }
 
-                        mafRepeatTimers[ iGamePad ] += fElapsedTime;
+                        mafRepeatTimers[iGamePad] += fElapsedTime;
                     }
                     else
                     {
-                        mafRepeatTimers[ iGamePad ] = 0f;
-                        maLastPressedButtons[ iGamePad ] = 0;
+                        mafRepeatTimers[iGamePad] = 0f;
+                        maLastPressedButtons[iGamePad] = 0;
                     }
                 }
             }
 
 
         }
-        
-        //----------------------------------------------------------------------
-        public bool IsMouseButtonDown( int _iButton )
-        {
-            if( mbDoubleClicking ) return false;
 
-            switch( _iButton )
+        //----------------------------------------------------------------------
+        public bool IsMouseButtonDown(int button)
+        {
+            if (mbDoubleClicking) return false;
+
+            switch (button)
             {
                 case 0:
-                    return MouseState.LeftButton    == ButtonState.Pressed;
+                    return MouseState.LeftButton == ButtonState.Pressed;
                 case 1:
-                    return MouseState.MiddleButton  == ButtonState.Pressed;
+                    return MouseState.MiddleButton == ButtonState.Pressed;
                 case 2:
-                    return MouseState.RightButton   == ButtonState.Pressed;
+                    return MouseState.RightButton == ButtonState.Pressed;
                 case 3:
-                    return MouseState.XButton1      == ButtonState.Pressed;
+                    return MouseState.XButton1 == ButtonState.Pressed;
                 case 4:
-                    return MouseState.XButton2      == ButtonState.Pressed;
+                    return MouseState.XButton2 == ButtonState.Pressed;
                 case 5:
-                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) > 0;
+                    return (MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue) > 0;
                 case 6:
-                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) < 0;
+                    return (MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue) < 0;
                 default:
                     return false;
             }
@@ -359,70 +358,70 @@ namespace NuclearWinter.Input
 
 
         //----------------------------------------------------------------------
-        bool WasMouseButtonDown( int _iButton )
+        bool WasMouseButtonDown(int button)
         {
-            if( mbDoubleClicking ) return false;
+            if (mbDoubleClicking) return false;
 
-            switch( _iButton )
+            switch (button)
             {
                 case 0:
-                    return PreviousMouseState.LeftButton    == ButtonState.Pressed;
+                    return PreviousMouseState.LeftButton == ButtonState.Pressed;
                 case 1:
-                    return PreviousMouseState.MiddleButton  == ButtonState.Pressed;
+                    return PreviousMouseState.MiddleButton == ButtonState.Pressed;
                 case 2:
-                    return PreviousMouseState.RightButton   == ButtonState.Pressed;
+                    return PreviousMouseState.RightButton == ButtonState.Pressed;
                 case 3:
-                    return PreviousMouseState.XButton1      == ButtonState.Pressed;
+                    return PreviousMouseState.XButton1 == ButtonState.Pressed;
                 case 4:
-                    return PreviousMouseState.XButton2      == ButtonState.Pressed;
+                    return PreviousMouseState.XButton2 == ButtonState.Pressed;
                 default:
                     return false;
             }
         }
 
         //----------------------------------------------------------------------
-        public bool WasMouseButtonJustPressed( int _iButton )
+        public bool WasMouseButtonJustPressed(int button)
         {
-            if( mbDoubleClicking ) return false;
+            if (mbDoubleClicking) return false;
 
-            switch( _iButton )
+            switch (button)
             {
                 case 0:
-                    return MouseState.LeftButton    == ButtonState.Pressed && PreviousMouseState.LeftButton     == ButtonState.Released;
+                    return MouseState.LeftButton == ButtonState.Pressed && PreviousMouseState.LeftButton == ButtonState.Released;
                 case 1:
-                    return MouseState.MiddleButton  == ButtonState.Pressed && PreviousMouseState.MiddleButton   == ButtonState.Released;
+                    return MouseState.MiddleButton == ButtonState.Pressed && PreviousMouseState.MiddleButton == ButtonState.Released;
                 case 2:
-                    return MouseState.RightButton   == ButtonState.Pressed && PreviousMouseState.RightButton    == ButtonState.Released;
+                    return MouseState.RightButton == ButtonState.Pressed && PreviousMouseState.RightButton == ButtonState.Released;
                 case 3:
-                    return MouseState.XButton1      == ButtonState.Pressed && PreviousMouseState.XButton1       == ButtonState.Released;
+                    return MouseState.XButton1 == ButtonState.Pressed && PreviousMouseState.XButton1 == ButtonState.Released;
                 case 4:
-                    return MouseState.XButton2      == ButtonState.Pressed && PreviousMouseState.XButton2       == ButtonState.Released;
+                    return MouseState.XButton2 == ButtonState.Pressed && PreviousMouseState.XButton2 == ButtonState.Released;
                 case 5:
-                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) > 0;
+                    return (MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue) > 0;
                 case 6:
-                    return ( MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue ) < 0;
+                    return (MouseState.ScrollWheelValue - PreviousMouseState.ScrollWheelValue) < 0;
                 default:
                     return false;
             }
         }
 
         //----------------------------------------------------------------------
-        public bool WasMouseButtonJustReleased( int _iButton, bool _bIgnoreDoubleClick=false )
+        public bool WasMouseButtonJustReleased(int button, bool ignoreDoubleClick = false)
         {
-            if( ! _bIgnoreDoubleClick && mbDoubleClicking ) return false;
+            if (!ignoreDoubleClick && mbDoubleClicking) return false;
 
-            switch( _iButton )
+            switch (button)
             {
                 case 0:
-                    return MouseState.LeftButton    == ButtonState.Released && PreviousMouseState.LeftButton     == ButtonState.Pressed;
+                    return MouseState.LeftButton == ButtonState.Released && PreviousMouseState.LeftButton == ButtonState.Pressed;
                 case 1:
-                    return MouseState.MiddleButton  == ButtonState.Released && PreviousMouseState.MiddleButton   == ButtonState.Pressed;
+                    return MouseState.MiddleButton == ButtonState.Released && PreviousMouseState.MiddleButton == ButtonState.Pressed;
                 case 2:
-                    return MouseState.RightButton   == ButtonState.Released && PreviousMouseState.RightButton    == ButtonState.Pressed;
+                    return MouseState.RightButton == ButtonState.Released && PreviousMouseState.RightButton == ButtonState.Pressed;
                 case 3:
-                    return MouseState.XButton1      == ButtonState.Released && PreviousMouseState.XButton1       == ButtonState.Pressed;
+                    return MouseState.XButton1 == ButtonState.Released && PreviousMouseState.XButton1 == ButtonState.Pressed;
                 case 4:
-                    return MouseState.XButton2      == ButtonState.Released && PreviousMouseState.XButton2       == ButtonState.Pressed;
+                    return MouseState.XButton2 == ButtonState.Released && PreviousMouseState.XButton2 == ButtonState.Pressed;
                 default:
                     return false;
             }
@@ -437,37 +436,37 @@ namespace NuclearWinter.Input
         //----------------------------------------------------------------------
         public bool IsShortcutKeyDown()
         {
-            return ( ( ActiveShortcutKey & ShortcutKey.LeftCtrl ) == ShortcutKey.LeftCtrl && KeyboardState.Native.IsKeyDown( Keys.LeftControl ) && ! KeyboardState.Native.IsKeyDown( Keys.RightAlt ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightCtrl ) == ShortcutKey.RightCtrl && KeyboardState.Native.IsKeyDown( Keys.RightControl ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.LeftAlt ) == ShortcutKey.LeftAlt && KeyboardState.Native.IsKeyDown( Keys.LeftAlt ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightAlt ) == ShortcutKey.RightAlt && KeyboardState.Native.IsKeyDown( Keys.RightAlt ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.LeftWindows ) == ShortcutKey.LeftWindows && KeyboardState.Native.IsKeyDown( Keys.LeftWindows ) )
-                || ( ( ActiveShortcutKey & ShortcutKey.RightWindows ) == ShortcutKey.RightWindows && KeyboardState.Native.IsKeyDown( Keys.RightWindows ) );
+            return ((ActiveShortcutKey & ShortcutKey.LeftCtrl) == ShortcutKey.LeftCtrl && KeyboardState.Native.IsKeyDown(Keys.LeftControl) && !KeyboardState.Native.IsKeyDown(Keys.RightAlt))
+                || ((ActiveShortcutKey & ShortcutKey.RightCtrl) == ShortcutKey.RightCtrl && KeyboardState.Native.IsKeyDown(Keys.RightControl))
+                || ((ActiveShortcutKey & ShortcutKey.LeftAlt) == ShortcutKey.LeftAlt && KeyboardState.Native.IsKeyDown(Keys.LeftAlt))
+                || ((ActiveShortcutKey & ShortcutKey.RightAlt) == ShortcutKey.RightAlt && KeyboardState.Native.IsKeyDown(Keys.RightAlt))
+                || ((ActiveShortcutKey & ShortcutKey.LeftWindows) == ShortcutKey.LeftWindows && KeyboardState.Native.IsKeyDown(Keys.LeftWindows))
+                || ((ActiveShortcutKey & ShortcutKey.RightWindows) == ShortcutKey.RightWindows && KeyboardState.Native.IsKeyDown(Keys.RightWindows));
         }
 
         //----------------------------------------------------------------------
-        public bool WasKeyJustPressed( Keys _key, bool _bNative=false )
+        public bool WasKeyJustPressed(Keys key, bool native = false)
         {
-            if( ! _bNative )
+            if (!native)
             {
-                return KeyboardState.IsKeyDown(_key) && ! PreviousKeyboardState.IsKeyDown(_key);
+                return KeyboardState.IsKeyDown(key) && !PreviousKeyboardState.IsKeyDown(key);
             }
             else
             {
-                return KeyboardState.Native.IsKeyDown(_key) && ! PreviousKeyboardState.Native.IsKeyDown(_key);
+                return KeyboardState.Native.IsKeyDown(key) && !PreviousKeyboardState.Native.IsKeyDown(key);
             }
         }
 
         //----------------------------------------------------------------------
-        public bool WasKeyJustReleased( Keys _key, bool _bNative )
+        public bool WasKeyJustReleased(Keys key, bool native)
         {
-            if( ! _bNative )
+            if (!native)
             {
-                return KeyboardState.IsKeyUp(_key) && ! PreviousKeyboardState.IsKeyUp(_key);
+                return KeyboardState.IsKeyUp(key) && !PreviousKeyboardState.IsKeyUp(key);
             }
             else
             {
-                return KeyboardState.Native.IsKeyUp(_key) && ! PreviousKeyboardState.Native.IsKeyUp(_key);
+                return KeyboardState.Native.IsKeyUp(key) && !PreviousKeyboardState.Native.IsKeyUp(key);
             }
         }
 
@@ -479,81 +478,81 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustPressed( Buttons _button, PlayerIndex _controllingPlayer )
+        public bool WasButtonJustPressed(Buttons button, PlayerIndex controllingPlayer)
         {
-            return WasButtonJustPressed( _button, _controllingPlayer, false );
+            return WasButtonJustPressed(button, controllingPlayer, false);
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustPressed( Buttons _button, PlayerIndex _controllingPlayer, bool _bRepeat )
+        public bool WasButtonJustPressed(Buttons button, PlayerIndex controllingPlayer, bool repeat)
         {
             PlayerIndex discardedPlayerIndex;
-            return WasButtonJustPressed( _button, _controllingPlayer, out discardedPlayerIndex, _bRepeat );
+            return WasButtonJustPressed(button, controllingPlayer, out discardedPlayerIndex, repeat);
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustPressed( Buttons _button, PlayerIndex? _controllingPlayer, out PlayerIndex _playerIndex )
+        public bool WasButtonJustPressed(Buttons button, PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            return WasButtonJustPressed( _button, _controllingPlayer, out _playerIndex, false );
+            return WasButtonJustPressed(button, controllingPlayer, out playerIndex, false);
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustPressed( Buttons _button, PlayerIndex? _controllingPlayer, out PlayerIndex _playerIndex, bool _bRepeat )
+        public bool WasButtonJustPressed(Buttons button, PlayerIndex? controllingPlayer, out PlayerIndex playerIndex, bool repeat)
         {
-            if( _controllingPlayer.HasValue )
+            if (controllingPlayer.HasValue)
             {
-                _playerIndex = _controllingPlayer.Value;
-                int iGamePad = (int)_playerIndex;
+                playerIndex = controllingPlayer.Value;
+                int iGamePad = (int)playerIndex;
 
                 //--------------------------------------------------------------
                 bool bButtonPressed;
 
-                switch( _button )
+                switch (button)
                 {
                     // Override for left stick
                     case Buttons.LeftThumbstickLeft:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.X < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X > -sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.X < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.X > -sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickRight:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.X > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X < sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.X > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.X < sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickDown:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.Y < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y > -sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.Y < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y > -sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickUp:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Left.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y < sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Left.Y > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y < sfStickThreshold;
                         break;
 
                     // Override for right stick
                     case Buttons.RightThumbstickLeft:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.X < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X > -sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.X < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.X > -sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickRight:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.X > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X < sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.X > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.X < sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickDown:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y < -sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y > -sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.Y < -sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y > -sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickUp:
-                        bButtonPressed = GamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
+                        bButtonPressed = GamePadStates[iGamePad].ThumbSticks.Right.Y > sfStickThreshold && PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y < sfStickThreshold;
                         break;
-                    
+
                     // Default button behavior for the rest
                     default:
-                        bButtonPressed = GamePadStates[ iGamePad ].IsButtonDown( _button ) && PreviousGamePadStates[ iGamePad ].IsButtonUp( _button );
+                        bButtonPressed = GamePadStates[iGamePad].IsButtonDown(button) && PreviousGamePadStates[iGamePad].IsButtonUp(button);
                         break;
                 }
 
-                if( ! bButtonPressed && _bRepeat )
+                if (!bButtonPressed && repeat)
                 {
-                    bButtonPressed = ( mabRepeatButtons[ (int)_playerIndex ] && _button == maLastPressedButtons[ (int)_playerIndex ] );
+                    bButtonPressed = (mabRepeatButtons[(int)playerIndex] && button == maLastPressedButtons[(int)playerIndex]);
                 }
-                
+
                 //--------------------------------------------------------------
                 // Keyboard controls
-                Keys key = GetKeyboardMapping( _button );
+                Keys key = GetKeyboardMapping(button);
 
-                if( _playerIndex == KeyboardPlayerIndex && key != Keys.None && KeyboardState.IsKeyDown( key ) && ! PreviousKeyboardState.IsKeyDown( key ) )
+                if (playerIndex == KeyboardPlayerIndex && key != Keys.None && KeyboardState.IsKeyDown(key) && !PreviousKeyboardState.IsKeyDown(key))
                 {
                     bButtonPressed = true;
                 }
@@ -562,72 +561,72 @@ namespace NuclearWinter.Input
             }
             else
             {
-                return  WasButtonJustPressed( _button, PlayerIndex.One, out _playerIndex, _bRepeat )
-                    ||  WasButtonJustPressed( _button, PlayerIndex.Two, out _playerIndex, _bRepeat )
-                    ||  WasButtonJustPressed( _button, PlayerIndex.Three, out _playerIndex, _bRepeat )
-                    ||  WasButtonJustPressed( _button, PlayerIndex.Four, out _playerIndex, _bRepeat );
+                return WasButtonJustPressed(button, PlayerIndex.One, out playerIndex, repeat)
+                    || WasButtonJustPressed(button, PlayerIndex.Two, out playerIndex, repeat)
+                    || WasButtonJustPressed(button, PlayerIndex.Three, out playerIndex, repeat)
+                    || WasButtonJustPressed(button, PlayerIndex.Four, out playerIndex, repeat);
             }
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustReleased( Buttons _button, PlayerIndex _controllingPlayer )
+        public bool WasButtonJustReleased(Buttons button, PlayerIndex controllingPlayer)
         {
             PlayerIndex discardedPlayerIndex;
-            return WasButtonJustReleased( _button, _controllingPlayer, out discardedPlayerIndex );
+            return WasButtonJustReleased(button, controllingPlayer, out discardedPlayerIndex);
         }
 
         //----------------------------------------------------------------------
-        public bool WasButtonJustReleased( Buttons _button, PlayerIndex? _controllingPlayer, out PlayerIndex _playerIndex )
+        public bool WasButtonJustReleased(Buttons button, PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            if( _controllingPlayer.HasValue )
+            if (controllingPlayer.HasValue)
             {
-                _playerIndex = _controllingPlayer.Value;
-                int iGamePad = (int)_playerIndex;
+                playerIndex = controllingPlayer.Value;
+                int iGamePad = (int)playerIndex;
 
                 //--------------------------------------------------------------
                 bool bButtonPressed;
 
-                switch( _button )
+                switch (button)
                 {
                     // Override for left stick
                     case Buttons.LeftThumbstickLeft:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.X > -sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Left.X < -sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Left.X > -sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickRight:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.X > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.X < sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Left.X > sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Left.X < sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickDown:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.Y > -sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y < -sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Left.Y > -sfStickThreshold;
                         break;
                     case Buttons.LeftThumbstickUp:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Left.Y > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Left.Y < sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Left.Y > sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Left.Y < sfStickThreshold;
                         break;
 
                     // Override for right stick
                     case Buttons.RightThumbstickLeft:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.X > -sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Right.X < -sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Right.X > -sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickRight:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.X > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.X < sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Right.X > sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Right.X < sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickDown:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y < -sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.Y > -sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y < -sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Right.Y > -sfStickThreshold;
                         break;
                     case Buttons.RightThumbstickUp:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].ThumbSticks.Right.Y > sfStickThreshold && GamePadStates[ iGamePad ].ThumbSticks.Right.Y < sfStickThreshold;
+                        bButtonPressed = PreviousGamePadStates[iGamePad].ThumbSticks.Right.Y > sfStickThreshold && GamePadStates[iGamePad].ThumbSticks.Right.Y < sfStickThreshold;
                         break;
-                    
+
                     // Default button behavior for the rest
                     default:
-                        bButtonPressed = PreviousGamePadStates[ iGamePad ].IsButtonDown( _button ) && GamePadStates[ iGamePad ].IsButtonUp( _button );
+                        bButtonPressed = PreviousGamePadStates[iGamePad].IsButtonDown(button) && GamePadStates[iGamePad].IsButtonUp(button);
                         break;
                 }
-                
+
                 //--------------------------------------------------------------
                 // Keyboard controls
-                Keys key = GetKeyboardMapping( _button );
+                Keys key = GetKeyboardMapping(button);
 
-                if( _playerIndex == KeyboardPlayerIndex && key != Keys.None && PreviousKeyboardState.IsKeyDown( key ) && ! KeyboardState.IsKeyDown( key ) )
+                if (playerIndex == KeyboardPlayerIndex && key != Keys.None && PreviousKeyboardState.IsKeyDown(key) && !KeyboardState.IsKeyDown(key))
                 {
                     bButtonPressed = true;
                 }
@@ -636,17 +635,17 @@ namespace NuclearWinter.Input
             }
             else
             {
-                return  WasButtonJustReleased( _button, PlayerIndex.One, out _playerIndex )
-                    ||  WasButtonJustReleased( _button, PlayerIndex.Two, out _playerIndex )
-                    ||  WasButtonJustReleased( _button, PlayerIndex.Three, out _playerIndex )
-                    ||  WasButtonJustReleased( _button, PlayerIndex.Four, out _playerIndex );
+                return WasButtonJustReleased(button, PlayerIndex.One, out playerIndex)
+                    || WasButtonJustReleased(button, PlayerIndex.Two, out playerIndex)
+                    || WasButtonJustReleased(button, PlayerIndex.Three, out playerIndex)
+                    || WasButtonJustReleased(button, PlayerIndex.Four, out playerIndex);
             }
         }
 
         //----------------------------------------------------------------------
-        public Keys GetKeyboardMapping( Buttons button )
+        public Keys GetKeyboardMapping(Buttons button)
         {
-            switch( button )
+            switch (button)
             {
                 case Buttons.A:
                     return Keys.Space;
@@ -669,19 +668,19 @@ namespace NuclearWinter.Input
         }
 
         //----------------------------------------------------------------------
-        Point                   mSavedMousePosition;
-        public bool             IsMouseCaptured     { get; private set; }
+        Point mSavedMousePosition;
+        public bool IsMouseCaptured { get; private set; }
 
         //----------------------------------------------------------------------
         public void CaptureMouse()
         {
             var savedMouseState = Mouse.GetState();
-            mSavedMousePosition = new Point( savedMouseState.X, savedMouseState.Y );
+            mSavedMousePosition = new Point(savedMouseState.X, savedMouseState.Y);
 
 #if ! FNA
             Game.IsMouseVisible = false;
-            Point mouseCenter = new Point( Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
-            Mouse.SetPosition( mouseCenter.X, mouseCenter.Y );
+            Point mouseCenter = new Point(Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
+            Mouse.SetPosition(mouseCenter.X, mouseCenter.Y);
 
             MouseState = Mouse.GetState();
             PreviousMouseState = MouseState;
@@ -716,7 +715,7 @@ namespace NuclearWinter.Input
         //----------------------------------------------------------------------
         public void ReleaseMouse()
         {
-            Debug.Assert( IsMouseCaptured );
+            Debug.Assert(IsMouseCaptured);
 
 #if FNA
             SDL2.SDL.SDL_SetRelativeMouseMode(SDL2.SDL.SDL_bool.SDL_FALSE);
@@ -725,7 +724,7 @@ namespace NuclearWinter.Input
             IsMouseCaptured = false;
 
             Game.IsMouseVisible = true;
-            Mouse.SetPosition( mSavedMousePosition.X, mSavedMousePosition.Y );
+            Mouse.SetPosition(mSavedMousePosition.X, mSavedMousePosition.Y);
 
             MouseState = Mouse.GetState();
             PreviousMouseState = MouseState;
