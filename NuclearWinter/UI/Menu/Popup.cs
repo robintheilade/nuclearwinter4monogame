@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
-    public abstract class Popup<T>: Panel where T:IMenuManager
+    public abstract class Popup<T> : Panel where T : IMenuManager
     {
-        public T                    Manager { get; private set; }
-        public readonly Point       DefaultSize = new Point( 800, 450 );
+        public T Manager { get; private set; }
+        public readonly Point DefaultSize = new Point(800, 450);
 
         //----------------------------------------------------------------------
-        public Popup( T _manager )
-        : base( _manager.PopupScreen, _manager.PopupScreen.Style.PopupFrame, _manager.PopupScreen.Style.PopupFrameCornerSize )
+        public Popup(T manager)
+        : base(manager.PopupScreen, manager.PopupScreen.Style.PopupFrame, manager.PopupScreen.Style.PopupFrameCornerSize)
         {
-            Manager     = _manager;
-            AnchoredRect = AnchoredRect.CreateCentered( DefaultSize.X, DefaultSize.Y );
+            Manager = manager;
+            AnchoredRect = AnchoredRect.CreateCentered(DefaultSize.X, DefaultSize.Y);
         }
 
         //----------------------------------------------------------------------
@@ -26,7 +22,7 @@ namespace NuclearWinter.UI
         /// </summary>
         public virtual void Close()
         {
-            Manager.PopPopup( this );
+            Manager.PopPopup(this);
         }
 
         //----------------------------------------------------------------------
@@ -39,15 +35,15 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnKeyPress( Keys _key )
+        protected internal override void OnKeyPress(Keys key)
         {
-            if( _key == Keys.Escape )
+            if (key == Keys.Escape)
             {
                 Dismiss();
             }
             else
             {
-                base.OnKeyPress( _key );
+                base.OnKeyPress(key);
             }
         }
     }
