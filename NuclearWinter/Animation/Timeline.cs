@@ -1,20 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace NuclearWinter.Animation
 {
     public class TimelineEvent
     {
-        public TimelineEvent( float _fTime, Action _action )
+        public TimelineEvent(float time, Action action)
         {
-            Time        = _fTime;
-            Action      = _action;
+            Time = time;
+            Action = action;
         }
 
-        public float        Time;
-        public Action       Action;
+        public float Time;
+        public Action Action;
     }
 
     public class Timeline
@@ -24,25 +22,25 @@ namespace NuclearWinter.Animation
             mlEvents = new List<TimelineEvent>();
         }
 
-        public void AddEvent( TimelineEvent _event )
+        public void AddEvent(TimelineEvent @event)
         {
-            mlEvents.Add( _event );
+            mlEvents.Add(@event);
 
-            mlEvents.Sort( delegate( TimelineEvent _a, TimelineEvent _b ) { return _a.Time.CompareTo( _b.Time ); } );
+            mlEvents.Sort(delegate (TimelineEvent _a, TimelineEvent _b) { return _a.Time.CompareTo(_b.Time); });
         }
 
-        public void Update( float _fElapsedTime )
+        public void Update(float elapsedTime)
         {
-            Time += _fElapsedTime;
+            Time += elapsedTime;
 
-            while( miEventOffset < mlEvents.Count && mlEvents[ miEventOffset ].Time <= Time )
+            while (miEventOffset < mlEvents.Count && mlEvents[miEventOffset].Time <= Time)
             {
                 // NOTE: We must increment miEventOffset before calling the
                 // Action, in case the Action calls Reset() or does any other
                 // change to the timeline
                 miEventOffset++;
 
-                mlEvents[ miEventOffset - 1 ].Action();
+                mlEvents[miEventOffset - 1].Action();
             }
         }
 
@@ -52,10 +50,10 @@ namespace NuclearWinter.Animation
             miEventOffset = 0;
         }
 
-        public float            Time;
+        public float Time;
 
         /// Time-sorted list of events
-        List<TimelineEvent>     mlEvents;
-        int                     miEventOffset;
+        List<TimelineEvent> mlEvents;
+        int miEventOffset;
     }
 }
