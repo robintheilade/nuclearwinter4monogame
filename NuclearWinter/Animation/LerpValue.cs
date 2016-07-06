@@ -1,48 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.Animation
 {
-    public class LerpValue: AnimatedValue
+    public class LerpValue : AnimatedValue
     {
         //----------------------------------------------------------------------
-        public LerpValue( float _fStart, float _fEnd, float _fDuration, float _fDelay, AnimationLoop _loop )
+        public LerpValue(float start, float end, float duration, float delay, AnimationLoop loop)
         {
-            Start       = _fStart;
-            End         = _fEnd;
-            Duration    = _fDuration;
-            Delay       = _fDelay;
-            Time        = 0f;
-            Loop        = _loop;
-            Direction   = AnimationDirection.Forward;
+            Start = start;
+            End = end;
+            Duration = duration;
+            Delay = delay;
+            Time = 0f;
+            Loop = loop;
+            Direction = AnimationDirection.Forward;
         }
 
-        public LerpValue( float _fStart, float _fEnd, float _fDuration, AnimationLoop _loop )
-        :   this ( _fStart, _fEnd, _fDuration, 0f, _loop )
-        {
-        }
-
-        public LerpValue( float _fStart, float _fEnd, float _fDuration, float _fDelay )
-        :   this ( _fStart, _fEnd, _fDuration, _fDelay, AnimationLoop.NoLoop )
+        public LerpValue(float start, float end, float duration, AnimationLoop loop)
+        : this(start, end, duration, 0f, loop)
         {
         }
 
-        public LerpValue( float _fStart, float _fEnd, float _fDuration )
-        :   this ( _fStart, _fEnd, _fDuration, 0f, AnimationLoop.NoLoop )
+        public LerpValue(float start, float end, float duration, float felay)
+        : this(start, end, duration, felay, AnimationLoop.NoLoop)
+        {
+        }
+
+        public LerpValue(float start, float end, float duration)
+        : this(start, end, duration, 0f, AnimationLoop.NoLoop)
         {
         }
 
         //----------------------------------------------------------------------
         public override float CurrentValue
         {
-            get { return MathHelper.Lerp( Start, End, ( Time - Delay ) / Duration ); }
+            get { return MathHelper.Lerp(Start, End, (Time - Delay) / Duration); }
         }
 
         //----------------------------------------------------------------------
-        public float    Start;
-        public float    End;
+        public float Start;
+        public float End;
     }
 }
