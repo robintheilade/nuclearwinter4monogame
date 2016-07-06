@@ -56,7 +56,12 @@ namespace NuclearWinter.GameFlow
             Color fadeColor = Color.Black * (1f - transition);
 
             Game.SpriteBatch.Begin();
-            Game.SpriteBatch.Draw(Game.WhitePixelTex, new Rectangle(0, 0, NuclearWinter.Resolution.InternalMode.Width + 1, NuclearWinter.Resolution.InternalMode.Height + 1), fadeColor);
+
+            // this.Game.Form.Width/Height does not work with fullscreen
+            // this.Game.ClientSize.Width/Height does not work with fullscreen
+            // this.Game.Graphics.PreferredBackBufferWidth/Height is unreliable not just in fullscreen
+            Game.SpriteBatch.Draw(Game.WhitePixelTex, new Rectangle(0, 0, this.Game.GraphicsDevice.DisplayMode.Width + 1, this.Game.GraphicsDevice.DisplayMode.Height + 1), fadeColor);
+
             Game.SpriteBatch.End();
         }
     }
