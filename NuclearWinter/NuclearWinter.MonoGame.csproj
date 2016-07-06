@@ -68,7 +68,6 @@
     <Compile Include="Storage\DesktopStorageHandler.cs" />
     <Compile Include="Storage\SaveHandler.cs" />
     <Compile Include="Storage\StorageHandler.cs" />
-    <Compile Include="StringBuilderExtNumeric.cs" />
     <Compile Include="UI\AnchoredRect.cs" />
     <Compile Include="UI\BoxGroup.cs" />
     <Compile Include="UI\Button.cs" />
