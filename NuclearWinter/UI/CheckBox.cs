@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace NuclearWinter.UI
 {
@@ -16,7 +13,7 @@ namespace NuclearWinter.UI
     }
 
     //--------------------------------------------------------------------------
-    public class CheckBox: Widget
+    public class CheckBox : Widget
     {
         //----------------------------------------------------------------------
         public string Text
@@ -25,32 +22,32 @@ namespace NuclearWinter.UI
             set { mLabel.Text = value; }
         }
 
-        public CheckBoxState    CheckState;
-        public Action<CheckBox,CheckBoxState> ChangeHandler;
+        public CheckBoxState CheckState;
+        public Action<CheckBox, CheckBoxState> ChangeHandler;
 
-        public Texture2D        Frame;
-        public int              FrameCornerSize;
-        
-        public object           Tag;
+        public Texture2D Frame;
+        public int FrameCornerSize;
 
-        //----------------------------------------------------------------------
-        Label                   mLabel;
-        bool                    mbIsHovered;
-        Rectangle               mCheckBoxRect; 
+        public object Tag;
 
         //----------------------------------------------------------------------
-        public CheckBox( Screen _screen, string _strText, object _tag=null )
-        : base( _screen )
+        Label mLabel;
+        bool mbIsHovered;
+        Rectangle mCheckBoxRect;
+
+        //----------------------------------------------------------------------
+        public CheckBox(Screen screen, string text, object tag = null)
+        : base(screen)
         {
             Frame = Screen.Style.CheckBoxFrame;
             FrameCornerSize = Screen.Style.CheckBoxFrameCornerSize;
 
-            mLabel = new Label( Screen, _strText, Anchor.Start );
-            mLabel.Padding = new Box( 0, 0, 0, Screen.Style.CheckBoxLabelSpacing );
+            mLabel = new Label(Screen, text, Anchor.Start);
+            mLabel.Padding = new Box(0, 0, 0, Screen.Style.CheckBoxLabelSpacing);
 
             Padding = Screen.Style.CheckBoxPadding;
 
-            Tag = _tag;
+            Tag = tag;
 
             UpdateContentSize();
         }
@@ -64,37 +61,37 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
 
-            mCheckBoxRect = new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize );
-            mLabel.DoLayout( new Rectangle( LayoutRect.X + Padding.Left + Screen.Style.CheckBoxSize, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - Screen.Style.CheckBoxSize, LayoutRect.Height - Padding.Vertical ) );
-            
+            mCheckBoxRect = new Rectangle(LayoutRect.X + Padding.Left, LayoutRect.Center.Y - Screen.Style.CheckBoxSize / 2, Screen.Style.CheckBoxSize, Screen.Style.CheckBoxSize);
+            mLabel.DoLayout(new Rectangle(LayoutRect.X + Padding.Left + Screen.Style.CheckBoxSize, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - Screen.Style.CheckBoxSize, LayoutRect.Height - Padding.Vertical));
+
             UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        public override Widget HitTest( Point _point )
+        public override Widget HitTest(Point point)
         {
-            return ( mCheckBoxRect.Contains( _point ) || mLabel.HitBox.Contains( _point ) ) ? this : null;
+            return (mCheckBoxRect.Contains(point) || mLabel.HitBox.Contains(point)) ? this : null;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove(Point hitPoint)
         {
-            mbIsHovered = mCheckBoxRect.Contains( _hitPoint ) || mLabel.LayoutRect.Contains( _hitPoint );
+            mbIsHovered = mCheckBoxRect.Contains(hitPoint) || mLabel.LayoutRect.Contains(hitPoint);
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
             mbIsHovered = false;
         }
 
-        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( mbIsHovered )
+            if (mbIsHovered)
             {
                 OnActivateUp();
             }
@@ -107,32 +104,32 @@ namespace NuclearWinter.UI
 
         protected internal override void OnActivateUp()
         {
-            CheckBoxState newState = ( CheckState == CheckBoxState.Checked ) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
-            if( ChangeHandler != null ) ChangeHandler( this, newState );
+            CheckBoxState newState = (CheckState == CheckBoxState.Checked) ? CheckBoxState.Unchecked : CheckBoxState.Checked;
+            if (ChangeHandler != null) ChangeHandler(this, newState);
             CheckState = newState;
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            DrawWithOffset( Point.Zero );
+            DrawWithOffset(Point.Zero);
         }
 
         //----------------------------------------------------------------------
-        public void DrawWithOffset( Point _pOffset )
+        public void DrawWithOffset(Point offset)
         {
             var rect = mCheckBoxRect;
-            rect.Offset( _pOffset );
-            Screen.DrawBox( Frame, rect, FrameCornerSize, Color.White );
+            rect.Offset(offset);
+            Screen.DrawBox(Frame, rect, FrameCornerSize, Color.White);
 
-            if( mbIsHovered )
+            if (mbIsHovered)
             {
-                Screen.DrawBox( Screen.Style.CheckBoxFrameHover, rect, FrameCornerSize, Color.White );
+                Screen.DrawBox(Screen.Style.CheckBoxFrameHover, rect, FrameCornerSize, Color.White);
             }
 
             Texture2D tex;
-                
-            switch( CheckState )
+
+            switch (CheckState)
             {
                 case UI.CheckBoxState.Checked:
                     tex = Screen.Style.CheckBoxChecked;
@@ -147,14 +144,14 @@ namespace NuclearWinter.UI
                     throw new NotSupportedException();
             }
 
-            Screen.Game.SpriteBatch.Draw( tex, new Vector2( rect.Center.X, rect.Center.Y ), null, Color.White, 0f, new Vector2( tex.Width, tex.Height ) / 2f, 1f, SpriteEffects.None, 1f );
+            Screen.Game.SpriteBatch.Draw(tex, new Vector2(rect.Center.X, rect.Center.Y), null, Color.White, 0f, new Vector2(tex.Width, tex.Height) / 2f, 1f, SpriteEffects.None, 1f);
 
-            mLabel.DrawWithOffset( _pOffset );
+            mLabel.DrawWithOffset(offset);
         }
 
         protected internal override void DrawFocused()
         {
-            Screen.DrawBox( Screen.Style.ButtonFocusOverlay, mLabel.LayoutRect, Screen.Style.ButtonCornerSize, Color.White );
+            Screen.DrawBox(Screen.Style.ButtonFocusOverlay, mLabel.LayoutRect, Screen.Style.ButtonCornerSize, Color.White);
         }
     }
 }
