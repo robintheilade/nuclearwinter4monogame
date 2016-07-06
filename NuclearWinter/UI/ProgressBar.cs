@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace NuclearWinter.UI
 {
     //--------------------------------------------------------------------------
-    public class ProgressBar: Widget
+    public class ProgressBar : Widget
     {
         //----------------------------------------------------------------------
         public int Value
@@ -19,40 +16,40 @@ namespace NuclearWinter.UI
         public int Max;
 
         //----------------------------------------------------------------------
-        int         miValue;
-        float       mfLerpValue;
+        int miValue;
+        float mfLerpValue;
 
         //----------------------------------------------------------------------
-        public void SetProgress( int _iValue )
+        public void SetProgress(int value)
         {
-            miValue = _iValue;
+            miValue = value;
         }
 
         //----------------------------------------------------------------------
-        public ProgressBar( Screen _screen, int _iValue=0, int _iMax=100 )
-        : base( _screen )
+        public ProgressBar(Screen screen, int value = 0, int max = 100)
+        : base(screen)
         {
-            Value   = _iValue;
-            Max     = _iMax;
+            Value = value;
+            Max = max;
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
-            float fLerpAmount = Math.Min( 1f, _fElapsedTime * NuclearGame.LerpMultiplier );
+            float fLerpAmount = Math.Min(1f, elapsedTime * NuclearGame.LerpMultiplier);
 
-            mfLerpValue = MathHelper.Lerp( mfLerpValue, Value, fLerpAmount );
+            mfLerpValue = MathHelper.Lerp(mfLerpValue, Value, fLerpAmount);
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( Screen.Style.ProgressBarFrame, LayoutRect, Screen.Style.ProgressBarFrameCornerSize, Color.White );
+            Screen.DrawBox(Screen.Style.ProgressBarFrame, LayoutRect, Screen.Style.ProgressBarFrameCornerSize, Color.White);
 
-            if( Value > 0 )
+            if (Value > 0)
             {
-                Rectangle progressRect = new Rectangle( LayoutRect.X, LayoutRect.Y, Screen.Style.ProgressBar.Width / 2 + (int)( ( LayoutRect.Width - Screen.Style.ProgressBar.Width / 2 ) * mfLerpValue / Max ), LayoutRect.Height );
-                Screen.DrawBox( Screen.Style.ProgressBar, progressRect, Screen.Style.ProgressBarCornerSize, Color.White );
+                Rectangle progressRect = new Rectangle(LayoutRect.X, LayoutRect.Y, Screen.Style.ProgressBar.Width / 2 + (int)((LayoutRect.Width - Screen.Style.ProgressBar.Width / 2) * mfLerpValue / Max), LayoutRect.Height);
+                Screen.DrawBox(Screen.Style.ProgressBar, progressRect, Screen.Style.ProgressBarCornerSize, Color.White);
             }
         }
     }
