@@ -171,11 +171,7 @@ namespace NuclearWinter
         /// </summary>
         public void SetWindowTitle(string title)
         {
-#if !FNA
-            SetWindowTextW(Window.Handle, title);
-#else
-            Window.Title = _strTitle;
-#endif
+            Window.Title = title;
         }
 
 
