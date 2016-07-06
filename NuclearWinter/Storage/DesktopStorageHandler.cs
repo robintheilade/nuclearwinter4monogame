@@ -1,36 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 
 namespace NuclearWinter.Storage
 {
-    class DesktopStorageHandler: StorageHandler
+    class DesktopStorageHandler : StorageHandler
     {
         //----------------------------------------------------------------------
-        public readonly string      RootPath;
-        public readonly string      AppIdentifier;
+        public readonly string RootPath;
+        public readonly string AppIdentifier;
 
         //----------------------------------------------------------------------
-        public DesktopStorageHandler( string _strAppIdentifier )
+        public DesktopStorageHandler(string appIdentifier)
         {
-            AppIdentifier = _strAppIdentifier;
-            RootPath = Path.Combine( NuclearGame.ApplicationDataFolderPath, AppIdentifier );
-            System.IO.Directory.CreateDirectory( RootPath );
+            AppIdentifier = appIdentifier;
+            RootPath = Path.Combine(NuclearGame.ApplicationDataFolderPath, AppIdentifier);
+            System.IO.Directory.CreateDirectory(RootPath);
         }
 
         //----------------------------------------------------------------------
-        public override BinaryReader OpenRead( string _strFilename )
+        public override BinaryReader OpenRead(string filename)
         {
-            var reader = new BinaryReader( File.OpenRead( Path.Combine( RootPath, _strFilename ) ) );
+            var reader = new BinaryReader(File.OpenRead(Path.Combine(RootPath, filename)));
             return reader;
         }
 
         //----------------------------------------------------------------------
-        public override BinaryWriter OpenWrite( string _strFilename )
+        public override BinaryWriter OpenWrite(string filename)
         {
-            var writer = new BinaryWriter( File.OpenWrite( Path.Combine( RootPath, _strFilename ) ) );
+            var writer = new BinaryWriter(File.OpenWrite(Path.Combine(RootPath, filename)));
             return writer;
         }
     }
