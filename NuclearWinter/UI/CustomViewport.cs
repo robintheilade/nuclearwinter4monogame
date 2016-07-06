@@ -1,25 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace NuclearWinter.UI
 {
-    public abstract class CustomViewport: Widget
+    public abstract class CustomViewport : Widget
     {
         //----------------------------------------------------------------------
-        public CustomViewport( Screen _screen )
-        : base( _screen )
+        public CustomViewport(Screen screen)
+        : base(screen)
         {
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
             HitBox = LayoutRect;
         }
 
@@ -31,7 +26,7 @@ namespace NuclearWinter.UI
             Screen.SuspendBatch();
             mPreviousViewport = Screen.Game.GraphicsDevice.Viewport;
 
-            Viewport viewport = new Viewport( LayoutRect );
+            Viewport viewport = new Viewport(LayoutRect);
             Screen.Game.GraphicsDevice.Viewport = viewport;
         }
 
