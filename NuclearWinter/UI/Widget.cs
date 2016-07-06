@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
-using System.Diagnostics;
 
 #if !FNA
 using OSKey = System.Windows.Forms.Keys;
@@ -20,76 +16,78 @@ namespace NuclearWinter.UI
         public int Bottom;
         public int Left;
 
-        public int Horizontal   { get { return Left + Right; } }
-        public int Vertical     { get { return Top + Bottom; } }
+        public int Horizontal { get { return Left + Right; } }
+        public int Vertical { get { return Top + Bottom; } }
 
-        public Box( int _iTop, int _iRight, int _iBottom, int _iLeft )
+        public Box(int top, int right, int bottom, int left)
         {
-            Top     = _iTop;
-            Right   = _iRight;
-            Bottom  = _iBottom;
-            Left    = _iLeft;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+            Left = left;
         }
 
         //----------------------------------------------------------------------
-        public Box( int _iValue )
+        public Box(int value)
         {
-            Left = Right = Top = Bottom = _iValue;
+            Left = Right = Top = Bottom = value;
         }
 
         //----------------------------------------------------------------------
-        public Box( int _iVertical, int _iHorizontal )
+        public Box(int vertical, int horizontal)
         {
-            Top = Bottom = _iVertical;
-            Left = Right = _iHorizontal;
+            Top = Bottom = vertical;
+            Left = Right = horizontal;
         }
     }
 
     public abstract class Widget
     {
         //----------------------------------------------------------------------
-        public Screen           Screen              { get; private set; }
-        public Widget           Parent;
+        public Screen Screen { get; private set; }
+        public Widget Parent;
 
         /// <summary>
         /// Returns whether the widget is connected to its Screen's root
         /// </summary>
         public bool IsOrphan
         {
-            get {
+            get
+            {
                 Widget widget = this;
-                while( widget.Parent != null && widget.Parent != Screen.Root ) widget = widget.Parent;
+                while (widget.Parent != null && widget.Parent != Screen.Root) widget = widget.Parent;
                 return widget.Parent == null;
             }
         }
 
-        public int              ContentWidth        { get; protected set; }
-        public int              ContentHeight       { get; protected set; }
+        public int ContentWidth { get; protected set; }
+        public int ContentHeight { get; protected set; }
 
-        public AnchoredRect     AnchoredRect;
-        public Rectangle        LayoutRect          { get; protected set; }
+        public AnchoredRect AnchoredRect;
+        public Rectangle LayoutRect { get; protected set; }
 
-        protected Box           mPadding;
-        public Box              Padding
+        protected Box mPadding;
+        public Box Padding
         {
             get { return mPadding; }
-            set {
+            set
+            {
                 mPadding = value;
                 UpdateContentSize();
             }
         }
 
-        public virtual Widget GetSibling( UI.Direction _direction, Widget _child )
+        public virtual Widget GetSibling(UI.Direction direction, Widget child)
         {
-            if( Parent != null )
+            if (Parent != null)
             {
-                return Parent.GetSibling( _direction, this );
+                return Parent.GetSibling(direction, this);
             }
 
             return null;
         }
 
-        public virtual Widget GetFirstFocusableDescendant( UI.Direction _direction )
+        public virtual Widget GetFirstFocusableDescendant(UI.Direction direction)
         {
             return this;
         }
@@ -110,33 +108,33 @@ namespace NuclearWinter.UI
             }
         }
 
-        public Rectangle        HitBox              { get; protected set; }
+        public Rectangle HitBox { get; protected set; }
 
         //----------------------------------------------------------------------
-        public Widget( Screen _screen, AnchoredRect _anchoredRect )
+        public Widget(Screen screen, AnchoredRect anchoredRect)
         {
-            Screen = _screen;
-            AnchoredRect = _anchoredRect;
+            Screen = screen;
+            AnchoredRect = anchoredRect;
         }
 
-        public Widget( Screen _screen )
-        : this( _screen, AnchoredRect.Full )
+        public Widget(Screen screen)
+        : this(screen, AnchoredRect.Full)
         {
         }
 
         //----------------------------------------------------------------------
-        public virtual void DoLayout( Rectangle _rect )
+        public virtual void DoLayout(Rectangle rectangle)
         {
             Rectangle childRectangle;
 
             // Horizontal
-            if( AnchoredRect.Left.HasValue )
+            if (AnchoredRect.Left.HasValue)
             {
-                childRectangle.X = _rect.Left + AnchoredRect.Left.Value;
-                if( AnchoredRect.Right.HasValue )
+                childRectangle.X = rectangle.Left + AnchoredRect.Left.Value;
+                if (AnchoredRect.Right.HasValue)
                 {
                     // Horizontally anchored
-                    childRectangle.Width = ( _rect.Right - AnchoredRect.Right.Value ) - childRectangle.X;
+                    childRectangle.Width = (rectangle.Right - AnchoredRect.Right.Value) - childRectangle.X;
                 }
                 else
                 {
@@ -148,26 +146,26 @@ namespace NuclearWinter.UI
             {
                 childRectangle.Width = AnchoredRect.Width;
 
-                if( AnchoredRect.Right.HasValue )
+                if (AnchoredRect.Right.HasValue)
                 {
                     // Right-anchored
-                    childRectangle.X = ( _rect.Right - AnchoredRect.Right.Value ) - childRectangle.Width;
+                    childRectangle.X = (rectangle.Right - AnchoredRect.Right.Value) - childRectangle.Width;
                 }
                 else
                 {
                     // Centered
-                    childRectangle.X = _rect.Center.X - childRectangle.Width / 2;
+                    childRectangle.X = rectangle.Center.X - childRectangle.Width / 2;
                 }
             }
 
             // Vertical
-            if( AnchoredRect.Top.HasValue )
+            if (AnchoredRect.Top.HasValue)
             {
-                childRectangle.Y = _rect.Top + AnchoredRect.Top.Value;
-                if( AnchoredRect.Bottom.HasValue )
+                childRectangle.Y = rectangle.Top + AnchoredRect.Top.Value;
+                if (AnchoredRect.Bottom.HasValue)
                 {
                     // Horizontally anchored
-                    childRectangle.Height = ( _rect.Bottom - AnchoredRect.Bottom.Value ) - childRectangle.Y;
+                    childRectangle.Height = (rectangle.Bottom - AnchoredRect.Bottom.Value) - childRectangle.Y;
                 }
                 else
                 {
@@ -179,15 +177,15 @@ namespace NuclearWinter.UI
             {
                 childRectangle.Height = AnchoredRect.Height;
 
-                if( AnchoredRect.Bottom.HasValue )
+                if (AnchoredRect.Bottom.HasValue)
                 {
                     // Bottom-anchored
-                    childRectangle.Y = ( _rect.Bottom - AnchoredRect.Bottom.Value ) - childRectangle.Height;
+                    childRectangle.Y = (rectangle.Bottom - AnchoredRect.Bottom.Value) - childRectangle.Height;
                 }
                 else
                 {
                     // Centered
-                    childRectangle.Y = _rect.Center.Y - childRectangle.Height / 2;
+                    childRectangle.Y = rectangle.Center.Y - childRectangle.Height / 2;
                 }
             }
 
@@ -195,25 +193,25 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public virtual Widget HitTest( Point _point )
+        public virtual Widget HitTest(Point point)
         {
-            return HitBox.Contains( _point ) ? this : null;
+            return HitBox.Contains(point) ? this : null;
         }
 
         //----------------------------------------------------------------------
-        protected Point TransformPointScreenToWidget( Point _point )
+        protected Point TransformPointScreenToWidget(Point point)
         {
-            return new Point( _point.X - LayoutRect.X, _point.Y - LayoutRect.Y );
+            return new Point(point.X - LayoutRect.X, point.Y - LayoutRect.Y);
         }
 
         //----------------------------------------------------------------------
-        public virtual void Update( float _fElapsedTime ) {}
+        public virtual void Update(float elapsedTime) { }
 
         protected internal virtual void UpdateContentSize()
         {
             // Compute content size then call this!
 
-            if( Parent != null )
+            if (Parent != null)
             {
                 Parent.UpdateContentSize();
             }
@@ -224,50 +222,50 @@ namespace NuclearWinter.UI
 
         // Called when a mouse button was pressed. Widget should return true if event was consumed
         // Otherwise it will bubble up to its parent
-        protected internal virtual bool       OnMouseDown ( Point _hitPoint, int _iButton ) { return true; }
-        protected internal virtual void       OnMouseUp   ( Point _hitPoint, int _iButton ) {}
+        protected internal virtual bool OnMouseDown(Point hitPoint, int button) { return true; }
+        protected internal virtual void OnMouseUp(Point hitPoint, int button) { }
 
 
-        protected internal virtual bool       OnMouseDoubleClick( Point _hitPoint ) { return false; }
+        protected internal virtual bool OnMouseDoubleClick(Point hitPoint) { return false; }
 
-        public virtual void                 OnMouseEnter( Point _hitPoint ) {}
-        public virtual void                 OnMouseOut  ( Point _hitPoint ) {}
-        public virtual void                 OnMouseMove ( Point _hitPoint ) {}
-        
-        protected internal virtual void     OnMouseWheel( Point _hitPoint, int _iDelta ) { if( Parent != null ) Parent.OnMouseWheel( _hitPoint, _iDelta ); }
+        public virtual void OnMouseEnter(Point hitPoint) { }
+        public virtual void OnMouseOut(Point hitPoint) { }
+        public virtual void OnMouseMove(Point hitPoint) { }
 
-        public const int                    MouseDragTriggerDistance   = 10;
+        protected internal virtual void OnMouseWheel(Point hitPoint, int delta) { if (Parent != null) Parent.OnMouseWheel(hitPoint, delta); }
 
-        protected internal virtual void OnOSKeyPress( OSKey _key )
+        public const int MouseDragTriggerDistance = 10;
+
+        protected internal virtual void OnOSKeyPress(OSKey key)
         {
-            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.LeftControl, true) || Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.RightControl, true);
 
-            if( ! bCtrl && _key == OSKey.Tab )
+            if (!bCtrl && key == OSKey.Tab)
             {
                 List<Direction> directions = new List<Direction>();
 
-                if( Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown( Keys.LeftShift ) || Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown( Keys.RightShift ) )
+                if (Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown(Keys.LeftShift) || Screen.Game.InputMgr.KeyboardState.Native.IsKeyDown(Keys.RightShift))
                 {
-                    directions.Add( Direction.Left );
-                    directions.Add( Direction.Up );
+                    directions.Add(Direction.Left);
+                    directions.Add(Direction.Up);
                 }
                 else
                 {
-                    directions.Add( Direction.Right );
-                    directions.Add( Direction.Down );
+                    directions.Add(Direction.Right);
+                    directions.Add(Direction.Down);
                 }
 
-                foreach( Direction direction in directions )
+                foreach (Direction direction in directions)
                 {
-                    Widget widget = GetSibling( direction, this );
+                    Widget widget = GetSibling(direction, this);
 
-                    if( widget != null )
+                    if (widget != null)
                     {
-                        Widget focusableWidget = widget.GetFirstFocusableDescendant( direction );
+                        Widget focusableWidget = widget.GetFirstFocusableDescendant(direction);
 
-                        if( focusableWidget != null )
+                        if (focusableWidget != null)
                         {
-                            Screen.Focus( focusableWidget );
+                            Screen.Focus(focusableWidget);
                             break;
                         }
                     }
@@ -275,40 +273,41 @@ namespace NuclearWinter.UI
             }
             else
             {
-                if( Parent != null ) Parent.OnOSKeyPress( _key );
+                if (Parent != null) Parent.OnOSKeyPress(key);
             }
         }
 
-        protected internal virtual void       OnKeyPress  ( Keys _key ) { if( Parent != null ) Parent.OnKeyPress( _key ); }
+        protected internal virtual void OnKeyPress(Keys key) { if (Parent != null) Parent.OnKeyPress(key); }
 
-        protected internal virtual void       OnTextEntered( char _char ) {}
+        protected internal virtual void OnTextEntered(char @char) { }
 
-        protected internal virtual bool       OnActivateDown() { return false; }
-        protected internal virtual void       OnActivateUp() {}
-        protected internal virtual bool       OnCancel( bool _bPressed ) { return false; } // return true to consume the event
+        protected internal virtual bool OnActivateDown() { return false; }
+        protected internal virtual void OnActivateUp() { }
+        protected internal virtual bool OnCancel(bool pressed) { return false; } // return true to consume the event
 
-        protected internal virtual void       OnFocus() {}
-        protected internal virtual void       OnBlur() {}
+        protected internal virtual void OnFocus() { }
+        protected internal virtual void OnBlur() { }
 
-        protected internal virtual bool       OnPadButton ( Buttons _button, bool _bIsDown ) { return false; }
+        protected internal virtual bool OnPadButton(Buttons button, bool isDown) { return false; }
 
-        protected internal virtual void       OnPadMove( Direction _direction ) {
-            Widget widget = GetSibling( _direction, this );
+        protected internal virtual void OnPadMove(Direction direction)
+        {
+            Widget widget = GetSibling(direction, this);
 
-            if( widget != null )
+            if (widget != null)
             {
-                Widget focusableWidget = widget.GetFirstFocusableDescendant( _direction );
+                Widget focusableWidget = widget.GetFirstFocusableDescendant(direction);
 
-                if( focusableWidget != null )
+                if (focusableWidget != null)
                 {
-                    Screen.Focus( focusableWidget );
+                    Screen.Focus(focusableWidget);
                 }
             }
         }
 
         //----------------------------------------------------------------------
-        public abstract void                Draw();
-        protected internal virtual void     DrawFocused() {}
-        protected internal virtual void     DrawHovered() {}
+        public abstract void Draw();
+        protected internal virtual void DrawFocused() { }
+        protected internal virtual void DrawHovered() { }
     }
 }
