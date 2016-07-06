@@ -1,138 +1,135 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using NuclearWinter;
-using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 
 namespace NuclearWinter.UI
 {
-    public class MessagePopup: Popup<IMenuManager>
+    public class MessagePopup : Popup<IMenuManager>
     {
-        public Label                TitleLabel      { get; private set; }
-        public Label                MessageLabel    { get; private set; }
+        public Label TitleLabel { get; private set; }
+        public Label MessageLabel { get; private set; }
 
-        public Group                ContentGroup    { get; private set; }
+        public Group ContentGroup { get; private set; }
 
-        BoxGroup                    mActionsGroup;
+        BoxGroup mActionsGroup;
 
-        Button                      mCloseButton;
-        Button                      mConfirmButton;
+        Button mCloseButton;
+        Button mConfirmButton;
 
-        Action                      mCloseCallback;
-        Action<bool>                mConfirmCallback;
+        Action mCloseCallback;
+        Action<bool> mConfirmCallback;
 
-        SpinningWheel               mSpinningWheel;
+        SpinningWheel mSpinningWheel;
 
-        public bool ShowSpinningWheel {
+        public bool ShowSpinningWheel
+        {
             set
             {
-                if( value )
+                if (value)
                 {
-                    if( mSpinningWheel.Parent == null )
+                    if (mSpinningWheel.Parent == null)
                     {
-                        AddChild( mSpinningWheel );
+                        AddChild(mSpinningWheel);
                     }
                 }
                 else
                 {
-                    if( mSpinningWheel.Parent != null )
+                    if (mSpinningWheel.Parent != null)
                     {
-                        RemoveChild( mSpinningWheel );
+                        RemoveChild(mSpinningWheel);
                     }
                 }
             }
         }
 
         //----------------------------------------------------------------------
-        public MessagePopup( IMenuManager _manager )
-        : base( _manager )
+        public MessagePopup(IMenuManager manager)
+        : base(manager)
         {
-            TitleLabel = new Label( Screen, "", Anchor.Start );
+            TitleLabel = new Label(Screen, "", Anchor.Start);
             TitleLabel.Font = Screen.Style.LargeFont;
-            TitleLabel.AnchoredRect = AnchoredRect.CreateTopAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
-            AddChild( TitleLabel );
+            TitleLabel.AnchoredRect = AnchoredRect.CreateTopAnchored(0, 0, 0, Screen.Style.DefaultButtonHeight);
+            AddChild(TitleLabel);
 
             {
-                mSpinningWheel = new SpinningWheel( Screen, Screen.Style.SpinningWheel );
-                mSpinningWheel.AnchoredRect = AnchoredRect.CreateCentered( mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight );
+                mSpinningWheel = new SpinningWheel(Screen, Screen.Style.SpinningWheel);
+                mSpinningWheel.AnchoredRect = AnchoredRect.CreateCentered(mSpinningWheel.ContentWidth, mSpinningWheel.ContentHeight);
 
                 // Message label
-                ContentGroup = new Group( Screen );
-                ContentGroup.AnchoredRect = AnchoredRect.CreateFull( 0, Screen.Style.DefaultButtonHeight + 10, 0, Screen.Style.DefaultButtonHeight + 10 );
-                AddChild( ContentGroup );
+                ContentGroup = new Group(Screen);
+                ContentGroup.AnchoredRect = AnchoredRect.CreateFull(0, Screen.Style.DefaultButtonHeight + 10, 0, Screen.Style.DefaultButtonHeight + 10);
+                AddChild(ContentGroup);
 
-                MessageLabel = new Label( Screen, "", Anchor.Start );
+                MessageLabel = new Label(Screen, "", Anchor.Start);
                 MessageLabel.WrapText = true;
 
                 // Actions
-                mActionsGroup = new BoxGroup( Screen, Orientation.Horizontal, 0, Anchor.End );
-                mActionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored( 0, 0, 0, Screen.Style.DefaultButtonHeight );
+                mActionsGroup = new BoxGroup(Screen, Orientation.Horizontal, 0, Anchor.End);
+                mActionsGroup.AnchoredRect = AnchoredRect.CreateBottomAnchored(0, 0, 0, Screen.Style.DefaultButtonHeight);
 
-                AddChild( mActionsGroup );
+                AddChild(mActionsGroup);
 
                 // Close / Cancel
-                mCloseButton = new Button( Screen, i18n.Common.Close );
+                mCloseButton = new Button(Screen, i18n.Common.Close);
                 mCloseButton.ClickHandler = delegate { Dismiss(); };
 
                 // Confirm
-                mConfirmButton = new Button( Screen, i18n.Common.Confirm );
+                mConfirmButton = new Button(Screen, i18n.Common.Confirm);
                 mConfirmButton.ClickHandler = delegate { Confirm(); };
-                mActionsGroup.AddChild( mConfirmButton );
+                mActionsGroup.AddChild(mConfirmButton);
             }
         }
 
         //----------------------------------------------------------------------
-        public void Open( int _iWidth, int _iHeight )
+        public void Open(int width, int height)
         {
-            AnchoredRect.Width = _iWidth;
-            AnchoredRect.Height = _iHeight;
+            AnchoredRect.Width = width;
+            AnchoredRect.Height = height;
 
-            Manager.PushPopup( this );
-            Screen.Focus( GetFirstFocusableDescendant( Direction.Down ) );
+            Manager.PushPopup(this);
+            Screen.Focus(GetFirstFocusableDescendant(Direction.Down));
 
             mSpinningWheel.Reset();
         }
 
         //----------------------------------------------------------------------
-        public void Setup( string _strTitleText, string _strMessageText, string _strCloseButtonCaption, bool _bShowSpinningWheel=false, Action _closeCallback=null )
+        public void Setup(string titleText, string messageText, string closeButtonCaption, bool showSpinningWheel = false, Action closeCallback = null)
         {
-            TitleLabel.Text     = _strTitleText;
+            TitleLabel.Text = titleText;
 
-            if( _strMessageText != null )
+            if (messageText != null)
             {
-                MessageLabel.Text   = _strMessageText;
+                MessageLabel.Text = messageText;
                 ContentGroup.Clear();
-                ContentGroup.AddChild( MessageLabel );
+                ContentGroup.AddChild(MessageLabel);
             }
 
-            mCloseButton.Text   = _strCloseButtonCaption;
-            ShowSpinningWheel   = _bShowSpinningWheel;
+            mCloseButton.Text = closeButtonCaption;
+            ShowSpinningWheel = showSpinningWheel;
 
             mActionsGroup.Clear();
-            mActionsGroup.AddChild( mCloseButton );
-            mCloseCallback = _closeCallback;
+            mActionsGroup.AddChild(mCloseButton);
+            mCloseCallback = closeCallback;
         }
 
         //----------------------------------------------------------------------
-        public void Setup( string _strTitleText, string _strMessageText, string _strConfirmButtonCaption, string _strCloseButtonCaption, Action<bool> _confirmCallback=null )
+        public void Setup(string titleText, string messageText, string confirmButtonCaption, string closeButtonCaption, Action<bool> confirmCallback = null)
         {
-            TitleLabel.Text     = _strTitleText;
+            TitleLabel.Text = titleText;
 
-            if( _strMessageText != null )
+            if (messageText != null)
             {
-                MessageLabel.Text   = _strMessageText;
+                MessageLabel.Text = messageText;
                 ContentGroup.Clear();
-                ContentGroup.AddChild( MessageLabel );
+                ContentGroup.AddChild(MessageLabel);
             }
 
-            mConfirmButton.Text = _strConfirmButtonCaption;
-            mCloseButton.Text   = _strCloseButtonCaption;
+            mConfirmButton.Text = confirmButtonCaption;
+            mCloseButton.Text = closeButtonCaption;
 
             mActionsGroup.Clear();
-            mActionsGroup.AddChild( mConfirmButton );
-            mActionsGroup.AddChild( mCloseButton );
+            mActionsGroup.AddChild(mConfirmButton);
+            mActionsGroup.AddChild(mCloseButton);
 
-            mConfirmCallback = _confirmCallback;
+            mConfirmCallback = confirmCallback;
         }
 
         //----------------------------------------------------------------------
@@ -158,8 +155,8 @@ namespace NuclearWinter.UI
             var closeCallback = mCloseCallback;
             var confirmCallback = mConfirmCallback;
             base.Dismiss();
-            if( closeCallback != null ) closeCallback();
-            if( confirmCallback != null ) confirmCallback( false );
+            if (closeCallback != null) closeCallback();
+            if (confirmCallback != null) confirmCallback(false);
         }
 
         //----------------------------------------------------------------------
@@ -167,7 +164,7 @@ namespace NuclearWinter.UI
         {
             var confirmCallback = mConfirmCallback;
             Close();
-            confirmCallback( true );
+            confirmCallback(true);
         }
     }
 }
