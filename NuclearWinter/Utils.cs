@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
-
-using Microsoft.Xna.Framework;
 using System.Globalization;
+using System.Reflection;
 
 namespace NuclearWinter
 {
@@ -12,14 +10,14 @@ namespace NuclearWinter
     {
         //----------------------------------------------------------------------
         // Source: http://thedeadpixelsociety.com/2012/01/hex-colors-in-xna/
-        public static Color ColorFromHex( string _str )
+        public static Color ColorFromHex(string value)
         {
-            if( _str.StartsWith("#") ) _str = _str.Substring( 1 );
+            if (value.StartsWith("#")) value = value.Substring(1);
 
-            uint hex = uint.Parse( _str, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture );
+            uint hex = uint.Parse(value, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
             Color color = Color.White;
-            if( _str.Length == 8 )
+            if (value.Length == 8)
             {
                 color.R = (byte)(hex >> 24);
                 color.G = (byte)(hex >> 16);
@@ -27,7 +25,7 @@ namespace NuclearWinter
                 color.A = (byte)(hex);
             }
             else
-            if( _str.Length == 6 )
+            if (value.Length == 6)
             {
                 color.R = (byte)(hex >> 16);
                 color.G = (byte)(hex >> 8);
@@ -46,47 +44,47 @@ namespace NuclearWinter
         // See http://forums.xna.com/forums/p/1610/157478.aspx
         public static List<T> GetValues<T>()
         {
-          Type currentEnum = typeof(T);
-          List<T> resultSet = new List<T>();
-          if (currentEnum.IsEnum)
-          {
-            FieldInfo[] fields = currentEnum.GetFields(BindingFlags.Static | BindingFlags.Public);
-            foreach (FieldInfo field in fields)
-              resultSet.Add((T)field.GetValue(null));
-          }
+            Type currentEnum = typeof(T);
+            List<T> resultSet = new List<T>();
+            if (currentEnum.IsEnum)
+            {
+                FieldInfo[] fields = currentEnum.GetFields(BindingFlags.Static | BindingFlags.Public);
+                foreach (FieldInfo field in fields)
+                    resultSet.Add((T)field.GetValue(null));
+            }
 
-          return resultSet;
+            return resultSet;
         }
 
         //----------------------------------------------------------------------
-        public static bool SegmentIntersect( ref Vector2 _vA, ref Vector2 _vB, ref Vector2 _vC, ref Vector2 _vD, out Vector2 _vIntersectionPoint )
+        public static bool SegmentIntersect(ref Vector2 a, ref Vector2 b, ref Vector2 c, ref Vector2 d, out Vector2 intersectionPoint)
         {
             float fCoeff1;
             float fCoeff2;
-            return SegmentIntersect( ref _vA, ref _vB, ref _vC, ref _vD, out _vIntersectionPoint, out fCoeff1, out fCoeff2 );
+            return SegmentIntersect(ref a, ref b, ref c, ref d, out intersectionPoint, out fCoeff1, out fCoeff2);
         }
 
         //----------------------------------------------------------------------
         // Based on implementation found in Farseer Physics 2
-        public static bool SegmentIntersect( ref Vector2 _vA, ref Vector2 _vB, ref Vector2 _vC, ref Vector2 _vD, out Vector2 _vIntersectionPoint, out float _fCoeff1, out float _fCoeff2 )
+        public static bool SegmentIntersect(ref Vector2 a, ref Vector2 b, ref Vector2 c, ref Vector2 d, out Vector2 intersectionPoint, out float coeff1, out float coeff2)
         {
-            _vIntersectionPoint = new Vector2();
-            _fCoeff1 = 0f;
-            _fCoeff2 = 0f;
+            intersectionPoint = new Vector2();
+            coeff1 = 0f;
+            coeff2 = 0f;
 
-            float fA = _vD.Y - _vC.Y;
-            float fB = _vB.X - _vA.X;
-            float fC = _vD.X - _vC.X;
-            float fD = _vB.Y - _vA.Y;
+            float fA = d.Y - c.Y;
+            float fB = b.X - a.X;
+            float fC = d.X - c.X;
+            float fD = b.Y - a.Y;
 
             // Denominator to solution of linear system
             float fDenom = (fA * fB) - (fC * fD);
 
             // If denominator is 0, then lines are parallel
-            if( ! ( fDenom >= -sfEpsilon && fDenom <= sfEpsilon ) )
+            if (!(fDenom >= -sfEpsilon && fDenom <= sfEpsilon))
             {
-                float fE = _vA.Y - _vC.Y;
-                float fF = _vA.X - _vC.X;
+                float fE = a.Y - c.Y;
+                float fF = a.X - c.X;
                 float fOneOverDenom = 1f / fDenom;
 
                 // Numerator of first equation
@@ -94,7 +92,7 @@ namespace NuclearWinter
                 fUA *= fOneOverDenom;
 
                 // Check if intersection point of the two lines is on line segment 1
-                if( fUA >= 0f && fUA <= 1f )
+                if (fUA >= 0f && fUA <= 1f)
                 {
                     // Numerator of second equation
                     float fUB = (fB * fE) - (fD * fF);
@@ -103,17 +101,17 @@ namespace NuclearWinter
                     // Check if intersection point of the two lines is on line segment 2
                     // means the line segments intersect, since we know it is on
                     // segment 1 as well.
-                    if( fUB >= 0f && fUB <= 1f )
+                    if (fUB >= 0f && fUB <= 1f)
                     {
                         // Check if they are coincident (no collision in this case)
-                        if( fUA != 0f && fUB != 0f )
+                        if (fUA != 0f && fUB != 0f)
                         {
                             // There is an intersection
-                            _vIntersectionPoint.X = _vA.X + fUA * fB;
-                            _vIntersectionPoint.Y = _vA.Y + fUA * fD;
+                            intersectionPoint.X = a.X + fUA * fB;
+                            intersectionPoint.Y = a.Y + fUA * fD;
 
-                            _fCoeff1 = fUA;
-                            _fCoeff2 = fUB;
+                            coeff1 = fUA;
+                            coeff2 = fUB;
 
                             return true;
                         }
