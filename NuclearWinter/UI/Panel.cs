@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+using System;
 
 namespace NuclearWinter.UI
 {
@@ -11,66 +8,69 @@ namespace NuclearWinter.UI
      * A widget that draws a box with the specified texture & corner size
      * Can also contain stuff
      */
-    public class Panel: Group
+    public class Panel : Group
     {
-        public Texture2D        Texture;
-        public int              CornerSize;
+        public Texture2D Texture;
+        public int CornerSize;
 
-        public bool             DoClipping;
+        public bool DoClipping;
 
         bool mbEnableScrolling;
-        public bool             EnableScrolling {
+        public bool EnableScrolling
+        {
             get { return mbEnableScrolling; }
-            set {
+            set
+            {
                 mbEnableScrolling = value;
                 HasDynamicHeight = mbEnableScrolling;
             }
         }
 
-        public Scrollbar        Scrollbar { get; private set; }
+        public Scrollbar Scrollbar { get; private set; }
 
-        protected Box           mMargin;
-        public Box              Margin
+        protected Box mMargin;
+        public Box Margin
         {
             get { return mMargin; }
 
-            set {
+            set
+            {
                 mMargin = value;
                 UpdateContentSize();
             }
         }
 
         //----------------------------------------------------------------------
-        public Panel( Screen _screen, Texture2D _texture, int _iCornerSize )
-        : base( _screen )
+        public Panel(Screen screen, Texture2D texture, int cornerSize)
+        : base(screen)
         {
-            Texture     = _texture;
-            CornerSize  = _iCornerSize;
-            Padding     = new Box( CornerSize );
+            Texture = texture;
+            CornerSize = cornerSize;
+            Padding = new Box(CornerSize);
 
-            Scrollbar   = new Scrollbar( _screen );
+            Scrollbar = new Scrollbar(screen);
             Scrollbar.Parent = this;
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
-            if( EnableScrolling )
+            if (EnableScrolling)
             {
-                Scrollbar.Update( _fElapsedTime );
+                Scrollbar.Update(elapsedTime);
             }
 
-            base.Update( _fElapsedTime );
+            base.Update(elapsedTime);
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
 
-            if( EnableScrolling )
+            if (EnableScrolling)
             {
-                Scrollbar.DoLayout( LayoutRect, ContentHeight );
+                Scrollbar.DoLayout(LayoutRect, ContentHeight);
             }
 
             HitBox = LayoutRect;
@@ -79,67 +79,67 @@ namespace NuclearWinter.UI
         protected override void LayoutChildren()
         {
             Rectangle childRectangle;
-            
-            if( EnableScrolling )
+
+            if (EnableScrolling)
             {
-                childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)Scrollbar.LerpOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical + Scrollbar.Max );
+                childRectangle = new Rectangle(LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top - (int)Scrollbar.LerpOffset, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical + Scrollbar.Max);
             }
             else
             {
-                childRectangle = new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical );
+                childRectangle = new Rectangle(LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical);
             }
-            
-            foreach( Widget widget in mlChildren )
+
+            foreach (Widget widget in mlChildren)
             {
-                widget.DoLayout( childRectangle );
+                widget.DoLayout(childRectangle);
             }
         }
 
-        public override Widget HitTest( Point _point )
+        public override Widget HitTest(Point point)
         {
-            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point ) ?? ( HitBox.Contains( _point ) ? this : null );
+            return Scrollbar.HitTest(point) ?? base.HitTest(point) ?? (HitBox.Contains(point) ? this : null);
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel(Point hitPoint, int delta)
         {
-            if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
-             || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
+            if ((delta < 0 && Scrollbar.Offset >= Scrollbar.Max)
+             || (delta > 0 && Scrollbar.Offset <= 0))
             {
-                base.OnMouseWheel( _hitPoint, _iDelta );
+                base.OnMouseWheel(hitPoint, delta);
                 return;
             }
 
-            DoScroll( -_iDelta * 50 / 120 );
+            DoScroll(-delta * 50 / 120);
         }
 
-        void DoScroll( int _iDelta )
+        void DoScroll(int delta)
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            int iScrollChange = (int)MathHelper.Clamp(delta, -Scrollbar.Offset, Math.Max(0, Scrollbar.Max - Scrollbar.Offset));
             Scrollbar.Offset += iScrollChange;
         }
 
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            if( Texture != null )
+            if (Texture != null)
             {
-                Screen.DrawBox( Texture, new Rectangle( LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical ), CornerSize, Color.White );
+                Screen.DrawBox(Texture, new Rectangle(LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical), CornerSize, Color.White);
             }
 
-            if( DoClipping )
+            if (DoClipping)
             {
-                Screen.PushScissorRectangle( new Rectangle( LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical ) );
+                Screen.PushScissorRectangle(new Rectangle(LayoutRect.X + Padding.Left + Margin.Left, LayoutRect.Y + Padding.Top + Margin.Top, LayoutRect.Width - Padding.Horizontal - Margin.Horizontal, LayoutRect.Height - Padding.Vertical - Margin.Vertical));
             }
 
             base.Draw();
 
-            if( DoClipping )
+            if (DoClipping)
             {
                 Screen.PopScissorRectangle();
             }
 
-            if( EnableScrolling )
+            if (EnableScrolling)
             {
                 Scrollbar.Draw();
             }
