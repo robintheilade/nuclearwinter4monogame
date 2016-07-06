@@ -1,0 +1,8 @@
+.vs
+*.user
+/NuclearSample/NuclearSample/bin
+/NuclearSample/NuclearSample/obj
+/NuclearSample/NuclearSampleContent/bin
+/NuclearSample/NuclearSampleContent/obj
+/NuclearWinter/bin
+/NuclearWinter/obj

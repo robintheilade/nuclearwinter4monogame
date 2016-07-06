@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Collections.Generic;
 using System;
-using Microsoft.Xna.Framework.Storage;
 
 namespace NuclearWinter.Storage
 {

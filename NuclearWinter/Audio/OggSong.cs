@@ -7,6 +7,7 @@ using System.IO;
  
 namespace NuclearWinter.Audio
 {
+    // TODO include when issue have been resolved: https://github.com/mono/MonoGame/issues/4700
     // Based on https://gist.github.com/nickgravelyn/5580531
     public class OggSong : IDisposable
     {
