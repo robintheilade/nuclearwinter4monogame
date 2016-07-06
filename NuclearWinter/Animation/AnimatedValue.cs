@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Microsoft.Xna.Framework;
-
-namespace NuclearWinter.Animation
+﻿namespace NuclearWinter.Animation
 {
     public enum AnimationDirection
     {
@@ -23,37 +17,39 @@ namespace NuclearWinter.Animation
     public abstract class AnimatedValue
     {
         //----------------------------------------------------------------------
-        public void SetTime( float _fTotalTime )
+        public void SetTime(float totalTime)
         {
-            Time = _fTotalTime;
+            Time = totalTime;
             UpdateDirection();
         }
 
         //----------------------------------------------------------------------
-        public void Update( float _fElapsedTime )
+        public void Update(float elapsedTime)
         {
-            if( Direction == AnimationDirection.Stopped )
+            if (Direction == AnimationDirection.Stopped)
             {
                 return;
             }
 
-            Time += ( (Direction == AnimationDirection.Forward) ? _fElapsedTime : -_fElapsedTime );
+            Time += ((Direction == AnimationDirection.Forward) ? elapsedTime : -elapsedTime);
 
             UpdateDirection();
         }
 
-        public bool IsOver {
-            get {
-                return ( Loop == AnimationLoop.NoLoop && Time >= Delay + Duration );
+        public bool IsOver
+        {
+            get
+            {
+                return (Loop == AnimationLoop.NoLoop && Time >= Delay + Duration);
             }
         }
 
         //----------------------------------------------------------------------
         void UpdateDirection()
         {
-            if( Time >= Delay + Duration )
+            if (Time >= Delay + Duration)
             {
-                switch( Loop )
+                switch (Loop)
                 {
                     case AnimationLoop.NoLoop:
                         Time = Delay + Duration;
@@ -62,16 +58,16 @@ namespace NuclearWinter.Animation
                         Time -= Delay + Duration;
                         break;
                     case AnimationLoop.LoopBackAndForth:
-                        Time = (Delay + Duration) - ( Time - (Delay + Duration) );
+                        Time = (Delay + Duration) - (Time - (Delay + Duration));
 
-                        Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
+                        Direction = (Direction == AnimationDirection.Forward) ? AnimationDirection.Backward : AnimationDirection.Forward;
                         break;
                 }
             }
             else
-            if( Time < 0 )
+            if (Time < 0)
             {
-                switch( Loop )
+                switch (Loop)
                 {
                     case AnimationLoop.NoLoop:
                         Time = 0;
@@ -81,20 +77,20 @@ namespace NuclearWinter.Animation
                         break;
                     case AnimationLoop.LoopBackAndForth:
                         Time = -Time;
-                        Direction = ( Direction == AnimationDirection.Forward ) ? AnimationDirection.Backward : AnimationDirection.Forward;
+                        Direction = (Direction == AnimationDirection.Forward) ? AnimationDirection.Backward : AnimationDirection.Forward;
                         break;
                 }
             }
         }
-        
+
         //----------------------------------------------------------------------
         public abstract float CurrentValue { get; }
 
         //----------------------------------------------------------------------
-        public AnimationDirection   Direction;
-        public float                Duration;
-        public float                Delay;
-        public float                Time;
-        public AnimationLoop        Loop;
+        public AnimationDirection Direction;
+        public float Duration;
+        public float Delay;
+        public float Time;
+        public AnimationLoop Loop;
     }
 }
