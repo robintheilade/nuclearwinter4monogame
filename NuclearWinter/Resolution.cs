@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace NuclearWinter
@@ -10,13 +9,13 @@ namespace NuclearWinter
     /// <summary>
     /// Describes a screen mode
     /// </summary>
-    public struct ScreenMode: IComparable<ScreenMode>
+    public struct ScreenMode : IComparable<ScreenMode>
     {
         //----------------------------------------------------------------------
-        public ScreenMode( int _iWidth, int _iHeight )
+        public ScreenMode(int width, int height)
         {
-            Width           = _iWidth;
-            Height          = _iHeight;
+            Width = width;
+            Height = height;
         }
 
         //----------------------------------------------------------------------
@@ -26,13 +25,13 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
-        public int CompareTo( ScreenMode _other )
+        public int CompareTo(ScreenMode other)
         {
-            int iOrder = Width.CompareTo( _other.Width );
+            int iOrder = Width.CompareTo(other.Width);
 
-            if( iOrder == 0 )
+            if (iOrder == 0)
             {
-                return Height.CompareTo( _other.Height );
+                return Height.CompareTo(other.Height);
             }
             else
             {
@@ -41,20 +40,22 @@ namespace NuclearWinter
         }
 
         //----------------------------------------------------------------------
-        public int      Width;
-        public int      Height;
+        public int Width;
+        public int Height;
 
-        public Vector2  Size
+        public Vector2 Size
         {
-            get {
-                return new Vector2( Width, Height );
+            get
+            {
+                return new Vector2(Width, Height);
             }
         }
 
         public Rectangle Rectangle
         {
-            get {
-                return new Rectangle( 0, 0, Width, Height );
+            get
+            {
+                return new Rectangle(0, 0, Width, Height);
             }
         }
     }
@@ -68,18 +69,18 @@ namespace NuclearWinter
         static Resolution()
         {
             ScaleFactor = 1f;
-            InternalMode = new ScreenMode( 1920, 1080 );
+            InternalMode = new ScreenMode(1920, 1080);
 
             SortedScreenModes = new List<ScreenMode>();
 
-            foreach( DisplayMode displayMode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes )
+            foreach (DisplayMode displayMode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
             {
-                if( displayMode.AspectRatio > 1f && displayMode.Width >= 800f && displayMode.Width <= InternalMode.Width && displayMode.Height <= InternalMode.Height )
+                if (displayMode.AspectRatio > 1f && displayMode.Width >= 800f && displayMode.Width <= InternalMode.Width && displayMode.Height <= InternalMode.Height)
                 {
-                    ScreenMode screenMode = new ScreenMode( displayMode.Width, displayMode.Height );
-                    if( ! SortedScreenModes.Contains( screenMode ) )
+                    ScreenMode screenMode = new ScreenMode(displayMode.Width, displayMode.Height);
+                    if (!SortedScreenModes.Contains(screenMode))
                     {
-                        SortedScreenModes.Add( screenMode );
+                        SortedScreenModes.Add(screenMode);
                     }
                 }
             }
@@ -89,15 +90,15 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Initialize the best Resolution available
-        public static ScreenMode Initialize( GraphicsDeviceManager _graphics )
+        public static ScreenMode Initialize(GraphicsDeviceManager graphics)
         {
-            List<ScreenMode> lReversedScreenModes = new List<ScreenMode>( SortedScreenModes );
+            List<ScreenMode> lReversedScreenModes = new List<ScreenMode>(SortedScreenModes);
             lReversedScreenModes.Reverse();
 
             int i = 0;
-            foreach( ScreenMode mode in lReversedScreenModes )
+            foreach (ScreenMode mode in lReversedScreenModes)
             {
-                if( SetScreenMode( _graphics, mode, true ) )
+                if (SetScreenMode(graphics, mode, true))
                 {
                     return mode;
                 }
@@ -105,34 +106,34 @@ namespace NuclearWinter
             }
 
             // Cannot happen
-            Debug.Assert( false );
+            Debug.Assert(false);
 
-            return new ScreenMode( 0, 0 );
+            return new ScreenMode(0, 0);
         }
 
         //----------------------------------------------------------------------
         // Initialize the Resolution using the specified ScreenMode
-        public static bool Initialize( GraphicsDeviceManager _graphics, ScreenMode _mode, bool _bFullscreen )
+        public static bool Initialize(GraphicsDeviceManager graphics, ScreenMode mode, bool fullscreen)
         {
-            InternalMode = new ScreenMode( 1920, 1080 );
-            return SetScreenMode( _graphics, _mode, _bFullscreen );
+            InternalMode = new ScreenMode(1920, 1080);
+            return SetScreenMode(graphics, mode, fullscreen);
         }
 
         //----------------------------------------------------------------------
         // Set the specified screen mode
-        public static bool SetScreenMode( GraphicsDeviceManager _graphics, ScreenMode _mode, bool _bFullscreen )
+        public static bool SetScreenMode(GraphicsDeviceManager graphics, ScreenMode mode, bool fullscreen)
         {
-            if( _bFullscreen )
+            if (fullscreen)
             {
                 // Fullscreen
-                foreach( DisplayMode displayMode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes )
+                foreach (DisplayMode displayMode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
                 {
-                    if( (_mode.Width == displayMode.Width)
-                    &&  (_mode.Height == displayMode.Height) )
+                    if ((mode.Width == displayMode.Width)
+                    && (mode.Height == displayMode.Height))
                     {
                         try
                         {
-                            ApplyScreenMode( _graphics, _mode, true );
+                            ApplyScreenMode(graphics, mode, true);
                         }
                         catch
                         {
@@ -144,10 +145,10 @@ namespace NuclearWinter
             }
             else
             {
-                if( (_mode.Width <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
-                &&  (_mode.Height <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height) )
+                if ((mode.Width <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
+                && (mode.Height <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height))
                 {
-                    ApplyScreenMode( _graphics, _mode, false );
+                    ApplyScreenMode(graphics, mode, false);
                     return true;
                 }
             }
@@ -157,40 +158,40 @@ namespace NuclearWinter
 
         //----------------------------------------------------------------------
         // Apply the specified ScreenMode
-        private static void ApplyScreenMode( GraphicsDeviceManager _graphics, ScreenMode _mode, bool _bFullscreen )
+        private static void ApplyScreenMode(GraphicsDeviceManager graphics, ScreenMode mode, bool fullscreen)
         {
-            Mode = _mode;
-            _graphics.PreferredBackBufferWidth  = Mode.Width;
-            _graphics.PreferredBackBufferHeight = Mode.Height;
-            _graphics.PreferMultiSampling       = true;
-            _graphics.IsFullScreen              = _bFullscreen;
-            _graphics.ApplyChanges();
+            Mode = mode;
+            graphics.PreferredBackBufferWidth = Mode.Width;
+            graphics.PreferredBackBufferHeight = Mode.Height;
+            graphics.PreferMultiSampling = true;
+            graphics.IsFullScreen = fullscreen;
+            graphics.ApplyChanges();
 
-            ScaleFactor = (float)( Mode.Width * 9 / 16 ) / (float)InternalMode.Height;
-            Scale = Matrix.CreateScale( ScaleFactor );
+            ScaleFactor = (float)(Mode.Width * 9 / 16) / (float)InternalMode.Height;
+            Scale = Matrix.CreateScale(ScaleFactor);
 
-            DefaultViewport = _graphics.GraphicsDevice.Viewport;
+            DefaultViewport = graphics.GraphicsDevice.Viewport;
 
-            mViewport        = new Viewport();
-            mViewport.X      = 0;
-            mViewport.Y      = (Mode.Height - (Mode.Width * 9 / 16 )) / 2;
-            mViewport.Width  = Mode.Width;
+            mViewport = new Viewport();
+            mViewport.X = 0;
+            mViewport.Y = (Mode.Height - (Mode.Width * 9 / 16)) / 2;
+            mViewport.Width = Mode.Width;
             mViewport.Height = Mode.Width * 9 / 16;
-            _graphics.GraphicsDevice.Viewport = mViewport;
+            graphics.GraphicsDevice.Viewport = mViewport;
         }
-        
+
         //----------------------------------------------------------------------
         public static List<ScreenMode> SortedScreenModes;
 
-        public static ScreenMode    Mode                { get; private set; }                   // Actual mode
-        public static ScreenMode    InternalMode        { get; private set; }                   // Internal mode
+        public static ScreenMode Mode { get; private set; }                   // Actual mode
+        public static ScreenMode InternalMode { get; private set; }                   // Internal mode
 
-        public static Viewport      DefaultViewport     { get; private set; }                   // The full viewport
+        public static Viewport DefaultViewport { get; private set; }                   // The full viewport
 
-        private static Viewport     mViewport;                                                  // The 16/9 viewport (with black borders)
-        public static Viewport      Viewport            { get { return mViewport; } }
+        private static Viewport mViewport;                                                  // The 16/9 viewport (with black borders)
+        public static Viewport Viewport { get { return mViewport; } }
 
-        public static Matrix        Scale               { get; private set; }
-        public static float         ScaleFactor         { get; private set; }
+        public static Matrix Scale { get; private set; }
+        public static float ScaleFactor { get; private set; }
     }
 }
