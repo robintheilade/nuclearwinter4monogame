@@ -1,43 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+using System;
 
 namespace NuclearWinter.UI
 {
     /*
      * A Image to be displayed
      */
-    public class Image: Widget
+    public class Image : Widget
     {
         protected bool mbStretch;
-        public bool Stretch {
+        public bool Stretch
+        {
             get { return mbStretch; }
             set { mbStretch = value; }
         }
 
         public Color Color = Color.White;
 
-        public Action<Image>    ClickHandler;
-        public Action<Image>    MouseEnterHandler;
-        public Action<Image>    MouseOutHandler;
-        public Action<Image>    MouseDownHandler;
-        public Action<Image,float>  UpdateHandler;
+        public Action<Image> ClickHandler;
+        public Action<Image> MouseEnterHandler;
+        public Action<Image> MouseOutHandler;
+        public Action<Image> MouseDownHandler;
+        public Action<Image, float> UpdateHandler;
 
         //----------------------------------------------------------------------
         protected Texture2D mTexture;
-        public Texture2D    Texture {
+        public Texture2D Texture
+        {
             get { return mTexture; }
-            set {
+            set
+            {
                 mTexture = value;
                 UpdateContentSize();
             }
         }
 
         //----------------------------------------------------------------------
-        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        public override Widget GetFirstFocusableDescendant(Direction direction)
         {
             return null;
         }
@@ -47,83 +47,83 @@ namespace NuclearWinter.UI
         {
             int iWidth = mTexture != null ? mTexture.Width : 0;
             int iHeight = mTexture != null ? mTexture.Height : 0;
-            
-            ContentWidth    = iWidth + Padding.Horizontal;
-            ContentHeight   = iHeight + Padding.Vertical;
+
+            ContentWidth = iWidth + Padding.Horizontal;
+            ContentHeight = iHeight + Padding.Vertical;
 
             base.UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        public Image( Screen _screen, Texture2D _texture = null, bool _bStretch = false )
-        : base( _screen )
+        public Image(Screen screen, Texture2D texture = null, bool stretch = false)
+        : base(screen)
         {
-            mTexture = _texture;
-            mbStretch = _bStretch;
+            mTexture = texture;
+            mbStretch = stretch;
             UpdateContentSize();
         }
 
         //----------------------------------------------------------------------
-        public override Widget HitTest( Point _point )
+        public override Widget HitTest(Point point)
         {
-            return ClickHandler != null ? base.HitTest( _point ) : null;
+            return ClickHandler != null ? base.HitTest(point) : null;
         }
 
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter(Point hitPoint)
         {
-            if( ClickHandler != null )
+            if (ClickHandler != null)
             {
-                Screen.Game.SetCursor( MouseCursor.Hand );
+                Screen.Game.SetCursor(MouseCursor.Hand);
             }
 
-            if( MouseEnterHandler != null ) MouseEnterHandler( this );
+            if (MouseEnterHandler != null) MouseEnterHandler(this);
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
-            if( ClickHandler != null )
+            if (ClickHandler != null)
             {
-                Screen.Game.SetCursor( MouseCursor.Default );
+                Screen.Game.SetCursor(MouseCursor.Default);
             }
 
-            if( MouseOutHandler != null ) MouseOutHandler( this );
+            if (MouseOutHandler != null) MouseOutHandler(this);
         }
 
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown(Point hitPoint, int button)
         {
-            if( MouseDownHandler != null )
+            if (MouseDownHandler != null)
             {
-                MouseDownHandler( this );
+                MouseDownHandler(this);
                 return true;
             }
 
             return ClickHandler != null;
         }
 
-        protected internal override void OnMouseUp(Point _hitPoint, int _iButton)
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return;
 
-            if( ClickHandler != null )
+            if (ClickHandler != null)
             {
-                ClickHandler( this );
+                ClickHandler(this);
             }
         }
 
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
-            if( UpdateHandler != null )
+            if (UpdateHandler != null)
             {
-                UpdateHandler( this, _fElapsedTime );
+                UpdateHandler(this, elapsedTime);
             }
 
-            base.Update( _fElapsedTime );
+            base.Update(elapsedTime);
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
 
             Point pCenter = LayoutRect.Center;
 
@@ -138,15 +138,15 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            if( mTexture == null ) return;
+            if (mTexture == null) return;
 
-            if( ! mbStretch )
+            if (!mbStretch)
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Vector2( LayoutRect.Center.X - ContentWidth / 2 + Padding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top ), Color );
+                Screen.Game.SpriteBatch.Draw(mTexture, new Vector2(LayoutRect.Center.X - ContentWidth / 2 + Padding.Left, LayoutRect.Center.Y - ContentHeight / 2 + Padding.Top), Color);
             }
             else
             {
-                Screen.Game.SpriteBatch.Draw( mTexture, new Rectangle( LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical ), Color );
+                Screen.Game.SpriteBatch.Draw(mTexture, new Rectangle(LayoutRect.X + Padding.Left, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal, LayoutRect.Height - Padding.Vertical), Color);
             }
         }
     }
