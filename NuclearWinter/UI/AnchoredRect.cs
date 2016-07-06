@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 using Microsoft.Xna.Framework;
 
 namespace NuclearWinter.UI
@@ -36,82 +32,82 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public AnchoredRect( int? _iLeft, int? _iTop, int? _iRight, int? _iBottom, int _iWidth, int _iHeight )
+        public AnchoredRect( int? left, int? top, int? right, int? bottom, int width, int height )
         {
-            Left    = _iLeft;
-            Top     = _iTop;
+            Left    = left;
+            Top     = top;
 
-            Right   = _iRight;
-            Bottom  = _iBottom;
+            Right   = right;
+            Bottom  = bottom;
 
-            Width   = _iWidth;
-            Height  = _iHeight;
+            Width   = width;
+            Height  = height;
         }
 
         //----------------------------------------------------------------------
-        public static AnchoredRect CreateFixed( int _iLeft, int _iTop, int _iWidth, int _iHeight )
+        public static AnchoredRect CreateFixed( int left, int top, int width, int height )
         {
-            return new AnchoredRect( _iLeft, _iTop, null, null, _iWidth, _iHeight );
+            return new AnchoredRect( left, top, null, null, width, height );
         }
 
-        public static AnchoredRect CreateFixed( Rectangle _rect )
+        public static AnchoredRect CreateFixed( Rectangle rectangle )
         {
-            return new AnchoredRect( _rect.Left, _rect.Top, null, null, _rect.Width, _rect.Height );
+            return new AnchoredRect( rectangle.Left, rectangle.Top, null, null, rectangle.Width, rectangle.Height );
         }
 
-        public static AnchoredRect CreateFull( int _iValue )
+        public static AnchoredRect CreateFull( int value )
         {
-            return new AnchoredRect( _iValue, _iValue, _iValue, _iValue, 0, 0 );
+            return new AnchoredRect( value, value, value, value, 0, 0 );
         }
 
-        public static AnchoredRect CreateFull( int _iLeft, int _iTop, int _iRight, int _iBottom )
+        public static AnchoredRect CreateFull( int left, int top, int right, int bottom )
         {
-            return new AnchoredRect( _iLeft, _iTop, _iRight, _iBottom, 0, 0 );
+            return new AnchoredRect( left, top, right, bottom, 0, 0 );
         }
 
-        public static AnchoredRect CreateLeftAnchored( int _iLeft, int _iTop, int _iBottom, int _iWidth )
+        public static AnchoredRect CreateLeftAnchored( int left, int top, int bottom, int width )
         {
-            return new AnchoredRect( _iLeft, _iTop, null, _iBottom, _iWidth, 0 );
+            return new AnchoredRect( left, top, null, bottom, width, 0 );
         }
 
-        public static AnchoredRect CreateRightAnchored( int _iRight, int _iTop, int _iBottom, int _iWidth )
+        public static AnchoredRect CreateRightAnchored( int right, int top, int bottom, int width )
         {
-            return new AnchoredRect( null, _iTop, _iRight, _iBottom, _iWidth, 0 );
+            return new AnchoredRect( null, top, right, bottom, width, 0 );
         }
 
-        public static AnchoredRect CreateTopAnchored( int _iLeft, int _iTop, int _iRight, int _iHeight )
+        public static AnchoredRect CreateTopAnchored( int left, int top, int right, int height )
         {
-            return new AnchoredRect( _iLeft, _iTop, _iRight, null, 0, _iHeight );
+            return new AnchoredRect( left, top, right, null, 0, height );
         }
 
-        public static AnchoredRect CreateBottomAnchored( int _iLeft, int _iBottom, int _iRight, int _iHeight )
+        public static AnchoredRect CreateBottomAnchored( int left, int bottom, int right, int height )
         {
-            return new AnchoredRect( _iLeft, null, _iRight, _iBottom, 0, _iHeight );
+            return new AnchoredRect( left, null, right, bottom, 0, height );
         }
 
-        public static AnchoredRect CreateBottomLeftAnchored( int _iLeft, int _iBottom, int _iWidth, int _iHeight )
+        public static AnchoredRect CreateBottomLeftAnchored( int left, int bottom, int width, int height )
         {
-            return new AnchoredRect( _iLeft, null, null, _iBottom, _iWidth, _iHeight );
+            return new AnchoredRect( left, null, null, bottom, width, height );
         }
 
-        public static AnchoredRect CreateBottomRightAnchored( int _iRight, int _iBottom, int _iWidth, int _iHeight )
+        public static AnchoredRect CreateBottomRightAnchored( int right, int bottom, int width, int height )
         {
-            return new AnchoredRect( null, null, _iRight, _iBottom, _iWidth, _iHeight );
+            return new AnchoredRect( null, null, right, bottom, width, height );
         }
 
-        public static AnchoredRect CreateTopRightAnchored( int _iRight, int _iTop, int _iWidth, int _iHeight )
+        public static AnchoredRect CreateTopRightAnchored( int right, int top, int width, int height )
         {
-            return new AnchoredRect( null, _iTop, _iRight, null, _iWidth, _iHeight );
+            return new AnchoredRect( null, top, right, null, width, height );
         }
 
-        public static AnchoredRect CreateTopLeftAnchored( int _iLeft, int _iTop, int _iWidth, int _iHeight )
+        public static AnchoredRect CreateTopLeftAnchored( int left, int top, int width, int height )
         {
-            return new AnchoredRect( _iLeft, _iTop, null, null, _iWidth, _iHeight );
+            return new AnchoredRect( left, top, null, null, width, height );
         }
 
-        public static AnchoredRect CreateCentered( int _iWidth, int _iHeight )
+        public static AnchoredRect CreateCentered( int width, int height )
         {
-            return new AnchoredRect( null, null, null, null, _iWidth, _iHeight );
+            return new AnchoredRect( null, null, null, null, width, height );
         }
     }
 }
