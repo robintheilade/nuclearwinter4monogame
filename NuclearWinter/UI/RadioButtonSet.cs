@@ -1,156 +1,157 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using NuclearWinter.Animation;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace NuclearWinter.UI
 {
-    public class RadioButtonSet: Widget
+    public class RadioButtonSet : Widget
     {
         //----------------------------------------------------------------------
         public struct RadioButtonSetStyle
         {
             //------------------------------------------------------------------
-            public int                      CornerSize;
-            public int                      FrameOffset;
+            public int CornerSize;
+            public int FrameOffset;
 
-            public Color                    TextColor;
-            public Color                    TextDownColor;
+            public Color TextColor;
+            public Color TextDownColor;
 
-            public Texture2D                ButtonFrameLeft;
-            public Texture2D                ButtonFrameMiddle;
-            public Texture2D                ButtonFrameRight;
+            public Texture2D ButtonFrameLeft;
+            public Texture2D ButtonFrameMiddle;
+            public Texture2D ButtonFrameRight;
 
-            public Texture2D                ButtonDownFrameLeft;
-            public Texture2D                ButtonDownFrameMiddle;
-            public Texture2D                ButtonDownFrameRight;
+            public Texture2D ButtonDownFrameLeft;
+            public Texture2D ButtonDownFrameMiddle;
+            public Texture2D ButtonDownFrameRight;
 
             //------------------------------------------------------------------
             public RadioButtonSetStyle(
-                int         _iCornerSize,
-                int         _iFrameOffset,
+                int cornerSize,
+                int frameOffset,
 
-                Color       _textColor,
-                Color       _textDownColor,
+                Color textColor,
+                Color textDownColor,
 
-                Texture2D   _buttonFrameLeft,
-                Texture2D   _buttonFrameMiddle,
-                Texture2D   _buttonFrameRight,
+                Texture2D buttonFrameLeft,
+                Texture2D buttonFrameMiddle,
+                Texture2D buttonFrameRight,
 
-                Texture2D   _ButtonDownFrameLeft,
-                Texture2D   _ButtonDownFrameMiddle,
-                Texture2D   _ButtonDownFrameRight
+                Texture2D buttonDownFrameLeft,
+                Texture2D buttonDownFrameMiddle,
+                Texture2D buttonDownFrameRight
             )
             {
-                CornerSize              = _iCornerSize;
-                FrameOffset             = _iFrameOffset;
+                CornerSize = cornerSize;
+                FrameOffset = frameOffset;
 
-                TextColor               = _textColor;
-                TextDownColor           = _textDownColor;
+                TextColor = textColor;
+                TextDownColor = textDownColor;
 
-                ButtonFrameLeft         = _buttonFrameLeft;
-                ButtonFrameMiddle       = _buttonFrameMiddle;
-                ButtonFrameRight        = _buttonFrameRight;
+                ButtonFrameLeft = buttonFrameLeft;
+                ButtonFrameMiddle = buttonFrameMiddle;
+                ButtonFrameRight = buttonFrameRight;
 
-                ButtonDownFrameLeft     = _ButtonDownFrameLeft;
-                ButtonDownFrameMiddle   = _ButtonDownFrameMiddle;
-                ButtonDownFrameRight    = _ButtonDownFrameRight;
-           }
+                ButtonDownFrameLeft = buttonDownFrameLeft;
+                ButtonDownFrameMiddle = buttonDownFrameMiddle;
+                ButtonDownFrameRight = buttonDownFrameRight;
+            }
         }
 
         //----------------------------------------------------------------------
-        List<Button>                    mlButtons;
-        public IList<Button>            Buttons { get { return mlButtons.AsReadOnly(); } }
+        List<Button> mlButtons;
+        public IList<Button> Buttons { get { return mlButtons.AsReadOnly(); } }
 
-        int                             miHoveredButton;
-        bool                            mbIsPressed;
+        int miHoveredButton;
+        bool mbIsPressed;
 
-        RadioButtonSetStyle             mStyle;
+        RadioButtonSetStyle mStyle;
         public RadioButtonSetStyle Style
         {
             get { return mStyle; }
-            set {
+            set
+            {
                 mStyle = value;
 
                 int i = 0;
-                foreach( Button button in mlButtons )
+                foreach (Button button in mlButtons)
                 {
                     button.Parent = this;
-                    button.TextColor = ( SelectedButtonIndex == i ) ? mStyle.TextDownColor : mStyle.TextColor;
-                    button.Padding = new Box( 0, mStyle.FrameOffset );
-                    button.Margin = new Box( 0, -mStyle.FrameOffset );
+                    button.TextColor = (SelectedButtonIndex == i) ? mStyle.TextDownColor : mStyle.TextColor;
+                    button.Padding = new Box(0, mStyle.FrameOffset);
+                    button.Margin = new Box(0, -mStyle.FrameOffset);
 
-                    button.Style.DownFrame  = Style.ButtonDownFrameMiddle;
-                    button.ClickHandler     = ButtonClicked;
+                    button.Style.DownFrame = Style.ButtonDownFrameMiddle;
+                    button.ClickHandler = ButtonClicked;
 
                     i++;
                 }
 
                 Button firstButton = mlButtons.First();
                 firstButton.Style.DownFrame = Style.ButtonDownFrameLeft;
-                firstButton.Margin = new Box( 0, -mStyle.FrameOffset, 0, 0 );
+                firstButton.Margin = new Box(0, -mStyle.FrameOffset, 0, 0);
 
                 Button lastButton = mlButtons.Last();
                 lastButton.Style.DownFrame = Style.ButtonDownFrameRight;
-                lastButton.Margin = new Box( 0, 0, 0, -mStyle.FrameOffset );
+                lastButton.Margin = new Box(0, 0, 0, -mStyle.FrameOffset);
             }
         }
 
         public bool Expand;
 
-        public Action<RadioButtonSet,int>   ClickHandler;
-        int                                 miSelectedButtonIndex = 0;
-        public int                          SelectedButtonIndex
+        public Action<RadioButtonSet, int> ClickHandler;
+        int miSelectedButtonIndex = 0;
+        public int SelectedButtonIndex
         {
-            get {
+            get
+            {
                 return miSelectedButtonIndex;
             }
 
-            set {
+            set
+            {
                 miSelectedButtonIndex = value;
 
-                for( int iButton = 0; iButton < mlButtons.Count; iButton++ )
+                for (int iButton = 0; iButton < mlButtons.Count; iButton++)
                 {
                     Button button = mlButtons[iButton];
 
-                    button.Style.CornerSize     = Style.CornerSize;
+                    button.Style.CornerSize = Style.CornerSize;
 
-                    if( iButton == miSelectedButtonIndex )
+                    if (iButton == miSelectedButtonIndex)
                     {
-                        button.TextColor            = mStyle.TextDownColor;
-                        if( iButton == 0 )
+                        button.TextColor = mStyle.TextDownColor;
+                        if (iButton == 0)
                         {
-                            button.Style.Frame          = Style.ButtonDownFrameLeft;
+                            button.Style.Frame = Style.ButtonDownFrameLeft;
                         }
                         else
-                        if( iButton == mlButtons.Count - 1 )
+                        if (iButton == mlButtons.Count - 1)
                         {
-                            button.Style.Frame          = Style.ButtonDownFrameRight;
+                            button.Style.Frame = Style.ButtonDownFrameRight;
                         }
                         else
                         {
-                            button.Style.Frame          = Style.ButtonDownFrameMiddle;
+                            button.Style.Frame = Style.ButtonDownFrameMiddle;
                         }
                     }
                     else
                     {
-                        button.TextColor            = mStyle.TextColor;
+                        button.TextColor = mStyle.TextColor;
 
-                        if( iButton == 0 )
+                        if (iButton == 0)
                         {
-                            button.Style.Frame          = Style.ButtonFrameLeft;
+                            button.Style.Frame = Style.ButtonFrameLeft;
                         }
                         else
-                        if( iButton == mlButtons.Count - 1 )
+                        if (iButton == mlButtons.Count - 1)
                         {
-                            button.Style.Frame          = Style.ButtonFrameRight;
+                            button.Style.Frame = Style.ButtonFrameRight;
                         }
                         else
                         {
-                            button.Style.Frame          = Style.ButtonFrameMiddle;
+                            button.Style.Frame = Style.ButtonFrameMiddle;
                         }
                     }
                 }
@@ -159,55 +160,55 @@ namespace NuclearWinter.UI
 
         public Button SelectedButton
         {
-            get { return mlButtons[ miSelectedButtonIndex ]; }
+            get { return mlButtons[miSelectedButtonIndex]; }
         }
 
         //----------------------------------------------------------------------
-        public override Widget GetFirstFocusableDescendant( Direction _direction )
+        public override Widget GetFirstFocusableDescendant(Direction direction)
         {
-            switch( _direction )
+            switch (direction)
             {
                 case Direction.Left:
-                    return mlButtons[ mlButtons.Count - 1 ];
+                    return mlButtons[mlButtons.Count - 1];
                 default:
-                    return mlButtons[ 0 ];
+                    return mlButtons[0];
             }
         }
 
         //----------------------------------------------------------------------
-        public override Widget GetSibling( Direction _direction, Widget _child )
+        public override Widget GetSibling(Direction direction, Widget child)
         {
-            int iIndex = mlButtons.IndexOf( (Button)_child );
+            int iIndex = mlButtons.IndexOf((Button)child);
 
-            switch( _direction )
+            switch (direction)
             {
                 case Direction.Left:
-                    if( iIndex > 0 )
+                    if (iIndex > 0)
                     {
                         return mlButtons[iIndex - 1];
                     }
                     break;
                 case Direction.Right:
-                    if( iIndex < mlButtons.Count - 1 )
+                    if (iIndex < mlButtons.Count - 1)
                     {
                         return mlButtons[iIndex + 1];
                     }
                     break;
             }
 
-            return base.GetSibling( _direction, this );
+            return base.GetSibling(direction, this);
         }
 
         //----------------------------------------------------------------------
-        public RadioButtonSet( Screen _screen, List<Button> _lButtons, int _iInitialButtonIndex, bool _bExpand = false )
-        : base( _screen )
+        public RadioButtonSet(Screen screen, List<Button> buttons, int initialButtonIndex, bool expand = false)
+        : base(screen)
         {
-            mlButtons = _lButtons;
+            mlButtons = buttons;
 
             Style = new RadioButtonSetStyle(
                 Screen.Style.RadioButtonCornerSize,
                 Screen.Style.RadioButtonFrameOffset,
-                
+
                 Color.White * 0.6f,
                 Color.White,
                 Screen.Style.ButtonFrameLeft,
@@ -219,44 +220,44 @@ namespace NuclearWinter.UI
                 Screen.Style.ButtonDownFrameRight
             );
 
-            SelectedButtonIndex = _iInitialButtonIndex;
-            Expand = _bExpand;
+            SelectedButtonIndex = initialButtonIndex;
+            Expand = expand;
 
             UpdateContentSize();
         }
 
-        public RadioButtonSet( Screen _screen, List<Button> _lButtons, bool _bExpand = false )
-        : this( _screen, _lButtons, 0, _bExpand )
+        public RadioButtonSet(Screen screen, List<Button> buttons, bool expand = false)
+        : this(screen, buttons, 0, expand)
         {
         }
 
         //----------------------------------------------------------------------
-        public RadioButtonSet( Screen _screen, RadioButtonSetStyle _style, List<Button> _lButtons, int _iInitialButtonIndex )
-        : base( _screen )
+        public RadioButtonSet(Screen screen, RadioButtonSetStyle style, List<Button> buttons, int initialButtonIndex)
+        : base(screen)
         {
-            mlButtons = _lButtons;
+            mlButtons = buttons;
 
-            Style = _style;
+            Style = style;
 
-            SelectedButtonIndex = _iInitialButtonIndex;
+            SelectedButtonIndex = initialButtonIndex;
 
             UpdateContentSize();
         }
 
-        public RadioButtonSet( Screen _screen, RadioButtonSetStyle _style, List<Button> _lButtons )
-        : this( _screen, _style, _lButtons, 0 )
+        public RadioButtonSet(Screen screen, RadioButtonSetStyle style, List<Button> buttons)
+        : this(screen, style, buttons, 0)
         {
         }
 
         //----------------------------------------------------------------------
         protected internal override void UpdateContentSize()
         {
-            ContentWidth    = Padding.Horizontal;
-            ContentHeight   = 0;
-            foreach( Button button in mlButtons )
+            ContentWidth = Padding.Horizontal;
+            ContentHeight = 0;
+            foreach (Button button in mlButtons)
             {
                 ContentWidth += button.ContentWidth;
-                ContentHeight = Math.Max( ContentHeight, button.ContentHeight );
+                ContentHeight = Math.Max(ContentHeight, button.ContentHeight);
             }
 
             ContentHeight += Padding.Vertical;
@@ -265,16 +266,16 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
 
             Point pCenter = LayoutRect.Center;
 
             int iHeight = LayoutRect.Height;
 
             HitBox = new Rectangle(
-                pCenter.X - ( Expand ? LayoutRect.Width : ContentWidth ) / 2,
+                pCenter.X - (Expand ? LayoutRect.Width : ContentWidth) / 2,
                 pCenter.Y - iHeight / 2,
                 Expand ? LayoutRect.Width : ContentWidth,
                 iHeight
@@ -287,19 +288,19 @@ namespace NuclearWinter.UI
 
             float fOffset = 0f;
 
-            foreach( Button button in mlButtons )
+            foreach (Button button in mlButtons)
             {
                 int iWidth = button.ContentWidth;
 
-                if( Expand )
+                if (Expand)
                 {
-                    if( iButton < mlButtons.Count - 1 )
+                    if (iButton < mlButtons.Count - 1)
                     {
-                        iWidth = (int)Math.Floor( fExpandedButtonWidth + fOffset - Math.Floor( fOffset ) );
+                        iWidth = (int)Math.Floor(fExpandedButtonWidth + fOffset - Math.Floor(fOffset));
                     }
                     else
                     {
-                        iWidth = (int)( LayoutRect.Width - Math.Floor( fOffset ) );
+                        iWidth = (int)(LayoutRect.Width - Math.Floor(fOffset));
                     }
                     fOffset += fExpandedButtonWidth;
                 }
@@ -308,67 +309,67 @@ namespace NuclearWinter.UI
                     fOffset += iWidth;
                 }
 
-                button.DoLayout( new Rectangle(
+                button.DoLayout(new Rectangle(
                     HitBox.X + iButtonX, pCenter.Y - iHeight / 2,
                     iWidth, iHeight
-                ) );
+                ));
 
                 iButtonX += iWidth;
                 iButton++;
             }
         }
 
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
-            foreach( Button button in mlButtons )
+            foreach (Button button in mlButtons)
             {
-                button.Update( _fElapsedTime );
+                button.Update(elapsedTime);
             }
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter(Point hitPoint)
         {
-            base.OnMouseEnter( _hitPoint );
-            UpdateHoveredButton( _hitPoint );
+            base.OnMouseEnter(hitPoint);
+            UpdateHoveredButton(hitPoint);
 
-            mlButtons[miHoveredButton].OnMouseEnter( _hitPoint );
+            mlButtons[miHoveredButton].OnMouseEnter(hitPoint);
         }
 
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
-            base.OnMouseOut( _hitPoint );
+            base.OnMouseOut(hitPoint);
 
-            mlButtons[miHoveredButton].OnMouseOut( _hitPoint );
+            mlButtons[miHoveredButton].OnMouseOut(hitPoint);
         }
 
-        public override void OnMouseMove(Point _hitPoint)
+        public override void OnMouseMove(Point hitPoint)
         {
-            base.OnMouseMove(_hitPoint);
+            base.OnMouseMove(hitPoint);
 
-            if( ! mbIsPressed )
+            if (!mbIsPressed)
             {
                 int iPreviousHoveredButton = miHoveredButton;
-                UpdateHoveredButton( _hitPoint );
+                UpdateHoveredButton(hitPoint);
 
-                if( iPreviousHoveredButton != miHoveredButton )
+                if (iPreviousHoveredButton != miHoveredButton)
                 {
-                    mlButtons[iPreviousHoveredButton].OnMouseOut( _hitPoint );
+                    mlButtons[iPreviousHoveredButton].OnMouseOut(hitPoint);
                 }
-                mlButtons[miHoveredButton].OnMouseEnter( _hitPoint );
+                mlButtons[miHoveredButton].OnMouseEnter(hitPoint);
             }
             else
             {
-                mlButtons[miHoveredButton].OnMouseMove( _hitPoint );
+                mlButtons[miHoveredButton].OnMouseMove(hitPoint);
             }
         }
 
-        void UpdateHoveredButton( Point _hitPoint )
+        void UpdateHoveredButton(Point hitPoint)
         {
             int iButton = 0;
-            foreach( Button button in mlButtons )
+            foreach (Button button in mlButtons)
             {
-                if( button.HitTest( _hitPoint ) != null )
+                if (button.HitTest(hitPoint) != null)
                 {
                     miHoveredButton = iButton;
                     break;
@@ -379,30 +380,30 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return false;
 
             mbIsPressed = true;
-            mlButtons[miHoveredButton].OnMouseDown( _hitPoint, _iButton );
+            mlButtons[miHoveredButton].OnMouseDown(hitPoint, button);
 
             return true;
         }
 
-        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return;
 
             mbIsPressed = false;
-            mlButtons[miHoveredButton].OnMouseUp( _hitPoint, _iButton );
+            mlButtons[miHoveredButton].OnMouseUp(hitPoint, button);
         }
 
-        internal void ButtonClicked( Button _button )
+        internal void ButtonClicked(Button button)
         {
-            int iSelectedButtonIndex = mlButtons.IndexOf( _button );
-            if( ClickHandler != null )
+            int iSelectedButtonIndex = mlButtons.IndexOf(button);
+            if (ClickHandler != null)
             {
-                ClickHandler( this, iSelectedButtonIndex );
+                ClickHandler(this, iSelectedButtonIndex);
             }
             SelectedButtonIndex = iSelectedButtonIndex;
         }
@@ -410,7 +411,7 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            foreach( Button button in mlButtons )
+            foreach (Button button in mlButtons)
             {
                 button.Draw();
             }
@@ -418,7 +419,7 @@ namespace NuclearWinter.UI
 
         protected internal override void DrawHovered()
         {
-            mlButtons[ miHoveredButton ].DrawHovered();
+            mlButtons[miHoveredButton].DrawHovered();
         }
     }
 }
