@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace NuclearWinter.UI
 {
@@ -19,7 +16,7 @@ namespace NuclearWinter.UI
         Down,
         Left,
         Up
-    
+
     }
 
     public enum Orientation
@@ -50,41 +47,41 @@ namespace NuclearWinter.UI
     public class UIFont
     {
         //----------------------------------------------------------------------
-        SpriteFont      mSpriteFont;
-        public int      YOffset;
+        SpriteFont mSpriteFont;
+        public int YOffset;
 
-        public ReadOnlyCollection<char> Characters                          { get { return mSpriteFont.Characters; } }
-        public char?                    DefaultCharacter                    { get { return mSpriteFont.DefaultCharacter; } set { mSpriteFont.DefaultCharacter = value; } }
-        public int                      LineSpacing                         { get { return mSpriteFont.LineSpacing; } set { mSpriteFont.LineSpacing = value; } }
-        public float                    Spacing                             { get { return mSpriteFont.Spacing; } set { mSpriteFont.Spacing = value; } }
+        public ReadOnlyCollection<char> Characters { get { return mSpriteFont.Characters; } }
+        public char? DefaultCharacter { get { return mSpriteFont.DefaultCharacter; } set { mSpriteFont.DefaultCharacter = value; } }
+        public int LineSpacing { get { return mSpriteFont.LineSpacing; } set { mSpriteFont.LineSpacing = value; } }
+        public float Spacing { get { return mSpriteFont.Spacing; } set { mSpriteFont.Spacing = value; } }
 
-        public Vector2 MeasureString( string _text )
+        public Vector2 MeasureString(string text)
         {
-            return mSpriteFont.MeasureString( _text );
+            return mSpriteFont.MeasureString(text);
         }
 
-        public Vector2 MeasureString( StringBuilder _text )
+        public Vector2 MeasureString(StringBuilder text)
         {
-            return mSpriteFont.MeasureString( _text );
-        }
-
-        //----------------------------------------------------------------------
-        public static implicit operator SpriteFont( UIFont _instance )
-        {
-            return _instance.mSpriteFont;
+            return mSpriteFont.MeasureString(text);
         }
 
         //----------------------------------------------------------------------
-        public UIFont( SpriteFont _font, int _iLineSpacing, int _iYOffset )
+        public static implicit operator SpriteFont(UIFont instance)
         {
-            mSpriteFont = _font;
-            mSpriteFont.LineSpacing = _iLineSpacing;
-            YOffset     = _iYOffset;
+            return instance.mSpriteFont;
         }
 
         //----------------------------------------------------------------------
-        public UIFont( SpriteFont _font )
-        : this( _font, _font.LineSpacing, 0 )
+        public UIFont(SpriteFont font, int lineSpacing, int yOffset)
+        {
+            mSpriteFont = font;
+            mSpriteFont.LineSpacing = lineSpacing;
+            YOffset = yOffset;
+        }
+
+        //----------------------------------------------------------------------
+        public UIFont(SpriteFont font)
+        : this(font, font.LineSpacing, 0)
         {
         }
     }
