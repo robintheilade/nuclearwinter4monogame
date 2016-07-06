@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
 
 #if !FNA
 using OSKey = System.Windows.Forms.Keys;
@@ -21,8 +19,8 @@ namespace NuclearWinter.UI
             get { return miStartOffset; }
             set
             {
-                miStartOffset   = (int)MathHelper.Clamp( value, 0, TextArea.Text.Length );
-                EndOffset       = StartOffset;
+                miStartOffset = (int)MathHelper.Clamp(value, 0, TextArea.Text.Length);
+                EndOffset = StartOffset;
                 Timer = 0f;
             }
         }
@@ -32,7 +30,7 @@ namespace NuclearWinter.UI
             get { return miEndOffset; }
             set
             {
-                miEndOffset = (int)MathHelper.Clamp( value, 0, TextArea.Text.Length );
+                miEndOffset = (int)MathHelper.Clamp(value, 0, TextArea.Text.Length);
             }
         }
 
@@ -44,133 +42,135 @@ namespace NuclearWinter.UI
 
         public bool HasBackwardSelection
         {
-            get {
+            get
+            {
                 return EndOffset < StartOffset;
             }
         }
 
         public bool HasForwardSelection
         {
-            get {
+            get
+            {
                 return EndOffset > StartOffset;
             }
         }
 
         //----------------------------------------------------------------------
-        public TextArea         TextArea { get; private set; }
+        public TextArea TextArea { get; private set; }
 
-        internal float          Timer;
-
-        //----------------------------------------------------------------------
-        int                     miStartOffset;
-        int                     miEndOffset;
+        internal float Timer;
 
         //----------------------------------------------------------------------
-        public TextCaret( TextArea _textArea )
+        int miStartOffset;
+        int miEndOffset;
+
+        //----------------------------------------------------------------------
+        public TextCaret(TextArea textArea)
         {
-            TextArea = _textArea;
+            TextArea = textArea;
         }
 
         //----------------------------------------------------------------------
-        internal virtual void Update( float _fElapsedTime )
+        internal virtual void Update(float elapsedTime)
         {
-            Timer = TextArea.HasFocus ? ( Timer + _fElapsedTime ) : 0f;
+            Timer = TextArea.HasFocus ? (Timer + elapsedTime) : 0f;
         }
 
         //----------------------------------------------------------------------
-        protected void DrawSelection( Rectangle _rect, Color _color )
+        protected void DrawSelection(Rectangle rectangle, Color color)
         {
-            if( HasSelection )
+            if (HasSelection)
             {
-                Point origin = new Point( _rect.X, _rect.Y - (int)TextArea.Scrollbar.LerpOffset );
+                Point origin = new Point(rectangle.X, rectangle.Y - (int)TextArea.Scrollbar.LerpOffset);
 
                 //--------------------------------------------------------------
                 // Start
-                int iStartOffset        = HasForwardSelection ? StartOffset: EndOffset;
+                int iStartOffset = HasForwardSelection ? StartOffset : EndOffset;
 
                 int iStartBlockLine;
-                Point startPos = TextArea.GetXYForCaretOffset( iStartOffset, out iStartBlockLine );
+                Point startPos = TextArea.GetXYForCaretOffset(iStartOffset, out iStartBlockLine);
 
                 int iStartCaretHeight = TextArea.LineHeight;
 
                 //--------------------------------------------------------------
                 // End
-                int iEndOffset          = HasForwardSelection ? EndOffset: StartOffset;
+                int iEndOffset = HasForwardSelection ? EndOffset : StartOffset;
 
                 int iEndBlockLine;
-                Point endPos = TextArea.GetXYForCaretOffset( iEndOffset, out iEndBlockLine );
+                Point endPos = TextArea.GetXYForCaretOffset(iEndOffset, out iEndBlockLine);
 
                 //--------------------------------------------------------------
-                if( iStartBlockLine == iEndBlockLine )
+                if (iStartBlockLine == iEndBlockLine)
                 {
-                    Rectangle selectionRectangle = new Rectangle( startPos.X, startPos.Y, endPos.X - startPos.X, iStartCaretHeight );
-                    selectionRectangle.Offset( origin );
-                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, _color );
+                    Rectangle selectionRectangle = new Rectangle(startPos.X, startPos.Y, endPos.X - startPos.X, iStartCaretHeight);
+                    selectionRectangle.Offset(origin);
+                    TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, selectionRectangle, color);
                 }
                 else
                 {
-                    Rectangle startSelectionRectangle = new Rectangle( startPos.X, startPos.Y, _rect.Width - startPos.X, iStartCaretHeight );
-                    startSelectionRectangle.Offset( origin );
-                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, startSelectionRectangle, _color );
+                    Rectangle startSelectionRectangle = new Rectangle(startPos.X, startPos.Y, rectangle.Width - startPos.X, iStartCaretHeight);
+                    startSelectionRectangle.Offset(origin);
+                    TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, startSelectionRectangle, color);
 
-                    if( iEndBlockLine > iStartBlockLine + 1 )
+                    if (iEndBlockLine > iStartBlockLine + 1)
                     {
-                        Rectangle selectionRectangle = new Rectangle( 0, startPos.Y + iStartCaretHeight, _rect.Width, iStartCaretHeight * ( iEndBlockLine - iStartBlockLine - 1 ) );
-                        selectionRectangle.Offset( origin );
-                        TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, selectionRectangle, _color );
+                        Rectangle selectionRectangle = new Rectangle(0, startPos.Y + iStartCaretHeight, rectangle.Width, iStartCaretHeight * (iEndBlockLine - iStartBlockLine - 1));
+                        selectionRectangle.Offset(origin);
+                        TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, selectionRectangle, color);
                     }
 
                     int iEndCaretHeight = TextArea.LineHeight;
 
-                    Rectangle endSelectionRectangle = new Rectangle( 0, endPos.Y, endPos.X, iEndCaretHeight );
-                    endSelectionRectangle.Offset( origin );
-                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, endSelectionRectangle, _color );
+                    Rectangle endSelectionRectangle = new Rectangle(0, endPos.Y, endPos.X, iEndCaretHeight);
+                    endSelectionRectangle.Offset(origin);
+                    TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, endSelectionRectangle, color);
                 }
             }
         }
 
         //----------------------------------------------------------------------
-        internal virtual void Draw( Rectangle _rect )
+        internal virtual void Draw(Rectangle rectangle)
         {
-            DrawSelection( _rect, TextArea.Screen.Style.DefaultTextColor * 0.3f );
+            DrawSelection(rectangle, TextArea.Screen.Style.DefaultTextColor * 0.3f);
 
-            if( TextArea.Screen.IsActive && TextArea.HasFocus )
+            if (TextArea.Screen.IsActive && TextArea.HasFocus)
             {
                 const float fBlinkInterval = 0.3f;
 
-                if( Timer % (fBlinkInterval * 2) < fBlinkInterval )
+                if (Timer % (fBlinkInterval * 2) < fBlinkInterval)
                 {
-                    Point caretPos = TextArea.GetPositionForCaret( EndOffset );
+                    Point caretPos = TextArea.GetPositionForCaret(EndOffset);
                     int iCaretHeight = TextArea.LineHeight;
 
-                    TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight ), TextArea.Screen.Style.DefaultTextColor );
+                    TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, new Rectangle(caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight), TextArea.Screen.Style.DefaultTextColor);
                 }
             }
         }
 
-        internal void SetCaretAt( Point _point, bool _bSelect )
+        internal void SetCaretAt(Point point, bool select)
         {
-            Move( _point.X, _point.Y / TextArea.LineHeight, _bSelect );
+            Move(point.X, point.Y / TextArea.LineHeight, select);
         }
 
-        internal void Move( int _iX, int _iLine, bool _bSelect )
+        internal void Move(int x, int line, bool select)
         {
             int iOffset = 0;
-            int iBlockLineIndex = Math.Max( 0, Math.Min( TextArea.WrappedLines.Count - 1, _iLine ) );
+            int iBlockLineIndex = Math.Max(0, Math.Min(TextArea.WrappedLines.Count - 1, line));
 
-            for( int iLine = 0; iLine < iBlockLineIndex; iLine++ )
+            for (int iLine = 0; iLine < iBlockLineIndex; iLine++)
             {
-                iOffset += TextArea.WrappedLines[ iLine ].Item1.Length;
+                iOffset += TextArea.WrappedLines[iLine].Item1.Length;
             }
 
-            int iOffsetInLine = ComputeCaretOffsetAtX( _iX, TextArea.WrappedLines[ iBlockLineIndex ].Item1, TextArea.Style.Font );
+            int iOffsetInLine = ComputeCaretOffsetAtX(x, TextArea.WrappedLines[iBlockLineIndex].Item1, TextArea.Style.Font);
             iOffset += iOffsetInLine;
-            if( _iLine < TextArea.WrappedLines.Count - 1 && iOffsetInLine == TextArea.WrappedLines[ iBlockLineIndex ].Item1.Length )
+            if (line < TextArea.WrappedLines.Count - 1 && iOffsetInLine == TextArea.WrappedLines[iBlockLineIndex].Item1.Length)
             {
                 iOffset--;
             }
 
-            if( _bSelect )
+            if (select)
             {
                 EndOffset = iOffset;
             }
@@ -179,82 +179,82 @@ namespace NuclearWinter.UI
                 StartOffset = iOffset;
             }
 
-            if( TextArea.CaretMovedHandler != null )
+            if (TextArea.CaretMovedHandler != null)
             {
-                TextArea.CaretMovedHandler( this );
+                TextArea.CaretMovedHandler(this);
             }
         }
 
-        internal void MoveStart( bool _bSelect )
+        internal void MoveStart(bool select)
         {
             int iLine;
-            TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            Move( 0, iLine, _bSelect );
+            TextArea.GetXYForCaretOffset(EndOffset, out iLine);
+            Move(0, iLine, select);
         }
 
-        internal void MoveEnd( bool _bSelect )
+        internal void MoveEnd(bool select)
         {
             int iLine;
-            TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            Move( int.MaxValue, iLine, _bSelect );
+            TextArea.GetXYForCaretOffset(EndOffset, out iLine);
+            Move(int.MaxValue, iLine, select);
         }
 
-        internal void MoveUp( bool _bSelect )
+        internal void MoveUp(bool select)
         {
             int iLine;
-            Point caretPos = TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            Move( caretPos.X, Math.Max( 0, iLine - 1 ), _bSelect );
+            Point caretPos = TextArea.GetXYForCaretOffset(EndOffset, out iLine);
+            Move(caretPos.X, Math.Max(0, iLine - 1), select);
         }
 
-        internal void MoveDown( bool _bSelect )
+        internal void MoveDown(bool select)
         {
             int iLine;
-            Point caretPos = TextArea.GetXYForCaretOffset( EndOffset, out iLine );
-            Move( caretPos.X, Math.Min( TextArea.WrappedLines.Count - 1, iLine + 1 ), _bSelect );
+            Point caretPos = TextArea.GetXYForCaretOffset(EndOffset, out iLine);
+            Move(caretPos.X, Math.Min(TextArea.WrappedLines.Count - 1, iLine + 1), select);
         }
 
-        int ComputeCaretOffsetAtX( int _iX, string _strText, UIFont _font )
+        int ComputeCaretOffsetAtX(int x, string text, UIFont font)
         {
             // FIXME: This does many calls to Style.Font.MeasureString
             // We should do a binary search instead!
             int iIndex = 0;
             float fPreviousX = 0f;
 
-            while( iIndex < _strText.Length )
+            while (iIndex < text.Length)
             {
                 iIndex++;
 
-                float fX = _font.MeasureString( _strText.Substring( 0, iIndex ) ).X;
-                if( fX > _iX )
+                float fX = font.MeasureString(text.Substring(0, iIndex)).X;
+                if (fX > x)
                 {
-                    bool bAfter = ( fX - _iX ) < ( ( fX - fPreviousX ) / 2f );
-                    return bAfter ? iIndex : ( iIndex - 1 );
+                    bool bAfter = (fX - x) < ((fX - fPreviousX) / 2f);
+                    return bAfter ? iIndex : (iIndex - 1);
                 }
 
                 fPreviousX = fX;
             }
 
-            return _strText.Length;
+            return text.Length;
         }
 
-        public void SetSelection( int _iStartOffset, int? _iEndOffset=null )
+        public void SetSelection(int startOffset, int? endOffset = null)
         {
-            StartOffset = _iStartOffset;
+            StartOffset = startOffset;
 
-            if( _iEndOffset.HasValue )
+            if (endOffset.HasValue)
             {
-                EndOffset = _iEndOffset.Value;
+                EndOffset = endOffset.Value;
             }
 
-            if( TextArea.CaretMovedHandler != null )
+            if (TextArea.CaretMovedHandler != null)
             {
-                TextArea.CaretMovedHandler( this );
+                TextArea.CaretMovedHandler(this);
             }
         }
     }
 
     //--------------------------------------------------------------------------
-    public class RemoteTextCaret: TextCaret
+    public class RemoteTextCaret : TextCaret
     {
         public Color CaretColor = Color.Black;
 
@@ -266,22 +266,22 @@ namespace NuclearWinter.UI
         float mfLabelAlpha = 0f;
 
         //----------------------------------------------------------------------
-        public RemoteTextCaret( string _strLabel, TextArea _textArea ): base ( _textArea )
+        public RemoteTextCaret(string label, TextArea textArea) : base(textArea)
         {
-            mstrLabelString = _strLabel;
-            
-            mvLabelSize = TextArea.Screen.Style.SmallFont.MeasureString( mstrLabelString );
+            mstrLabelString = label;
+
+            mvLabelSize = TextArea.Screen.Style.SmallFont.MeasureString(mstrLabelString);
         }
 
         //----------------------------------------------------------------------
-        public void OnMouseMove( Point _point )
+        public void OnMouseMove(Point point)
         {
-            Point caretPos = TextArea.GetPositionForCaret( EndOffset );
+            Point caretPos = TextArea.GetPositionForCaret(EndOffset);
             int iCaretHeight = TextArea.LineHeight;
 
-            Rectangle hitBox = new Rectangle( caretPos.X - 5, caretPos.Y, 10, iCaretHeight );
+            Rectangle hitBox = new Rectangle(caretPos.X - 5, caretPos.Y, 10, iCaretHeight);
 
-            if( hitBox.Contains( _point ) )
+            if (hitBox.Contains(point))
             {
                 mfLabelAlpha = 1.0f;
                 mfLabelAlphaTimer = 3.0f;
@@ -294,60 +294,60 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal override void Update( float _fElapsedTime )
+        internal override void Update(float elapsedTime)
         {
-            if( ! mbIsHovered )
+            if (!mbIsHovered)
             {
                 mfLabelAlphaTimer -= 0.05f;
-                mfLabelAlpha = MathHelper.Clamp( mfLabelAlphaTimer, 0, 1.0f );
+                mfLabelAlpha = MathHelper.Clamp(mfLabelAlphaTimer, 0, 1.0f);
             }
 
-            base.Update( _fElapsedTime );
+            base.Update(elapsedTime);
         }
 
         //----------------------------------------------------------------------
-        internal override void Draw( Rectangle _rect )
+        internal override void Draw(Rectangle rectangle)
         {
-            DrawSelection( _rect, CaretColor * 0.3f );
+            DrawSelection(rectangle, CaretColor * 0.3f);
 
-            Point caretPos = TextArea.GetPositionForCaret( EndOffset );
+            Point caretPos = TextArea.GetPositionForCaret(EndOffset);
             int iCaretHeight = TextArea.LineHeight;
 
             // Caret
-            TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight ), CaretColor );
+            TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, new Rectangle(caretPos.X, caretPos.Y, TextArea.Screen.Style.CaretWidth, iCaretHeight), CaretColor);
 
             // Label
-            TextArea.Screen.Game.SpriteBatch.Draw( TextArea.Screen.Game.WhitePixelTex, new Rectangle( caretPos.X - 4, caretPos.Y - (int)mvLabelSize.Y, (int)mvLabelSize.X + 6, (int)mvLabelSize.Y ), CaretColor * mfLabelAlpha );
-            TextArea.Screen.Game.SpriteBatch.DrawString( TextArea.Screen.Style.SmallFont, mstrLabelString, new Vector2( caretPos.X - 1, caretPos.Y - mvLabelSize.Y ), Color.White * mfLabelAlpha );
-            
+            TextArea.Screen.Game.SpriteBatch.Draw(TextArea.Screen.Game.WhitePixelTex, new Rectangle(caretPos.X - 4, caretPos.Y - (int)mvLabelSize.Y, (int)mvLabelSize.X + 6, (int)mvLabelSize.Y), CaretColor * mfLabelAlpha);
+            TextArea.Screen.Game.SpriteBatch.DrawString(TextArea.Screen.Style.SmallFont, mstrLabelString, new Vector2(caretPos.X - 1, caretPos.Y - mvLabelSize.Y), Color.White * mfLabelAlpha);
+
         }
     }
 
     //--------------------------------------------------------------------------
-    public class TextArea: Widget
+    public class TextArea : Widget
     {
         public class TextAreaStyle
         {
             public UIFont Font;
             public UIFont BoldFont;
 
-            public Color CommentColor = new Color( 0, 128, 0 );
+            public Color CommentColor = new Color(0, 128, 0);
 
-            public Color StringColor = new Color( 128, 128, 128 );
-            public Color NumberColor = new Color( 255, 0, 0 );
+            public Color StringColor = new Color(128, 128, 128);
+            public Color NumberColor = new Color(255, 0, 0);
 
-            public Color KeywordColor = new Color( 0, 0, 255 );
+            public Color KeywordColor = new Color(0, 0, 255);
             public bool KeywordBold = true;
 
-            public Color CustomKeywordColor = new Color( 0, 0, 128 );
+            public Color CustomKeywordColor = new Color(0, 0, 128);
             public bool CustomKeywordBold = true;
-            public string[] CustomKeywords = {};
+            public string[] CustomKeywords = { };
         }
 
         public TextAreaStyle Style = new TextAreaStyle();
 
         //----------------------------------------------------------------------
-        public string           Text
+        public string Text
         {
             get { return mstrText; }
             private set
@@ -357,7 +357,7 @@ namespace NuclearWinter.UI
 
                 miGutterWidth = 0;
 
-                if( DisplayLineNumbers )
+                if (DisplayLineNumbers)
                 {
                     UpdateGutterWidth();
                 }
@@ -365,10 +365,11 @@ namespace NuclearWinter.UI
         }
 
         bool mbDisplayLineNumbers;
-        public bool             DisplayLineNumbers
+        public bool DisplayLineNumbers
         {
             get { return mbDisplayLineNumbers; }
-            set {
+            set
+            {
                 mbDisplayLineNumbers = value;
                 UpdateGutterWidth();
             }
@@ -377,175 +378,179 @@ namespace NuclearWinter.UI
         void UpdateGutterWidth()
         {
             int iLines = 0;
-            for( int i = 0; i < mstrText.Length; i++ )
+            for (int i = 0; i < mstrText.Length; i++)
             {
-                if( mstrText[i] == '\n' ) iLines++;
+                if (mstrText[i] == '\n') iLines++;
             }
 
-            miGutterWidth = (int)Style.Font.MeasureString( ( iLines + 1 ).ToString() ).X + Padding.Right;
+            miGutterWidth = (int)Style.Font.MeasureString((iLines + 1).ToString()).X + Padding.Right;
         }
 
-        int                     miGutterWidth;
+        int miGutterWidth;
 
         //public bool             WrapLines;
 
-        List<Tuple<string,bool>> mlWrappedLines;
-        public List<Tuple<string,bool>> WrappedLines
+        List<Tuple<string, bool>> mlWrappedLines;
+        public List<Tuple<string, bool>> WrappedLines
         {
-            get {
-                if( mlWrappedLines == null )
+            get
+            {
+                if (mlWrappedLines == null)
                 {
-                    DoWrap( LayoutRect.Width - Padding.Horizontal - ( DisplayLineNumbers ? miGutterWidth : 0 ) );
+                    DoWrap(LayoutRect.Width - Padding.Horizontal - (DisplayLineNumbers ? miGutterWidth : 0));
                 }
-                return mlWrappedLines; 
+                return mlWrappedLines;
             }
-            private set {
+            private set
+            {
                 mlWrappedLines = value;
             }
         }
 
         public List<int> WrappedLineNumberMappings;
 
-        public TextCaret        Caret               { get; private set; }
-        public Dictionary<UInt16,RemoteTextCaret>
-                                RemoteCaretsById    { get; private set; }
-        public int              TabSpaces   = 4;
+        public TextCaret Caret { get; private set; }
+        public Dictionary<UInt16, RemoteTextCaret>
+                                RemoteCaretsById
+        { get; private set; }
+        public int TabSpaces = 4;
 
-        public bool             IsReadOnly;
+        public bool IsReadOnly;
 
         // FIXME: Properly support generic syntax highlighting instead
         // This is just a quick hack
-        public bool             EnableLuaHighlight;
+        public bool EnableLuaHighlight;
 
         // FIXME: Use EventHandler for those?
-        public Func<TextArea,int,string,bool>           TextInsertedHandler;
-        public Func<TextArea,int,int,bool>              TextRemovedHandler;
-        public Action<TextCaret>                        CaretMovedHandler;
+        public Func<TextArea, int, string, bool> TextInsertedHandler;
+        public Func<TextArea, int, int, bool> TextRemovedHandler;
+        public Action<TextCaret> CaretMovedHandler;
 
         //----------------------------------------------------------------------
-        public int              LineHeight  { get { return Style.Font.LineSpacing; } }
+        public int LineHeight { get { return Style.Font.LineSpacing; } }
 
         //----------------------------------------------------------------------
-        public Scrollbar        Scrollbar           { get; private set; }
+        public Scrollbar Scrollbar { get; private set; }
 
-        public Texture2D        PanelTex;
-
-        //----------------------------------------------------------------------
-        string                  mstrText;
-        bool                    mbWrapTextNeeded;
-
-        bool                    mbIsDragging;
-        bool                    mbScrollToCaret;
+        public Texture2D PanelTex;
 
         //----------------------------------------------------------------------
-        public TextArea( Screen _screen )
-        : base( _screen )
+        string mstrText;
+        bool mbWrapTextNeeded;
+
+        bool mbIsDragging;
+        bool mbScrollToCaret;
+
+        //----------------------------------------------------------------------
+        public TextArea(Screen screen)
+        : base(screen)
         {
-            Style.Font      = Screen.Style.ParagraphFont;
-            Style.BoldFont  = Screen.Style.ParagraphFont;
-            Text            = "";
+            Style.Font = Screen.Style.ParagraphFont;
+            Style.BoldFont = Screen.Style.ParagraphFont;
+            Text = "";
             mbWrapTextNeeded = true;
-            Caret           = new TextCaret( this );
-            RemoteCaretsById = new Dictionary<UInt16,RemoteTextCaret>();
+            Caret = new TextCaret(this);
+            RemoteCaretsById = new Dictionary<UInt16, RemoteTextCaret>();
 
-            Padding         = Screen.Style.TextAreaPadding;
+            Padding = Screen.Style.TextAreaPadding;
 
-            Scrollbar       = new Scrollbar( _screen );
+            Scrollbar = new Scrollbar(screen);
             Scrollbar.Parent = this;
 
-            PanelTex        = Screen.Style.TextAreaFrame;
+            PanelTex = Screen.Style.TextAreaFrame;
         }
 
         //----------------------------------------------------------------------
-        public override void DoLayout( Rectangle _rect )
+        public override void DoLayout(Rectangle rectangle)
         {
             Rectangle previousLayoutRect = LayoutRect;
-            base.DoLayout( _rect );
+            base.DoLayout(rectangle);
             HitBox = LayoutRect;
 
-            if( mbWrapTextNeeded || ( LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height ) )
+            if (mbWrapTextNeeded || (LayoutRect.Width != previousLayoutRect.Width || LayoutRect.Height != previousLayoutRect.Height))
             {
-                DoWrap( LayoutRect.Width - Padding.Horizontal - ( DisplayLineNumbers ? miGutterWidth : 0 ) );
+                DoWrap(LayoutRect.Width - Padding.Horizontal - (DisplayLineNumbers ? miGutterWidth : 0));
             }
 
             ContentHeight = Padding.Vertical + LineHeight * WrappedLines.Count + LineHeight / 2;
 
-            if( mbScrollToCaret )
+            if (mbScrollToCaret)
             {
-                Point caretPos = GetPositionForCaret( Caret.EndOffset );
+                Point caretPos = GetPositionForCaret(Caret.EndOffset);
                 int iCaretHeight = LineHeight;
 
-                if( caretPos.Y < LayoutRect.Top + 20 )
+                if (caretPos.Y < LayoutRect.Top + 20)
                 {
-                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Top + 20 );
+                    Scrollbar.Offset += caretPos.Y - (LayoutRect.Top + 20);
                 }
                 else
-                if( caretPos.Y > LayoutRect.Bottom - 20 - iCaretHeight )
+                if (caretPos.Y > LayoutRect.Bottom - 20 - iCaretHeight)
                 {
-                    Scrollbar.Offset += caretPos.Y - ( LayoutRect.Bottom - 20 - iCaretHeight );
+                    Scrollbar.Offset += caretPos.Y - (LayoutRect.Bottom - 20 - iCaretHeight);
                 }
 
                 mbScrollToCaret = false;
             }
 
-            Scrollbar.DoLayout( LayoutRect, ContentHeight );
+            Scrollbar.DoLayout(LayoutRect, ContentHeight);
         }
 
         //----------------------------------------------------------------------
-        public override Widget HitTest( Point _point )
+        public override Widget HitTest(Point point)
         {
-            return Scrollbar.HitTest( _point ) ?? base.HitTest( _point );
+            return Scrollbar.HitTest(point) ?? base.HitTest(point);
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseWheel( Point _hitPoint, int _iDelta )
+        protected internal override void OnMouseWheel(Point hitPoint, int delta)
         {
-            if( ( _iDelta < 0 && Scrollbar.Offset >= Scrollbar.Max )
-             || ( _iDelta > 0 && Scrollbar.Offset <= 0 ) )
+            if ((delta < 0 && Scrollbar.Offset >= Scrollbar.Max)
+             || (delta > 0 && Scrollbar.Offset <= 0))
             {
-                base.OnMouseWheel( _hitPoint, _iDelta );
+                base.OnMouseWheel(hitPoint, delta);
                 return;
             }
 
-            DoScroll( -_iDelta * 50 / 120 );
+            DoScroll(-delta * 50 / 120);
         }
 
         //----------------------------------------------------------------------
-        void DoScroll( int _iDelta )
+        void DoScroll(int delta)
         {
-            int iScrollChange = (int)MathHelper.Clamp( _iDelta, -Scrollbar.Offset, Math.Max( 0, Scrollbar.Max - Scrollbar.Offset ) );
+            int iScrollChange = (int)MathHelper.Clamp(delta, -Scrollbar.Offset, Math.Max(0, Scrollbar.Max - Scrollbar.Offset));
             Scrollbar.Offset += iScrollChange;
         }
 
         //----------------------------------------------------------------------
-        public void ScrollToCaret(){
+        public void ScrollToCaret()
+        {
             mbScrollToCaret = true;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseEnter( Point _hitPoint )
+        public override void OnMouseEnter(Point hitPoint)
         {
-            Screen.Game.SetCursor( MouseCursor.IBeam );
-            base.OnMouseEnter( _hitPoint );
+            Screen.Game.SetCursor(MouseCursor.IBeam);
+            base.OnMouseEnter(hitPoint);
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseOut( Point _hitPoint )
+        public override void OnMouseOut(Point hitPoint)
         {
-            Screen.Game.SetCursor( MouseCursor.Default );
-            base.OnMouseOut( _hitPoint );
+            Screen.Game.SetCursor(MouseCursor.Default);
+            base.OnMouseOut(hitPoint);
         }
 
         //----------------------------------------------------------------------
-        void SetCaretPosition( Point _hitPoint, bool _bSelect )
+        void SetCaretPosition(Point hitPoint, bool select)
         {
-            Caret.SetCaretAt( new Point( Math.Max( 0, _hitPoint.X - ( LayoutRect.X + Padding.Left + miGutterWidth ) ), _hitPoint.Y - ( LayoutRect.Y + Padding.Top ) + (int)Scrollbar.LerpOffset ), _bSelect );
+            Caret.SetCaretAt(new Point(Math.Max(0, hitPoint.X - (LayoutRect.X + Padding.Left + miGutterWidth)), hitPoint.Y - (LayoutRect.Y + Padding.Top) + (int)Scrollbar.LerpOffset), select);
         }
 
         //----------------------------------------------------------------------
-        internal Point GetPositionForCaret( int _iOffset )
+        internal Point GetPositionForCaret(int offset)
         {
-            Point caretPos = GetXYForCaretOffset( _iOffset );
+            Point caretPos = GetXYForCaretOffset(offset);
             caretPos.X += LayoutRect.X + Padding.Left + miGutterWidth;
             caretPos.Y += LayoutRect.Y + Padding.Top - (int)Scrollbar.LerpOffset;
 
@@ -553,100 +558,100 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        internal Point GetXYForCaretOffset( int _iCaretOffset )
+        internal Point GetXYForCaretOffset(int caretOffset)
         {
             int iLine;
-            return GetXYForCaretOffset( _iCaretOffset, out iLine );
+            return GetXYForCaretOffset(caretOffset, out iLine);
         }
 
         //----------------------------------------------------------------------
-        internal Point GetXYForCaretOffset( int _iCaretOffset, out int _iLine )
+        internal Point GetXYForCaretOffset(int caretOffset, out int line)
         {
             int iOffset = 0;
             int iLine = 0;
-            foreach( Tuple<string,bool> lineTuple in WrappedLines )
+            foreach (Tuple<string, bool> lineTuple in WrappedLines)
             {
-                if( iOffset + lineTuple.Item1.Length == _iCaretOffset && iLine < WrappedLines.Count - 1 )
+                if (iOffset + lineTuple.Item1.Length == caretOffset && iLine < WrappedLines.Count - 1)
                 {
                     iLine++;
-                    _iLine = iLine;
-                    return new Point( 0, iLine * LineHeight );
+                    line = iLine;
+                    return new Point(0, iLine * LineHeight);
                 }
 
-                if( iOffset + lineTuple.Item1.Length < _iCaretOffset )
+                if (iOffset + lineTuple.Item1.Length < caretOffset)
                 {
                     iOffset += lineTuple.Item1.Length;
                 }
                 else
                 {
-                    _iLine = iLine;
-                    return new Point( (int)Style.Font.MeasureString( lineTuple.Item1.Substring( 0, _iCaretOffset - iOffset ) ).X, iLine * LineHeight );
+                    line = iLine;
+                    return new Point((int)Style.Font.MeasureString(lineTuple.Item1.Substring(0, caretOffset - iOffset)).X, iLine * LineHeight);
                 }
 
                 iLine++;
             }
 
-            _iLine = iLine;
+            line = iLine;
             return Point.Zero;
         }
 
         //----------------------------------------------------------------------
-        public void DoWrap( int _iWidth )
+        public void DoWrap(int width)
         {
-            int iActualWidth = _iWidth;
-            mlWrappedLines = Screen.Game.WrapText( Style.Font, Text, iActualWidth );
+            int iActualWidth = width;
+            mlWrappedLines = Screen.Game.WrapText(Style.Font, Text, iActualWidth);
             mbWrapTextNeeded = false;
         }
 
         //----------------------------------------------------------------------
-        protected internal override bool OnMouseDown( Point _hitPoint, int _iButton )
+        protected internal override bool OnMouseDown(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return false;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return false;
 
             mbIsDragging = true;
 
-            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
-            SetCaretPosition( _hitPoint, bShift );
+            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.LeftShift, true) || Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.RightShift, true);
+            SetCaretPosition(hitPoint, bShift);
 
-            Screen.Focus( this );
+            Screen.Focus(this);
 
             return true;
         }
 
         //----------------------------------------------------------------------
-        public override void OnMouseMove( Point _hitPoint )
+        public override void OnMouseMove(Point hitPoint)
         {
-            if( mbIsDragging )
+            if (mbIsDragging)
             {
-                SetCaretPosition( _hitPoint, true );
+                SetCaretPosition(hitPoint, true);
             }
             else
             {
-                foreach( var remoteCaret in RemoteCaretsById.Values )
+                foreach (var remoteCaret in RemoteCaretsById.Values)
                 {
-                    remoteCaret.OnMouseMove( _hitPoint );
+                    remoteCaret.OnMouseMove(hitPoint);
                 }
             }
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnMouseUp( Point _hitPoint, int _iButton )
+        protected internal override void OnMouseUp(Point hitPoint, int button)
         {
-            if( _iButton != Screen.Game.InputMgr.PrimaryMouseButton ) return;
+            if (button != Screen.Game.InputMgr.PrimaryMouseButton) return;
 
-            if( mbIsDragging )
+            if (mbIsDragging)
             {
-                SetCaretPosition( _hitPoint, true );
+                SetCaretPosition(hitPoint, true);
                 mbIsDragging = false;
             }
         }
 
         //----------------------------------------------------------------------
-        protected internal override bool OnMouseDoubleClick( Point _hitPoint )
+        protected internal override bool OnMouseDoubleClick(Point hitPoint)
         {
-            SetCaretPosition( _hitPoint, true );
-            Caret.StartOffset = GetPreviousCaretStop( Caret.StartOffset );
-            Caret.EndOffset = GetNextCaretStop( Caret.StartOffset, false );
+            SetCaretPosition(hitPoint, true);
+            Caret.StartOffset = GetPreviousCaretStop(Caret.StartOffset);
+            Caret.EndOffset = GetNextCaretStop(Caret.StartOffset, false);
 
             return true;
         }
@@ -654,19 +659,19 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void DeleteSelectedText()
         {
-            if( ! Caret.HasSelection || IsReadOnly ) return;
+            if (!Caret.HasSelection || IsReadOnly) return;
 
             bool bHasForwardSelection = Caret.HasForwardSelection;
-            int iStartOffset        = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
-            int iEndOffset          = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
+            int iStartOffset = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
+            int iEndOffset = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
 
-            if( TextRemovedHandler == null || TextRemovedHandler( this, iStartOffset, iEndOffset ) )
+            if (TextRemovedHandler == null || TextRemovedHandler(this, iStartOffset, iEndOffset))
             {
                 // Merge start and end
-                Text = ( iStartOffset < Text.Length ? Text.Remove( iStartOffset ) : "" ) + Text.Substring( iEndOffset );
+                Text = (iStartOffset < Text.Length ? Text.Remove(iStartOffset) : "") + Text.Substring(iEndOffset);
 
                 // Clear selection
-                Caret.SetSelection( iStartOffset );
+                Caret.SetSelection(iStartOffset);
 
                 mbScrollToCaret = true;
             }
@@ -674,23 +679,24 @@ namespace NuclearWinter.UI
 
         public void CopySelectionToClipboard()
         {
-            if( Caret.HasSelection )
+            if (Caret.HasSelection)
             {
                 bool bHasForwardSelection = Caret.HasForwardSelection;
-                int iStartOffset        = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
-                int iEndOffset          = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
+                int iStartOffset = bHasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
+                int iEndOffset = bHasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
 
                 string strText = "";
-                strText += Text.Substring( iStartOffset, iEndOffset - iStartOffset );
+                strText += Text.Substring(iStartOffset, iEndOffset - iStartOffset);
 
 #if !FNA
                 // NOTE: For this to work, you must put [STAThread] before your Main()
-                
+
                 // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
                 try
                 {
-                    System.Windows.Forms.Clipboard.SetText( strText ); //, System.Windows.Forms.TextDataFormat.Html );
-                } catch {}
+                    System.Windows.Forms.Clipboard.SetText(strText); //, System.Windows.Forms.TextDataFormat.Html );
+                }
+                catch { }
 #else
                 SDL2.SDL.SDL_SetClipboardText( strText );
 #endif
@@ -699,30 +705,31 @@ namespace NuclearWinter.UI
 
         public void PasteFromClipboard()
         {
-            if( IsReadOnly ) return;
+            if (IsReadOnly) return;
 
 #if !FNA
             // NOTE: For this to work, you must put [STAThread] before your Main()
-            
+
             // TODO: Add HTML support - http://msdn.microsoft.com/en-us/library/Aa767917.aspx#unknown_156
             // GetText( System.Windows.Forms.TextDataFormat.Html );
             string strPastedText = null;
             try
             {
                 strPastedText = System.Windows.Forms.Clipboard.GetText();
-            } catch {}
+            }
+            catch { }
 #else
             string strPastedText = SDL2.SDL.SDL_GetClipboardText();
 #endif
-            if( strPastedText != null )
+            if (strPastedText != null)
             {
-                strPastedText = strPastedText.Replace( "\r\n", "\n" ).Replace( "\t", new String( ' ', TabSpaces ) );
+                strPastedText = strPastedText.Replace("\r\n", "\n").Replace("\t", new String(' ', TabSpaces));
                 DeleteSelectedText();
 
-                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strPastedText ) )
+                if (TextInsertedHandler == null || TextInsertedHandler(this, Caret.StartOffset, strPastedText))
                 {
-                    Text = Text.Insert( Caret.StartOffset, strPastedText );
-                    Caret.SetSelection( Caret.StartOffset + strPastedText.Length );
+                    Text = Text.Insert(Caret.StartOffset, strPastedText);
+                    Caret.SetSelection(Caret.StartOffset + strPastedText.Length);
                     mbScrollToCaret = true;
                 }
             }
@@ -731,63 +738,63 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public void SelectAll()
         {
-            Caret.SetSelection( 0, Text.Length );
+            Caret.SetSelection(0, Text.Length);
 
             mbIsDragging = false;
         }
 
         public void ClearSelection()
         {
-            Caret.SetSelection( Caret.StartOffset, Caret.StartOffset );
+            Caret.SetSelection(Caret.StartOffset, Caret.StartOffset);
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnTextEntered( char _char )
+        protected internal override void OnTextEntered(char @char)
         {
-            if( ! IsReadOnly && ! char.IsControl( _char ) )
+            if (!IsReadOnly && !char.IsControl(@char))
             {
                 DeleteSelectedText();
 
-                string strAddedText = _char.ToString();
-                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strAddedText ) )
+                string strAddedText = @char.ToString();
+                if (TextInsertedHandler == null || TextInsertedHandler(this, Caret.StartOffset, strAddedText))
                 {
-                    Text = Text.Insert( Caret.StartOffset, strAddedText );
-                    Caret.SetSelection( Caret.StartOffset + 1 );
+                    Text = Text.Insert(Caret.StartOffset, strAddedText);
+                    Caret.SetSelection(Caret.StartOffset + 1);
 
                     mbScrollToCaret = true;
                 }
             }
         }
 
-        protected internal override void OnOSKeyPress( OSKey _key )
+        protected internal override void OnOSKeyPress(OSKey key)
         {
-            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftControl, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightControl, true );
+            bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.LeftControl, true) || Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.RightControl, true);
             bool bShortcutKey = Screen.Game.InputMgr.IsShortcutKeyDown();
-            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.LeftShift, true ) || Screen.Game.InputMgr.KeyboardState.IsKeyDown( Keys.RightShift, true );
+            bool bShift = Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.LeftShift, true) || Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.RightShift, true);
 
-            switch( _key )
+            switch (key)
             {
                 case OSKey.A:
-                    if( bShortcutKey )
+                    if (bShortcutKey)
                     {
                         SelectAll();
                     }
                     break;
                 case OSKey.X:
-                    if( bShortcutKey )
+                    if (bShortcutKey)
                     {
                         CopySelectionToClipboard();
                         DeleteSelectedText();
                     }
                     break;
                 case OSKey.C:
-                    if( bShortcutKey )
+                    if (bShortcutKey)
                     {
                         CopySelectionToClipboard();
                     }
                     break;
                 case OSKey.V:
-                    if( bShortcutKey )
+                    if (bShortcutKey)
                     {
                         PasteFromClipboard();
                     }
@@ -796,81 +803,79 @@ namespace NuclearWinter.UI
 #if FNA
                 case OSKey.Return:
 #endif
-                    if( ! IsReadOnly )
+                    if (!IsReadOnly)
                     {
-                        int iLineStartIndex = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) ) + 1;
+                        int iLineStartIndex = Text.LastIndexOf('\n', Math.Max(0, Caret.StartOffset - 1)) + 1;
                         int iSpaces = 0;
-                        while( iLineStartIndex + iSpaces < Text.Length && Text[ iLineStartIndex + iSpaces ] == ' ' ) iSpaces++;
+                        while (iLineStartIndex + iSpaces < Text.Length && Text[iLineStartIndex + iSpaces] == ' ') iSpaces++;
 
-                        string strNewLine = "\n" + new String( ' ', iSpaces );
+                        string strNewLine = "\n" + new String(' ', iSpaces);
 
-                        if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strNewLine  ) )
+                        if (TextInsertedHandler == null || TextInsertedHandler(this, Caret.StartOffset, strNewLine))
                         {
-                            Text = Text.Insert( Caret.StartOffset, strNewLine );
-                            Caret.SetSelection( Caret.StartOffset + strNewLine.Length );
+                            Text = Text.Insert(Caret.StartOffset, strNewLine);
+                            Caret.SetSelection(Caret.StartOffset + strNewLine.Length);
                             mbScrollToCaret = true;
                         }
                     }
                     break;
                 case OSKey.Back:
-                    if( ! IsReadOnly )
+                    if (!IsReadOnly)
                     {
-                        if( Caret.HasSelection )
+                        if (Caret.HasSelection)
                         {
                             DeleteSelectedText();
                         }
-                        else
-                        if( Caret.StartOffset > 0 )
+                        else if (Caret.StartOffset > 0)
                         {
-                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartOffset - 1, Caret.StartOffset ) )
+                            if (TextRemovedHandler == null || TextRemovedHandler(this, Caret.StartOffset - 1, Caret.StartOffset))
                             {
-                                Caret.SetSelection( Caret.StartOffset - 1 );
-                                Text = Text.Remove( Caret.StartOffset, 1 );
+                                Caret.SetSelection(Caret.StartOffset - 1);
+                                Text = Text.Remove(Caret.StartOffset, 1);
                                 mbScrollToCaret = true;
                             }
                         }
                     }
                     break;
                 case OSKey.Delete:
-                    if( ! IsReadOnly )
+                    if (!IsReadOnly)
                     {
-                        if( Caret.HasSelection )
+                        if (Caret.HasSelection)
                         {
                             DeleteSelectedText();
                         }
-                        else
-                        if( Caret.StartOffset < Text.Length )
+                        else if (Caret.StartOffset < Text.Length)
                         {
-                            if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartOffset, Caret.StartOffset + 1 ) )
+                            if (TextRemovedHandler == null || TextRemovedHandler(this, Caret.StartOffset, Caret.StartOffset + 1))
                             {
-                                Text = Text.Remove( Caret.StartOffset, 1 );
+                                Text = Text.Remove(Caret.StartOffset, 1);
                                 mbScrollToCaret = true;
                             }
                         }
                     }
                     break;
                 case OSKey.Tab:
-                    if( ! IsReadOnly && ! bCtrl )
+                    if (!IsReadOnly && !bCtrl)
                     {
-                        if( Caret.HasSelection )
+                        if (Caret.HasSelection)
                         {
                             bool bWasForwardSelection = Caret.HasForwardSelection;
                             int iStartOffset = bWasForwardSelection ? Caret.StartOffset : Caret.EndOffset;
                             int iEndOffset = bWasForwardSelection ? Caret.EndOffset : Caret.StartOffset;
 
-                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, iStartOffset - 1 ) );
+                            int iLastLineBreak = Text.LastIndexOf('\n', Math.Max(0, iStartOffset - 1));
 
-                            if( ! bShift )
+                            if (!bShift)
                             {
-                                string strTab = new String( ' ', TabSpaces );
+                                string strTab = new String(' ', TabSpaces);
 
                                 do
                                 {
-                                    if( TextInsertedHandler == null || TextInsertedHandler( this, iLastLineBreak + 1, strTab ) )
+                                    if (TextInsertedHandler == null || TextInsertedHandler(this, iLastLineBreak + 1, strTab))
                                     {
-                                        Text = Text.Insert( iLastLineBreak + 1, strTab );
+                                        Text = Text.Insert(iLastLineBreak + 1, strTab);
 
-                                        if( iLastLineBreak + 1 <= iStartOffset )
+                                        if (iLastLineBreak + 1 <= iStartOffset)
                                         {
                                             iStartOffset += strTab.Length;
                                         }
@@ -878,218 +883,219 @@ namespace NuclearWinter.UI
                                         iEndOffset += strTab.Length;
                                     }
 
-                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1, Math.Max( 0, iEndOffset - iLastLineBreak - 2 ) );
+                                    iLastLineBreak = Text.IndexOf('\n', iLastLineBreak + 1, Math.Max(0, iEndOffset - iLastLineBreak - 2));
                                 }
-                                while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
+                                while (iLastLineBreak != -1 && iLastLineBreak < iEndOffset);
                             }
                             else
                             {
                                 do
                                 {
                                     int iSpaces = 0;
-                                    while( iLastLineBreak + 1 + iSpaces < Text.Length && iSpaces < TabSpaces && Text[ iLastLineBreak + 1 + iSpaces ] == ' ' ) iSpaces++;
+                                    while (iLastLineBreak + 1 + iSpaces < Text.Length && iSpaces < TabSpaces && Text[iLastLineBreak + 1 + iSpaces] == ' ') iSpaces++;
 
-                                    if( TextRemovedHandler == null || TextRemovedHandler( this, iLastLineBreak + 1, iLastLineBreak + 1 + iSpaces ) )
+                                    if (TextRemovedHandler == null || TextRemovedHandler(this, iLastLineBreak + 1, iLastLineBreak + 1 + iSpaces))
                                     {
-                                        Text = Text.Remove( iLastLineBreak + 1, iSpaces );
+                                        Text = Text.Remove(iLastLineBreak + 1, iSpaces);
 
-                                        if( iLastLineBreak + 1 <= iStartOffset )
+                                        if (iLastLineBreak + 1 <= iStartOffset)
                                         {
-                                            iStartOffset = Math.Max( iLastLineBreak + 1, iStartOffset - iSpaces );
+                                            iStartOffset = Math.Max(iLastLineBreak + 1, iStartOffset - iSpaces);
                                         }
 
                                         iEndOffset -= iSpaces;
                                     }
 
-                                    iLastLineBreak = Text.IndexOf( '\n', iLastLineBreak + 1, Math.Max( 0, iEndOffset - iLastLineBreak - 2 ) );
+                                    iLastLineBreak = Text.IndexOf('\n', iLastLineBreak + 1, Math.Max(0, iEndOffset - iLastLineBreak - 2));
                                 }
-                                while( iLastLineBreak != -1 && iLastLineBreak < iEndOffset );
+                                while (iLastLineBreak != -1 && iLastLineBreak < iEndOffset);
                             }
 
-                            Caret.SetSelection( bWasForwardSelection ? iStartOffset : iEndOffset, bWasForwardSelection ? iEndOffset : iStartOffset );
+                            Caret.SetSelection(bWasForwardSelection ? iStartOffset : iEndOffset, bWasForwardSelection ? iEndOffset : iStartOffset);
                         }
                         else
                         {
-                            int iLastLineBreak = Text.LastIndexOf( '\n', Math.Max( 0, Caret.StartOffset - 1 ) );
+                            int iLastLineBreak = Text.LastIndexOf('\n', Math.Max(0, Caret.StartOffset - 1));
 
-                            if( ! bShift )
+                            if (!bShift)
                             {
                                 int iDistance = 0;
-                                if( iLastLineBreak != -1 )
+                                if (iLastLineBreak != -1)
                                 {
                                     iDistance = Caret.StartOffset - iLastLineBreak - 1;
                                 }
 
                                 int iSpaces = TabSpaces - (iDistance % TabSpaces);
-                                if( iSpaces == 0 ) iSpaces = TabSpaces;
+                                if (iSpaces == 0) iSpaces = TabSpaces;
 
-                                string strTab = new String( ' ', iSpaces );
+                                string strTab = new String(' ', iSpaces);
 
-                                if( TextInsertedHandler == null || TextInsertedHandler( this, Caret.StartOffset, strTab ) )
+                                if (TextInsertedHandler == null || TextInsertedHandler(this, Caret.StartOffset, strTab))
                                 {
-                                    Text = Text.Insert( Caret.StartOffset, strTab );
-                                    Caret.SetSelection( Caret.StartOffset + strTab.Length );
+                                    Text = Text.Insert(Caret.StartOffset, strTab);
+                                    Caret.SetSelection(Caret.StartOffset + strTab.Length);
                                     mbScrollToCaret = true;
                                 }
                             }
-                            else
-                            if( Caret.StartOffset > 0 )
+                            else if (Caret.StartOffset > 0)
                             {
                                 int iStartIndex = Caret.StartOffset - iLastLineBreak - 1;
 
-                                int iSpacesToNearestTabStop = ( iStartIndex % TabSpaces );
-                                if( iSpacesToNearestTabStop == 0 ) iSpacesToNearestTabStop = TabSpaces;
+                                int iSpacesToNearestTabStop = (iStartIndex % TabSpaces);
+                                if (iSpacesToNearestTabStop == 0) iSpacesToNearestTabStop = TabSpaces;
 
                                 int iSpaces = 0;
-                                while( iLastLineBreak + iStartIndex - iSpaces >= 0 && iSpaces < iSpacesToNearestTabStop && Text[ iLastLineBreak + iStartIndex - iSpaces ] == ' ' ) iSpaces++;
+                                while (iLastLineBreak + iStartIndex - iSpaces >= 0 && iSpaces < iSpacesToNearestTabStop && Text[iLastLineBreak + iStartIndex - iSpaces] == ' ') iSpaces++;
 
-                                if( TextRemovedHandler == null || TextRemovedHandler( this, Caret.StartOffset - iSpaces, Caret.StartOffset ) )
+                                if (TextRemovedHandler == null || TextRemovedHandler(this, Caret.StartOffset - iSpaces, Caret.StartOffset))
                                 {
-                                    Text = Text.Remove( Caret.StartOffset - iSpaces, iSpaces );
-                                    Caret.SetSelection( Caret.StartOffset - iSpaces );
+                                    Text = Text.Remove(Caret.StartOffset - iSpaces, iSpaces);
+                                    Caret.SetSelection(Caret.StartOffset - iSpaces);
                                     mbScrollToCaret = true;
                                 }
                             }
                         }
                     }
                     break;
-                case OSKey.Left: {
-                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset ) - 1;
+                case OSKey.Left:
+                    {
+                        int iNewOffset = (bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset) - 1;
 
-                    if( bCtrl )
-                    {
-                        iNewOffset = GetPreviousCaretStop( iNewOffset );
-                    }
-                    else
-                    if( ! bShift && Caret.HasSelection )
-                    {
-                        if( Caret.HasBackwardSelection )
+                        if (bCtrl)
                         {
-                            iNewOffset = Caret.EndOffset;
+                            iNewOffset = GetPreviousCaretStop(iNewOffset);
+                        }
+                        else if (!bShift && Caret.HasSelection)
+                        {
+                            if (Caret.HasBackwardSelection)
+                            {
+                                iNewOffset = Caret.EndOffset;
+                            }
+                            else
+                            {
+                                iNewOffset++;
+                            }
+                        }
+
+                        if (bShift)
+                        {
+                            Caret.SetSelection(Caret.StartOffset, iNewOffset);
+                        }
+                        else
+                        {
+                            Caret.SetSelection(iNewOffset);
+                        }
+
+                        mbScrollToCaret = true;
+                        break;
+                    }
+                case OSKey.Right:
+                    {
+                        int iNewOffset = (bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset);
+
+                        if (bCtrl)
+                        {
+                            iNewOffset = GetNextCaretStop(iNewOffset);
+                        }
+                        else if (!bShift && Caret.HasSelection)
+                        {
+                            if (Caret.HasForwardSelection)
+                            {
+                                iNewOffset = Caret.EndOffset;
+                            }
+                            else
+                            {
+                                iNewOffset--;
+                            }
                         }
                         else
                         {
                             iNewOffset++;
                         }
-                    }
 
-                    if( bShift )
-                    {
-                        Caret.SetSelection( Caret.StartOffset, iNewOffset );
-                    }
-                    else
-                    {
-                        Caret.SetSelection( iNewOffset );
-                    }
-
-                    mbScrollToCaret = true;
-                    break;
-                }
-                case OSKey.Right: {
-                    int iNewOffset          = ( bShift || bCtrl ? Caret.EndOffset : Caret.StartOffset );
-
-                    if( bCtrl )
-                    {
-                        iNewOffset = GetNextCaretStop( iNewOffset );
-                    }
-                    else
-                    if( ! bShift && Caret.HasSelection )
-                    {
-                        if( Caret.HasForwardSelection )
+                        if (bShift)
                         {
-                            iNewOffset = Caret.EndOffset;
+                            Caret.SetSelection(Caret.StartOffset, iNewOffset);
                         }
                         else
                         {
-                            iNewOffset--;
+                            Caret.SetSelection(iNewOffset);
                         }
-                    }
-                    else
-                    {
-                        iNewOffset++;
-                    }
 
-                    if( bShift )
-                    {
-                        Caret.SetSelection( Caret.StartOffset, iNewOffset );
+                        mbScrollToCaret = true;
+                        break;
                     }
-                    else
-                    {
-                        Caret.SetSelection( iNewOffset );
-                    }
-
-                    mbScrollToCaret = true;
-                    break;
-                }
                 case OSKey.End:
-                    Caret.MoveEnd( bShift );
+                    Caret.MoveEnd(bShift);
                     mbScrollToCaret = true;
                     break;
                 case OSKey.Home:
-                    Caret.MoveStart( bShift );
+                    Caret.MoveStart(bShift);
                     mbScrollToCaret = true;
                     break;
                 case OSKey.Up:
-                    Caret.MoveUp( bShift );
+                    Caret.MoveUp(bShift);
                     mbScrollToCaret = true;
                     break;
                 case OSKey.Down:
-                    Caret.MoveDown( bShift );
+                    Caret.MoveDown(bShift);
                     mbScrollToCaret = true;
                     break;
-                case OSKey.PageUp: {
-                    Point target = GetPositionForCaret( Caret.EndOffset );
-                    target.Y -= LayoutRect.Height;
-                    SetCaretPosition( target, bShift );
-                    mbScrollToCaret = true;
-                    break;
-                }
-                case OSKey.PageDown: {
-                    Point target = GetPositionForCaret( Caret.EndOffset );
-                    target.Y += LayoutRect.Height;
-                    SetCaretPosition( target, bShift );
-                    mbScrollToCaret = true;
-                    break;
-                }
+                case OSKey.PageUp:
+                    {
+                        Point target = GetPositionForCaret(Caret.EndOffset);
+                        target.Y -= LayoutRect.Height;
+                        SetCaretPosition(target, bShift);
+                        mbScrollToCaret = true;
+                        break;
+                    }
+                case OSKey.PageDown:
+                    {
+                        Point target = GetPositionForCaret(Caret.EndOffset);
+                        target.Y += LayoutRect.Height;
+                        SetCaretPosition(target, bShift);
+                        mbScrollToCaret = true;
+                        break;
+                    }
                 default:
-                    base.OnOSKeyPress( _key );
+                    base.OnOSKeyPress(key);
                     break;
             }
         }
 
         //----------------------------------------------------------------------
-        int GetPreviousCaretStop( int _iOffset )
+        int GetPreviousCaretStop(int offset)
         {
-            if( _iOffset > 0 && _iOffset < mstrText.Length && mstrText[ _iOffset ] != '\n' )
+            if (offset > 0 && offset < mstrText.Length && mstrText[offset] != '\n')
             {
-                int iPreviousWordOffset = _iOffset;
-                char startChar = mstrText[ iPreviousWordOffset ];
+                int iPreviousWordOffset = offset;
+                char startChar = mstrText[iPreviousWordOffset];
 
                 bool bStartInWhitespace = startChar == ' ';
-                bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
+                bool bStartInWord = !bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf(startChar) == -1;
 
-                while( iPreviousWordOffset > 0 )
+                while (iPreviousWordOffset > 0)
                 {
-                    bool bIsLineBreak = mstrText[ iPreviousWordOffset - 1 ] == '\n';
-                    bool bIsWhiteSpace = mstrText[ iPreviousWordOffset - 1 ] == ' ' || bIsLineBreak;
-                    bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( mstrText[ iPreviousWordOffset - 1 ] ) == -1;
+                    bool bIsLineBreak = mstrText[iPreviousWordOffset - 1] == '\n';
+                    bool bIsWhiteSpace = mstrText[iPreviousWordOffset - 1] == ' ' || bIsLineBreak;
+                    bool bIsInWord = !bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf(mstrText[iPreviousWordOffset - 1]) == -1;
 
-                    if( bStartInWord )
+                    if (bStartInWord)
                     {
-                        if( ! bIsInWord || bIsWhiteSpace )
+                        if (!bIsInWord || bIsWhiteSpace)
                         {
                             break;
                         }
                     }
                     else
-                    if( bStartInWhitespace )
+                    if (bStartInWhitespace)
                     {
-                        if( bIsLineBreak )
+                        if (bIsLineBreak)
                         {
                             break;
                         }
 
-                        if( ! bIsWhiteSpace )
+                        if (!bIsWhiteSpace)
                         {
                             bStartInWhitespace = false;
                             bStartInWord = bIsInWord;
@@ -1097,96 +1103,96 @@ namespace NuclearWinter.UI
                     }
                     else
                     {
-                        if( bIsInWord || bIsWhiteSpace ) break;
+                        if (bIsInWord || bIsWhiteSpace) break;
                     }
 
                     iPreviousWordOffset--;
                 }
 
-                _iOffset = iPreviousWordOffset;
+                offset = iPreviousWordOffset;
             }
 
-            return _iOffset;
+            return offset;
         }
 
         //----------------------------------------------------------------------
-        int GetNextCaretStop( int _iOffset, bool _bGrabNextWhiteSpace=true )
+        int GetNextCaretStop(int offset, bool grabNextWhiteSpace = true)
         {
-            if( _iOffset < mstrText.Length )
+            if (offset < mstrText.Length)
             {
-                char startChar = Text[ _iOffset ];
+                char startChar = Text[offset];
 
-                _iOffset++;
+                offset++;
 
-                if( startChar != '\n' )
+                if (startChar != '\n')
                 {
                     bool bStartInWhitespace = startChar == ' ';
-                    bool bStartInWord = ! bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf( startChar ) == -1;
-                                
-                    while( _iOffset < mstrText.Length )
+                    bool bStartInWord = !bStartInWhitespace && TextManipulation.WordBoundaries.IndexOf(startChar) == -1;
+
+                    while (offset < mstrText.Length)
                     {
-                        bool bIsLineBreak = mstrText[ _iOffset ] == '\n';
-                        bool bIsWhiteSpace = mstrText[ _iOffset ] == ' ' || bIsLineBreak;
-                        bool bIsInWord = ! bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf( mstrText[ _iOffset ] ) == -1;
+                        bool bIsLineBreak = mstrText[offset] == '\n';
+                        bool bIsWhiteSpace = mstrText[offset] == ' ' || bIsLineBreak;
+                        bool bIsInWord = !bIsWhiteSpace && TextManipulation.WordBoundaries.IndexOf(mstrText[offset]) == -1;
 
-                        if( bIsLineBreak || ( bIsWhiteSpace && ! bStartInWhitespace && ! _bGrabNextWhiteSpace ) ) break;
+                        if (bIsLineBreak || (bIsWhiteSpace && !bStartInWhitespace && !grabNextWhiteSpace)) break;
 
-                        if( bStartInWord )
+                        if (bStartInWord)
                         {
-                            if( bIsWhiteSpace )
+                            if (bIsWhiteSpace)
                             {
                                 bStartInWhitespace = true;
                                 bStartInWord = false;
                             }
                             else
-                            if( ! bIsInWord )
+                            if (!bIsInWord)
                             {
                                 break;
                             }
                         }
                         else
-                        if( bStartInWhitespace )
+                        if (bStartInWhitespace)
                         {
-                            if( bIsLineBreak )
+                            if (bIsLineBreak)
                             {
                                 break;
                             }
 
-                            if( ! bIsWhiteSpace )
+                            if (!bIsWhiteSpace)
                             {
                                 break;
                             }
                         }
                         else
                         {
-                            if( bIsInWord || bIsWhiteSpace ) break;
+                            if (bIsInWord || bIsWhiteSpace) break;
                         }
 
-                        _iOffset++;
+                        offset++;
                     }
                 }
             }
 
-            return _iOffset;
+            return offset;
         }
 
         //----------------------------------------------------------------------
-        protected internal override void OnPadMove( Direction _direction )
+        protected internal override void OnPadMove(Direction direction)
         {
             return;
         }
 
         //----------------------------------------------------------------------
-        public override void Update( float _fElapsedTime )
+        public override void Update(float elapsedTime)
         {
-            Caret.Update( _fElapsedTime );
+            Caret.Update(elapsedTime);
 
-            foreach( var caret in RemoteCaretsById )
+            foreach (var caret in RemoteCaretsById)
             {
-                caret.Value.Update( _fElapsedTime );
+                caret.Value.Update(elapsedTime);
             }
 
-            Scrollbar.Update( _fElapsedTime );
+            Scrollbar.Update(elapsedTime);
         }
 
         enum HighlightType
@@ -1198,8 +1204,8 @@ namespace NuclearWinter.UI
             InlineComment,
             BlockComment
         }
-        
-        string[] LuaKeywords = { 
+
+        string[] LuaKeywords = {
             "and",      "break",    "do",       "else",         "elseif",
             "end",      "false",    "for",      "function",     "if",
             "in",       "local",    "nil",      "not",          "or",
@@ -1209,16 +1215,16 @@ namespace NuclearWinter.UI
         //----------------------------------------------------------------------
         public override void Draw()
         {
-            Screen.DrawBox( PanelTex, LayoutRect, Screen.Style.TextAreaFrameCornerSize, Color.White );
-            if( DisplayLineNumbers )
+            Screen.DrawBox(PanelTex, LayoutRect, Screen.Style.TextAreaFrameCornerSize, Color.White);
+            if (DisplayLineNumbers)
             {
-                Screen.DrawBox( Screen.Style.TextAreaGutterFrame, new Rectangle( LayoutRect.X, LayoutRect.Y, miGutterWidth + Padding.Left, LayoutRect.Height ), Screen.Style.TextAreaGutterCornerSize, Color.White );
+                Screen.DrawBox(Screen.Style.TextAreaGutterFrame, new Rectangle(LayoutRect.X, LayoutRect.Y, miGutterWidth + Padding.Left, LayoutRect.Height), Screen.Style.TextAreaGutterCornerSize, Color.White);
             }
 
             //------------------------------------------------------------------
             // Text
-            var rect = LayoutRect; rect.Inflate( -Screen.Style.TextAreaScissorOffset, -Screen.Style.TextAreaScissorOffset );
-            Screen.PushScissorRectangle( rect );
+            var rect = LayoutRect; rect.Inflate(-Screen.Style.TextAreaScissorOffset, -Screen.Style.TextAreaScissorOffset);
+            Screen.PushScissorRectangle(rect);
 
             int iX = LayoutRect.X + Padding.Left + miGutterWidth;
             int iY = LayoutRect.Y + Padding.Top;
@@ -1228,27 +1234,27 @@ namespace NuclearWinter.UI
 
             HighlightType hlType = HighlightType.None;
 
-            foreach( Tuple<string,bool> lineTuple in WrappedLines )
+            foreach (Tuple<string, bool> lineTuple in WrappedLines)
             {
                 float fTextY = iY + Style.Font.YOffset - Scrollbar.LerpOffset;
-                if( fTextY > LayoutRect.Bottom ) break;
+                if (fTextY > LayoutRect.Bottom) break;
 
                 bool bDraw = fTextY >= LayoutRect.Top - Style.Font.LineSpacing;
 
                 string strText = lineTuple.Item1;
 
-                if( bDraw && bNewLine &&  DisplayLineNumbers )
+                if (bDraw && bNewLine && DisplayLineNumbers)
                 {
                     string strLineNumber = iLine.ToString();
-                    int iWidth = (int)Style.Font.MeasureString( strLineNumber ).X;
-                    Screen.Game.SpriteBatch.DrawString( Style.Font, strLineNumber, new Vector2( LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, fTextY ), Screen.Style.DefaultTextColor * 0.5f );
+                    int iWidth = (int)Style.Font.MeasureString(strLineNumber).X;
+                    Screen.Game.SpriteBatch.DrawString(Style.Font, strLineNumber, new Vector2(LayoutRect.X + Padding.Left - Padding.Right + miGutterWidth - iWidth, fTextY), Screen.Style.DefaultTextColor * 0.5f);
                 }
 
-                if( ! EnableLuaHighlight )
+                if (!EnableLuaHighlight)
                 {
-                    if( bDraw )
+                    if (bDraw)
                     {
-                        Screen.Game.SpriteBatch.DrawString( Style.Font, strText, new Vector2( iX, fTextY ), Screen.Style.DefaultTextColor );
+                        Screen.Game.SpriteBatch.DrawString(Style.Font, strText, new Vector2(iX, fTextY), Screen.Style.DefaultTextColor);
                     }
                 }
                 else
@@ -1261,46 +1267,36 @@ namespace NuclearWinter.UI
                     int iOffset = 0;
                     bool bCharIsAlphanumeric = false;
 
-                    while( iOffset < strText.Length )
+                    while (iOffset < strText.Length)
                     {
                         char newChar = strText[iOffset];
 
                         bool bPrevCharIsAlphanumeric = bCharIsAlphanumeric;
-                        bool bCharIsAlpha = ( newChar >= 'A' && newChar <= 'Z' ) || ( newChar >= 'a' && newChar <= 'z' );
-                        bool bCharIsNumeric = ( newChar >= '0' && newChar <= '9' );
+                        bool bCharIsAlpha = (newChar >= 'A' && newChar <= 'Z') || (newChar >= 'a' && newChar <= 'z');
+                        bool bCharIsNumeric = (newChar >= '0' && newChar <= '9');
                         bCharIsAlphanumeric = bCharIsAlpha || bCharIsNumeric;
 
-                        if( ! bCharIsAlphanumeric || ! bPrevCharIsAlphanumeric )
+                        if (!bCharIsAlphanumeric || !bPrevCharIsAlphanumeric)
                         {
                             bool bAddCharAfter = true;
 
-                            if( hlType == HighlightType.BlockComment )
+                            if (hlType == HighlightType.BlockComment)
                             {
-                                if( newChar == ']' && ( iOffset > 0 ) && strText[iOffset - 1] == ']' )
+                                if (newChar == ']' && (iOffset > 0) && strText[iOffset - 1] == ']')
                                 {
                                     bAddCharAfter = false;
                                     hlType = HighlightType.None;
                                 }
                             }
                             else
-                            if( hlType == HighlightType.InlineComment )
+                            if (hlType == HighlightType.InlineComment)
                             {
-                                
+
                             }
                             else
-                            if( hlType == HighlightType.QuotedString )
+                            if (hlType == HighlightType.QuotedString)
                             {
-                                if( newChar == '\''  && ( iOffset == 0 || strText[iOffset - 1] != '\\' ) )
-                                {
-                                    color = Style.StringColor;
-                                    hlType = HighlightType.None;
-                                    bAddCharAfter = false;
-                                }
-                            }
-                            else
-                            if( hlType == HighlightType.DoubleQuotedString )
-                            {
-                                if( newChar == '"'  && ( iOffset == 0 || strText[iOffset - 1] != '\\' ) )
+                                if (newChar == '\'' && (iOffset == 0 || strText[iOffset - 1] != '\\'))
                                 {
                                     color = Style.StringColor;
                                     hlType = HighlightType.None;
@@ -1308,42 +1304,52 @@ namespace NuclearWinter.UI
                                 }
                             }
                             else
-                            if( hlType == HighlightType.Number )
+                            if (hlType == HighlightType.DoubleQuotedString)
                             {
-                                if( ! bCharIsAlphanumeric )
+                                if (newChar == '"' && (iOffset == 0 || strText[iOffset - 1] != '\\'))
+                                {
+                                    color = Style.StringColor;
+                                    hlType = HighlightType.None;
+                                    bAddCharAfter = false;
+                                }
+                            }
+                            else
+                            if (hlType == HighlightType.Number)
+                            {
+                                if (!bCharIsAlphanumeric)
                                 {
                                     color = Style.NumberColor;
                                     hlType = HighlightType.None;
                                 }
                             }
                             else
-                            if( newChar == '\'' )
+                            if (newChar == '\'')
                             {
-                                if( hlType == HighlightType.None )
+                                if (hlType == HighlightType.None)
                                 {
                                     hlType = HighlightType.QuotedString;
                                 }
                             }
                             else
-                            if( newChar == '"' )
+                            if (newChar == '"')
                             {
-                                if( hlType == HighlightType.None )
+                                if (hlType == HighlightType.None)
                                 {
                                     hlType = HighlightType.DoubleQuotedString;
                                 }
                             }
                             else
-                            if( bCharIsNumeric && ! bPrevCharIsAlphanumeric )
+                            if (bCharIsNumeric && !bPrevCharIsAlphanumeric)
                             {
-                                if( hlType == HighlightType.None )
+                                if (hlType == HighlightType.None)
                                 {
                                     hlType = HighlightType.Number;
                                 }
                             }
                             else
-                            if( newChar == '-' && ( iOffset < strText.Length - 1) && strText[iOffset + 1] == '-' )
+                            if (newChar == '-' && (iOffset < strText.Length - 1) && strText[iOffset + 1] == '-')
                             {
-                                if( iOffset < strText.Length - 3 && strText[iOffset + 2] == '[' && strText[iOffset + 3]  == '[' )
+                                if (iOffset < strText.Length - 3 && strText[iOffset + 2] == '[' && strText[iOffset + 3] == '[')
                                 {
                                     hlType = HighlightType.BlockComment;
                                 }
@@ -1353,13 +1359,13 @@ namespace NuclearWinter.UI
                                 }
                             }
                             else
-                            if( LuaKeywords.Contains( strAccumulator ) )
+                            if (LuaKeywords.Contains(strAccumulator))
                             {
                                 color = Style.KeywordColor;
                                 font = Style.KeywordBold ? Style.BoldFont : Style.Font;
                             }
                             else
-                            if( Style.CustomKeywords.Contains( strAccumulator ) )
+                            if (Style.CustomKeywords.Contains(strAccumulator))
                             {
                                 color = Style.CustomKeywordColor;
                                 font = Style.CustomKeywordBold ? Style.BoldFont : Style.Font;
@@ -1369,26 +1375,26 @@ namespace NuclearWinter.UI
                                 color = Screen.Style.DefaultTextColor;
                             }
 
-                            if( ! bAddCharAfter )
+                            if (!bAddCharAfter)
                             {
                                 strAccumulator += newChar;
                             }
 
-                            if( fTextY >= LayoutRect.Top - Style.Font.LineSpacing )
+                            if (fTextY >= LayoutRect.Top - Style.Font.LineSpacing)
                             {
-                                Screen.Game.SpriteBatch.DrawString( font, strAccumulator, new Vector2( iX + iXOffset, fTextY ), color );
-                                iXOffset += (int)font.MeasureString( strAccumulator ).X;
+                                Screen.Game.SpriteBatch.DrawString(font, strAccumulator, new Vector2(iX + iXOffset, fTextY), color);
+                                iXOffset += (int)font.MeasureString(strAccumulator).X;
                             }
 
                             strAccumulator = "";
                             font = Style.Font;
 
-                            if( bAddCharAfter )
+                            if (bAddCharAfter)
                             {
                                 strAccumulator += newChar;
                             }
 
-                            switch( hlType )
+                            switch (hlType)
                             {
                                 case HighlightType.BlockComment:
                                 case HighlightType.InlineComment:
@@ -1421,12 +1427,12 @@ namespace NuclearWinter.UI
                 iY += Style.Font.LineSpacing;
                 bNewLine = false;
 
-                if( lineTuple.Item2 )
+                if (lineTuple.Item2)
                 {
                     iLine++;
                     bNewLine = true;
 
-                    if( hlType == HighlightType.InlineComment )
+                    if (hlType == HighlightType.InlineComment)
                     {
                         hlType = HighlightType.None;
                     }
@@ -1435,28 +1441,28 @@ namespace NuclearWinter.UI
 
             //------------------------------------------------------------------
             // Draw carets & selections
-            foreach( var caret in RemoteCaretsById.Values )
+            foreach (var caret in RemoteCaretsById.Values)
             {
-                caret.Draw( new Rectangle( LayoutRect.X + Padding.Left + miGutterWidth, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - miGutterWidth, LayoutRect.Height - Padding.Vertical ) );
+                caret.Draw(new Rectangle(LayoutRect.X + Padding.Left + miGutterWidth, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - miGutterWidth, LayoutRect.Height - Padding.Vertical));
             }
 
-            Caret.Draw( new Rectangle( LayoutRect.X + Padding.Left + miGutterWidth, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - miGutterWidth, LayoutRect.Height - Padding.Vertical ) );
+            Caret.Draw(new Rectangle(LayoutRect.X + Padding.Left + miGutterWidth, LayoutRect.Y + Padding.Top, LayoutRect.Width - Padding.Horizontal - miGutterWidth, LayoutRect.Height - Padding.Vertical));
 
             Screen.PopScissorRectangle();
 
             Scrollbar.Draw();
         }
 
-        public void ReplaceContent( string _strText )
+        public void ReplaceContent(string text)
         {
-            Text = _strText;
+            Text = text;
 
             // Make sure caret is valid
-            int iStartOffset    = Caret.StartOffset;
-            int iEndOffset      = Caret.EndOffset;
+            int iStartOffset = Caret.StartOffset;
+            int iEndOffset = Caret.EndOffset;
 
-            Caret.StartOffset   = iStartOffset;
-            Caret.EndOffset     = iEndOffset;
+            Caret.StartOffset = iStartOffset;
+            Caret.EndOffset = iEndOffset;
         }
     }
 }
