@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using System;
 
 #if !FNA
 using OSKey = System.Windows.Forms.Keys;
@@ -238,6 +239,22 @@ namespace NuclearWinter.UI
 
         protected internal virtual void OnOSKeyPress(OSKey key)
         {
+            // allow user to handle keys
+            // if the user set the args.Handled to true no more processing will happen
+            var handlers = this.KeyPress;
+            if (handlers != null)
+            {
+                var args = new KeyPressEventArgs(key, this.Screen.Game.InputMgr.KeyboardState);
+                foreach (EventHandler<KeyPressEventArgs> handler in handlers.GetInvocationList())
+                {
+                    handler(this, args);
+                    if(args.Handled)
+                    {
+                        return;
+                    }
+                }
+            }
+
             bool bCtrl = Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.LeftControl, true) || Screen.Game.InputMgr.KeyboardState.IsKeyDown(Keys.RightControl, true);
 
             if (!bCtrl && key == OSKey.Tab)
@@ -309,5 +326,7 @@ namespace NuclearWinter.UI
         public abstract void Draw();
         protected internal virtual void DrawFocused() { }
         protected internal virtual void DrawHovered() { }
+
+        public EventHandler<KeyPressEventArgs> KeyPress;
     }
 }

@@ -55,6 +55,7 @@
     <Compile Include="i18n\Common.Designer.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\WindowMessageFilter.cs" />
+    <Compile Include="KeyPressEventArgs.cs" />
     <Compile Include="LocalizedKeyboardState.cs" />
     <Compile Include="MouseCursor.cs" />
     <Compile Include="NuclearGame.cs" />
