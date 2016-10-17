@@ -40,6 +40,12 @@ namespace NuclearWinter.UI
             }
         }
 
+        public Color Color
+        {
+            get;
+            set;
+        } = Color.White;
+
         //----------------------------------------------------------------------
         public Panel(Screen screen, Texture2D texture, int cornerSize)
         : base(screen)
@@ -124,7 +130,7 @@ namespace NuclearWinter.UI
         {
             if (Texture != null)
             {
-                Screen.DrawBox(Texture, new Rectangle(LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical), CornerSize, Color.White);
+                Screen.DrawBox(Texture, new Rectangle(LayoutRect.X + Margin.Left, LayoutRect.Y + Margin.Top, LayoutRect.Width - Margin.Horizontal, LayoutRect.Height - Margin.Vertical), CornerSize, this.Color);
             }
 
             if (DoClipping)
