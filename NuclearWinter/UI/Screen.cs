@@ -198,24 +198,30 @@ namespace NuclearWinter.UI
 
             if (!bHasMouseEvent)
             {
-                Widget hoveredWidget = (FocusedWidget == null ? null : FocusedWidget.HitTest(mouseHitPoint)) ?? Root.HitTest(mouseHitPoint);
-
                 if (mouseHitPoint != mPreviousMouseHitPoint)
                 {
                     if (mClickedWidget == null)
                     {
+                        // old code only checked focused widget for mouse hit which meant you would not get
+                        // Widget.OnMouseEnter and Widget.OnMMouseOut events on other widgets than the focussed
+                        var hoveredWidget = Root.HitTest(mouseHitPoint);
                         if (hoveredWidget != null && hoveredWidget == HoveredWidget)
                         {
                             HoveredWidget.OnMouseMove(mouseHitPoint);
                         }
                         else
                         {
-                            if (HoveredWidget != null)
+                            // cache previously hoveed widget and set the new hovered widget
+                            // before call OnMouseOut or else any handler that checks for
+                            // Widget.IsHovered will get an old result
+                            var previousHoveredWidget = this.HoveredWidget;
+                            this.HoveredWidget = hoveredWidget;
+
+                            if (previousHoveredWidget != null)
                             {
-                                HoveredWidget.OnMouseOut(mouseHitPoint);
+                                previousHoveredWidget.OnMouseOut(mouseHitPoint);
                             }
 
-                            HoveredWidget = hoveredWidget;
                             if (HoveredWidget != null)
                             {
                                 HoveredWidget.OnMouseEnter(mouseHitPoint);
