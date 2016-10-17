@@ -223,15 +223,37 @@ namespace NuclearWinter.UI
 
         // Called when a mouse button was pressed. Widget should return true if event was consumed
         // Otherwise it will bubble up to its parent
-        protected internal virtual bool OnMouseDown(Point hitPoint, int button) { return true; }
-        protected internal virtual void OnMouseUp(Point hitPoint, int button) { }
+        protected internal virtual bool OnMouseDown(Point hitPoint, int button)
+        {
+            this.MouseDown?.Invoke(this, hitPoint, button);
+            return true;
+        }
 
+        protected internal virtual void OnMouseUp(Point hitPoint, int button)
+        {
+            this.MouseUp?.Invoke(this, hitPoint, button);
+        }
 
-        protected internal virtual bool OnMouseDoubleClick(Point hitPoint) { return false; }
+        protected internal virtual bool OnMouseDoubleClick(Point hitPoint)
+        {
+            this.MouseDoubleClick?.Invoke(this, hitPoint);
+            return false;
+        }
 
-        public virtual void OnMouseEnter(Point hitPoint) { }
-        public virtual void OnMouseOut(Point hitPoint) { }
-        public virtual void OnMouseMove(Point hitPoint) { }
+        public virtual void OnMouseEnter(Point hitPoint)
+        {
+            this.MouseEnter?.Invoke(this, hitPoint);
+        }
+
+        public virtual void OnMouseOut(Point hitPoint)
+        {
+            this.MouseOut?.Invoke(this, hitPoint);
+        }
+
+        public virtual void OnMouseMove(Point hitPoint)
+        {
+            this.MouseMove?.Invoke(this, hitPoint);
+        }
 
         protected internal virtual void OnMouseWheel(Point hitPoint, int delta) { if (Parent != null) Parent.OnMouseWheel(hitPoint, delta); }
 
@@ -328,5 +350,11 @@ namespace NuclearWinter.UI
         protected internal virtual void DrawHovered() { }
 
         public EventHandler<KeyPressEventArgs> KeyPress;
+        public event Action<Widget, Point, int> MouseDown;
+        public event Action<Widget, Point, int> MouseUp;
+        public event Action<Widget, Point> MouseEnter;
+        public event Action<Widget, Point> MouseOut;
+        public event Action<Widget, Point> MouseMove;
+        public event Action<Widget, Point> MouseDoubleClick;
     }
 }
