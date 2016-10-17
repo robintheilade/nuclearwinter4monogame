@@ -64,11 +64,6 @@ namespace NuclearWinter.UI
         }
 
         //----------------------------------------------------------------------
-        public override Widget HitTest(Point point)
-        {
-            return ClickHandler != null ? base.HitTest(point) : null;
-        }
-
         public override void OnMouseEnter(Point hitPoint)
         {
             if (ClickHandler != null)
