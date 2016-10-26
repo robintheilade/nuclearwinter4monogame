@@ -48,6 +48,12 @@ namespace NuclearWinter.UI
         public Screen Screen { get; private set; }
         public Widget Parent;
 
+        public string ID
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Returns whether the widget is connected to its Screen's root
         /// </summary>
