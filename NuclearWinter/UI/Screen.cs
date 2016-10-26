@@ -377,6 +377,19 @@ namespace NuclearWinter.UI
             ResumeBatch();
         }
 
+        public void DoScissorRectangle(Rectangle scissorRectangle, Action action)
+        {
+            try
+            {
+                this.PushScissorRectangle(scissorRectangle);
+                action();
+            }
+            finally
+            {
+                this.PopScissorRectangle();
+            }
+        }
+
         public Rectangle ScissorRectangle
         {
             get { return mlScissorRects.Count > 0 ? mlScissorRects.Peek() : Game.GraphicsDevice.Viewport.Bounds; }
